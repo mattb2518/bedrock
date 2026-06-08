@@ -98,10 +98,13 @@ Infrastructure questions to answer before writing any code:
 4. CI/CD pipeline
 5. Local development environment on Windows/WSL2
 
+Before doing anything else, ask me for the GitHub personal access token. I'll paste it in chat. Store it in .env.local as GITHUB_TOKEN once the project is scaffolded — do not store it anywhere else or include it in any committed file.
+
 When you scaffold the project:
 - Create .env.local at the project root with all variables from SPEC.md Section 17 as placeholders
+- Add GITHUB_TOKEN with the value I provide
 - .gitignore already excludes .env.local — do not commit it
-- I will fill in actual values
+- I will fill in the remaining actual values
 
 Build sequence from the spec:
 Phase 1: Design system + quiz flow with mocked data
