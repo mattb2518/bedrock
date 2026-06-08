@@ -1137,3 +1137,50 @@ If you could move the needle on exactly one issue in American public life — on
 **REMINDER FOR MATT — two sessions to run with a more powerful model before build:**
 - **Recommendation engine logic:** Use Opus 4.7 or Deep Thinking mode for the matching formula design — multi-constraint optimization that benefits from deeper reasoning
 - **Full bias and competitive landscape check:** Run the complete quiz question set through Opus asking "what would a sophisticated critic from the left say, and from the right" — fresh eyes on the whole instrument at once
+---
+
+## 17. Environment Variables
+
+*All of these go in `.env.local` at the project root. This file is gitignored and never committed.*
+*Claude Code should create this file during initial scaffolding and populate it with placeholders.*
+
+```
+# GitHub
+GITHUB_TOKEN=your_token_here
+
+# Anthropic
+ANTHROPIC_API_KEY=your_key_here
+
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+
+# Google Civic Information API
+GOOGLE_CIVIC_API_KEY=your_key_here
+
+# OpenStates
+OPENSTATES_API_KEY=your_key_here
+
+# OpenSecrets
+OPENSECRETS_API_KEY=your_key_here
+
+# VoteSmart (free for nonprofits — apply at votesmart.org)
+VOTESMART_API_KEY=your_key_here
+
+# Ballotpedia (paid license — pending)
+BALLOTPEDIA_API_KEY=your_key_here
+
+# Plausible Analytics
+NEXT_PUBLIC_PLAUSIBLE_DOMAIN=bedrock.guide
+
+# Environment
+NEXT_PUBLIC_APP_ENV=development
+```
+
+*Notes:*
+- *Keys marked `NEXT_PUBLIC_` are exposed to the browser — only use for non-sensitive public identifiers*
+- *All others are server-side only*
+- *Ballotpedia key will be blank until licensing conversation is complete*
+- *VoteSmart key will be blank until nonprofit application is approved*
+- *During Phase 1 (mocked data), only ANTHROPIC_API_KEY and Supabase keys are needed*
