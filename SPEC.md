@@ -1360,6 +1360,8 @@ I'm not red. I'm not blue. I'm red, white, and blue. And I think more of us are 
 
 There's got to be a better way. This is mine.
 
+Your Civic Mantle isn't a label we put on you. It's something you claim.
+
 — Matt
 
 ---
@@ -1420,7 +1422,9 @@ Independent-minded voters don't think in absolutes. Neither does Bedrock.
 Every question lets you say "it depends" — and when you do, the quiz follows up. What does it depend on? Which situations? Which conditions? That follow-up is where the richest signal lives.
 
 **What you get.**
-Your civic identity first. A named type — one of ten — with a constellation that shows exactly how you got there across all eight dimensions. Not a party label. Not a left-right score. A plain-English summary of where you stand, what you're consistent on, and where you're genuinely torn.
+Your civic identity first. A named type — one of ten — with a constellation that shows exactly how you got there across all eight dimensions. We call it your Civic Mantle. The word is intentional — a mantle isn't assigned. It's something you recognize as yours and take up.
+
+Not a party label. Not a left-right score. A plain-English summary of where you stand, what you're consistent on, and where you're genuinely torn.
 
 *[COMPONENT: Constellation map — 10 Civic Mantle types, dominant dimensions, one-liner descriptions. Required on this page. Radar/spider chart, 8 axes, blue fill on dark navy. Shareable artifact.]*
 
@@ -1894,7 +1898,7 @@ Slide 2: Eyebrow "There's got to be a better way." / Headline "Find what you *ac
 Slide 3: Eyebrow "For the voters who haven't given up." / Headline "There's got to be a better way." (DM Sans 46px) / Subhead: independent voter audience
 
 **3. Civic Mantle + Three Pillars**
-Civic identity is the overarching layer — not a pillar itself. Needs visual design treatment to make the hierarchy clear (above or surrounding the three pillars). Copy: "Your Civic Mantle — one of ten named types, with a constellation unique to you. Everything below is built on top of it."
+Civic identity is the overarching layer — not a pillar itself. Needs visual design treatment to make the hierarchy clear (above or surrounding the three pillars). Copy: "Your Civic Mantle — one of ten named types, with a constellation unique to you. Everything below is built on top of it. Not a label. A mantle. Something to claim."
 
 Three pillars in order, each with tri-color accent bar:
 - Your ballot (red accent) — "Every race, matched to your values. From president to school board."
