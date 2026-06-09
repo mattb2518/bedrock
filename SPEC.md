@@ -69,7 +69,11 @@ Same quiz → recommended independent journalists, Substacks, podcasts matched t
 ### Account and Save/Return
 
 - Mandatory account creation (not optional)
-- **Account creation timing:** TBD — before quiz, after Layer 1, or at point of saving results. Decision needed before build.
+- **Account creation timing:** Optional and contextual — never forced except at one moment:
+  - Available (not required) before the quiz starts, for users who want to be signed in from the beginning
+  - Available (not required) after Layer 1, prompted alongside the constellation teaser as a "save your progress" nudge
+  - **Required** when the user explicitly clicks "Save and continue later" — that action only makes sense with an account to save to
+  - Users who complete the entire quiz in one sitting are never forced to create an account; prompted to save results at the end
 - Email link as backup save mechanism
 - System knows exactly where user is on return
 - Profile persists across sessions with recursive learning via Claude API
@@ -1126,7 +1130,7 @@ If you could move the needle on exactly one issue in American public life — on
 
 **NOTE FOR CLAUDE CODE:** These are unresolved design decisions requiring Matt's input. Flag them when relevant but do not make decisions on them independently. Raise them explicitly before proceeding with any build work that depends on them.
 
-1. Account creation timing — before quiz, after Layer 1, or at save point?
+1. ~~Account creation timing~~ — **resolved:** optional/contextual; required only at "Save and continue later"
 2. Importance ratings — still in or out? If in, belongs in Layer 3
 3. Open text on every question — every question or optional "want to say more?"
 4. Recommendation engine matching formula — biggest unresolved design question; **run a dedicated session with Opus 4.7 or Deep Thinking mode before speccing this**
