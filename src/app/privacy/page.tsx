@@ -57,6 +57,11 @@ export default function PrivacyPage() {
         </section>
 
         <section>
+          <h2 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-h3)", color: "var(--color-text-primary)", marginBottom: "var(--space-4)" }}>Google Sign-In.</h2>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-body)", color: "var(--color-text-secondary)", lineHeight: "var(--leading-relaxed)" }}>You can create an account and sign in using Google. This is entirely your choice — email and password (or a magic link) work just as well. If you use Google Sign-In, Google will know that you authenticated with Bedrock. We have no control over what Google does with that signal. If that concerns you — and given the nature of this platform, it's a reasonable concern — use email instead. We won't treat you differently either way.</p>
+        </section>
+
+        <section>
           <h2 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-h3)", color: "var(--color-text-primary)", marginBottom: "var(--space-4)" }}>Exactly two cookies.</h2>
           <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-body)", color: "var(--color-text-secondary)", lineHeight: "var(--leading-relaxed)", marginBottom: "var(--space-4)" }}>We set exactly two cookies. No third-party cookies. No tracking pixels. No fingerprinting.</p>
           <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
