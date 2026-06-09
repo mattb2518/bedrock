@@ -49,7 +49,7 @@ export default function SignUpPage() {
 
         <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-small)", color: "var(--color-text-muted)", textAlign: "center", marginTop: "var(--space-6)" }}>
           Already have an account?{" "}
-          <Link href="/auth/signin" style={{ color: "var(--color-blue-accent)" }}>Sign in</Link>
+          <Link href="/signin" style={{ color: "var(--color-blue-accent)" }}>Sign in</Link>
         </p>
 
         <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-micro)", color: "var(--color-text-muted)", textAlign: "center", marginTop: "var(--space-4)", lineHeight: "var(--leading-relaxed)" }}>

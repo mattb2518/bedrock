@@ -37,7 +37,7 @@ export default function SignInPage() {
 
         <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-small)", color: "var(--color-text-muted)", textAlign: "center", marginTop: "var(--space-6)" }}>
           Don't have an account?{" "}
-          <Link href="/auth/signup" style={{ color: "var(--color-blue-accent)" }}>Create one</Link>
+          <Link href="/signup" style={{ color: "var(--color-blue-accent)" }}>Create one</Link>
         </p>
       </div>
     </div>

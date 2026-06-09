@@ -7,8 +7,8 @@ const COOKIE_NAME = "bedrock_gate";
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Always allow the password gate page and its API route
-  if (pathname === "/gate" || pathname.startsWith("/api/gate")) {
+  // Always allow the password gate page, its API route, and auth pages
+  if (pathname === "/gate" || pathname.startsWith("/api/gate") || pathname === "/signin" || pathname === "/signup") {
     return NextResponse.next();
   }
 
