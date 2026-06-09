@@ -17,6 +17,7 @@ const aboutLinks = [
   { label: "About Bedrock", href: "/about" },
   { label: "How It Works", href: "/how-it-works" },
   { label: "FAQ", href: "/faq" },
+  { label: "Privacy & Data", href: "/privacy" },
 ];
 
 // The granite "B" mark — bold geometric letterform

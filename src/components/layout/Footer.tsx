@@ -58,7 +58,7 @@ export default function Footer() {
           <div>
             <Link href="/" style={{ textDecoration: "none", display: "inline-block", marginBottom: "var(--space-4)" }}>
               <span style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-h3)", fontWeight: "700", color: "var(--color-text-primary)" }}>
-                Bedrock
+                bedrock
               </span>
               <span style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-body)", fontWeight: "400", color: "var(--color-gold)" }}>
                 .guide
