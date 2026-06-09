@@ -249,7 +249,7 @@ export default function Home() {
         >
           From the{" "}
           <a
-            href="https://countryoverself.com"
+            href="https://www.countryoverself.com"
             target="_blank"
             rel="noopener noreferrer"
             style={{ color: "var(--color-text-secondary)" }}

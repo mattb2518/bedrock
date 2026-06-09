@@ -208,7 +208,7 @@ Frustrated-but-constructive. Optimistic and forward-looking. Not angry, not resi
 
 ## 6. Country Over Self Connection
 
-The Country Over Self podcast (countryoverself.com) is Bedrock's origin story and credibility credential. Founded and hosted by Matt Blumberg. Built around the philosophy "I'm not red, I'm not blue — I'm red, white, and blue."
+The Country Over Self podcast (www.countryoverself.com — always use www, bare domain doesn't resolve) is Bedrock's origin story and credibility credential. Founded and hosted by Matt Blumberg. Built around the philosophy "I'm not red, I'm not blue — I'm red, white, and blue."
 
 The podcast is a completed series — available on Spotify, Apple Podcasts, and YouTube. A second season is possible but not planned. Reference it as a completed work, not an ongoing one, unless that changes."
 

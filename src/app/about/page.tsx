@@ -54,7 +54,7 @@ export default function AboutPage() {
 
         <p>Bedrock is the same question pointed in a different direction. Not at the presidents. At the rest of us. The bedrock of democratic life isn't in Washington. It's in what ordinary citizens actually believe — and whether they show up knowing it.</p>
 
-        <p><a href="https://countryoverself.com" target="_blank" rel="noopener noreferrer" style={{ color: "var(--color-blue-accent)" }}>Listen to <em>Country Over Self</em> on Spotify, Apple Podcasts, or YouTube →</a></p>
+        <p><a href="https://www.countryoverself.com" target="_blank" rel="noopener noreferrer" style={{ color: "var(--color-blue-accent)" }}>Listen to <em>Country Over Self</em> on Spotify, Apple Podcasts, or YouTube →</a></p>
 
         <h2 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-h3)", color: "var(--color-text-primary)", marginTop: "var(--space-4)" }}>What I believe.</h2>
 
