@@ -34,7 +34,7 @@
 The quiz is the shared engine. It produces a civic identity — a named type and dimensional constellation — which is the overarching layer that powers everything else.
 
 **Civic Identity** (overarching layer, not a pillar)
-Values quiz → dimensional profile → named civic type (one of ten) + unique constellation radar chart. This is the foundation on which all three pillars rest. Displayed prominently above or around the three pillars on the homepage and results page — needs visual design treatment to make the hierarchy clear.
+Values quiz → dimensional profile → named Civic Mantle type (one of ten) + unique constellation radar chart. This is the foundation on which all three pillars rest. Displayed prominently above or around the three pillars on the homepage and results page — needs visual design treatment to make the hierarchy clear.
 
 **Pillar 1 — Your Ballot**
 Civic identity → personalized ballot recommendations for every race (president to school board) → printable guide → transparent sourcing
@@ -134,7 +134,7 @@ The dimensional model is Bedrock's core IP. Eight axes, each a genuine spectrum 
 
 ---
 
-## 4. The Ten Civic Types
+## 4. The Civic Mantle
 
 The output of the quiz. Each user gets:
 - **1 primary type** — dominant civic identity
@@ -143,7 +143,7 @@ The output of the quiz. Each user gets:
 - Edge case: near-pure primary acknowledged in copy ("You're one of the purest [Type]s we've seen")
 - Edge case: genuinely centered profile gets special treatment
 
-### Type Directory
+### Civic Mantle Directory
 
 | Label | Working Name | Dimension Profile (dominant poles) | One-liner |
 |---|---|---|---|
@@ -1422,7 +1422,7 @@ Every question lets you say "it depends" — and when you do, the quiz follows u
 **What you get.**
 Your civic identity first. A named type — one of ten — with a constellation that shows exactly how you got there across all eight dimensions. Not a party label. Not a left-right score. A plain-English summary of where you stand, what you're consistent on, and where you're genuinely torn.
 
-*[COMPONENT: Constellation map — 10 civic types, dominant dimensions, one-liner descriptions. Required on this page. Radar/spider chart, 8 axes, blue fill on dark navy. Shareable artifact.]*
+*[COMPONENT: Constellation map — 10 Civic Mantle types, dominant dimensions, one-liner descriptions. Required on this page. Radar/spider chart, 8 axes, blue fill on dark navy. Shareable artifact.]*
 
 Three things built on top of it:
 
@@ -1722,9 +1722,9 @@ Layer 1 maps your foundational values across eight dimensions — and ends with 
 *What's my constellation?*
 A radar chart unique to you — eight axes, one for each dimension, shaped by your answers. No two constellations look exactly alike. It appears for the first time at the end of Layer 1 and deepens as you complete the quiz. It's designed to be shareable.
 
-*What are the ten civic types?*
-The named output of the quiz — one primary type, plus secondary affinities. Each type has a plain-English label, a working name, a one-liner, and a dimensional profile. You'll recognize yourself in yours.
-Read the full type directory →
+*What is my Civic Mantle?*
+Your Civic Mantle is your named civic identity — one primary type out of ten, plus up to three secondary affinities. Think of it as the civic version of a Myers-Briggs result: a label that actually fits, a dimensional profile that shows your reasoning, and a constellation chart that's unique to you. The word mantle is intentional — it's something you claim, not something assigned to you.
+Explore the full Civic Mantle →
 
 *What is "it depends" and why is it a real answer?*
 Because for independent-minded voters it often is. When you select "it depends" the quiz follows up — asking what it depends on, which situations, which conditions. That follow-up is where the richest signal lives. We track your "it depends" patterns across the whole quiz because they tell us something important about how you think.
@@ -1884,7 +1884,7 @@ Appears only if user selects "drifted away," "registered but vote differently," 
 The homepage has four sections in order:
 
 **1. Nav**
-Mark (mountain/strata SVG) + wordmark (BEDROCK.guide) + nav links (How it works / The framework / About) + "Take the quiz" CTA button
+Mark (mountain/strata SVG) + wordmark (BEDROCK.guide) + nav links (Civic Mantle / How It Works / About) + "Take the quiz" CTA button
 
 **2. Hero**
 Rotating headline system — three slides, auto-advances every 5 seconds, dot indicators, manual click resets timer, buttons always visible below slides.
@@ -1893,8 +1893,8 @@ Slide 1: Eyebrow "Not red. Not blue." / Headline "All of it." (tri-color: red/wh
 Slide 2: Eyebrow "There's got to be a better way." / Headline "Find what you *actually* believe." (Libre Baskerville, gold italic on "actually") / Subhead: values quiz focus
 Slide 3: Eyebrow "For the voters who haven't given up." / Headline "There's got to be a better way." (DM Sans 46px) / Subhead: independent voter audience
 
-**3. Civic Identity + Three Pillars**
-Civic identity is the overarching layer — not a pillar itself. Needs visual design treatment to make the hierarchy clear (above or surrounding the three pillars). Copy: "Your civic identity — one of ten named types, with a constellation unique to you. Everything below is built on top of it."
+**3. Civic Mantle + Three Pillars**
+Civic identity is the overarching layer — not a pillar itself. Needs visual design treatment to make the hierarchy clear (above or surrounding the three pillars). Copy: "Your Civic Mantle — one of ten named types, with a constellation unique to you. Everything below is built on top of it."
 
 Three pillars in order, each with tri-color accent bar:
 - Your ballot (red accent) — "Every race, matched to your values. From president to school board."
@@ -1908,7 +1908,7 @@ Attribution: "From the *Country Over Self* podcast." (*Country Over Self* italic
 ### Nav Links — Two States
 
 **Public nav (pre-login):**
-Mark + wordmark · How It Works · The Framework · About · Take the Quiz (primary CTA button)
+Mark + wordmark · Civic Mantle · How It Works · About · Take the Quiz (primary CTA button)
 
 **App nav (post-login):**
 Mark + wordmark · Quiz · Your Ballot · Your Media · Your Conversations · My Profile · [account avatar]
@@ -2009,4 +2009,5 @@ Mark sits left of wordmark with ~14px gap
 
 ### Contact
 hello@bedrock.guide (all pages, all contexts)
+
 
