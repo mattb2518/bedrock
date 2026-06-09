@@ -27,9 +27,9 @@ function LogoMark() {
     <Image
       src="/logo-mark.svg"
       alt="Bedrock mark"
-      width={24}
-      height={24}
-      style={{ display: "block", flexShrink: 0 }}
+      width={20}
+      height={20}
+      style={{ display: "block", flexShrink: 0, marginTop: "1px" }}
       priority
     />
   );
@@ -108,7 +108,7 @@ export default function Nav() {
             flexShrink: 0,
             display: "flex",
             alignItems: "center",
-            gap: "14px",
+            gap: "8px",
           }}
         >
           <LogoMark />
@@ -129,7 +129,7 @@ export default function Nav() {
               fontSize: "var(--wordmark-tld-size-nav)",
               fontWeight: "var(--wordmark-tld-weight)",
               color: "var(--wordmark-tld)",
-              marginLeft: "-2px",
+              marginLeft: "-1px",
             }}
           >
             .guide
