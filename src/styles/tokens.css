@@ -225,6 +225,14 @@
   --nav-text:               var(--color-text-secondary);
   --nav-text-active:        var(--color-white);
   --nav-logo-color:         var(--color-white);
+  --wordmark-primary:        #E8E4DA;            /* "Bedrock" — full opacity */
+  --wordmark-tld:            rgba(232,228,218,0.45); /* ".guide" — muted, same family */
+  --wordmark-size-hero:      42px;
+  --wordmark-tld-size-hero:  28px;
+  --wordmark-size-nav:       18px;
+  --wordmark-tld-size-nav:   13px;
+  --wordmark-weight:         700;
+  --wordmark-tld-weight:     400;
 
 
   /* ============================================================
