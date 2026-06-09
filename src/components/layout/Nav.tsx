@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState, useRef, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -20,10 +21,18 @@ const aboutLinks = [
   { label: "Privacy & Data", href: "/privacy" },
 ];
 
-// Logo placeholder — replace with real granite logo once asset is ready
-// Drop the final SVG at public/logo.svg and swap this component to use <Image>
+// Logo mark — references public/logo-mark.svg (single source of truth per brand guidelines)
 function LogoMark() {
-  return null; // no placeholder — wait for real asset
+  return (
+    <Image
+      src="/logo-mark.svg"
+      alt="Bedrock mark"
+      width={24}
+      height={24}
+      style={{ display: "block", flexShrink: 0 }}
+      priority
+    />
+  );
 }
 
 export default function Nav() {
@@ -99,7 +108,7 @@ export default function Nav() {
             flexShrink: 0,
             display: "flex",
             alignItems: "center",
-            gap: "8px",
+            gap: "14px",
           }}
         >
           <LogoMark />
@@ -112,7 +121,7 @@ export default function Nav() {
               letterSpacing: "-0.01em",
             }}
           >
-            bedrock
+            Bedrock
           </span>
           <span
             style={{
@@ -120,7 +129,7 @@ export default function Nav() {
               fontSize: "var(--wordmark-tld-size-nav)",
               fontWeight: "var(--wordmark-tld-weight)",
               color: "var(--wordmark-tld)",
-              marginLeft: "-4px",
+              marginLeft: "-2px",
             }}
           >
             .guide
