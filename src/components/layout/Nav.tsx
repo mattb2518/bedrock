@@ -27,8 +27,8 @@ function LogoMark() {
     <Image
       src="/logo-mark.svg"
       alt="Bedrock mark"
-      width={20}
-      height={20}
+      width={28}
+      height={28}
       style={{ display: "block", flexShrink: 0 }}
       priority
     />
