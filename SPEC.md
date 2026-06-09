@@ -785,7 +785,7 @@ Climate and energy policy is one of the major questions of the era. Of the follo
 - Whether international competitiveness matters as much as domestic emissions
 - How you weigh costs on current energy users against future generations
 
-**[EE]:** *"The United States has more wind energy capacity than any country except China — enough to power about 46 million homes. Texas alone generates more wind power than most countries. The state that built its economy on oil quietly became one of the largest wind energy producers in the world, mostly because the economics made sense. American energy transitions have always been less ideological and more practical than the political debate suggests."*
+**[EE]:** *"The United States has more wind energy capacity than any country except China — enough to power about 46 million homes. Texas alone generates more wind power than most countries. The state that built its economy on oil is now one of the largest wind energy producers in the world."*
 
 ---
 
@@ -835,7 +835,7 @@ American public education produces wildly unequal outcomes depending almost enti
 - Whether you distinguish between charter schools and private vouchers
 - Whether you think the problem starts before kindergarten
 
-**[EE]:** *"The Perry Preschool Project, launched in 1962 in Ypsilanti, Michigan, enrolled 58 low-income children in a high-quality preschool and tracked them for 40 years. Those who attended were more likely to graduate high school, hold steady jobs, own homes, and stay out of prison. The return on investment was calculated at $7 to $12 for every dollar spent. One of the most studied interventions in American social policy."*
+**[EE]:** *"The Perry Preschool Project, launched in 1962 in Ypsilanti, Michigan, enrolled 58 low-income children in a high-quality preschool and tracked them for 40 years. Those who attended were more likely to graduate high school, hold steady jobs, own homes, and stay out of prison. One of the most studied interventions in American social policy."*
 
 ---
 
