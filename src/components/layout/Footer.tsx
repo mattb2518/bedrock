@@ -57,10 +57,10 @@ export default function Footer() {
           {/* Brand */}
           <div>
             <Link href="/" style={{ textDecoration: "none", display: "inline-block", marginBottom: "var(--space-4)" }}>
-              <span style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-h3)", fontWeight: "700", color: "var(--color-text-primary)" }}>
+              <span style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-h3)", fontWeight: "var(--wordmark-weight)", color: "var(--wordmark-primary)" }}>
                 bedrock
               </span>
-              <span style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-body)", fontWeight: "400", color: "var(--color-gold)" }}>
+              <span style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-body)", fontWeight: "var(--wordmark-tld-weight)", color: "var(--wordmark-tld)" }}>
                 .guide
               </span>
             </Link>
