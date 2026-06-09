@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
+import type { User } from "@supabase/supabase-js";
 
 const topNavLinks = [
   { label: "The Framework", href: "/methodology" },
@@ -43,12 +45,34 @@ function BMark({ size = 28 }: { size?: number }) {
 export default function Nav() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
   const aboutRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
+  const router = useRouter();
 
   const isAboutActive = aboutLinks.some(
     (l) => pathname === l.href || pathname.startsWith(l.href)
   );
+
+  // Subscribe to auth state
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data }) => setUser(data.user));
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+
+  async function handleSignOut() {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push("/");
+    router.refresh();
+  }
+
+  // Initials from email for avatar
+  const initials = user?.email ? user.email[0].toUpperCase() : "";
 
   // Close About dropdown on outside click
   useEffect(() => {
@@ -311,6 +335,81 @@ export default function Nav() {
           >
             Take the Quiz
           </Link>
+
+          {/* Auth: signed out → Sign in link; signed in → avatar + sign out */}
+          {user === null ? (
+            <Link
+              href="/signin"
+              style={{
+                fontFamily: "var(--font-body)",
+                fontSize: "var(--text-small)",
+                fontWeight: "var(--weight-medium)",
+                color: "var(--color-text-secondary)",
+                textDecoration: "none",
+                whiteSpace: "nowrap",
+                borderBottom: "2px solid transparent",
+                paddingBottom: "2px",
+                transition: "var(--transition-fast)",
+              }}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.color = "var(--color-text-primary)")
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.color = "var(--color-text-secondary)")
+              }
+            >
+              Sign in
+            </Link>
+          ) : (
+            <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}>
+              <Link
+                href="/profile"
+                title={user.email}
+                style={{
+                  width: "30px",
+                  height: "30px",
+                  borderRadius: "50%",
+                  backgroundColor: "var(--color-gold)",
+                  color: "#0a1628",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontFamily: "var(--font-body)",
+                  fontSize: "var(--text-small)",
+                  fontWeight: "var(--weight-bold)",
+                  textDecoration: "none",
+                  flexShrink: 0,
+                }}
+              >
+                {initials}
+              </Link>
+              <button
+                onClick={handleSignOut}
+                style={{
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  fontFamily: "var(--font-body)",
+                  fontSize: "var(--text-small)",
+                  fontWeight: "var(--weight-medium)",
+                  color: "var(--color-text-muted)",
+                  padding: 0,
+                  whiteSpace: "nowrap",
+                  transition: "var(--transition-fast)",
+                }}
+                onMouseEnter={(e) =>
+                  ((e.currentTarget as HTMLElement).style.color =
+                    "var(--color-text-primary)")
+                }
+                onMouseLeave={(e) =>
+                  ((e.currentTarget as HTMLElement).style.color =
+                    "var(--color-text-muted)")
+                }
+              >
+                Sign out
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Mobile hamburger */}
@@ -437,6 +536,57 @@ export default function Nav() {
           >
             Take the Quiz
           </Link>
+
+          {/* Mobile auth */}
+          <div style={{ borderTop: "1px solid var(--color-border)", paddingTop: "var(--space-3)" }}>
+            {user === null ? (
+              <Link
+                href="/signin"
+                onClick={() => setMenuOpen(false)}
+                style={{
+                  fontFamily: "var(--font-body)",
+                  fontSize: "var(--text-body)",
+                  fontWeight: "var(--weight-medium)",
+                  color: "var(--color-text-secondary)",
+                  textDecoration: "none",
+                }}
+              >
+                Sign in
+              </Link>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
+                <Link
+                  href="/profile"
+                  onClick={() => setMenuOpen(false)}
+                  style={{
+                    fontFamily: "var(--font-body)",
+                    fontSize: "var(--text-body)",
+                    fontWeight: "var(--weight-medium)",
+                    color: "var(--color-text-secondary)",
+                    textDecoration: "none",
+                  }}
+                >
+                  My Profile ({user.email})
+                </Link>
+                <button
+                  onClick={() => { setMenuOpen(false); handleSignOut(); }}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    fontFamily: "var(--font-body)",
+                    fontSize: "var(--text-body)",
+                    fontWeight: "var(--weight-medium)",
+                    color: "var(--color-text-muted)",
+                    padding: 0,
+                    textAlign: "left",
+                  }}
+                >
+                  Sign out
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       )}
 
