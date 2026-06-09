@@ -24,7 +24,7 @@ const faqs = [
   },
   {
     q: "Do I have to create an account?",
-    a: "No — you can take the quiz and see your results without an account. But to save your profile, access Your Ballot, Your Media Diet, and Your Conversations, and return to your results later, you'll need to create one. Account creation is free and requires only an email and password.",
+    a: "No — you can take the quiz and see your results without an account. But to save your civic profile and results, access Your Ballot, Your Media Diet, and Your Conversations, you'll need to create one. It's free. You can sign up with an email and password, a magic link (no password needed), or Google. If you're privacy-conscious about Google Sign-In, email is just as easy — we don't treat you differently either way.",
   },
   {
     q: "What do you do with my quiz answers?",
