@@ -29,15 +29,21 @@
 
 ## 2. Product Architecture
 
-### Two Pillars, One Quiz
+### Three Pillars, One Quiz, One Civic Identity
 
-The quiz is the shared engine that powers both pillars:
+The quiz is the shared engine. It produces a civic identity — a named type and dimensional constellation — which is the overarching layer that powers everything else.
+
+**Civic Identity** (overarching layer, not a pillar)
+Values quiz → dimensional profile → named civic type (one of ten) + unique constellation radar chart. This is the foundation on which all three pillars rest. Displayed prominently above or around the three pillars on the homepage and results page — needs visual design treatment to make the hierarchy clear.
 
 **Pillar 1 — Your Ballot**
-Values quiz → dimensional profile → personalized ballot recommendations for every race (president to school board) → printable guide
+Civic identity → personalized ballot recommendations for every race (president to school board) → printable guide → transparent sourcing
 
 **Pillar 2 — Your Media Diet**
-Same quiz → recommended independent journalists, Substacks, podcasts matched to dimensional profile
+Civic identity → recommended independent journalists, Substacks, podcasts in three tiers (confirming, expanding, challenging)
+
+**Pillar 3 — Your Conversations**
+Civic identity → Claude-powered chat interface for preparing and navigating difficult civic conversations across political difference. Uses the user's dimensional profile as persistent context. Broad scope — any civic disagreement, any time, not limited to election season.
 
 ### Quiz Architecture — Four Layers
 
@@ -1135,6 +1141,16 @@ If you could move the needle on exactly one issue in American public life — on
 5. Candidate data model — how positions map to dimensions
 6. Media diet MVP scope — how many sources at launch
 7. Outreach emails to Ballotpedia (data@ballotpedia.org) and VoteMate (partnerships@votemateus.org) — drafted in earlier session, pending Matt adding name/background before sending
+8. Cookie banner — **legal review required before launch:** confirm whether strictly-necessary-only cookie policy (exactly two cookies, Plausible analytics which is cookieless) requires a user consent banner under applicable law (GDPR, CCPA). If required, design minimal non-intrusive implementation consistent with privacy-first brand.
+9. Opt-out toggle for anonymized research — **required feature before launch:** users must be able to opt out of having their responses used in anonymized aggregate research. Accessible in account settings. Must be built and tested before Privacy & Data page goes live.
+10. Scoring logic open-source — **required before launch:** full scoring methodology to be documented and published on GitHub. Trust & Methodology page links to it directly.
+11. Anthropic API data handling — **confirm before launch:** verify current Anthropic API policy on data storage and model training. Update Privacy & Data "On Claude" section if policy has changed.
+12. Pricing/donation model — confirm before launch. FAQ currently flags this.
+13. Data sources and coverage limitations for ballot recommendations — confirm before launch. FAQ currently flags this.
+14. Media ratings methodology — confirm AllSides and Ad Fontes Media as primary sources before launch. FAQ currently flags this.
+15. Your Conversations — scope and UX to be fully specced. See Section 14.
+16. Homepage visual design — civic identity layer needs visual treatment above/around the three pillars. Design decision required before build.
+17. Demographic module interaction with scoring — **confirm before build:** how political lineage data interacts with dimensional scores in candidate matching. See Section 12.
 
 **REMINDER FOR MATT — two sessions to run with a more powerful model before build:**
 - **Recommendation engine logic:** Use Opus 4.7 or Deep Thinking mode for the matching formula design — multi-constraint optimization that benefits from deeper reasoning
@@ -1186,3 +1202,697 @@ NEXT_PUBLIC_APP_ENV=development
 - *Ballotpedia key will be blank until licensing conversation is complete*
 - *VoteSmart key will be blank until nonprofit application is approved*
 - *During Phase 1 (mocked data), only ANTHROPIC_API_KEY and Supabase keys are needed*
+
+---
+
+## 11. Page Copy Inventory
+
+*All copy finalized June 2026. Name throughout is "Bedrock" in prose. Domain bedrock.guide used in nav wordmark and URL contexts. Contact email hello@bedrock.guide throughout.*
+
+*Component placeholders marked [COMPONENT: ...] are required UI elements — not optional. Must be built before the relevant page goes live.*
+
+---
+
+### About Us
+
+**I'm not red. I'm not blue. I'm red, white, and blue.**
+And I couldn't find a single civic tool built for people who think that way. So I built one.
+
+**There's got to be a better way.**
+I'm frustrated — and I suspect you are too. Frustrated that real problems with real solutions sit unsolved year after year. Frustrated that the tools built for voters assume you have a party and flatten everything else. Frustrated that even engaged, thoughtful citizens walk into voting booths uninformed about most of what's on their ballot.
+
+But frustration without action is just noise. So instead of waiting for someone else to fix it, I built something.
+
+Our political system has become so polarized that real problems stop getting solved. Not because solutions don't exist. Because solving them would require leaders to put country over party. Over self. Over their next fundraising email.
+
+The issues most Americans actually agree on — and there are more of them than you think — sit unsolved year after year while our politicians perform outrage for their bases.
+
+Parties have nationalized every local race. The media ecosystem rewards the loudest voices and punishes the most honest ones. Leaders who could unite us have decided division is more useful to them.
+
+**The people this hurts most.**
+The fastest-growing voter segment in America — people who don't fully belong to either party — has no real civic infrastructure built for it.
+
+Every existing tool assumes a party as a starting point. The media ecosystem sorts you into a tribe whether you want one or not. The political conversation treats you as a swing voter to be captured rather than a citizen to be served.
+
+That's not an accident. It's a structural failure.
+
+Independent-minded voters aren't apathetic. They're often the most thoughtful people in the room. They deserve tools built specifically for them — tools that start from their values, not a party's. Tools that dig down to the bedrock of what they actually believe, not the tribal shortcuts everyone else offers.
+
+That's what Bedrock is. My answer to all of it.
+
+**The mission.**
+Help independent-minded citizens understand, articulate, and act on what they actually believe — because democracy works better when more people show up with clarity and conviction rather than confusion and indifference.
+
+Country over self isn't only a presidential virtue. It starts with citizens who know what they actually believe and show up ready to act on it.
+
+**Where this comes from.**
+I'm Matt Blumberg — technology entrepreneur, business author, and for the last several years, host of a podcast called *Country Over Self*. Vibe coded with Claude.
+
+The podcast grew out of a simple obsession: I've read over 150 presidential biographies, and the question I kept coming back to wasn't about policy or party. It was about character. When did American presidents choose the country over themselves? Over their power, their party, their legacy?
+
+What I found, over and over, was that courage in public life isn't partisan. It shows up on the left and the right. It always has.
+
+Bedrock is the same question pointed in a different direction. Not at the presidents. At the rest of us. The bedrock of democratic life isn't in Washington. It's in what ordinary citizens actually believe — and whether they show up knowing it.
+
+Listen to *Country Over Self* on Spotify, Apple Podcasts, or YouTube →
+
+**What I believe.**
+Democracy works better when more citizens understand what they actually believe and act on it. That's not a partisan position. It's a precondition for everything else.
+
+Civic identity isn't something you get assigned once. It's something you develop over time. Bedrock is built around that idea.
+
+And transparency isn't a feature. It's the foundation. If you don't understand how a tool works, you can't trust what it produces. So we show our work — every dimension, every methodology decision, every recommendation explained.
+
+**On bias.**
+Every tool has a perspective baked into it. Including this one.
+
+The eight dimensions Bedrock uses to map civic values were designed to be genuinely cross-partisan — every position at every pole has a defensible, honorable answer. We publish the methodology. We open-source the scoring logic.
+
+If you think we've gotten something wrong, there's a feedback mechanism on every question. Or email hello@bedrock.guide. I read it.
+
+**The long game.**
+Bedrock started as a passion project. It may someday grow into a nonprofit or public benefit corporation. Before then — and if and when it does — no political donors, no party affiliation, and published methodology.
+
+No interest in where you land. Only in helping you get there honestly.
+
+I'm not red. I'm not blue. I'm red, white, and blue. And I think more of us are than anyone in Washington wants to admit.
+
+There's got to be a better way. This is mine.
+
+— Matt
+
+---
+
+### How It Works
+
+**There's got to be a better way to articulate what you believe, with all its nuances.**
+Most civic quizzes give you a left-right score and call it a day. Bedrock doesn't. Here's what we actually do — and why.
+
+**It's a conversation, not a survey.**
+The quiz is designed to feel like a thoughtful back-and-forth, not a form. It follows up when your answers are interesting. It sits with complexity instead of flattening it. It lets you say "it depends" and actually means it.
+
+It saves your progress. It gets smarter every time you return.
+
+**Eight dimensions. Not two.**
+We don't put you on a left-right spectrum. We map you across eight dimensions of civic identity — the real tensions every thoughtful voter navigates whether they know it or not.
+
+Before you answer a single question, we show you all eight. No black boxes.
+
+Stability ↔ Change — Steady vs. Bold
+Local ↔ Federal — Close to Home vs. Bigger Stage
+National ↔ Global — Home First vs. Bigger Picture
+Rules ↔ Outcomes — Fair Process vs. Fair Result
+Markets ↔ Governance — Let It Compete vs. Set the Rules
+Pragmatism ↔ Idealism — What Works vs. What's Right
+Individual ↔ Collective — Personal vs. Shared Responsibility
+Trust ↔ Skepticism — Trust the System vs. Question It
+
+Every dimension has honorable, defensible positions at both ends. There is no right answer. There's only yours.
+
+Read the full methodology →
+
+**Four layers of questions.**
+The quiz builds in four stages — each one going deeper than the last.
+
+*Layer 1 — Your values foundation.*
+Twenty questions about what you believe at the level of principle. Closes with one question: of the eight dimensions, which feel most central to who you are as a voter? Then — before you move on — your constellation appears for the first time. A radar chart unique to you across all eight dimensions. The shape is yours. No one else's will look exactly like it.
+
+*Layer 2 — Your real-world positions.*
+Eight questions on actual policy debates and real events — chosen specifically because they produce cross-partisan discomfort. This is where stated values meet actual positions. Sometimes they align. Sometimes they don't. Both are useful.
+
+*Layer 3 — What drives your vote.*
+Eight questions about voting behavior, priority intensity, and the factors that have actually shaped how you've voted in the past. This layer sharpens how the recommendation engine weighs your profile.
+
+*Layer 4 — Where you draw the line.*
+The dealbreakers. The issues where a single position overrides everything else — democratic process, rights, governance conduct, character. Most civic tools never ask these questions. They're often the most predictive of all.
+
+**A little context — after the quiz.**
+Once you've completed the four layers, we ask a short set of optional questions about your political background: your relationship to political parties, where you're coming from ideologically, and basic geography and demographics.
+
+These come last deliberately. We don't ask them upfront because demographic context can color how people answer values questions — and we want your unfiltered thinking, not your tribal identity. Asked afterward, the same information becomes calibration data that helps us interpret your profile more accurately.
+
+You can skip them entirely. They're never used for anything other than improving your recommendations.
+
+**"It depends" is a real answer.**
+Independent-minded voters don't think in absolutes. Neither does Bedrock.
+
+Every question lets you say "it depends" — and when you do, the quiz follows up. What does it depend on? Which situations? Which conditions? That follow-up is where the richest signal lives.
+
+**What you get.**
+Your civic identity first. A named type — one of ten — with a constellation that shows exactly how you got there across all eight dimensions. Not a party label. Not a left-right score. A plain-English summary of where you stand, what you're consistent on, and where you're genuinely torn.
+
+*[COMPONENT: Constellation map — 10 civic types, dominant dimensions, one-liner descriptions. Required on this page. Radar/spider chart, 8 axes, blue fill on dark navy. Shareable artifact.]*
+
+Three things built on top of it:
+
+*Your ballot.* Every race we can reliably cover, matched to your values with a plain-English explanation of why. Transparent sourcing so you can check our work. Printable guide you can take to the polls.
+
+*Your media diet.* A three-tier recommendation — sources that deepen what you know, sources that expand how you think, and sources that challenge you where it counts. Not just media that agrees with you. Media that makes you smarter.
+
+*Your conversations.* A Claude-powered chat interface that uses your values profile to help you have difficult civic conversations across difference — with your uncle about immigration, your neighbor about guns, anyone across any divide. Knowing where you actually stand makes it easier to understand where someone else does.
+
+**Your profile is yours.**
+It lives in your account. It's used only to power your recommendations and conversations. No ads. No third parties. No political organizations. Ever.
+
+You can update it anytime. You can delete it anytime, completely and permanently.
+
+Read our full privacy and data policy →
+
+**Ready?**
+There's got to be a better way to show up as a citizen. This is it.
+
+Find your bedrock →
+
+---
+
+### Trust & Methodology
+
+**There's got to be a better way to earn trust.**
+Trust isn't claimed. It's built — through transparency, accountability, and showing your work. Here's ours.
+
+**Who built this.**
+Me — Matt Blumberg. Vibe coded with Claude.
+
+No political party. No political donors. No institutional backer with an agenda. A technology entrepreneur who got frustrated enough to build something.
+
+Read the full story →
+
+**Who funds this.**
+Right now: me personally.
+
+If the platform grows: small user donations, nonpartisan civic foundation grants, and potentially a nonprofit structure with full financial transparency. That may happen someday. Before then — and if and when it does — no political parties, PACs, political donors, advertising, or any organization with a stake in where you land will ever fund this.
+
+**The core design decision.**
+Most civic quizzes map you onto a single left-right spectrum. We think that's wrong — not just imprecise, but actively misleading. Real political identity is multidimensional. Flattening it into one axis loses almost everything that matters.
+
+So we built an eight-dimension model instead.
+
+Each dimension captures a genuine tension that every thoughtful voter navigates — not a proxy for party affiliation, not a coded version of left vs. right. Eight real spectrums, each with honorable positions at both ends.
+
+**The eight dimensions.**
+Before you answer a single question, we show you all eight. No black boxes.
+
+*[COMPONENT: Dimensions reference table — all eight dimensions with shorthand label, user-facing label, and one-sentence plain-English description. Required on this page.]*
+
+**The deep dive.**
+*For the skeptics. Each dimension explained fully — what it measures, why it's not a partisan proxy, and a concrete example of the tension in practice.*
+
+*1. Stability ↔ Change — Steady vs. Bold*
+How much should existing systems, institutions, and norms change — and how fast? This isn't about being timid or reckless. It's about whether you trust gradual improvement more than structural transformation, or vice versa. And it often depends — you might want bold change in healthcare but steady hands on the economy. That's not inconsistency. That's nuance, and we want to capture it.
+
+Example: When the criminal justice system produces unjust outcomes, do you want to reform it from within — better training, better laws, better accountability — or do you think the structure itself needs to be overhauled entirely?
+
+*2. Local ↔ Federal — Close to Home vs. Bigger Stage*
+When a problem needs solving, where should the decision-making power live — closest to the people affected, or at the scale needed to make it stick? Local control can mean responsiveness and accountability. Federal power can mean consistency and reach.
+
+Example: Should school curriculum be set by local school boards who know their communities, or by national standards that ensure every child gets the same foundation regardless of zip code?
+
+*3. National ↔ Global — Home First vs. Bigger Picture*
+When American interests and global cooperation pull in different directions, which wins — and how often? It's not isolationism vs. globalism. It's about where you draw the circle of concern, and why.
+
+Example: If a trade agreement would create jobs abroad and lower prices for American consumers, but cost American manufacturing jobs — is that a win, a loss, or something more complicated?
+
+*4. Rules ↔ Outcomes — Fair Process vs. Fair Result*
+If a process is fair but produces unequal outcomes, is that acceptable? If an outcome seems just but the process was messy, does that matter? This is one of the deepest tensions in democratic life.
+
+Example: A judge follows sentencing guidelines precisely and gives two people identical sentences for the same crime. One grew up with resources and opportunity, the other didn't. The process was identical. The impact on their lives won't be. Is that justice?
+
+*5. Markets ↔ Governance — Let It Compete vs. Set the Rules*
+When something important is broken — housing, healthcare, education, the environment — is the better lever competition and private incentives, or regulation and public investment? This isn't capitalism vs. socialism. It's a practical question about which tools work better, and when.
+
+Example: Prescription drug prices are high. Do you want more competition between pharmaceutical companies to drive prices down, or a government body that negotiates or sets prices directly?
+
+*6. Pragmatism ↔ Idealism — What Works vs. What's Right*
+Are your positions anchored to a vision of what should be — a principle you won't compromise — or are they constantly negotiated against what's actually achievable? Neither is naive. Both are honorable.
+
+Example: A bipartisan immigration bill would meaningfully reduce illegal crossings and create a path to legal status for long-term residents — but it requires compromises that neither side loves. Do you support passing it, or hold out for something that gets it more right?
+
+*7. Individual ↔ Collective — Personal vs. Shared Responsibility*
+Where does responsibility primarily live — with the individual, or with the community? This isn't about laziness vs. generosity, or freedom vs. control. It's about how you understand the relationship between personal agency and the systems people are born into.
+
+Example: Someone is struggling financially after a job loss. How much of their path forward is on them — and how much should a social safety net absorb?
+
+*8. Trust ↔ Skepticism — Trust the System vs. Question It*
+Do you believe existing institutions — courts, agencies, elections, media — are basically legitimate and worth working within? Or are they captured or structurally flawed in ways that demand challenge? Healthy skepticism has a long and honorable tradition across the entire political spectrum.
+
+Example: A court rules in a way you believe is deeply wrong. Do you accept it as legitimate even if you'll fight to change it, or do you think the institution itself has lost its claim to authority?
+
+**How we tested for bias.**
+Every dimension was designed so that both poles have defensible, honorable positions. Neither end should feel like the obviously correct answer or the obviously wrong one.
+
+We ran five stress tests before finalizing the model:
+
+*The partisan smell test* — does either pole secretly smell like Democrat or Republican? If yes, we rewrote it.
+
+*The independence test* — are the dimensions actually measuring different things, or are some just proxies for each other? We identified two pairs with redundancy risk and designed questions specifically to pull them apart.
+
+*The real person test* — we mapped eight distinct political archetypes across all eight dimensions and confirmed they produce genuinely different profiles with no dangerous overlap.
+
+*The questionability test* — can we write at least two or three good, non-leading questions for each dimension? If a dimension was real but unquestionable without sounding partisan, we fixed it.
+
+*The output test* — would two candidates with genuinely different governing philosophies score differently across these dimensions? We tested against real political figures. They do.
+
+**How the quiz is structured.**
+Four layers, each going deeper than the last. Full description in How It Works →
+
+*Layer 1 — Values foundation:* Twenty questions across three tiers — eight anchor questions establishing your baseline on each dimension, eight crossover questions loading on two dimensions simultaneously, and four synthesis questions loading on three or more at once. Closes with a dimension importance rating, then your first constellation reveal.
+
+*Layer 2 — Reality check:* Eight questions — real policy debates and actual events chosen specifically because they produce cross-partisan discomfort.
+
+*Layer 3 — Voting behavior:* Eight questions about what actually drives your vote — priority intensity, past patterns, decisive factors.
+
+*Layer 4 — Threshold questions:* The dealbreakers. Hard filters on democratic process, rights and dignity, governance conduct, and character. A single position here can override dimensional alignment in candidate matching.
+
+*Context module:* Optional questions about political background, asked after the four layers. Calibration data, not quiz scoring. Full explanation in How It Works →
+
+**How "it depends" works.**
+"It depends" is a first-class answer throughout — not a middle option, not a cop-out. When you select it the quiz follows up: what does it depend on? We track both the substantive lean when you do lean, and the pattern of which dimensions produce the most genuine uncertainty. Both inform matching.
+
+**How scoring works.**
+Your answers produce a profile across all eight dimensions — a multidimensional map of where you stand and how strongly. The importance ratings from Layer 1 act as weights. Threshold responses from Layer 4 act as hard filters.
+
+[FLAG: Full scoring logic to be documented and open-sourced before launch. This section will link to the published methodology on GitHub.]
+
+**What your profile powers.**
+Your civic identity — one of ten named types, with a constellation unique to you. Three things built on top of it: your ballot recommendations, your media diet, your conversations. Full descriptions in How It Works →
+
+**How we handle mistakes.**
+We'll make them. Here's the commitment:
+
+If a question is biased — we fix it and say so publicly. If a recommendation is wrong — we correct it and explain why. If our methodology has a flaw — we publish the flaw and the fix.
+
+Feedback mechanism on every question. hello@bedrock.guide for anything else. A human reads it. If your question reveals a gap in how we've explained ourselves, we update this page.
+
+**Three accountability commitments.**
+*Published methodology* — open to scrutiny, updated when we learn something. You're reading it now.
+
+*Open-source scoring logic* — you can see exactly how your profile is built. [FLAG: GitHub link to be added before launch.]
+
+*No political donors* — ever. The independence of this platform is non-negotiable.
+
+**Still skeptical?**
+Good. You should be. Skepticism is healthy — we built an entire dimension around it.
+
+hello@bedrock.guide. A human reads it.
+
+---
+
+### Privacy & Data
+
+**There's got to be a better way to talk about privacy.**
+Most privacy policies are written by lawyers for lawyers. This one is written for you. Same legal commitments. Plain English.
+
+**The short version.**
+We collect your quiz responses and build a civic profile from them. We use that profile to power your recommendations and conversations. That's it. Nothing else. Ever.
+
+No ads. No data brokers. No political organizations. No third parties. Full stop.
+
+**What we collect.**
+*When you create an account:*
+Your email address. Your password — encrypted, never readable by us. Two-factor authentication phone number, if you choose to add it.
+
+*When you take the quiz:*
+Your answers across all four layers. Your importance ratings. Your open-text responses. Your "it depends" follow-up answers. How your thinking changes over time as you return.
+
+*When you complete the context module:*
+Your optional responses about political background, geographic context, and basic demographics. These are treated identically to your quiz responses — same storage, same protections, same deletion. They are never used for anything other than improving your recommendations.
+
+*That's the complete list.* We don't collect your location, your browsing history, your contacts, or anything else.
+
+**How we use it.**
+Your profile powers four things:
+
+Your civic identity — the dimensional profile and named type that everything else is built on.
+
+Your ballot recommendations — matching your values to candidates and races.
+
+Your media recommendations — matching your civic identity to journalists, Substacks, and podcasts.
+
+Your conversations — providing context to the Claude-powered interface so it understands where you're coming from before you say a word.
+
+That's all. We don't analyze it for any other purpose. We don't sell it. We don't share it. We don't use it to train AI models.
+
+**Who sees it.**
+You. And the systems that power your experience.
+
+Not us personally — nobody at Bedrock reads your individual responses. Not Anthropic — your profile data doesn't pass to them beyond what's needed to process each conversation in real time. Not anyone else — ever, for any reason, including legal requests we consider overreaching.
+
+If we ever receive a legal demand for user data we'll notify you unless prohibited by law from doing so — and we'll fight requests we believe are inappropriate.
+
+**How we store it.**
+Your profile is encrypted at rest and in transit. Your password is hashed — even we can't read it. We use industry-standard security practices and update them regularly.
+
+Inactive accounts are flagged after two years with a simple question: want to keep your profile? If we don't hear back, we delete it.
+
+**Your rights.**
+You're in control. Always.
+
+*See it.* View your complete profile and all stored responses anytime from your account settings.
+
+*Update it.* Retake any section of the quiz and update your profile anytime.
+
+*Export it.* Download your complete profile as a plain-text document anytime.
+
+*Delete it.* Delete your account and all associated data permanently, anytime, in one click. No waiting period. Gone means gone.
+
+**On research.**
+We may use anonymized, aggregated data across all quiz responses for research purposes — to improve the quiz, publish civic insights, and better understand how independent voters think. Never individual responses. Never anything traceable to you.
+
+We'll publish any research we produce. If we learn something from your data, we share it with everyone.
+
+If you'd prefer your responses not be used even anonymously, you can opt out in account settings.
+
+**On cookies.**
+We use exactly two cookies — one to keep you logged in, one to remember your preferences. No tracking. No advertising. No third parties.
+
+For analytics we use Plausible — a privacy-first tool that doesn't track individual users and doesn't require cookies. We chose it specifically because it doesn't compromise your privacy to tell us how the product is performing.
+
+[FLAG: Legal review required before launch — confirm whether strictly-necessary-only cookie policy requires a user consent banner under GDPR, CCPA, or other applicable law. If required, implement minimal non-intrusive banner consistent with privacy-first brand.]
+
+**On Claude.**
+The quiz conversation and Your Conversations are powered by Claude — Anthropic's AI. Your responses are processed by Claude in real time. Anthropic does not store your individual responses or use them for model training. For Anthropic's full privacy practices, see anthropic.com/privacy.
+
+[FLAG: Confirm current Anthropic API data handling policy before launch. Update this section if policy has changed.]
+
+**Changes to this policy.**
+If we ever change how we handle your data in a meaningful way, we'll tell you directly — by email, before the change takes effect. Not buried in an updated terms of service. A plain email that says what's changing and why.
+
+You'll always have the option to delete your account before any change takes effect.
+
+**Questions.**
+hello@bedrock.guide. A human reads it.
+
+**The one-sentence version.**
+Your data powers your experience and nothing else — and you can delete all of it anytime in one click.
+
+---
+
+*[INTERNAL — Privacy & Data functionality required before launch:]*
+
+*Must-have before launch:*
+- Account deletion — one click, immediate, permanent, no loops
+- Profile export — download as plain text
+- Profile view — complete stored responses visible in account settings
+- Quiz retake — update any section independently
+- Opt-out toggle — responses excluded from anonymized research, accessible in account settings
+- Two-factor authentication — optional at account creation
+- Cookie audit — confirm exactly two cookies before policy goes live
+- Privacy-first analytics — Plausible confirmed and implemented before launch
+- Third-party script audit — confirm nothing loading additional cookies
+- Legal request notification system — alert users when demands received
+- Privacy policy change notification — email before changes take effect
+- Inactive account notification — two-year threshold, email prompt before deletion
+- Confirm Anthropic API data handling policy — update copy if needed
+- Cookie banner legal review — see Open Questions #8
+
+---
+
+### FAQ
+
+**There's got to be a better way to answer your questions.**
+So here they are — plain English, no hedging.
+
+**About Bedrock**
+
+*What is Bedrock?*
+A civic identity platform for independent-minded voters. It maps your values across eight dimensions, gives you a named civic identity and a constellation that's unique to you, then builds three things on top of it: personalized ballot recommendations, a curated media diet, and a Claude-powered conversation interface to help you talk across political difference.
+
+*Who is this for?*
+Anyone who thinks for themselves politically — especially people who don't fit neatly into either party. You don't have to be registered as an independent. You just have to be willing to answer honestly.
+
+*Is Bedrock partisan?*
+No. We have no party affiliation, no political donors, and no interest in where you land — only in helping you get there honestly. The quiz is designed so every position at every pole has a defensible, honorable answer. There is no right answer. There's only yours.
+
+*Who built this?*
+Matt Blumberg — technology entrepreneur, business author, and host of the *Country Over Self* podcast. Vibe coded with Claude. No political backing. No institutional agenda. Read the full story →
+
+*Is this free?*
+Yes. Creating an account and taking the quiz is free. If you find it valuable, there will be an option to support the platform — but it will never be paywalled.
+[FLAG: Confirm pricing/donation model before launch.]
+
+**About the Quiz**
+
+*How long does the quiz take?*
+About 15 minutes for a first pass through the four layers. Longer if you engage deeply with the open-text boxes and follow-up questions — which we encourage. The more you put in, the more accurate your profile.
+
+*What are the four layers?*
+Layer 1 maps your foundational values across eight dimensions — and ends with your first constellation reveal. Layer 2 tests those values against real policy debates and actual events. Layer 3 surfaces what actually drives your vote. Layer 4 asks the dealbreakers — the positions that override everything else. Read the full breakdown →
+
+*What's my constellation?*
+A radar chart unique to you — eight axes, one for each dimension, shaped by your answers. No two constellations look exactly alike. It appears for the first time at the end of Layer 1 and deepens as you complete the quiz. It's designed to be shareable.
+
+*What are the ten civic types?*
+The named output of the quiz — one primary type, plus secondary affinities. Each type has a plain-English label, a working name, a one-liner, and a dimensional profile. You'll recognize yourself in yours.
+Read the full type directory →
+
+*What is "it depends" and why is it a real answer?*
+Because for independent-minded voters it often is. When you select "it depends" the quiz follows up — asking what it depends on, which situations, which conditions. That follow-up is where the richest signal lives. We track your "it depends" patterns across the whole quiz because they tell us something important about how you think.
+
+*Can I retake the quiz?*
+Yes — any layer, any time. Your profile updates when you do. We'd encourage revisiting before every major election and after significant events that might shift your thinking.
+
+*What's the context module?*
+A short set of optional questions about your political background — asked after the four layers, not before. We ask them last deliberately: pre-quiz demographic questions can color how people answer values questions. Post-quiz, the same information becomes calibration data. You can skip it entirely.
+
+*What are the eight dimensions?*
+Stability↔Change, Local↔Federal, National↔Global, Rules↔Outcomes, Markets↔Governance, Pragmatism↔Idealism, Individual↔Collective, and Trust↔Skepticism. We show you all eight before you answer a single question. Read the full methodology →
+
+**About Your Ballot**
+
+*How do you match me to candidates?*
+Your dimensional profile, importance weights, and threshold filters run against candidate profiles built from public positions, voting records, and stated platforms. Claude generates a plain-English explanation of why each candidate matches or doesn't match your values.
+
+*How complete is the ballot coverage?*
+We cover every race we have reliable data for — federal, state, and local. Coverage varies by race and location. Some downballot races have limited public information and we'll tell you that honestly rather than guess. Transparent sourcing on every recommendation so you can check our work.
+[FLAG: Confirm data sources and coverage limitations before launch.]
+
+*Can I print my ballot guide?*
+Yes. Once your recommendations are generated you can print a clean, formatted guide to take to the polls.
+
+*What if I disagree with a recommendation?*
+Good — that's useful. There's a feedback mechanism on every recommendation. Tell us why you disagree and it informs both your profile and our methodology. Your profile is yours to update anytime.
+
+*Does Bedrock tell me who to vote for?*
+No. We show you how candidates align with your values and explain why. The vote is yours. Always.
+
+**About Your Media Diet**
+
+*How do you recommend media sources?*
+We curate a database of high-quality journalism, Substacks, and podcasts — rated for political lean, rigor, independence, and which civic dimensions they cover most thoughtfully. Your profile generates a three-tier recommendation: sources that deepen what you know, sources that expand how you think, and sources that challenge you where it counts.
+
+*Why three tiers? Why not just sources that match my views?*
+Because a media diet that only confirms what you already believe makes you a worse citizen, not a better one. The best independent voters maintain a deliberately balanced media diet. We think that's worth building into the product rather than leaving to chance.
+
+*How do you rate sources for bias and quality?*
+We use established credibility research — including AllSides and Ad Fontes Media — as our foundation for bias and quality ratings. We add our own dimension coverage tags indicating which of the eight civic dimensions each source addresses most rigorously.
+[FLAG: Confirm specific data sources and methodology for media ratings before launch.]
+
+*Can I suggest a source?*
+Yes — there's a suggestion mechanism in your media recommendations. We review every suggestion and update the database regularly.
+
+**About Your Conversations**
+
+*What is Your Conversations?*
+A Claude-powered chat interface that uses your values profile as context. You describe a difficult civic conversation you need to have — with a family member, a neighbor, a colleague — and Claude helps you prepare for it: understanding where the other person might be coming from, finding common ground, and navigating the disagreement productively rather than defensively.
+
+*What kinds of conversations can it help with?*
+Any civic disagreement across political difference. Immigration, guns, abortion, taxes, elections — if it's a topic where you and someone else see things differently, Your Conversations can help you approach it more thoughtfully.
+
+*Does it tell me what to say?*
+No. It helps you think. The goal isn't a script — it's clarity about where you stand, genuine curiosity about where the other person stands, and the tools to have a real conversation rather than a performative one.
+
+*Does it use my values profile?*
+Yes. Claude knows your dimensional profile before you say a word. You don't have to explain yourself from scratch every time. It meets you where you are.
+
+**About Your Account and Data**
+
+*Do I need an account?*
+Yes. Without an account your profile can't be saved and the product can't deliver on its core promise — a civic identity that deepens over time. Creating an account requires only an email and password.
+
+*What do you do with my data?*
+Power your experience and nothing else. No ads. No third parties. No political organizations. Ever. Read the full privacy policy →
+
+*Can I delete my account?*
+Yes — anytime, in one click, permanently. No waiting period. Gone means gone.
+
+*Is my political profile secure?*
+Yes. Encrypted at rest and in transit. Your password is hashed — even we can't read it.
+
+*What happens if Bedrock shuts down?*
+Before any shutdown we'll give users advance notice, the ability to export their complete profile as a plain-text document, and confirmation of permanent deletion. We won't disappear your data without warning.
+
+**About Country Over Self**
+
+*What is Country Over Self?*
+A podcast hosted by Matt Blumberg exploring the moments when American presidents chose the country over themselves — over their power, their party, their legacy. The intellectual origin of Bedrock. The same question that drove the podcast — what does it look like to put country over self — is the question this platform tries to help ordinary citizens answer in their own civic lives.
+
+Listen on Spotify, Apple Podcasts, or YouTube →
+
+**Still have a question?**
+hello@bedrock.guide. A human reads it.
+
+---
+
+## 12. Demographic Module
+
+*Asked after all four quiz layers — not before. Post-quiz demographic questions are calibration data that help interpret dimensional scores without biasing them. Explicitly not part of quiz scoring.*
+
+### Design Principles
+- Asked after the quiz — pre-quiz demographic questions contaminate answers by triggering tribal identity
+- Framed as context, not classification
+- Entire module is optional — users can skip entirely
+- Political lineage labels (Question 2) are deliberately specific and historically grounded — they signal that Bedrock understands the actual diversity within parties, not just party labels
+
+### Intro Copy
+"Last question — a little context helps us calibrate. How would you describe your political background?"
+
+### Question 1 — Political background
+"How would you describe your relationship to political parties?"
+
+- Always independent — never affiliated
+- Drifted away from a party — used to be closer to one
+- Registered with a party but vote differently
+- Currently affiliated — but it's complicated
+- It's complicated
+
+*Note: "It's complicated" as a standalone option validates the most honest answer for the target audience and will be the most-selected option after "always independent."*
+
+### Question 2 — Political lineage (conditional)
+Appears only if user selects "drifted away," "registered but vote differently," or "currently affiliated" in Question 1.
+
+"Which tradition feels most like your political background — even if you've moved away from it?"
+
+- Progressive / liberal Democrat
+- Moderate / centrist Democrat
+- Blue Dog / conservative Democrat
+- Moderate / Rockefeller Republican
+- Chamber of Commerce / business Republican
+- Social conservative Republican
+- National conservative / MAGA Republican
+- Libertarian
+- None of these feel right
+- It's complicated
+
+*Note: These labels are deliberately specific and historically grounded — they signal that Bedrock understands the actual diversity within parties, not just party labels.*
+
+### Question 3 — Basic demographics (optional block)
+"A little more context — optional, and never used for anything other than improving our recommendations:"
+
+- Age range: Under 30 / 30–44 / 45–59 / 60+
+- Geographic context: Urban / Suburban / Rural / Small town
+- Region: Northeast / South / Midwest / West / Other
+
+*Presented as a simple optional block, not individual required questions.*
+
+### Question 4 — Open text (optional)
+"Anything else about your political background that would help us understand where you're coming from? Totally optional — but we're genuinely curious."
+
+[Free text field — no character limit, no required response]
+
+### Data Handling
+- Demographic responses treated identically to quiz responses: same storage, same protections, same deletion rights
+- Never used for anything other than improving recommendations
+- Opt-out toggle in account settings applies to demographic data as well as quiz data
+- [FLAG: Demographic module requires its own section in the scoring/matching documentation — specifically how political lineage data interacts with dimensional scores in candidate matching. See Open Question #17.]
+
+---
+
+## 13. Homepage Architecture
+
+### Structure
+The homepage has four sections in order:
+
+**1. Nav**
+Mark (mountain/strata SVG) + wordmark (BEDROCK.guide) + nav links (How it works / The framework / About) + "Take the quiz" CTA button
+
+**2. Hero**
+Rotating headline system — three slides, auto-advances every 5 seconds, dot indicators, manual click resets timer, buttons always visible below slides.
+
+Slide 1: Eyebrow "Not red. Not blue." / Headline "All of it." (tri-color: red/white/blue, DM Sans 700 68px) / Subhead: full platform overview
+Slide 2: Eyebrow "There's got to be a better way." / Headline "Find what you *actually* believe." (Libre Baskerville, gold italic on "actually") / Subhead: values quiz focus
+Slide 3: Eyebrow "For the voters who haven't given up." / Headline "There's got to be a better way." (DM Sans 46px) / Subhead: independent voter audience
+
+**3. Civic Identity + Three Pillars**
+Civic identity is the overarching layer — not a pillar itself. Needs visual design treatment to make the hierarchy clear (above or surrounding the three pillars). Copy: "Your civic identity — one of ten named types, with a constellation unique to you. Everything below is built on top of it."
+
+Three pillars in order, each with tri-color accent bar:
+- Your ballot (red accent) — "Every race, matched to your values. From president to school board."
+- Your media diet (white accent) — "Independent journalism matched to how you actually think."
+- Your conversations (blue accent) — "Claude-powered prep for difficult conversations across difference."
+
+**4. Tagline band**
+*"Not red, not blue — red, white, and blue."* (gold italic Libre Baskerville 22px)
+Attribution: "From the *Country Over Self* podcast." (*Country Over Self* italicized)
+
+### Nav Links (confirmed)
+- How it works
+- The framework (links to Trust & Methodology)
+- About
+- Take the quiz (primary CTA button)
+
+---
+
+## 14. Your Conversations — Feature Spec
+
+*Third pillar. New scope added June 2026. Full UX spec TBD — this section captures the product decisions made to date.*
+
+### What It Is
+A Claude-powered chat interface that uses the user's dimensional profile as persistent context. Users describe a difficult civic conversation they need to have and Claude helps them prepare for it.
+
+### Core Interaction
+User inputs: the person they need to talk to, that person's approximate beliefs/position, and the topic. Claude, knowing the user's values profile, helps them:
+- Understand where the other person might be coming from
+- Identify genuine common ground
+- Navigate the disagreement productively rather than defensively
+- Approach the conversation with curiosity rather than opposition
+
+### Key Design Decisions
+- **Scope:** Broad — any civic disagreement, any time, not limited to election season
+- **Profile integration:** Claude has the user's full dimensional profile as context before the conversation begins. User doesn't need to explain themselves from scratch.
+- **Tab placement:** Separate tab in nav alongside Your Ballot and Your Media Diet
+- **Goal:** Clarity and preparation, not a script. The output is better thinking, not talking points.
+- **Tone:** Claude approaches these conversations as a thoughtful, non-judgmental guide — same voice as the rest of the product
+
+### Open Questions
+- UX design of the interface — form inputs vs. conversational prompt vs. structured template
+- Whether conversation history is saved and for how long
+- Whether Claude has access to information about the "other person" beyond what the user provides
+- Integration with ballot recommendations (e.g., "Help me talk to my neighbor about Candidate X")
+
+[FLAG: Full UX spec required before build. Add to build sequence after core quiz flow is stable.]
+
+---
+
+## 15. Visual Identity (Summary)
+
+*Full details in docs/brand-guidelines.md and src/styles/tokens.css. This section captures key decisions for Claude Code reference.*
+
+### Logo Mark
+Irregular mountain/rock peak silhouette with three horizontal wave bands:
+- Red fills from peak downward (top ~35%)
+- White is wave-edged middle band
+- Blue fills base (~50%)
+- Left-face shadow gradient for geological depth
+- SVG clipPath construction: polygon `points="0,60 0,52 3,47 6,50 11,41 29,4 33,13 37,8 41,17 45,11 51,20 56,15 60,19 60,60"`
+
+### Wordmark
+"BEDROCK" — Libre Baskerville 700, ~20px, all-caps, letter-spacing 0.05em
+".guide" appended — Libre Baskerville 400, ~13px, rgba(232,228,218,0.45), same baseline
+Mark sits left of wordmark with ~14px gap
+
+### Colors
+- Page background: #1A2D45
+- Nav bar: #132238
+- Crimson: #D44035
+- Warm white: #E8E4DA
+- Blue: #6B9FEA
+- Gold: #C8A96E
+
+### Typography
+- Display/headings: Libre Baskerville
+- Body/UI: DM Sans
+- Both Google Fonts
+
+### Contact
+hello@bedrock.guide (all pages, all contexts)
+
