@@ -339,6 +339,8 @@ When something in society isn't working well, what's your instinct?
 
 **It depends** → OT: *"What shapes your answer — the stakes, who's affected, the track record of change in that area?"*
 
+**[EE]:** *"In the 1920s the United States amended the Constitution to ban alcohol, then amended it again to unban alcohol thirteen years later. The GI Bill of 1944 paid for the education of 7.8 million veterans and is widely credited with creating the postwar middle class. Two consequential acts of bold change, one generation apart."*
+
 *Note: A1 carries four substantive options instead of the usual three. This is deliberate on the foundational dimension — the original three were all change-positive (mild, bold, structural) and missed the strong-stability position.*
 
 ---
@@ -482,6 +484,8 @@ When a major American expert institution — a federal regulatory agency, a scie
 *"Trust by track record — calibrate based on how the institution has done on this kind of question before. The CDC gets more benefit of the doubt on epidemiology than on nutrition."*
 
 **It depends** → OT: *"What shapes how much trust you extend — the type of institution, whether you can see their reasoning, whether they have a stake in the outcome?"*
+
+**[EE]:** *"Gallup has tracked American confidence in major institutions since the 1970s. Confidence in the US military has roughly doubled over that period. Confidence in Congress has fallen by about three-quarters. Same country, same Americans — two federal institutions on opposite trajectories."*
 
 ---
 
@@ -651,6 +655,8 @@ A major industry — pharmaceuticals, social media, financial services — has p
 - Whether the industry is genuinely competitive
 - Whether the harm is ongoing
 
+**[EE]:** *"The Sherman Antitrust Act of 1890 was passed by Republicans, signed by a Republican president, and used most aggressively in its first thirty years against Republican-allied corporations like Standard Oil. The political coalition around antitrust has changed two or three times since."*
+
 ---
 
 ### SYNTHESIS QUESTIONS (4)
@@ -759,6 +765,8 @@ The United States spends more on healthcare per person than any other wealthy co
 *"The simplifying answer. Administrative overhead consumes about 30 cents of every American healthcare dollar — a cost most other systems don't carry."*
 
 **It depends** → OT: *"What do you think is the most broken part — costs, access, quality, insurance complexity?"*
+
+**[EE]:** *"American healthcare spends roughly $1 trillion a year on administrative costs alone — more than the entire GDP of Sweden or Switzerland. A 2021 federal rule required hospitals to publish their prices. Most still haven't."*
 
 
 ---
@@ -1051,6 +1059,8 @@ When an incumbent is running for reelection, how does that affect your thinking?
 
 **It depends** → OT: *"What shapes how you think about incumbents — the office, how long they've served, what they did with the time?"*
 
+**[EE]:** *"'Throw out the bums — but not my bums.' Congressional reelection rates have been above 90% in every cycle since 1996. Public approval of Congress over the same period has averaged 20%. Americans don't want to throw the bums out — just everyone else's."*
+
 
 ---
 
@@ -1068,6 +1078,8 @@ The candidate from your usual party is mediocre — not corrupt, just unremarkab
 *"Principles are easier to act on when the stakes are low."*
 
 **It depends** → OT: *"What would push you toward the better candidate — how impressive they are, how mediocre your usual party's candidate is, how safe the seat is?"*
+
+**[EE]:** *"In 2006 Joe Lieberman lost his Democratic primary in Connecticut, ran as an Independent, won the general, caucused with Democrats, and two years later delivered a keynote speech endorsing John McCain at the Republican National Convention."*
 
 ---
 
