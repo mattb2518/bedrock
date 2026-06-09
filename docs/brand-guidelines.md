@@ -81,9 +81,9 @@ Red, white, and blue — used as a unified American system, never as opposing pa
 ### Logo & Mark
 **The mark:** A tri-color mountain/strata symbol — three horizontal layers in red, white, and blue suggesting bedrock geological layers. Reads as both geological foundation and American flag colors. Never red on left / blue on right (avoids partisan team read).
 
-**The wordmark:** "Bedrock" set in Libre Baskerville, tracked slightly. The mark sits to the left of the wordmark.
+**The wordmark:** "Bedrock.guide" — `Bedrock` in Libre Baskerville 700, `.guide` in Libre Baskerville 400 at ~65% opacity (`rgba(232,228,218,0.45)`), roughly 65% of the Bedrock font size, same baseline. The mark sits to the left of the wordmark.
 
-**Lockup:** Mark + wordmark horizontal for nav and headers. Mark alone for favicon and small sizes.
+**Lockup:** Mark + wordmark horizontal for nav and headers. Mark alone for favicon and small sizes. At nav size: `Bedrock` at 18px/700, `.guide` at 13px/400.
 
 **Color on dark background:** Mark uses gradient from crimson through off-white to blue. Wordmark in `#E8E4DA`.
 
