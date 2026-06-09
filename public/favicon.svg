@@ -1,0 +1,18 @@
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <title>Bedrock Favicon</title>
+  <desc>Rounded square containing a single mountain peak with three horizontal bands: blue at the peak, red in the middle, white at the base.</desc>
+  <clipPath id="frame">
+    <rect x="0" y="0" width="64" height="64" rx="14"/>
+  </clipPath>
+  <g clip-path="url(#frame)">
+    <rect x="0" y="0" width="64" height="64" fill="#11203A"/>
+    <clipPath id="peak">
+      <polygon points="10,52 32,16 54,52"/>
+    </clipPath>
+    <g clip-path="url(#peak)">
+      <rect x="0" y="16" width="64" height="13" fill="#6B9FEA"/>
+      <rect x="0" y="29" width="64" height="12" fill="#D44035"/>
+      <rect x="0" y="41" width="64" height="11" fill="#E8E4DA"/>
+    </g>
+  </g>
+</svg>

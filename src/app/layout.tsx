@@ -25,6 +25,10 @@ export const metadata: Metadata = {
   description:
     "A civic identity platform for independent-minded voters. Take the quiz. Find your bedrock.",
   metadataBase: new URL("https://bedrock.guide"),
+  icons: {
+    icon: "/favicon.svg",
+    shortcut: "/favicon.svg",
+  },
   openGraph: {
     title: "Bedrock",
     description: "Know what you actually believe.",

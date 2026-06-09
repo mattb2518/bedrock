@@ -1,35 +1,12 @@
 <svg width="120" height="120" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
   <title>Bedrock Logo Mark</title>
-  <desc>Irregular mountain peak silhouette with horizontal wavy red, white, and blue strata bands. Left-face shadow gradient for geological depth.</desc>
-  <defs>
-    <clipPath id="peak">
-      <polygon points="0,60 0,52 3,47 6,50 11,41 29,4 33,13 37,8 41,17 45,11 51,20 56,15 60,19 60,60"/>
-    </clipPath>
-    <linearGradient id="redGrad" x1="0" y1="1" x2="1" y2="0.15">
-      <stop offset="0%" stop-color="#7A1008"/>
-      <stop offset="50%" stop-color="#E8301E"/>
-      <stop offset="100%" stop-color="#C02010"/>
-    </linearGradient>
-    <linearGradient id="whiteGrad" x1="0" y1="1" x2="1" y2="0.15">
-      <stop offset="0%" stop-color="#A8A49C"/>
-      <stop offset="45%" stop-color="#F4F0E8"/>
-      <stop offset="75%" stop-color="#FFFFFF"/>
-      <stop offset="100%" stop-color="#D0CCC4"/>
-    </linearGradient>
-    <linearGradient id="blueGrad" x1="0" y1="1" x2="1" y2="0.15">
-      <stop offset="0%" stop-color="#081840"/>
-      <stop offset="45%" stop-color="#3070D0"/>
-      <stop offset="75%" stop-color="#5E96EA"/>
-      <stop offset="100%" stop-color="#1A3E88"/>
-    </linearGradient>
-    <linearGradient id="shadowGrad" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="rgba(0,0,0,0.58)"/>
-      <stop offset="38%" stop-color="rgba(0,0,0,0.15)"/>
-      <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
-    </linearGradient>
-  </defs>
-  <rect x="0" y="0" width="60" height="60" fill="url(#blueGrad)" clip-path="url(#peak)"/>
-  <path d="M-10,41 Q2,33 15,41 Q28,49 41,41 Q54,33 70,41 L70,61 Q54,53 41,61 Q28,69 15,61 Q2,53 -10,61 Z" fill="url(#whiteGrad)" clip-path="url(#peak)"/>
-  <path d="M-10,21 Q2,13 15,21 Q28,29 41,21 Q54,13 70,21 L70,41 Q54,33 41,41 Q28,49 15,41 Q2,33 -10,41 Z" fill="url(#redGrad)" clip-path="url(#peak)"/>
-  <rect x="0" y="0" width="60" height="60" fill="url(#shadowGrad)" clip-path="url(#peak)"/>
+  <desc>Asymmetric two-peak mountain silhouette filled with three bold horizontal strata bands: blue at the peak, red in the middle, white at the base. Optimized for small screen sizes.</desc>
+  <clipPath id="peak">
+    <polygon points="4,52 24,14 38,30 48,20 56,52"/>
+  </clipPath>
+  <g clip-path="url(#peak)">
+    <rect x="0" y="14" width="60" height="14" fill="#6B9FEA"/>
+    <rect x="0" y="28" width="60" height="13" fill="#D44035"/>
+    <rect x="0" y="41" width="60" height="13" fill="#E8E4DA"/>
+  </g>
 </svg>

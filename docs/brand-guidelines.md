@@ -79,24 +79,26 @@ Red, white, and blue — used as a unified American system, never as opposing pa
 - Error: `#E84040`
 
 ### Logo & Mark
-**The mark:** A tri-color mountain/strata symbol — three horizontal layers in red, white, and blue suggesting bedrock geological layers. Reads as both geological foundation and American flag colors. Never red on left / blue on right (avoids partisan team read).
+**The mark:** An asymmetric two-peak mountain silhouette with three bold flat horizontal strata bands — blue at the peak (`#6B9FEA`), red in the middle (`#D44035`), white at the base (`#E8E4DA`). Reads as both geological bedrock and American flag colors. Band order (blue top / red middle / white base) is intentional and fixed — do not reorder. Flat colors only — no gradients, no shadows.
 
-**Canonical asset:** The mark lives at `public/logo-mark.svg` — the single approved source. Do not recreate it from description; reference the file directly (served at `/logo-mark.svg` in Next.js). It is built as four SVG layers inside a clipped peak polygon: blue base, wavy white middle band, wavy red top band, and a left-face shadow gradient for depth.
+**Canonical asset:** `public/logo-mark.svg` — the single approved source. viewBox `0 0 60 60`. Reference the file directly via Next.js `<Image src="/logo-mark.svg">` — do not inline or recreate from description.
+
+**Favicon:** `public/favicon.svg` — a simplified single-peak variant inside a rounded-square `#11203A` container, viewBox `0 0 64 64`. The single peak (vs. two peaks in the mark) is a deliberate simplification for 16px legibility, not an inconsistency. Wired via `icons` in the Next.js metadata export; `favicon.ico` removed.
 
 **The wordmark:** "Bedrock.guide" — `Bedrock` in Libre Baskerville 700, `.guide` in Libre Baskerville 400 at `rgba(232,228,218,0.45)`. Both at the same font size. The mark sits to the left of the wordmark.
 
-**Lockup (locked June 2026):** Mark + wordmark horizontal for nav, headers, and footer. Mark alone for favicon and small sizes.
+**Lockup (locked June 2026):** Mark + wordmark horizontal for nav, headers, and footer. Favicon alone for browser tab.
 
 Nav implementation:
-- Mark: `public/logo-mark.svg` via Next.js `<Image>`, 20×20px
+- Mark: `public/logo-mark.svg` via Next.js `<Image>`, 28×28px
 - Outer flex: `align-items:center; gap:8px`
 - Text wrapper: `display:flex; align-items:baseline; line-height:1; margin-top:6px`
-- `Bedrock`: Libre Baskerville 700, 18px, `#E8E4DA`, `letter-spacing:-0.01em`, `line-height:1`
-- `.guide`: Libre Baskerville 400, 18px, `rgba(232,228,218,0.45)`, `line-height:1`
+- `Bedrock`: Libre Baskerville 700, 24px, `#E8E4DA`, `letter-spacing:-0.01em`, `line-height:1`
+- `.guide`: Libre Baskerville 400, 22px, `rgba(232,228,218,0.45)`, `line-height:1`
 
 Footer: same pattern, mark at 28×28px, wordmark at `var(--text-h3)` / `calc(var(--text-h3) - 2px)`.
 
-**Color on dark background:** Mark uses gradient from crimson through off-white to blue. Wordmark in `#E8E4DA`.
+**Color:** Mark uses flat colors. Wordmark in `#E8E4DA`.
 
 ### Typography
 **Display / headlines:** Libre Baskerville (serif) — signals gravitas and civic authority without stuffiness. Used for hero headlines, section titles, civic type names.
