@@ -2,17 +2,9 @@ import Link from "next/link";
 
 const columns = [
   {
-    heading: "The Platform",
-    links: [
-      { label: "Take the Quiz", href: "/quiz" },
-      { label: "Your Ballot", href: "/ballot" },
-      { label: "Your Media Diet", href: "/media" },
-      { label: "Your Conversations", href: "/conversations" },
-    ],
-  },
-  {
     heading: "Features",
     links: [
+      { label: "Take the Quiz", href: "/quiz" },
       { label: "Your Ballot", href: "/ballot" },
       { label: "Your Media Diet", href: "/media" },
       { label: "Your Conversations", href: "/conversations" },
@@ -23,9 +15,10 @@ const columns = [
     heading: "About",
     links: [
       { label: "About Bedrock", href: "/about" },
+      { label: "How It Works", href: "/how-it-works" },
+      { label: "Trust & Methodology", href: "/methodology" },
       { label: "FAQ", href: "/faq" },
       { label: "Privacy & Data", href: "/privacy" },
-      { label: "Trust & Methodology", href: "/methodology" },
     ],
   },
 ];
@@ -48,7 +41,7 @@ export default function Footer() {
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "1fr repeat(3, auto)",
+            gridTemplateColumns: "1fr repeat(2, auto)",
             gap: "var(--space-12)",
             marginBottom: "var(--space-12)",
           }}
