@@ -82,6 +82,33 @@ Civic identity → Claude-powered chat interface for preparing and navigating di
 - System knows exactly where user is on return
 - Profile persists across sessions with recursive learning via Claude API
 
+### Returning User — Quiz Page Behavior
+
+**Partial completion (any layer incomplete):**
+Resume exactly where they left off. No retake screen. No branching. Just continue.
+
+**Full completion (all four layers + context module done):**
+Landing on the quiz page shows a retake screen with two options:
+
+*Option A — Retake from scratch*
+- Confirmation dialog required: "This will replace your current profile. Your previous answers will be permanently deleted. Are you sure?"
+- On confirm: clears all existing responses, starts Layer 1 fresh
+- Profile updates in full when new quiz is complete
+- Constellation and civic type update on completion
+
+*Option B — Edit responses*
+- Shows quiz layer by layer — user navigates one layer at a time
+- Within each layer, existing answers are pre-filled and individually editable
+- No forced re-do of unchanged answers
+- **Cascade behavior:** When a user changes one or more answers in Layer 1, on advancing to Layer 2 show a soft prompt: "You updated some foundational answers — your positions in this layer may be worth revisiting." Same prompt on Layer 3 if Layer 1 or 2 changed. No forced re-answer — user can dismiss and move on.
+- Profile re-scores with updated inputs on save, whether or not downstream layers were revisited
+- Constellation and civic type update immediately on save
+
+**Design notes:**
+- Retake screen should feel low-pressure — framed as growth ("Your thinking evolves. Your profile can too."), not as correction
+- Both paths end with a profile update confirmation and refreshed results view
+- Retake from scratch is the nuclear option; Edit responses is the expected path for most returning users
+
 ---
 
 ## 3. The Eight Civic Dimensions
