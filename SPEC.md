@@ -1851,15 +1851,48 @@ Three pillars in order, each with tri-color accent bar:
 *"Not red, not blue — red, white, and blue."* (gold italic Libre Baskerville 22px)
 Attribution: "From the *Country Over Self* podcast." (*Country Over Self* italicized)
 
-### Nav Links (confirmed)
-- How it works
-- The framework (links to Trust & Methodology)
-- About
-- Take the quiz (primary CTA button)
+### Nav Links — Two States
+
+**Public nav (pre-login):**
+Mark + wordmark · How It Works · The Framework · About · Take the Quiz (primary CTA button)
+
+**App nav (post-login):**
+Mark + wordmark · Quiz · Your Ballot · Your Media · Your Conversations · My Profile · [account avatar]
+
+**Quiz nav item — three states:**
+- Not started → label "Take the Quiz" → begins quiz
+- In progress → label "Continue Quiz" → resumes at current question
+- Complete → label "My Quiz" → offers to review answers or retake any layer
+
+**Behavior:**
+- Nav is persistent on all pages, both public and app states
+- On mobile: collapses to hamburger menu showing all items
+- Homepage public nav is the only nav that differs — slightly more marketing-oriented; all other pages use the same persistent nav
 
 ---
 
-## 14. Your Conversations — Feature Spec
+## 15. My Profile Page
+
+*The user's civic identity home base. A persistent page accessible from nav after account creation — not just a one-time results reveal.*
+
+### What It Shows
+- Named primary civic type + working name + one-liner
+- Constellation (radar/spider chart, 8 axes, blue fill on dark navy — shareable artifact)
+- Dimensional breakdown — score and label on all 8 dimensions
+- Secondary type(s) — shown if similarity score clears threshold
+- Quiz completion indicator (40% after L1 / 65% after L2 / 85% after L3 / 100% after L4)
+- Last updated date
+- Links to retake any individual layer
+
+### Behavior
+- Updates automatically when user completes or retakes any quiz layer
+- **Shareable** — user can generate a public link showing their constellation only (no other profile data exposed)
+- **Exportable** — download full profile as plain text (per privacy commitments in Section 11)
+- Accessible from nav as "My Profile" post-login
+
+---
+
+## 16. Your Conversations — Feature Spec
 
 *Third pillar. New scope added June 2026. Full UX spec TBD — this section captures the product decisions made to date.*
 
