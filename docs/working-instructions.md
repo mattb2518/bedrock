@@ -134,3 +134,26 @@ git push origin main
 ```
 
 Token is in .env.local as GITHUB_TOKEN.
+
+---
+
+## Brand & Design Files
+
+Two files are the source of truth for all brand, copy, and design work. Read them at the start of any session involving copy, UI, or design decisions.
+
+**Brand guidelines** (voice, tone, colors, typography, logo, audience, positioning):
+```
+docs/brand-guidelines.md
+https://raw.githubusercontent.com/mattb2518/bedrock/main/docs/brand-guidelines.md
+```
+
+**CSS design tokens** (all color values, type scale, spacing, component tokens):
+```
+src/styles/tokens.css
+https://raw.githubusercontent.com/mattb2518/bedrock/main/src/styles/tokens.css
+```
+
+**For Claude Project sessions (claude.ai):** Fetch brand-guidelines.md via the raw GitHub URL above before any copy or design work.
+
+**For Claude Code sessions:** Both files are in the repo. Read them from the filesystem. Import tokens.css into your global stylesheet — do not redefine these values elsewhere.
+
