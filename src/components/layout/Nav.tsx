@@ -7,7 +7,6 @@ import { createClient } from "@/lib/supabase/client";
 import type { User } from "@supabase/supabase-js";
 
 const topNavLinks = [
-  { label: "The Framework", href: "/methodology" },
   { label: "Your Ballot", href: "/ballot" },
   { label: "Your Media", href: "/media" },
   { label: "Your Conversations", href: "/conversations" },
@@ -16,6 +15,7 @@ const topNavLinks = [
 const aboutLinks = [
   { label: "About Bedrock", href: "/about" },
   { label: "How It Works", href: "/how-it-works" },
+  { label: "Trust & Methodology", href: "/methodology" },
   { label: "FAQ", href: "/faq" },
   { label: "Privacy & Data", href: "/privacy" },
 ];

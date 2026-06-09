@@ -4,10 +4,10 @@ const columns = [
   {
     heading: "The Platform",
     links: [
-      { label: "How It Works", href: "/how-it-works" },
-      { label: "The Framework", href: "/methodology" },
       { label: "Take the Quiz", href: "/quiz" },
-      { label: "Your Results", href: "/results" },
+      { label: "Your Ballot", href: "/ballot" },
+      { label: "Your Media Diet", href: "/media" },
+      { label: "Your Conversations", href: "/conversations" },
     ],
   },
   {
