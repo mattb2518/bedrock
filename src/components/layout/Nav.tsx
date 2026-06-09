@@ -29,7 +29,7 @@ function LogoMark() {
       alt="Bedrock mark"
       width={20}
       height={20}
-      style={{ display: "block", flexShrink: 0, marginTop: "1px" }}
+      style={{ display: "block", flexShrink: 0 }}
       priority
     />
   );
@@ -112,27 +112,30 @@ export default function Nav() {
           }}
         >
           <LogoMark />
-          <span
-            style={{
-              fontFamily: "var(--font-display)",
-              fontSize: "var(--wordmark-size-nav)",
-              fontWeight: "var(--wordmark-weight)",
-              color: "var(--wordmark-primary)",
-              letterSpacing: "-0.01em",
-            }}
-          >
-            Bedrock
-          </span>
-          <span
-            style={{
-              fontFamily: "var(--font-display)",
-              fontSize: "var(--wordmark-tld-size-nav)",
-              fontWeight: "var(--wordmark-tld-weight)",
-              color: "var(--wordmark-tld)",
-              marginLeft: "-1px",
-            }}
-          >
-            .guide
+          <span style={{ display: "flex", alignItems: "baseline", lineHeight: 1, marginTop: "6px" }}>
+            <span
+              style={{
+                fontFamily: "var(--font-display)",
+                fontSize: "var(--wordmark-size-nav)",
+                fontWeight: "var(--wordmark-weight)",
+                color: "var(--wordmark-primary)",
+                letterSpacing: "-0.01em",
+                lineHeight: 1,
+              }}
+            >
+              Bedrock
+            </span>
+            <span
+              style={{
+                fontFamily: "var(--font-display)",
+                fontSize: "var(--wordmark-tld-size-nav)",
+                fontWeight: "var(--wordmark-tld-weight)",
+                color: "var(--wordmark-tld)",
+                lineHeight: 1,
+              }}
+            >
+              .guide
+            </span>
           </span>
         </Link>
 

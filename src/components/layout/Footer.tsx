@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 const columns = [
   {
@@ -49,12 +50,15 @@ export default function Footer() {
         >
           {/* Brand */}
           <div>
-            <Link href="/" style={{ textDecoration: "none", display: "inline-block", marginBottom: "var(--space-4)" }}>
-              <span style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-h3)", fontWeight: "var(--wordmark-weight)", color: "var(--wordmark-primary)" }}>
-                Bedrock
-              </span>
-              <span style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-body)", fontWeight: "var(--wordmark-tld-weight)", color: "var(--wordmark-tld)" }}>
-                .guide
+            <Link href="/" style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "8px", marginBottom: "var(--space-4)" }}>
+              <Image src="/logo-mark.svg" alt="Bedrock mark" width={28} height={28} style={{ display: "block", flexShrink: 0 }} />
+              <span style={{ display: "flex", alignItems: "baseline", lineHeight: 1, marginTop: "6px" }}>
+                <span style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-h3)", fontWeight: "var(--wordmark-weight)", color: "var(--wordmark-primary)", lineHeight: 1 }}>
+                  Bedrock
+                </span>
+                <span style={{ fontFamily: "var(--font-display)", fontSize: "calc(var(--text-h3) - 2px)", fontWeight: "var(--wordmark-tld-weight)", color: "var(--wordmark-tld)", lineHeight: 1 }}>
+                  .guide
+                </span>
               </span>
             </Link>
             <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-small)", color: "var(--color-text-muted)", lineHeight: "var(--leading-relaxed)", maxWidth: "240px" }}>

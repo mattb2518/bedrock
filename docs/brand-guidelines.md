@@ -83,9 +83,18 @@ Red, white, and blue — used as a unified American system, never as opposing pa
 
 **Canonical asset:** The mark lives at `public/logo-mark.svg` — the single approved source. Do not recreate it from description; reference the file directly (served at `/logo-mark.svg` in Next.js). It is built as four SVG layers inside a clipped peak polygon: blue base, wavy white middle band, wavy red top band, and a left-face shadow gradient for depth.
 
-**The wordmark:** "Bedrock.guide" — `Bedrock` in Libre Baskerville 700, `.guide` in Libre Baskerville 400 at ~65% opacity (`rgba(232,228,218,0.45)`), roughly 65% of the Bedrock font size, same baseline. The mark sits to the left of the wordmark.
+**The wordmark:** "Bedrock.guide" — `Bedrock` in Libre Baskerville 700, `.guide` in Libre Baskerville 400 at `rgba(232,228,218,0.45)`. Both at the same font size. The mark sits to the left of the wordmark.
 
-**Lockup:** Mark + wordmark horizontal for nav and headers. Mark alone for favicon and small sizes. At nav size: `Bedrock` at ~20px/700, `.guide` at ~13px/400, with a ~14px gap between mark and wordmark.
+**Lockup (locked June 2026):** Mark + wordmark horizontal for nav, headers, and footer. Mark alone for favicon and small sizes.
+
+Nav implementation:
+- Mark: `public/logo-mark.svg` via Next.js `<Image>`, 20×20px
+- Outer flex: `align-items:center; gap:8px`
+- Text wrapper: `display:flex; align-items:baseline; line-height:1; margin-top:6px`
+- `Bedrock`: Libre Baskerville 700, 18px, `#E8E4DA`, `letter-spacing:-0.01em`, `line-height:1`
+- `.guide`: Libre Baskerville 400, 18px, `rgba(232,228,218,0.45)`, `line-height:1`
+
+Footer: same pattern, mark at 28×28px, wordmark at `var(--text-h3)` / `calc(var(--text-h3) - 2px)`.
 
 **Color on dark background:** Mark uses gradient from crimson through off-white to blue. Wordmark in `#E8E4DA`.
 
