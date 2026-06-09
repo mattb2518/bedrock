@@ -62,7 +62,7 @@ Same quiz → recommended independent journalists, Substacks, podcasts matched t
   - **Open text:** "Tell us more — what shapes your answer?" Used when nuance is personal and hard to pre-enumerate
   - **Choice follow-up (select all that apply):** 3-4 specific sub-cases. Used when sub-cases are predictable
 - Each question gets one follow-up mechanic, decided at write time
-- **Micro-reactions** after each answer: brief, warm, occasionally surprising, never partisan, occasionally humorous
+- **Micro-reactions** after each answer: brief, warm, occasionally surprising, never partisan, occasionally humorous. User must tap, click, or press Enter to advance — no auto-advance. Click target should be the full screen or answer area, not a labeled button.
 - **Easter eggs:** American only — historical nuggets, serious trivia, or humor. Woven in naturally, roughly 1 per question. Mix of serious historical and lighter Americana.
 - **Bias check rule:** All questions reviewed for political lean before finalizing. Micro-reactions and examples must be balanced — no option should feel like the "wrong" answer
 
