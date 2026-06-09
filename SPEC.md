@@ -199,6 +199,9 @@ Communicated via progress bar design, not explicit question numbering. Gives loc
 - "Here's where you sit relative to other Bedrock users"
 - Shareable — people screenshot and share their constellation
 
+### Option Order Randomization
+Display order of A/B/C (and D where it applies on A1) is randomized per question per user session at render time. Position bias is real — left-most or first-listed options pick up a few points of preference independent of content — and randomization keeps it from compounding any framing tilt. Internal scoring keys to position-independent option IDs, not letters. The "It depends" path stays in its fixed last slot.
+
 ### Open Questions (resolve before build)
 - Account creation timing — before quiz, after L1, or at save point?
 - Importance ratings — still in or out? If in, belongs in Layer 3
@@ -310,7 +313,7 @@ Select as many or as few as apply. Add your own at the bottom if something isn't
 - **[DIM]** = Primary dimension
 - **[SEC]** = Secondary dimension (crossover/synthesis only)
 - **[F/U]** = Follow-up: OT = open text, MC = multiple choice select all that apply
-- **[EE]** = Easter egg
+- **[EE]** = Easter egg (per-question, shown to all users regardless of which option they pick — may be inspired by a particular answer but not tied to it)
 
 ---
 
@@ -329,9 +332,14 @@ When something in society isn't working well, what's your instinct?
 *"Urgency as a moral position. Hard to argue with when you're the one waiting."*
 
 **C.** Fix the system that produces the problem — change the rules and incentives, and better outcomes follow.
-*"The root cause approach. Fix the incentive structure and you don't fight the same battle twice."*
+*"Systems thinking — change the rules instead of fighting the outcomes."*
+
+**D.** Test whether it's really broken before changing anything — what looks broken from one angle is often working as intended from another.
+*"Chesterton's Fence — before tearing down what looks like an unnecessary obstacle, find out why it was put there in the first place."*
 
 **It depends** → OT: *"What shapes your answer — the stakes, who's affected, the track record of change in that area?"*
+
+*Note: A1 carries four substantive options instead of the usual three. This is deliberate on the foundational dimension — the original three were all change-positive (mild, bold, structural) and missed the strong-stability position.*
 
 ---
 
@@ -343,17 +351,17 @@ Most problems affecting Americans day-to-day — housing, school quality, public
 *"Subsidiarity — decisions made at the lowest level capable of making them well. Older than America, but America made it famous."*
 
 **B.** The federal government — national problems need national solutions, and local governments too often protect local interests at the expense of people who need help most.
-*"The equity argument. Local control can mean local exclusion. Child labor laws and food safety standards required federal action because states weren't going there on their own. Federal urban renewal programs of the same era demolished functional neighborhoods in the name of national priorities. The direction of the mistake cuts both ways."*
+*"The equity argument. Local control can mean local exclusion — child labor laws and food safety required federal action because states weren't going there on their own."*
 
 **C.** Whoever has the strongest track record on that specific problem — some things states have solved brilliantly, others have required federal action.
-*"Federalism as a tool, not a religion."*
+*"Federalism by track record — let the level that's working own it."*
 
 **It depends** → MC: *"What tips the balance?"*
 - Whether the problem crosses state lines
 - Whether local governments have already tried and failed
 - Whether equal treatment across states matters for this issue
 
-**[EE on A]:** *"The 10th Amendment — 'powers not delegated to the United States are reserved to the States' — is the shortest and most fought-over sentence in the Bill of Rights. Invoked to defend slavery. Invoked to legalize marijuana. Same 28 words."*
+**[EE]:** *"The 10th Amendment — 'powers not delegated to the United States are reserved to the States' — is the shortest and most fought-over sentence in the Bill of Rights. Invoked to defend slavery. Invoked to legalize marijuana. Same 28 words."*
 
 ---
 
@@ -365,7 +373,7 @@ When American and global interests conflict, the United States should generally:
 *"There's a reason we have a State Department and not a World Department."*
 
 **B.** Weigh global interests seriously — in an interconnected world, what's bad for the world tends to become bad for America, and global leadership builds influence money can't buy.
-*"The post-WWII order America built was the greatest strategic investment in American history."*
+*"The post-WWII alliance system has shaped the global order for 75 years — the longest stretch without great-power war in modern history."*
 
 **C.** Lead by example rather than intervention — America's most durable influence has always come from being worth emulating.
 *"John Winthrop called it a city on a hill in 1630. Still the most distinctly American theory of foreign policy."*
@@ -396,8 +404,6 @@ A mandatory minimum sentencing law that many judges and legal scholars argue pro
 - How realistic near-term legislative change is
 - Whether the harm is ongoing
 
-**[EE on B]:** *"In 1849 Thoreau went to jail rather than pay a tax funding the Mexican-American War. Emerson visited and asked 'Henry, what are you doing in there?' Thoreau replied: 'Waldo, what are you doing out there?' The essay he wrote — Civil Disobedience — later influenced Gandhi and Martin Luther King Jr."*
-
 ---
 
 **A5 — Markets↔Governance**
@@ -405,13 +411,13 @@ A mandatory minimum sentencing law that many judges and legal scholars argue pro
 When it comes to solving big economic and social problems — healthcare costs, housing shortages, environmental damage — your instinct is:
 
 **A.** Let markets lead, with guardrails where necessary — competition and price signals allocate resources better than government programs.
-*"Prices carry information no central planner can replicate. The track record of command economies is not ambiguous."*
+*"Prices carry information no central planner can replicate. Markets aggregate decentralized knowledge in ways government allocation can't match."*
 
 **B.** Government needs to lead, using market tools where they work — some problems are too important, too long-term, or too inequitable to leave to markets that have no incentive to solve them.
 *"Markets are excellent at a lot of things. Problems where costs fall on people outside the transaction aren't one of them."*
 
 **C.** Build the market you want — design rules and incentives so doing the right thing is also the profitable thing.
-*"Not 'government vs. markets' but 'what rules make markets work for everyone?' Cap and trade made pollution expensive without picking winners."*
+*"Design the rules so the right thing is also the profitable thing. Cap and trade made pollution expensive without picking winners."*
 
 **It depends** → MC (select all that apply): *"What shapes your answer?"*
 - Whether the market has actually failed or just needs better rules
@@ -428,12 +434,14 @@ In politics and civic life, lasting change usually comes from:
 *"Not glamorous, but it's how Social Security, Medicare, and the Civil Rights Act got across the finish line — all compromised, all transformative."*
 
 **B.** Holding the line until the world catches up — movements that settle for less rarely get more, and the way to expand the possible is to keep demanding what's right.
-*"Abolitionists, suffragists, and Second Amendment advocates were all told they were asking for too much. All eventually moved the needle by refusing to settle."*
+*"The hold-the-line theory of change. Movements that settle for less rarely get more."*
 
 **C.** Building the coalition first — the limiting factor is rarely the idea, it's the political will, and you build will by bringing more people along before you ask for the vote.
 *"The community organizer theory of change. Obama called it 'the long game.' So did Madison, in different words."*
 
 **It depends** → OT: *"What shapes your answer — whether the moment is politically ripe, how much harm is accumulating, whether a partial win forecloses the fuller one?"*
+
+**[EE]:** *"In 1849 Thoreau went to jail rather than pay a tax funding the Mexican-American War. Emerson visited and asked 'Henry, what are you doing in there?' Thoreau replied: 'Waldo, what are you doing out there?' The essay he wrote — Civil Disobedience — later influenced Gandhi and Martin Luther King Jr."*
 
 
 ---
@@ -442,7 +450,7 @@ In politics and civic life, lasting change usually comes from:
 
 When individual freedom and community wellbeing genuinely conflict — one person's choice imposes real costs on others — what should generally give way?
 
-**A.** Individual freedom should be the strong default — the history of collective overreach is longer and darker than the history of too much individual liberty.
+**A.** Individual freedom should be the strong default — restrictions on what people can do require strong justification.
 *"The burden of proof should always be on whoever wants to restrict what someone else can do."*
 
 **B.** Community wellbeing — we're shaped by and responsible to our communities, and a freedom that imposes serious costs on others isn't worth protecting.
@@ -456,22 +464,22 @@ When individual freedom and community wellbeing genuinely conflict — one perso
 - Whether the community norm is itself fair
 - Whether government or community is doing the asking
 
-**[EE on C]:** *"Eighteen states still have laws requiring citizens to help a neighbor in distress. Vermont's is the most famous — you can be fined for walking past someone drowning. One of the few places American law says being a decent neighbor is mandatory."*
+**[EE]:** *"Eighteen states still have laws requiring citizens to help a neighbor in distress. Vermont's is the most famous — you can be fined for walking past someone drowning. One of the few places American law says being a decent neighbor is mandatory."*
 
 ---
 
 **A8 — Trust↔Skepticism**
 
-When a major American institution — a federal agency, the Supreme Court, a scientific body, the mainstream press — reaches a conclusion you find surprising or uncomfortable, your first instinct is:
+When a major American expert institution — a federal regulatory agency, a scientific body like the CDC or NIH, an established peer-reviewed consensus — reaches a conclusion you find surprising or uncomfortable, your first instinct is:
 
 **A.** Give it serious weight — institutions with long track records of rigor have earned some deference, even when their conclusions are inconvenient.
 *"The accumulated expertise of thousands of people working on a problem for decades is not nothing."*
 
 **B.** Scrutinize it hard — institutions have interests, blind spots, and failure modes, and healthy skepticism is what keeps them honest.
-*"Every major institutional failure in American history — from the Tuskegee study to the savings and loan collapse to the 2008 financial crisis — was preceded by too much deference."*
+*"Major institutional failures in American history — from the Tuskegee study to early COVID guidance reversals to repeated FBI surveillance overreach — were preceded by too much deference."*
 
 **C.** Calibrate based on the institution's track record on this specific type of question — the CDC gets more benefit of the doubt on epidemiology than on nutrition.
-*"Blanket trust and blanket skepticism are both intellectually lazy. The work is knowing which institutions have earned it on which questions."*
+*"Trust by track record — calibrate based on how the institution has done on this kind of question before. The CDC gets more benefit of the doubt on epidemiology than on nutrition."*
 
 **It depends** → OT: *"What shapes how much trust you extend — the type of institution, whether you can see their reasoning, whether they have a stake in the outcome?"*
 
@@ -496,7 +504,7 @@ The Constitution has been amended 27 times in 235 years. Some think that's about
 
 **It depends** → OT: *"What would make you more or less comfortable with the amendment process being used more frequently?"*
 
-**[EE on B]:** *"The 27th Amendment — preventing Congress from giving itself an immediate pay raise — was proposed in 1789 and not ratified until 1992. A University of Texas student named Gregory Watson rediscovered it in 1982, wrote a paper arguing it was still open for ratification, got a C, and spent the next decade getting state legislatures to ratify it anyway. He got his grade changed to an A in 2017."*
+**[EE]:** *"The 27th Amendment — preventing Congress from giving itself an immediate pay raise — was proposed in 1789 and not ratified until 1992. A University of Texas student named Gregory Watson rediscovered it in 1982, wrote a paper arguing it was still open for ratification, got a C, and spent the next decade getting state legislatures to ratify it anyway. He got his grade changed to an A in 2017."*
 
 ---
 
@@ -536,7 +544,7 @@ When your local and federal government disagree about what's best for your commu
 
 **It depends** → OT: *"What would make you trust one level over the other on a specific issue?"*
 
-**[EE on A]:** *"The United States has approximately 90,000 units of local government — more than any other country on earth. Americans have always been serious about keeping power close to home. Whether that's working as intended is a separate question."*
+**[EE]:** *"The United States has approximately 90,000 units of local government — more than any other country on earth. Americans have always been serious about keeping power close to home. Whether that's working as intended is a separate question."*
 
 ---
 
@@ -579,7 +587,7 @@ The United States has the opportunity to join a new international agreement on a
 - Whether other major powers are genuinely committed
 - What America would have to give up
 
-**[EE on B]:** *"The United States proposed the League of Nations, championed it at Versailles, and refused to join it. Wilson won the Nobel Peace Prize for the idea and died having failed to ratify it at home. Twenty-seven years later, America helped write the Universal Declaration of Human Rights and has never ratified the treaty making it binding. Eleanor Roosevelt chaired the drafting committee. America's relationship with its own ideals has always been complicated — and always will be."*
+**[EE]:** *"The United States proposed the League of Nations, championed it at Versailles, and refused to join it. Wilson won the Nobel Peace Prize for the idea and died having failed to ratify it at home. Twenty-seven years later, America helped write the Universal Declaration of Human Rights and has never ratified the treaty making it binding. Eleanor Roosevelt chaired the drafting committee. America's relationship with its own ideals has always been complicated — and always will be."*
 
 ---
 
@@ -598,7 +606,7 @@ A candidate you broadly agree with has a real chance of winning — but only if 
 
 **It depends** → OT: *"What would determine whether you'd support them — the specific issue, how much they're softening, something about the candidate?"*
 
-**[EE on A]:** *"In 1964 LBJ privately told aides that signing the Civil Rights Act would cost Democrats the South 'for a generation.' He signed it, was right about the political cost, and passed the Voting Rights Act, Medicare, and Medicaid in the next eighteen months — because he won. The legislation of idealists is usually written by pragmatists who got elected."*
+**[EE]:** *"In 1964 LBJ told aides that signing the Civil Rights Act would cost Democrats the South 'for a generation.' He signed it. Twenty-two years later Reagan struck a sweeping tax reform deal with Democratic leadership that cut rates and closed loopholes conservatives had argued about for decades. Both got their landmark bills because they could count votes. The legislation of idealists is usually written by pragmatists who got elected."*
 
 ---
 
@@ -621,7 +629,7 @@ Major economic transitions — manufacturing decline, the shift to clean energy,
 - Whether affected workers had meaningful warning
 - Whether the companies involved are still profitable
 
-**[EE on B]:** *"When the Erie Canal opened in 1825 it destroyed the economies of every town along the older trade routes overnight. Nobody compensated them. The towns that adapted survived. The ones that didn't are still there, smaller, wondering what happened. America has always been better at building the new thing than caring for the people displaced by it."*
+**[EE]:** *"When the Erie Canal opened in 1825 it destroyed the economies of every town along the older trade routes overnight. The towns that adapted survived. The ones that didn't are still there, smaller, wondering what happened."*
 
 ---
 
@@ -664,7 +672,7 @@ After a series of domestic attacks, a president declares a national emergency an
 
 **It depends** → OT: *"What would determine how much executive emergency authority you'd support — the nature of the threat, the specific powers, the track record of the president?"*
 
-**[EE on C]:** *"The federal income tax was introduced in 1861 as a temporary Civil War measure. Repealed in 1872. Back in 1894. Struck down by the Supreme Court. Back via constitutional amendment in 1913. The United States has been arguing about a tax that was supposed to last four years for over 160 years. 'Temporary' is doing a lot of work in American governance."*
+**[EE]:** *"The federal income tax was introduced in 1861 as a temporary Civil War measure. Repealed in 1872. Back in 1894. Struck down by the Supreme Court. Back via constitutional amendment in 1913. The United States has been arguing about a tax that was supposed to last four years for over 160 years. 'Temporary' is doing a lot of work in American governance."*
 
 ---
 
@@ -679,11 +687,11 @@ A large wave of people is arriving at the southern border — some fleeing viole
 *"The average wait for a green card from certain countries exceeds 50 years. That's not a backlog — that's a closed door with a waiting room."*
 
 **C.** The core problem is the conditions people are fleeing — as long as extreme violence and poverty persist in sending countries, no level of enforcement or processing capacity will resolve the underlying pressure.
-*"You can manage the symptom at the border or address the disease at the source — but border policy alone has never stopped a refugee crisis."*
+*"Border policy alone has never stopped a refugee crisis — sending-country conditions are doing the driving."*
 
 **It depends** → OT: *"What factors matter most — the distinction between asylum seekers and economic migrants, security screening, fairness to people immigrating legally?"*
 
-**[EE]:** *"The United States has no official national language. Roughly 350 languages are spoken in American homes today. New York City alone has residents who speak over 200 languages — more linguistic diversity in one city than most countries have in their entire territory. America has always been this, even when it pretended otherwise."*
+**[EE]:** *"The United States has no official national language. Roughly 350 languages are spoken in American homes today. New York City alone has residents who speak over 200 languages — more linguistic diversity in one city than most countries have in their entire territory."*
 
 ---
 
@@ -702,7 +710,7 @@ American political campaigns are enormously expensive and funded largely by weal
 
 **It depends** → OT: *"What feels like the most corrupting influence — where the money comes from, what donors expect, what happens after officials leave office?"*
 
-**[EE on C]:** *"In 1799 Aaron Burr got a water company chartered to address a genuine public health crisis, inserted a clause allowing surplus capital to be used for 'any monied transactions,' never really built the water system, and turned the surplus into the Bank of Manhattan — which eventually became JPMorgan Chase. The gap between public purpose and private enrichment has been a feature of American civic life since almost the beginning."*
+**[EE]:** *"In 1799 Aaron Burr got a water company chartered to address a genuine public health crisis, inserted a clause allowing surplus capital to be used for 'any monied transactions,' never really built the water system, and turned the surplus into the Bank of Manhattan — which eventually became JPMorgan Chase. The gap between public purpose and private enrichment has been a feature of American civic life since almost the beginning."*
 
 ---
 
@@ -721,7 +729,7 @@ During a severe pandemic, the federal government mandates vaccines, masks, and b
 
 **It depends** → OT: *"What would have made the response feel more legitimate — different policies, more honest communication, more local control, clearer expiration dates?"*
 
-**[EE on B]:** *"During the 1918 influenza pandemic Philadelphia held a Liberty Loan parade despite warnings from its public health director. Cases exploded within days. San Francisco, which closed schools and banned public gatherings, fared significantly better. The Philadelphia health director who was overruled was named Wilmer Krusen. Almost nobody knows his name, which is its own kind of lesson about how we remember these things."*
+**[EE]:** *"During the 1918 influenza pandemic Philadelphia held a Liberty Loan parade despite warnings from its public health director. Cases exploded within days. San Francisco, which closed schools and banned public gatherings, fared significantly better. The Philadelphia health director who was overruled was named Wilmer Krusen. Almost nobody knows his name, which is its own kind of lesson about how we remember these things."*
 
 
 ---
@@ -747,6 +755,9 @@ The United States spends more on healthcare per person than any other wealthy co
 **C.** Redesign how we pay — move from fee-for-service to outcomes-based payment so providers make money when patients stay healthy, not when they get sick.
 *"Fee-for-service medicine is like paying a mechanic by the part replaced rather than whether your car runs."*
 
+**D.** Move toward single-payer or Medicare-for-All — every other wealthy democracy covers everyone for less per capita, and the patchwork of private insurance is what makes American healthcare uniquely expensive.
+*"The simplifying answer. Administrative overhead consumes about 30 cents of every American healthcare dollar — a cost most other systems don't carry."*
+
 **It depends** → OT: *"What do you think is the most broken part — costs, access, quality, insurance complexity?"*
 
 
@@ -754,7 +765,7 @@ The United States spends more on healthcare per person than any other wealthy co
 
 **L2-Q2 — Climate and Energy**
 
-Climate change is real and human-caused. The policy debate is about how to respond. Of the following, what's the right first move?
+Climate and energy policy is one of the major questions of the era. Of the following, what's the right first move?
 
 **A.** Get the prices right — put a price on carbon, remove fossil fuel subsidies, and let markets drive the transition without picking winners.
 *"The acid rain cap-and-trade program cut emissions 50% at a fraction of projected cost. Make pollution expensive and people find cheaper ways to avoid it."*
@@ -765,13 +776,16 @@ Climate change is real and human-caused. The policy debate is about how to respo
 **C.** Win the technology race — the country that leads on solar, battery storage, and next-generation nuclear wins both the climate and the economic competition.
 *"Solar cost $75 per watt in 1977. It costs less than $0.20 today. That's the learning curve. The question is how fast we want to accelerate it."*
 
+**D.** Slow down — the science is more contested than presented, the costs of aggressive transition fall heaviest on working families and energy-intensive industries, and prudence argues for waiting on clearer evidence before locking in expensive policy.
+*"The cost-benefit caution. Energy transitions are real, but so is the price of getting them wrong — and the people paying that price aren't usually the people making the decisions."*
+
 **It depends** → MC (select all that apply): *"What shapes your view?"*
 - How fast you think the transition needs to happen
 - How much you trust government to pick the right technologies
 - Whether international competitiveness matters as much as domestic emissions
 - How you weigh costs on current energy users against future generations
 
-**[EE on C]:** *"The United States has more wind energy capacity than any country except China — enough to power about 46 million homes. Texas alone generates more wind power than most countries. The state that built its economy on oil quietly became one of the largest wind energy producers in the world, mostly because the economics made sense. American energy transitions have always been less ideological and more practical than the political debate suggests."*
+**[EE]:** *"The United States has more wind energy capacity than any country except China — enough to power about 46 million homes. Texas alone generates more wind power than most countries. The state that built its economy on oil quietly became one of the largest wind energy producers in the world, mostly because the economics made sense. American energy transitions have always been less ideological and more practical than the political debate suggests."*
 
 ---
 
@@ -780,7 +794,7 @@ Climate change is real and human-caused. The policy debate is about how to respo
 The Second Amendment protects an individual right to own firearms. The debate is about where that right has limits. Of the following, what's the right first move?
 
 **A.** Enforce what's already on the books — fix the background check database, fund mental health reporting, prosecute straw purchases.
-*"A background check system with known gaps, a mental health reporting system most states underfund, prosecution rates for straw purchases near zero. The problem may be less about the laws than the will to enforce them."*
+*"Background check gaps go unfilled. Most states underfund mental health reporting. Prosecution rates for straw purchases are near zero. The existing system has room before reaching for a new one."*
 
 **B.** Close the gaps with targeted new laws — universal background checks, red flag laws, and safe storage requirements don't infringe the core right to self-defense.
 *"Every constitutional right has limits where it imposes serious costs on others. The question is where those limits are, not whether they exist."*
@@ -788,12 +802,15 @@ The Second Amendment protects an individual right to own firearms. The debate is
 **C.** Address the root causes — gun violence is concentrated in communities with high poverty, low opportunity, and inadequate mental health resources.
 *"The countries with the lowest gun violence rates aren't just countries with stricter laws — they're countries with stronger safety nets and less concentrated poverty."*
 
+**D.** Pass major new restrictions — universal background checks, a federal permit-to-purchase requirement, restrictions on military-style weapons, and stricter limits on who can carry where.
+*"The structural-change answer. Most other wealthy democracies treat firearms more like vehicles — licensed, regulated, and limited by type — and have dramatically lower gun violence rates."*
+
 **It depends** → MC (select all that apply): *"What shapes your view?"*
 - Whether you think more laws would actually be enforced
 - Whether the focus should be on handguns or military-style rifles
 - Whether mental health is more central than access
 
-**[EE on A]:** *"Dodge City — the most iconic frontier town in American history — had a strict ordinance requiring all visitors to check their firearms at the sheriff's office upon arrival. The sign at the city limits read 'The Carrying of Firearms Strictly Prohibited.' Wyatt Earp enforced it. The Old West was more complicated than the legend."*
+**[EE]:** *"Dodge City — the most iconic frontier town in American history — had a strict ordinance requiring all visitors to check their firearms at the sheriff's office upon arrival. The sign at the city limits read 'The Carrying of Firearms Strictly Prohibited.' Wyatt Earp enforced it. The Old West was more complicated than the legend."*
 
 ---
 
@@ -810,12 +827,15 @@ American public education produces wildly unequal outcomes depending almost enti
 **C.** Invest in early childhood — dollar for dollar, pre-K investment produces better long-term outcomes than almost any other education spending.
 *"By the time a child enters kindergarten, the gaps that will define their educational trajectory are already forming."*
 
+**D.** Expand school choice broadly — vouchers, education savings accounts, and tax credits that let public funds follow students to the school their parents choose, public or private, secular or religious.
+*"The parent-power answer. The premise: parents allocate education resources better than school districts do, and competition raises quality across the board."*
+
 **It depends** → MC (select all that apply): *"What shapes your view?"*
 - Whether your concern is primarily equity or quality
 - Whether you distinguish between charter schools and private vouchers
 - Whether you think the problem starts before kindergarten
 
-**[EE on C]:** *"The Perry Preschool Project, launched in 1962 in Ypsilanti, Michigan, enrolled 58 low-income children in a high-quality preschool and tracked them for 40 years. Those who attended were more likely to graduate high school, hold steady jobs, own homes, and stay out of prison. The return on investment was calculated at $7 to $12 for every dollar spent. One of the most studied interventions in American social policy."*
+**[EE]:** *"The Perry Preschool Project, launched in 1962 in Ypsilanti, Michigan, enrolled 58 low-income children in a high-quality preschool and tracked them for 40 years. Those who attended were more likely to graduate high school, hold steady jobs, own homes, and stay out of prison. The return on investment was calculated at $7 to $12 for every dollar spent. One of the most studied interventions in American social policy."*
 
 ---
 
@@ -824,7 +844,7 @@ American public education produces wildly unequal outcomes depending almost enti
 Setting aside border enforcement, the legal immigration system determines who gets to come to America and how. Of the following, what's the right first move?
 
 **A.** Shift to a skills-based points system — select immigrants primarily for education, skills, and economic potential. Canada and Australia do this.
-*"About two-thirds of American green cards go to family members of existing residents — a policy designed in 1965 that changed the composition of immigration far more than expected."*
+*"About two-thirds of American green cards go to family members of existing residents — a policy designed in 1965 that changed the composition of immigration considerably."*
 
 **B.** Clear the backlog and fix the wait times — before redesigning the system, make the existing one function. People who followed the rules deserve an answer in their lifetime.
 *"The average wait for a green card from certain countries exceeds 50 years. That's not a backlog — that's a closed door with a waiting room."*
@@ -832,12 +852,15 @@ Setting aside border enforcement, the legal immigration system determines who ge
 **C.** Significantly raise the overall numbers — the United States has an aging population, a below-replacement birth rate, and industries that can't find enough workers.
 *"Japan chose restriction and is now managing a shrinking, aging population with severe labor shortages. The United States has a different option — but the window may be narrower than most people realize."*
 
+**D.** Reduce overall numbers — current levels exceed what the labor market, public services, and assimilation infrastructure can absorb. Lower numbers would raise wages for existing workers and ease pressure on housing.
+*"The level-the-curve answer. Labor unions and environmentalists have historically held versions of this position alongside restrictionist conservatives — the coalition is older and stranger than it looks."*
+
 **It depends** → MC (select all that apply): *"What shapes your view?"*
 - Whether you prioritize economic contribution or family unity
 - Whether current overall levels are too high, too low, or about right
 - Whether immigration levels affect wages for existing workers
 
-**[EE on C]:** *"In 1977 ABC aired a Schoolhouse Rock segment called 'The Great American Melting Pot' — a three-minute animated song about immigration that ended with the Statue of Liberty serving soup. Watched by roughly every American child of that generation. Probably the most effective civic education about immigration ever produced in this country. Also a pretty accurate description of how the country actually works — one grandmother at a time."*
+**[EE]:** *"In 1977 ABC aired a Schoolhouse Rock segment called 'The Great American Melting Pot' — a three-minute animated song about immigration that ended with the Statue of Liberty serving soup. Watched by roughly every American child of that generation."*
 
 ---
 
@@ -880,7 +903,7 @@ The United States spends more on its military than the next ten countries combin
 - Whether military strength deters conflict or invites it
 - Whether domestic investment should take priority
 
-**[EE on A]:** *"Iceland is a full NATO member with no standing army. Its contribution to collective defense is primarily its geography and its Coast Guard, which has fought three 'Cod Wars' against the United Kingdom over fishing rights. The alliance that has kept the peace in Europe for 75 years includes a country whose most recent military conflict was about fish."*
+**[EE]:** *"Iceland is a full NATO member with no standing army. Its contribution to collective defense is primarily its geography and its Coast Guard, which has fought three 'Cod Wars' against the United Kingdom over fishing rights. The alliance that has kept the peace in Europe for 75 years includes a country whose most recent military conflict was about fish."*
 
 ---
 
@@ -888,18 +911,21 @@ The United States spends more on its military than the next ten countries combin
 
 Since the Supreme Court overturned Roe v. Wade in 2022, abortion policy has been set by state legislatures, producing a patchwork that varies dramatically by geography. Of the following, what's the right first move?
 
-**A.** Let the democratic process work at the state level — the Court returned this question to elected legislatures, and different states reaching different conclusions reflects genuine moral disagreement no national consensus can resolve right now.
+**A.** Pass a national ban with limited exceptions — a federal framework restricting abortion broadly, with carve-outs for rape, incest, and the life of the mother. The position that the government's role here is the same as on murder: uniform national protection.
+*"The view that this is the question and the answer is no — and that no level of federalism makes it acceptable for the answer to be yes somewhere."*
+
+**B.** Let the democratic process work at the state level — the Court returned this question to elected legislatures, and different states reaching different conclusions reflects genuine moral disagreement no national consensus can resolve right now.
 *"When the Court settled this nationally for fifty years it didn't resolve the disagreement — it suppressed it."*
 
-**B.** Pass a national legislative framework — rights that vary by zip code aren't really rights, and a functioning democracy should reach a durable compromise reflecting where most Americans actually are.
+**C.** Pass a national legislative framework — rights that vary by zip code aren't really rights, and a functioning democracy should reach a durable compromise reflecting where most Americans actually are: access in early pregnancy, restrictions later.
 *"Polling consistently shows most Americans support access in early pregnancy and restrictions later — a position held by neither party's base but by a significant majority of the country."*
 
-**C.** Protect access to contraception and reproductive healthcare broadly — whatever your view on abortion, the legal reasoning in Dobbs created uncertainty around contraception and IVF that most Americans didn't intend.
-*"Clarifying those protections is a narrower, more achievable goal that commands much broader consensus than the abortion debate itself."*
+**D.** Codify federal protection with no gestational limits — abortion access as a constitutional right of bodily autonomy, no state restrictions, public funding for those who can't afford it.
+*"The bodily-autonomy answer. The position that government's proper role in pregnancy decisions is, ultimately, none."*
 
-**It depends** → OT: *"What factors matter most — stage of pregnancy, specific circumstances, role of religious belief, federal vs. state authority?"*
+**It depends** → OT: *"What factors matter most — stage of pregnancy, specific circumstances, role of religious belief, federal vs. state authority, whether to focus on the narrower contraception and IVF protections that command broader consensus?"*
 
-**[EE on B]:** *"In 1972 — the year before Roe — the Republican platform supported abortion access and the Democratic platform was silent on it. George H.W. Bush was pro-choice before becoming Reagan's running mate. Al Gore was pro-life before running for president. Jesse Jackson opposed abortion until 1988. The sorting of both parties into hard positions happened gradually, then suddenly — entirely within living memory. The issue didn't change. The parties around it did."*
+**[EE]:** *"In 1972 — the year before Roe — the Republican platform supported abortion access and the Democratic platform was silent on it. George H.W. Bush was pro-choice before becoming Reagan's running mate. Al Gore was pro-life before running for president. Jesse Jackson opposed abortion until 1988. The sorting of both parties into hard positions happened gradually, then suddenly — entirely within living memory. The issue didn't change. The parties around it did."*
 
 ---
 
@@ -916,12 +942,15 @@ Technology companies now know more about most Americans than the government does
 **C.** Regulate the algorithms, not the data — the harm isn't that companies collect information, it's that they use it to maximize engagement in ways that damage mental health, spread misinformation, and polarize the electorate.
 *"Facebook's own research showed its algorithms made users angrier and more polarized — and it deployed them anyway because engagement drove revenue."*
 
+**D.** Trust competition and exit — new platforms emerge when old ones overreach, and government tools tend to entrench whoever's already large. Microsoft was supposed to be unstoppable in 1998; TikTok displaced Facebook for a generation; Bluesky and Mastodon are responses to Twitter.
+*"The market-correcting answer. Big Tech criticism is bipartisan, but so is concern that letting Washington pick winners and losers in technology has a worse track record than the problem it's trying to fix."*
+
 **It depends** → MC (select all that apply): *"What shapes your view?"*
 - Whether competition or regulation is the more effective tool
 - Whether you're more concerned about privacy or algorithmic harm
 - Whether American tech dominance is a national security asset worth protecting
 
-**[EE on B]:** *"The United States has comprehensive federal privacy laws for video rental records, children's online activity, and educational records. There is no comprehensive federal privacy law for anything else. The Video Privacy Protection Act of 1988 was passed specifically because a reporter got Robert Bork's Blockbuster rental history during his Supreme Court confirmation. Your Blockbuster history has been federally protected for 35 years. Your location data has not."*
+**[EE]:** *"The United States has comprehensive federal privacy laws for video rental records, children's online activity, and educational records. There is no comprehensive federal privacy law for anything else. The Video Privacy Protection Act of 1988 was passed specifically because a reporter got Robert Bork's Blockbuster rental history during his Supreme Court confirmation. Your Blockbuster history has been federally protected for 35 years. Your location data has not."*
 
 ---
 
@@ -949,7 +978,7 @@ A candidate you mostly agree with has a serious and credible character issue —
 
 **It depends** → OT: *"What would push you to 'disqualifying' — the type of conduct, how recent, the volume of incidents, whether they've acknowledged it?"*
 
-**[EE on B]:** *"Grover Cleveland was elected president in 1884 despite his opponents publicizing that he'd fathered a child out of wedlock. They chanted 'Ma, ma, where's my pa?' His supporters responded: 'Gone to the White House, ha ha ha.' He won."*
+**[EE]:** *"Grover Cleveland was elected president in 1884 despite his opponents publicizing that he'd fathered a child out of wedlock. They chanted 'Ma, ma, where's my pa?' His supporters responded: 'Gone to the White House, ha ha ha.' He won."*
 
 ---
 
@@ -1003,7 +1032,7 @@ Most American ballots include state legislature, county commissioner, school boa
 
 **It depends** → OT: *"What shapes how much you engage — the office, whether it's contested, whether you can find good information?"*
 
-**[EE on A]:** *"The average American voter faces 15 to 30 separate decisions on a general election ballot. In California in 2016, voters decided 17 statewide propositions alone — covering marijuana legalization, death penalty repeal, and workplace rules for adult film actors. That was before the candidates. A fully engaged California voter in a presidential year can face 40 or more distinct choices. Most voters research about three of them thoroughly."*
+**[EE]:** *"The average American voter faces 15 to 30 separate decisions on a general election ballot. In California in 2016, voters decided 17 statewide propositions alone — covering marijuana legalization, death penalty repeal, and workplace rules for adult film actors. That was before the candidates. A fully engaged California voter in a presidential year can face 40 or more distinct choices. Most voters research about three of them thoroughly."*
 
 ---
 
@@ -1057,7 +1086,7 @@ When deciding how to vote, are you primarily thinking about the next two to four
 
 **It depends** → OT: *"What shapes your time horizon — the specific issues, who's most affected, the office being filled?"*
 
-**[EE on B]:** *"The Constitution was written in 1787 by delegates whose average age was 42. Benjamin Franklin was 81 and had to be carried into the convention hall. Gouverneur Morris, who wrote the final draft, was 35. The document they produced in four months of a Philadelphia summer has outlasted every other national constitution written in the same century. Whatever they were doing in that room, the time horizon was definitely not 'next election cycle.'"*
+**[EE]:** *"The Constitution was written in 1787 by delegates whose average age was 42. Benjamin Franklin was 81 and had to be carried into the convention hall. Gouverneur Morris, who wrote the final draft, was 35. The document they produced in four months of a Philadelphia summer has outlasted every other national constitution written in the same century. Whatever they were doing in that room, the time horizon was definitely not 'next election cycle.'"*
 
 ---
 
