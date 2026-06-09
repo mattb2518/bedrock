@@ -18,6 +18,7 @@ SPEC.md is the document both Claude Project and Claude Code work from. Always pu
 ### Sync rule
 Before switching from Claude Project to Claude Code → push latest spec to GitHub.
 Before switching back to Claude Project → note any implementation decisions worth capturing in the spec.
+Within a single Claude Project session → commit spec changes to GitHub at each natural checkpoint (after completing a section, after a batch of approved edits), not just at session end. Prevents local-vs-remote divergence in longer sessions.
 
 ---
 
