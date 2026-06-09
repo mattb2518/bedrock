@@ -1,22 +1,65 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { usePathname } from "next/navigation";
 
-const navLinks = [
-  { label: "How It Works", href: "/how-it-works" },
+const topNavLinks = [
   { label: "The Framework", href: "/methodology" },
   { label: "Your Ballot", href: "/ballot" },
   { label: "Your Media", href: "/media" },
   { label: "Your Conversations", href: "/conversations" },
-  { label: "About", href: "/about" },
+];
+
+const aboutLinks = [
+  { label: "About Bedrock", href: "/about" },
+  { label: "How It Works", href: "/how-it-works" },
   { label: "FAQ", href: "/faq" },
 ];
 
+// The granite "B" mark — bold geometric letterform
+function BMark({ size = 28 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 28 28"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      style={{ flexShrink: 0, display: "block" }}
+      aria-hidden="true"
+    >
+      {/* Rounded square background */}
+      <rect width="28" height="28" rx="6" fill="#3D3A35" />
+      {/* Bold B letterform */}
+      <path
+        d="M8 6h7.5c1.5 0 2.7.4 3.5 1.1.8.7 1.2 1.7 1.2 2.9 0 .9-.2 1.6-.7 2.2-.4.5-.9.9-1.5 1.1.9.2 1.6.6 2.1 1.3.5.7.8 1.5.8 2.5 0 1.4-.5 2.5-1.4 3.3-.9.8-2.2 1.2-3.9 1.2H8V6zm2.2 6.2h4.8c.9 0 1.6-.2 2.1-.6.5-.4.7-1 .7-1.7 0-.7-.2-1.3-.7-1.7-.5-.4-1.2-.6-2.1-.6h-4.8v4.6zm0 6.4h5.2c1 0 1.8-.2 2.3-.7.5-.5.8-1.1.8-1.9 0-.8-.3-1.5-.8-1.9-.5-.5-1.3-.7-2.3-.7h-5.2v5.2z"
+        fill="#E8E4DA"
+      />
+    </svg>
+  );
+}
+
 export default function Nav() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [aboutOpen, setAboutOpen] = useState(false);
+  const aboutRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
+
+  const isAboutActive = aboutLinks.some(
+    (l) => pathname === l.href || pathname.startsWith(l.href)
+  );
+
+  // Close About dropdown on outside click
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (aboutRef.current && !aboutRef.current.contains(e.target as Node)) {
+        setAboutOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
 
   return (
     <nav
@@ -40,8 +83,18 @@ export default function Nav() {
           justifyContent: "space-between",
         }}
       >
-        {/* Wordmark */}
-        <Link href="/" style={{ textDecoration: "none", flexShrink: 0 }}>
+        {/* Wordmark with B mark */}
+        <Link
+          href="/"
+          style={{
+            textDecoration: "none",
+            flexShrink: 0,
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+          }}
+        >
+          <BMark size={26} />
           <span
             style={{
               fontFamily: "var(--font-display)",
@@ -51,7 +104,7 @@ export default function Nav() {
               letterSpacing: "-0.01em",
             }}
           >
-            Bedrock
+            bedrock
           </span>
           <span
             style={{
@@ -59,6 +112,7 @@ export default function Nav() {
               fontSize: "var(--wordmark-tld-size-nav)",
               fontWeight: "var(--wordmark-tld-weight)",
               color: "var(--wordmark-tld)",
+              marginLeft: "-4px",
             }}
           >
             .guide
@@ -74,8 +128,10 @@ export default function Nav() {
             gap: "var(--space-6)",
           }}
         >
-          {navLinks.map((link) => {
-            const active = pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href));
+          {topNavLinks.map((link) => {
+            const active =
+              pathname === link.href ||
+              (link.href !== "/" && pathname.startsWith(link.href));
             return (
               <Link
                 key={link.href}
@@ -83,25 +139,152 @@ export default function Nav() {
                 style={{
                   fontFamily: "var(--font-body)",
                   fontSize: "var(--text-small)",
-                  fontWeight: active ? "var(--weight-semibold)" : "var(--weight-medium)",
-                  color: active ? "var(--color-text-primary)" : "var(--color-text-secondary)",
+                  fontWeight: active
+                    ? "var(--weight-semibold)"
+                    : "var(--weight-medium)",
+                  color: active
+                    ? "var(--color-text-primary)"
+                    : "var(--color-text-secondary)",
                   textDecoration: "none",
                   transition: "var(--transition-fast)",
                   whiteSpace: "nowrap",
-                  borderBottom: active ? "2px solid var(--color-gold)" : "2px solid transparent",
+                  borderBottom: active
+                    ? "2px solid var(--color-gold)"
+                    : "2px solid transparent",
                   paddingBottom: "2px",
                 }}
                 onMouseEnter={(e) =>
                   (e.currentTarget.style.color = "var(--color-text-primary)")
                 }
                 onMouseLeave={(e) =>
-                  (e.currentTarget.style.color = active ? "var(--color-text-primary)" : "var(--color-text-secondary)")
+                  (e.currentTarget.style.color = active
+                    ? "var(--color-text-primary)"
+                    : "var(--color-text-secondary)")
                 }
               >
                 {link.label}
               </Link>
             );
           })}
+
+          {/* About dropdown */}
+          <div ref={aboutRef} style={{ position: "relative" }}>
+            <button
+              onClick={() => setAboutOpen((o) => !o)}
+              style={{
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                fontFamily: "var(--font-body)",
+                fontSize: "var(--text-small)",
+                fontWeight: isAboutActive
+                  ? "var(--weight-semibold)"
+                  : "var(--weight-medium)",
+                color: isAboutActive
+                  ? "var(--color-text-primary)"
+                  : "var(--color-text-secondary)",
+                borderBottom: isAboutActive
+                  ? "2px solid var(--color-gold)"
+                  : "2px solid transparent",
+                paddingBottom: "2px",
+                display: "flex",
+                alignItems: "center",
+                gap: "4px",
+                whiteSpace: "nowrap",
+                transition: "var(--transition-fast)",
+              }}
+              onMouseEnter={(e) =>
+                ((e.currentTarget as HTMLElement).style.color =
+                  "var(--color-text-primary)")
+              }
+              onMouseLeave={(e) =>
+                ((e.currentTarget as HTMLElement).style.color = isAboutActive
+                  ? "var(--color-text-primary)"
+                  : "var(--color-text-secondary)")
+              }
+            >
+              About
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 12 12"
+                fill="none"
+                style={{
+                  transform: aboutOpen ? "rotate(180deg)" : "rotate(0deg)",
+                  transition: "transform 0.15s ease",
+                }}
+              >
+                <path
+                  d="M2 4l4 4 4-4"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+
+            {aboutOpen && (
+              <div
+                style={{
+                  position: "absolute",
+                  top: "calc(100% + 12px)",
+                  right: 0,
+                  backgroundColor: "var(--color-bg-surface)",
+                  border: "1px solid var(--color-border)",
+                  borderRadius: "var(--radius-lg)",
+                  padding: "var(--space-2)",
+                  minWidth: "180px",
+                  boxShadow: "0 8px 24px rgba(0,0,0,0.3)",
+                  zIndex: 100,
+                }}
+              >
+                {aboutLinks.map((link) => {
+                  const active = pathname === link.href;
+                  return (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      onClick={() => setAboutOpen(false)}
+                      style={{
+                        display: "block",
+                        fontFamily: "var(--font-body)",
+                        fontSize: "var(--text-small)",
+                        fontWeight: active
+                          ? "var(--weight-semibold)"
+                          : "var(--weight-medium)",
+                        color: active
+                          ? "var(--color-text-primary)"
+                          : "var(--color-text-secondary)",
+                        textDecoration: "none",
+                        padding: "var(--space-3) var(--space-4)",
+                        borderRadius: "var(--radius-md)",
+                        backgroundColor: active
+                          ? "var(--color-bg-deep, #0f1f33)"
+                          : "transparent",
+                        transition: "var(--transition-fast)",
+                      }}
+                      onMouseEnter={(e) => {
+                        (e.currentTarget as HTMLElement).style.backgroundColor =
+                          "var(--color-bg-deep, #0f1f33)";
+                        (e.currentTarget as HTMLElement).style.color =
+                          "var(--color-text-primary)";
+                      }}
+                      onMouseLeave={(e) => {
+                        (e.currentTarget as HTMLElement).style.backgroundColor =
+                          active ? "var(--color-bg-deep, #0f1f33)" : "transparent";
+                        (e.currentTarget as HTMLElement).style.color = active
+                          ? "var(--color-text-primary)"
+                          : "var(--color-text-secondary)";
+                      }}
+                    >
+                      {link.label}
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
+          </div>
 
           {/* Take the Quiz CTA */}
           <Link
@@ -119,7 +302,8 @@ export default function Nav() {
               whiteSpace: "nowrap",
             }}
             onMouseEnter={(e) =>
-              (e.currentTarget.style.backgroundColor = "var(--color-red-light)")
+              (e.currentTarget.style.backgroundColor =
+                "var(--color-red-light)")
             }
             onMouseLeave={(e) =>
               (e.currentTarget.style.backgroundColor = "var(--color-red)")
@@ -179,7 +363,7 @@ export default function Nav() {
             gap: "var(--space-4)",
           }}
         >
-          {navLinks.map((link) => (
+          {topNavLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
@@ -195,6 +379,46 @@ export default function Nav() {
               {link.label}
             </Link>
           ))}
+          {/* About group in mobile */}
+          <div
+            style={{
+              borderTop: "1px solid var(--color-border)",
+              paddingTop: "var(--space-3)",
+              display: "flex",
+              flexDirection: "column",
+              gap: "var(--space-3)",
+            }}
+          >
+            <span
+              style={{
+                fontFamily: "var(--font-body)",
+                fontSize: "var(--text-micro)",
+                fontWeight: "var(--weight-semibold)",
+                color: "var(--color-text-muted)",
+                textTransform: "uppercase",
+                letterSpacing: "var(--tracking-wider)",
+              }}
+            >
+              About
+            </span>
+            {aboutLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={() => setMenuOpen(false)}
+                style={{
+                  fontFamily: "var(--font-body)",
+                  fontSize: "var(--text-body)",
+                  fontWeight: "var(--weight-medium)",
+                  color: "var(--color-text-secondary)",
+                  textDecoration: "none",
+                  paddingLeft: "var(--space-3)",
+                }}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
           <Link
             href="/quiz"
             onClick={() => setMenuOpen(false)}
