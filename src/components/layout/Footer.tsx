@@ -16,6 +16,7 @@ const columns = [
     heading: "About",
     links: [
       { label: "About Bedrock", href: "/about" },
+      { label: "Civic Mantle", href: "/civic-mantle" },
       { label: "How It Works", href: "/how-it-works" },
       { label: "Trust & Methodology", href: "/methodology" },
       { label: "FAQ", href: "/faq" },
