@@ -11,7 +11,7 @@ A civic identity platform for independent-minded voters. Not a party voter guide
 
 **Mission:** Help independent-minded citizens understand, articulate, and act on what they actually believe — because democracy works better when more people show up with clarity and conviction rather than confusion and indifference.
 
-**The one-liner:** Your values. Your ballot. Your media diet. All in one place.
+**The one-liner:** Find what you actually believe. Then put it to work — on your ballot, in your media diet, and in your conversations across difference.
 
 **Founder:** Matt Blumberg — technology entrepreneur, civic institutionalist, creator of the Country Over Self podcast. "I'm not red. I'm not blue. I'm red, white, and blue."
 
@@ -108,15 +108,46 @@ Red, white, and blue — used as a unified American system, never as opposing pa
 **Never:** Comic Sans, anything that reads as playful/casual, system fonts in display contexts.
 
 ### Hero Headline System
-The homepage hero uses a rotating tri-color headline system. Three lines, each a different color:
+The homepage hero uses a rotating full-headline system — three complete slides, each with its own eyebrow, headline, and subhead. Auto-advances every 5 seconds. Dot indicators allow manual navigation. Buttons always visible below the slide area.
 
-```
-Your values.          ← crimson
-Your ballot.          ← off-white  
-Your call.            ← blue
-```
+**Slide 1**
+- Eyebrow: "Not red. Not blue." (Libre Baskerville italic, muted)
+- Headline: "All of it." (DM Sans 700, 68px — tri-color: "All" in crimson #D44035, " of " in warm white #E8E4DA, "it." in blue #6B9FEA)
+- Subhead: Full platform overview — values, ballot, media diet, conversations
 
-The third line rotates through variants ("Your call." / "Your voice." / "Your bedrock.") with a smooth crossfade. The word "Your" repeats intentionally — it's the brand's core assertion that this is about the user, not a party.
+**Slide 2**
+- Eyebrow: "There's got to be a better way." (Libre Baskerville italic, muted)
+- Headline: "Find what you *actually* believe." (Libre Baskerville 700, 44px — "actually" in gold italic #C8A96E)
+- Subhead: Values quiz focus
+
+**Slide 3**
+- Eyebrow: "For the voters who haven't given up." (Libre Baskerville italic, muted)
+- Headline: "There's got to be a better way." (DM Sans 700, 46px, warm white)
+- Subhead: Independent voter audience
+
+**Implementation:** Slides fade in/out (opacity transition 0.6s). Fixed-height slide wrapper so page doesn't jump. CTAs ("Find your bedrock" primary button + "How it works" ghost button) sit below the slide wrapper and never move.
+
+### Homepage Architecture
+The homepage has four sections in order:
+
+**1. Nav**
+Mark + wordmark (BEDROCK.guide) + nav links (How it works / The framework / About) + "Take the quiz" CTA button
+
+**2. Hero**
+Rotating headline system (three slides, as above)
+
+**3. Civic Identity + Three Pillars**
+Civic identity is the overarching layer — not a pillar itself. Needs visual design treatment above or surrounding the three pillars to make the hierarchy clear. Copy: "Your civic identity — one of ten named types, with a constellation unique to you. Everything below is built on top of it."
+
+Three pillars in order, each with a tri-color accent bar:
+- **Your ballot** (crimson accent #D44035) — "Every race, matched to your values. From president to school board."
+- **Your media diet** (warm white accent #E8E4DA) — "Independent journalism matched to how you actually think."
+- **Your conversations** (blue accent #6B9FEA) — "Claude-powered prep for difficult conversations across difference."
+
+**4. Tagline band**
+*"Not red, not blue — red, white, and blue."*
+Typography: Libre Baskerville italic, 22px, gold #C8A96E
+Attribution below: "From the *Country Over Self* podcast." (*Country Over Self* italicized)
 
 ### Spacing & Layout
 - Generous whitespace — this is not a dense information site
@@ -164,7 +195,9 @@ Frustrated-but-constructive. Optimistic and forward-looking. Not angry, not resi
 
 ## 6. Country Over Self Connection
 
-The Country Over Self podcast (countryoverself.com) is Bedrock's origin story and credibility credential. Founded by Matt Blumberg. Built around the philosophy "I'm not red, I'm not blue — I'm red, white, and blue."
+The Country Over Self podcast (countryoverself.com) is Bedrock's origin story and credibility credential. Founded and hosted by Matt Blumberg. Built around the philosophy "I'm not red, I'm not blue — I'm red, white, and blue."
+
+The podcast is a completed series — available on Spotify, Apple Podcasts, and YouTube. A second season is possible but not planned. Reference it as a completed work, not an ongoing one, unless that changes."
 
 **How it surfaces on the site:**
 - About page — explicit origin story
