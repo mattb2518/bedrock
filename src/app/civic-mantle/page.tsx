@@ -321,7 +321,7 @@ export default function CivicMantlePage() {
           The Civic Mantle Map
         </p>
         <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-body)", color: "var(--color-text-secondary)", marginBottom: "var(--space-8)", maxWidth: "560px" }}>
-          Ten types. You'll recognize yourself in yours — and probably see people you know in the others. Click any card to see real-world examples.
+          Ten types. You'll recognize yourself in yours — and probably see people you know in the others. Your result will include one primary Civic Mantle and up to three secondary affinities — because most people don't fit perfectly into one box. Click any card to see real-world examples.
         </p>
 
         {/* 5-column grid → 2 rows of 5 */}
@@ -332,10 +332,6 @@ export default function CivicMantlePage() {
         }} className="mantle-grid">
           {types.map(t => <TypeCard key={t.label} type={t} />)}
         </div>
-
-        <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-small)", color: "var(--color-text-muted)", marginTop: "var(--space-6)", fontStyle: "italic" }}>
-          Your result includes one primary Civic Mantle and up to three secondary affinities — because most people don't fit perfectly into one box.
-        </p>
       </div>
 
       {/* Sample Constellation */}
