@@ -1159,13 +1159,14 @@ If you could move the needle on exactly one issue in American public life — on
 21. Rejects taking any meaningful policy action on climate
 22. Supports directing public education funds primarily to religious institutions
 23. Supports federal speech restrictions on "hate speech" or "misinformation" beyond current First Amendment limits
-24. Supports legalizing all federally controlled substances including hard drugs
+24. Supports federal regulation of political campaign speech or content beyond current First Amendment limits
+25. Supports legalizing all federally controlled substances including hard drugs
 
 **CHARACTER**
-25. Credibly accused of sexual misconduct
-26. Has made public statements that explicitly denigrate people based on race, ethnicity, religion, gender identity, or sexual orientation
-27. Has supported policies that materially disadvantage people based on race, ethnicity, religion, gender identity, or sexual orientation
-28. Has been convicted of a felony involving fraud, violence, or abuse of office
+26. Credibly accused of sexual misconduct
+27. Has made public statements that explicitly denigrate people based on race, ethnicity, religion, gender identity, or sexual orientation
+28. Has supported policies that materially disadvantage people based on race, ethnicity, religion, gender identity, or sexual orientation
+29. Has been convicted of a felony involving fraud, violence, or abuse of office
 
 **Open text:** *"Anything else that would disqualify a candidate for you, regardless of their other positions?"*
 
@@ -1180,12 +1181,12 @@ If you could move the needle on exactly one issue in American public life — on
 - 5 process/institutional items — genuinely cross-partisan
 - 3 civil liberties items — genuinely cross-partisan
 - 1 national security item — cross-partisan
-- 15 policy absolute items:
+- 16 policy absolute items:
   - 8 paired items (10/11, 12/13, 14/15, 16/17) — 4 filter left-leaning candidates, 4 filter right-leaning
-  - 7 Other items (18–24) — 3 filter left-leaning (18 race/gender preferences, 23 speech restrictions, 24 drug legalization), 4 filter right-leaning (19 LGBTQ protections, 20 climate-cause denial, 21 climate-policy rejection, 22 religious-school funding)
-  - Net policy-absolute filter split: 7 left-leaning, 8 right-leaning (the religious-school item is the unpaired filter-right addition)
+  - 8 Other items (18–25) — 4 filter left-leaning (18 race/gender preferences, 23 speech restrictions, 24 campaign-speech regulation, 25 drug legalization), 4 filter right-leaning (19 LGBTQ protections, 20 climate-cause denial, 21 climate-policy rejection, 22 religious-school funding)
+  - Net policy-absolute filter split: 8 left-leaning, 8 right-leaning — balanced
 - 4 character items — genuinely cross-partisan
-- Total: 28 items + open text
+- Total: 29 items + open text
 
 ---
 
