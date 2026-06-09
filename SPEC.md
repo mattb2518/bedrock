@@ -971,7 +971,7 @@ A candidate you mostly agree with has a serious and credible character issue —
 *"The most reliable predictor of how someone will exercise power is how they've exercised it before — in relationships, in business, in private moments when they thought no one was watching."*
 
 **B.** Policy mostly wins — I'm electing someone to do a job, not be a role model. If the record is strong and the alternative is worse, I can hold my nose.
-*"FDR had a famously complicated personal life. LBJ was legendarily cruel to his staff. Both transformed the country. Waiting for a candidate with good character AND good policy is often waiting for someone who doesn't exist."*
+*"FDR had a famously complicated personal life. LBJ was legendarily cruel to his staff. Both transformed the country."*
 
 **C.** Depends on whether the character issue is relevant to the job — financial fraud tells you something about how someone will handle public money. A messy divorce probably doesn't.
 *"Not all character flaws are created equal."*
@@ -1005,7 +1005,7 @@ Most voters have a general partisan lean. What would most reliably make you vote
 You're in a primary. Your preferred candidate holds positions closest to yours but faces an uphill general election battle. A more moderate candidate is more electable but less aligned. How do you vote?
 
 **A.** Vote for who I actually want — primaries exist to express genuine preference, and strategically voting for someone you don't really want often produces a candidate nobody's excited about.
-*"'Electable' is often a proxy for 'familiar' — and familiar isn't always better."*
+*"The expressive-preference answer — vote your actual view in the primary, save strategic voting for the general."*
 
 **B.** Vote for who can win — a candidate who loses the general helps nobody, and winning is the prerequisite for everything else.
 *"The perfect candidate who loses has zero influence on policy. The imperfect candidate who wins has enormous influence."*
@@ -1044,7 +1044,7 @@ When an incumbent is running for reelection, how does that affect your thinking?
 *"Campaign promises are cheap. Voting records, budget decisions, and constituent services are evidence."*
 
 **B.** Mild disadvantage — incumbents accumulate obligations and the habits of power over time. Fresh perspective is harder to maintain the longer someone has been in office.
-*"The longer someone holds office, the more relationships, donors, and institutional interests they accumulate. Challengers haven't had time to be captured yet."*
+*"The longer someone holds office, the more relationships, obligations, and institutional habits accumulate."*
 
 **C.** Entirely depends on the record — incumbency itself is neutral. A strong record deserves reelection. A weak one deserves a challenger.
 *"Incumbency is neither a credential nor a scarlet letter. The question is always the same: did they do the job well?"*
@@ -1093,7 +1093,7 @@ When deciding how to vote, are you primarily thinking about the next two to four
 **L3-Q8 — Issue Priority (capstone)**
 
 *No Easter egg. No micro-reactions. Let it land.*
-*UI note: "Tell us" opens a text field immediately — more invitation than option. Visually distinct from "It depends" on every other question.*
+*UI note: Four equal options, presented as siblings. D opens a text field immediately on selection — visually distinct from "It depends" on every other question, and not framed as a fallback for users who didn't fit A/B/C.*
 
 If you could move the needle on exactly one issue in American public life — one thing that, if fixed, would matter most to you — what would it be?
 
@@ -1103,7 +1103,8 @@ If you could move the needle on exactly one issue in American public life — on
 
 **C.** National unity and civic health — the polarization and distrust that makes every other problem harder to solve.
 
-**Tell us** → *"What's the one issue you'd move if you could — in your own words. This becomes part of your Bedrock profile and helps us find the candidates and media that match what actually matters to you."*
+**D.** Something else entirely — and it matters enough that I want to name it myself.
+→ OT: *"What's the one issue you'd move if you could — in your own words. This becomes part of your Bedrock profile and helps us find the candidates and media that match what actually matters to you."*
 
 ## 10. Layer 4 — Dealbreaker Screen — Complete
 
