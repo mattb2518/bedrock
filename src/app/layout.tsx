@@ -1,11 +1,23 @@
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
+import { Libre_Baskerville, DM_Sans } from "next/font/google";
 import Script from "next/script";
+import Nav from "@/components/layout/Nav";
+import Footer from "@/components/layout/Footer";
 import "./globals.css";
 
-const geist = Geist({
-  variable: "--font-geist-sans",
+const libreBaskerville = Libre_Baskerville({
+  weight: ["400", "700"],
+  style: ["normal", "italic"],
   subsets: ["latin"],
+  variable: "--font-display",
+  display: "swap",
+});
+
+const dmSans = DM_Sans({
+  weight: ["400", "500", "600", "700"],
+  subsets: ["latin"],
+  variable: "--font-body",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -29,7 +41,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${geist.variable} h-full antialiased`}>
+    <html
+      lang="en"
+      className={`${libreBaskerville.variable} ${dmSans.variable} h-full antialiased`}
+    >
       <head>
         {process.env.NEXT_PUBLIC_APP_ENV === "production" && (
           <Script
@@ -39,8 +54,19 @@ export default function RootLayout({
           />
         )}
       </head>
-      <body className="min-h-full flex flex-col bg-white text-slate-900">
-        {children}
+      <body
+        style={{
+          backgroundColor: "var(--color-bg-page)",
+          color: "var(--color-text-primary)",
+          fontFamily: "var(--font-body)",
+          minHeight: "100vh",
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        <Nav />
+        <main style={{ flex: 1 }}>{children}</main>
+        <Footer />
       </body>
     </html>
   );
