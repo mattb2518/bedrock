@@ -4,7 +4,7 @@ import type { NextRequest } from "next/server";
 const PASSWORD = "redwhiteblue";
 const COOKIE_NAME = "bedrock_gate";
 
-export function proxy(request: NextRequest) {
+export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Always allow the password gate page and its API route
