@@ -62,6 +62,8 @@ Same quiz → recommended independent journalists, Substacks, podcasts matched t
   - **Open text:** "Tell us more — what shapes your answer?" Used when nuance is personal and hard to pre-enumerate
   - **Choice follow-up (select all that apply):** 3-4 specific sub-cases. Used when sub-cases are predictable
 - Each question gets one follow-up mechanic, decided at write time
+- **Dimension importance rating:** Single question at the end of Layer 1 — after all 20 questions, before the constellation reveal. Shows all eight dimensions as selectable tiles; user picks up to 3 that feel most central to their civic identity. Framing: *"You've just mapped how you think. Before we show you your constellation — which of these feel most central to who you are as a voter?"* Output feeds the recommendation engine as a weighting signal. Pushes Layer 1 to 21 items total.
+- **"Add context" on every question:** Small, subtle gray "+ add context" link below each answer. Expands an inline text field on click. No label saying "optional" — unobtrusiveness communicates that. Applies to all layers.
 - **Micro-reactions** after each answer: brief, warm, occasionally surprising, never partisan, occasionally humorous. User must tap, click, or press Enter to advance — no auto-advance. Click target should be the full screen or answer area, not a labeled button.
 - **Easter eggs:** American only — historical nuggets, serious trivia, or humor. Woven in naturally, roughly 1 per question. Mix of serious historical and lighter Americana.
 - **Bias check rule:** All questions reviewed for political lean before finalizing. Micro-reactions and examples must be balanced — no option should feel like the "wrong" answer
@@ -69,11 +71,7 @@ Same quiz → recommended independent journalists, Substacks, podcasts matched t
 ### Account and Save/Return
 
 - Mandatory account creation (not optional)
-- **Account creation timing:** Optional and contextual — never forced except at one moment:
-  - Available (not required) before the quiz starts, for users who want to be signed in from the beginning
-  - Available (not required) after Layer 1, prompted alongside the constellation teaser as a "save your progress" nudge
-  - **Required** when the user explicitly clicks "Save and continue later" — that action only makes sense with an account to save to
-  - Users who complete the entire quiz in one sitting are never forced to create an account; prompted to save results at the end
+- **Account creation timing:** TBD — before quiz, after Layer 1, or at point of saving results. Decision needed before build.
 - Email link as backup save mechanism
 - System knows exactly where user is on return
 - Profile persists across sessions with recursive learning via Claude API
@@ -1130,9 +1128,9 @@ If you could move the needle on exactly one issue in American public life — on
 
 **NOTE FOR CLAUDE CODE:** These are unresolved design decisions requiring Matt's input. Flag them when relevant but do not make decisions on them independently. Raise them explicitly before proceeding with any build work that depends on them.
 
-1. ~~Account creation timing~~ — **resolved:** optional/contextual; required only at "Save and continue later"
-2. Importance ratings — still in or out? If in, belongs in Layer 3
-3. Open text on every question — every question or optional "want to say more?"
+1. Account creation timing — before quiz, after Layer 1, or at save point?
+2. ~~Importance ratings~~ — **resolved:** single "pick your top 3 dimensions" question at end of Layer 1, before constellation reveal
+3. ~~Open text on every question~~ — **resolved:** subtle "+ add context" link on every question, expands inline on click, no forced visibility
 4. Recommendation engine matching formula — biggest unresolved design question; **run a dedicated session with Opus 4.7 or Deep Thinking mode before speccing this**
 5. Candidate data model — how positions map to dimensions
 6. Media diet MVP scope — how many sources at launch
