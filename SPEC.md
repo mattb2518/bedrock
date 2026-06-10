@@ -314,6 +314,8 @@ One more layer — and it's different from everything before it.
 
 These aren't preferences. They're lines.
 
+Not party lines — your lines.
+
 A candidate can be 90% aligned with your values and still be disqualified by one position, one vote, or one behavior.
 
 This is where you tell us yours.
@@ -1447,6 +1449,8 @@ Every question lets you say "it depends" — and when you do, the quiz follows u
 
 **What you get.**
 Your civic identity first. A named type — one of ten — with a constellation that shows exactly how you got there across all eight dimensions. We call it your Civic Mantle. The word is intentional — a mantle isn't assigned. It's something you recognize as yours and take up.
+
+The type is shorthand. The constellation is the truth. Most people fit one type cleanly. Some sit between two or three. A few don't fit any — and that's information too.
 
 Not a party label. Not a left-right score. A plain-English summary of where you stand, what you're consistent on, and where you're genuinely torn.
 
