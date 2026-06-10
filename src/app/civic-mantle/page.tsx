@@ -91,12 +91,10 @@ const types = [
 ];
 
 // ── Card component with flip ─────────────────────────────────────────────────
-function TypeCard({ type }: { type: typeof types[0] }) {
-  const [flipped, setFlipped] = useState(false);
-
+function TypeCard({ type, flipped, onToggle }: { type: typeof types[0]; flipped: boolean; onToggle: () => void }) {
   return (
     <div
-      onClick={() => setFlipped(f => !f)}
+      onClick={onToggle}
       style={{ cursor: "pointer", perspective: "1000px", height: "210px" }}
       title={flipped ? "Click to flip back" : "Click to flip"}
     >
@@ -157,7 +155,7 @@ function TypeCard({ type }: { type: typeof types[0] }) {
           display: "flex", flexDirection: "column", gap: "var(--space-3)",
         }}>
           <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-micro)", fontWeight: "var(--weight-semibold)", color: "var(--color-text-muted)", letterSpacing: "var(--tracking-wider)", textTransform: "uppercase", margin: 0 }}>
-            A forerunner
+            An Early {type.label.replace(/^The /, "")}
           </p>
           <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-2)", flex: 1 }}>
             <p style={{ fontFamily: "var(--font-display)", fontWeight: "700", fontSize: "var(--text-h4)", color: "var(--color-text-primary)", margin: 0, lineHeight: "var(--leading-tight)" }}>
@@ -179,6 +177,8 @@ function TypeCard({ type }: { type: typeof types[0] }) {
 
 // ── Page ─────────────────────────────────────────────────────────────────────
 export default function CivicMantlePage() {
+  const [flippedLabel, setFlippedLabel] = useState<string | null>(null);
+
   return (
     <div style={{ maxWidth: "var(--max-width-full)", margin: "0 auto", padding: "var(--space-16) var(--space-6)" }}>
 
@@ -227,7 +227,14 @@ export default function CivicMantlePage() {
           gridTemplateColumns: "repeat(5, 1fr)",
           gap: "var(--space-4)",
         }} className="mantle-grid">
-          {types.map(t => <TypeCard key={t.label} type={t} />)}
+          {types.map(t => (
+            <TypeCard
+              key={t.label}
+              type={t}
+              flipped={flippedLabel === t.label}
+              onToggle={() => setFlippedLabel(prev => (prev === t.label ? null : t.label))}
+            />
+          ))}
         </div>
       </div>
 

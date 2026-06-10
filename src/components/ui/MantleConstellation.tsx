@@ -27,7 +27,7 @@ export default function MantleConstellation() {
     <div className="mantle-fingerprints">
       {MANTLES.map(m => (
         <Link key={m.label} href="/civic-mantle" className="mantle-fp">
-          <Constellation scores={m.scores} size={150} showLabels={false} showGrid={false} />
+          <Constellation scores={m.scores} size={150} showLabels={false} showGrid={false} viewBox="70 70 260 260" />
           <span className="mantle-fp__label">{m.label}</span>
         </Link>
       ))}
@@ -36,14 +36,16 @@ export default function MantleConstellation() {
         .mantle-fingerprints {
           display: grid;
           grid-template-columns: repeat(5, 1fr);
-          gap: var(--space-8) var(--space-4);
+          gap: var(--space-2) var(--space-1);
+          max-width: 900px;
+          margin: 0 auto;
         }
         .mantle-fp {
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: var(--space-2);
-          padding: var(--space-4) var(--space-2) var(--space-3);
+          gap: 0;
+          padding: var(--space-2) var(--space-1);
           border: 1px solid transparent;
           border-radius: var(--radius-lg);
           text-decoration: none;
@@ -60,6 +62,7 @@ export default function MantleConstellation() {
           color: var(--color-text-secondary);
           text-align: center;
           line-height: var(--leading-snug);
+          margin-top: -6px;
         }
         .mantle-fp:hover .mantle-fp__label {
           color: var(--color-text-primary);
