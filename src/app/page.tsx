@@ -2,15 +2,15 @@ import HeroSlider from "@/components/layout/HeroSlider";
 import Link from "next/link";
 
 const types = [
-  { label: "The Honest Broker",    oneLiner: "Plays by the rules — and expects everyone else to." },
-  { label: "The System Fixer",     oneLiner: "Not left or right — just tired of broken machinery." },
+  { label: "The Honest Broker",    oneLiner: "The rules are the freedom." },
+  { label: "The System Fixer",     oneLiner: "Not left or right — building better machinery." },
   { label: "The Long Gamer",       oneLiner: "Thinks in decades and across borders." },
   { label: "The Good Neighbor",    oneLiner: "Believes the best solutions start closest to home." },
   { label: "The Missourian",       oneLiner: "You'll believe it when you see it — and you're usually right." },
   { label: "The Eternal Optimist", oneLiner: "Democracy is messy and you're here for all of it." },
-  { label: "The Steward",          oneLiner: "Someone has to protect what works — you volunteered." },
+  { label: "The Steward",          oneLiner: "Knows what's worth conserving — and what isn't." },
   { label: "The Free Agent",       oneLiner: "Never fit a box and stopped trying." },
-  { label: "The Standard Bearer",  oneLiner: "The institutions aren't perfect, but they're what we've got." },
+  { label: "The Standard Bearer",  oneLiner: "The institutions are imperfect — and worth defending." },
   { label: "The Pioneer",          oneLiner: "Progress is possible, and you know how to build it." },
 ];
 
