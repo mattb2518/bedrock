@@ -34,6 +34,7 @@ type ConstellationProps = {
   innerLabels?: string[];
   size?: number;
   showLabels?: boolean;
+  showGrid?: boolean;
 };
 
 export default function Constellation({
@@ -42,6 +43,7 @@ export default function Constellation({
   innerLabels = DIMENSION_AXES.inner,
   size = 360,
   showLabels = true,
+  showGrid = true,
 }: ConstellationProps) {
   const cx = 200, cy = 200, r = 140;
   const n = scores.length;
@@ -75,7 +77,7 @@ export default function Constellation({
   return (
     <svg viewBox="0 0 400 400" width={size} height={size} style={{ display: "block", margin: "0 auto" }}>
       {/* Grid */}
-      {gridPolygons.map((pts, i) => (
+      {showGrid && gridPolygons.map((pts, i) => (
         <polygon key={i} points={pts} fill="none" stroke="rgba(107,159,234,0.12)" strokeWidth="1" />
       ))}
       {/* Axis lines */}

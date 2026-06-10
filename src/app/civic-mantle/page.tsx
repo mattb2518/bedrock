@@ -17,108 +17,76 @@ const dimensions = [
   { a: "Trust",       b: "Skepticism"  },
 ];
 
-// REVIEW NEEDED: Politician pairings below are illustrative suggestions —
-// one R, one D per type. Confirm accuracy before going live.
 const types = [
   {
     label: "The Honest Broker",
     workingName: "Pragmatic Constitutionalist",
     oneLiner: "The rules are the freedom.",
     dimensions: ["Stability", "Federal", "Rules", "Markets", "Trust"],
-    politicians: [
-      { name: "John Kasich",  party: "R", note: "Moderate, rule-follower, bipartisan reputation" },
-      { name: "Joe Manchin",  party: "D", note: "Played by the rules even when it hurt his party" },
-    ],
+    figure: { name: "George Washington", why: "Set the rules by following them — precedent, restraint, and a peaceful handoff of power." },
   },
   {
     label: "The System Fixer",
     workingName: "Independent Architect",
     oneLiner: "Not left or right — building better machinery.",
     dimensions: ["Change", "Outcomes", "Pragmatism", "Skepticism"],
-    politicians: [
-      { name: "Chris Christie",    party: "R", note: "Outcomes-first, willing to break from party" },
-      { name: "Michael Bloomberg", party: "D", note: "Independent-minded, relentlessly results-driven" },
-    ],
+    figure: { name: "Theodore Roosevelt", why: "Busted the trusts and bolted his own party; broken machinery was there to be fixed." },
   },
   {
     label: "The Long Gamer",
     workingName: "Principled Globalist",
     oneLiner: "Thinks in decades and across borders.",
     dimensions: ["Global", "Idealism", "Collective", "Federal"],
-    politicians: [
-      { name: "George H.W. Bush", party: "R", note: "Long-view foreign policy, multilateral by instinct" },
-      { name: "Bill Clinton",     party: "D", note: "NAFTA, global engagement, generational thinking" },
-    ],
+    figure: { name: "Benjamin Franklin", why: "Diplomat and institution-builder who thought in generations and across an ocean." },
   },
   {
     label: "The Good Neighbor",
     workingName: "Rooted Pragmatist",
     oneLiner: "Believes the best solutions start closest to home.",
     dimensions: ["Local", "Pragmatism", "Collective", "Stability"],
-    politicians: [
-      { name: "Phil Scott",        party: "R", note: "Vermont governor, locally-focused, pragmatic moderate" },
-      { name: "Gretchen Whitmer",  party: "D", note: "Practical, locally-rooted, focused on what works" },
-    ],
+    figure: { name: "Jane Addams", why: "Built Hull House block by block — change starts closest to home." },
   },
   {
     label: "The Missourian",
     workingName: "Constructive Skeptic",
     oneLiner: "You'll believe it when you see it — and you're usually right.",
     dimensions: ["Skepticism", "Outcomes", "Pragmatism", "Individual"],
-    politicians: [
-      { name: "Rand Paul",    party: "R", note: "Skeptical of institutions, demands proof" },
-      { name: "Bernie Sanders", party: "D", note: "\"Show me the results\" — skeptical of the same machinery from the other direction" },
-    ],
+    figure: { name: "Harry S. Truman", why: "The Show-Me State's own: plain-spoken, skeptical, \"the buck stops here.\"" },
   },
   {
     label: "The Eternal Optimist",
     workingName: "Civic Optimist",
     oneLiner: "Democracy is messy and you're here for all of it.",
     dimensions: ["Trust", "Change", "Collective", "Idealism"],
-    politicians: [
-      { name: "Ronald Reagan",  party: "R", note: "\"Morning in America\" — civic optimism as identity" },
-      { name: "Barack Obama",   party: "D", note: "\"Yes We Can\" — belief in collective possibility" },
-    ],
+    figure: { name: "Walt Whitman", why: "Sang the sprawling, messy democracy and loved every contradiction of it." },
   },
   {
     label: "The Steward",
     workingName: "Steady Steward",
     oneLiner: "Knows what's worth conserving — and what isn't.",
     dimensions: ["Stability", "Rules", "Trust", "Local"],
-    politicians: [
-      { name: "Susan Collins", party: "R", note: "Institutional protector, defender of process" },
-      { name: "Pat Leahy",     party: "D", note: "Senate institutionalist, tradition over politics" },
-    ],
+    figure: { name: "Dwight D. Eisenhower", why: "Steady hands on what worked; guarded the center and warned against overreach." },
   },
   {
     label: "The Free Agent",
     workingName: "Sovereign Independent",
     oneLiner: "Never fit a box and stopped trying.",
     dimensions: ["Individual", "Skepticism", "Local", "Markets"],
-    politicians: [
-      { name: "Ron Paul",       party: "R", note: "Genuinely never fit a box, stopped trying" },
-      { name: "Tulsi Gabbard",  party: "D", note: "Broke from party orthodoxy repeatedly, defied categorization" },
-    ],
+    figure: { name: "Mark Twain", why: "Never fit a box, skewered every institution, and answered to no party." },
   },
   {
     label: "The Standard Bearer",
     workingName: "Principled Institutionalist",
     oneLiner: "The institutions are imperfect — and worth defending.",
     dimensions: ["Rules", "Trust", "Global", "Idealism", "Federal"],
-    politicians: [
-      { name: "Mitt Romney", party: "R", note: "Voted conscience over party, institutional to the end" },
-      { name: "John Kerry",  party: "D", note: "Multilateral, rule-of-law instinct, institutionalist" },
-    ],
+    figure: { name: "Abraham Lincoln", why: "Held the Union and its institutions together when they were all that was left." },
   },
   {
     label: "The Pioneer",
     workingName: "Growth-First Independent",
     oneLiner: "Progress is possible, and you know how to build it.",
     dimensions: ["Change", "Markets", "National", "Pragmatism"],
-    politicians: [
-      { name: "Marco Rubio",     party: "R", note: "Growth-oriented, builder mentality, pragmatic ambition" },
-      { name: "Pete Buttigieg",  party: "D", note: "Progress-focused, builds toward the future" },
-    ],
+    figure: { name: "Alexander Hamilton", why: "Built the machinery of a national economy from scratch — progress you can engineer." },
   },
 ];
 
@@ -189,28 +157,17 @@ function TypeCard({ type }: { type: typeof types[0] }) {
           display: "flex", flexDirection: "column", gap: "var(--space-3)",
         }}>
           <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-micro)", fontWeight: "var(--weight-semibold)", color: "var(--color-text-muted)", letterSpacing: "var(--tracking-wider)", textTransform: "uppercase", margin: 0 }}>
-            Real-world examples
+            A forerunner
           </p>
-          {type.politicians.map(p => (
-            <div key={p.name} style={{ display: "flex", gap: "var(--space-3)", alignItems: "flex-start" }}>
-              <span style={{
-                flexShrink: 0,
-                backgroundColor: p.party === "R" ? "rgba(212,64,53,0.15)" : "rgba(107,159,234,0.15)",
-                color: p.party === "R" ? "var(--color-red)" : "var(--color-blue-accent)",
-                border: `1px solid ${p.party === "R" ? "rgba(212,64,53,0.3)" : "rgba(107,159,234,0.3)"}`,
-                borderRadius: "var(--radius-full)",
-                padding: "1px 8px",
-                fontFamily: "var(--font-body)",
-                fontSize: "var(--text-micro)",
-                fontWeight: "var(--weight-semibold)",
-              }}>{p.party}</span>
-              <div>
-                <p style={{ fontFamily: "var(--font-body)", fontWeight: "var(--weight-semibold)", fontSize: "var(--text-small)", color: "var(--color-text-primary)", margin: 0 }}>{p.name}</p>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "10px", color: "var(--color-text-muted)", margin: 0, lineHeight: "1.4" }}>{p.note}</p>
-              </div>
-            </div>
-          ))}
-          <p style={{ fontFamily: "var(--font-body)", fontSize: "10px", color: "var(--color-text-muted)", margin: "auto 0 0 0", textAlign: "right", opacity: 0.5 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-2)", flex: 1 }}>
+            <p style={{ fontFamily: "var(--font-display)", fontWeight: "700", fontSize: "var(--text-h4)", color: "var(--color-text-primary)", margin: 0, lineHeight: "var(--leading-tight)" }}>
+              {type.figure.name}
+            </p>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-small)", color: "var(--color-text-secondary)", margin: 0, lineHeight: "var(--leading-relaxed)" }}>
+              {type.figure.why}
+            </p>
+          </div>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: "10px", color: "var(--color-text-muted)", margin: 0, textAlign: "right", opacity: 0.5 }}>
             ← flip back
           </p>
         </div>
