@@ -1,4 +1,5 @@
 import HeroSlider from "@/components/layout/HeroSlider";
+import Constellation, { DIMENSION_PAIRS } from "@/components/ui/Constellation";
 import Link from "next/link";
 
 const types = [
@@ -21,68 +22,90 @@ export default function Home() {
       <HeroSlider />
 
       {/* ── Civic Mantle Teaser ───────────────────────────── */}
-      <section style={{ backgroundColor: "var(--color-bg-page)", padding: "var(--space-20) var(--space-6)" }}>
+      <section style={{ backgroundColor: "var(--color-bg-section)", padding: "var(--space-20) var(--space-6)" }}>
         <div style={{ maxWidth: "var(--max-width-wide)", margin: "0 auto" }}>
 
-          {/* Section header */}
-          <div style={{ textAlign: "center", marginBottom: "var(--space-12)" }}>
-            <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-small)", fontWeight: "var(--weight-semibold)", color: "var(--color-gold)", letterSpacing: "var(--tracking-wider)", textTransform: "uppercase", marginBottom: "var(--space-4)" }}>
-              Civic Mantle
-            </p>
-            <h2 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-h2)", color: "var(--color-text-primary)", lineHeight: "var(--leading-tight)", marginBottom: "var(--space-4)" }}>
-              Ten mantles.<br />One is yours.
-            </h2>
-            <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-body-lg)", color: "var(--color-text-secondary)", lineHeight: "var(--leading-relaxed)", maxWidth: "560px", margin: "0 auto" }}>
-              Not a label. A mantle — something you claim. The quiz maps your values across eight dimensions and gives you a named civic identity that's specific to you.
-            </p>
-          </div>
+          {/* Split hero: pitch + constellation */}
+          <div className="mantle-hero" style={{ display: "grid", gridTemplateColumns: "1.1fr 0.9fr", gap: "var(--space-16)", alignItems: "center" }}>
 
-          {/* Ten types grid */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "var(--space-3)", marginBottom: "var(--space-10)" }}>
-            {types.map((t) => (
-              <div
-                key={t.label}
-                style={{
-                  backgroundColor: "var(--color-bg-surface)",
-                  border: "1px solid var(--color-border)",
-                  borderRadius: "var(--radius-md)",
-                  padding: "var(--space-4) var(--space-5)",
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "var(--space-2)",
-                }}
-              >
-                <p style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-body)", fontWeight: "700", color: "var(--color-text-primary)", margin: 0 }}>
-                  {t.label}
-                </p>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-small)", color: "var(--color-text-muted)", margin: 0, lineHeight: "var(--leading-relaxed)", fontStyle: "italic" }}>
-                  {t.oneLiner}
-                </p>
+            {/* Left — the pitch */}
+            <div>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-small)", fontWeight: "var(--weight-semibold)", color: "var(--color-gold)", letterSpacing: "var(--tracking-wider)", textTransform: "uppercase", marginBottom: "var(--space-4)" }}>
+                Civic Mantle
+              </p>
+              <h2 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-h2)", color: "var(--color-text-primary)", lineHeight: "var(--leading-tight)", marginBottom: "var(--space-5)" }}>
+                Ten mantles.<br />One is yours.
+              </h2>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-body-lg)", color: "var(--color-text-secondary)", lineHeight: "var(--leading-relaxed)", maxWidth: "480px", marginBottom: "var(--space-8)" }}>
+                Not a label. A mantle — something you claim. The quiz maps your values across eight dimensions and hands you a constellation that&apos;s yours alone.
+              </p>
+              <div style={{ display: "flex", gap: "var(--space-4)", flexWrap: "wrap" }}>
+                <Link
+                  href="/quiz"
+                  style={{ backgroundColor: "var(--color-red)", color: "#fff", fontFamily: "var(--font-body)", fontWeight: "var(--weight-semibold)", fontSize: "var(--text-body)", padding: "var(--space-3) var(--space-6)", borderRadius: "var(--btn-radius)", textDecoration: "none" }}
+                >
+                  Find your mantle →
+                </Link>
+                <Link
+                  href="/civic-mantle"
+                  style={{ backgroundColor: "transparent", color: "var(--color-text-secondary)", fontFamily: "var(--font-body)", fontWeight: "var(--weight-medium)", fontSize: "var(--text-body)", padding: "var(--space-3) var(--space-6)", borderRadius: "var(--btn-radius)", textDecoration: "none", border: "1px solid var(--color-border)" }}
+                >
+                  Explore all ten
+                </Link>
               </div>
-            ))}
+            </div>
+
+            {/* Right — the constellation */}
+            <div style={{ backgroundColor: "var(--color-bg-surface)", border: "1px solid var(--color-border)", borderRadius: "var(--radius-lg)", padding: "var(--space-8)", boxShadow: "var(--shadow-glow-blue)" }}>
+              <Constellation size={300} showLabels={false} />
+              <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-small)", color: "var(--color-text-muted)", textAlign: "center", marginTop: "var(--space-4)", fontStyle: "italic" }}>
+                One person&apos;s civic fingerprint — <span style={{ color: "var(--color-gold)" }}>The Honest Broker</span>
+              </p>
+            </div>
           </div>
 
-          {/* CTAs */}
-          <div style={{ textAlign: "center", display: "flex", gap: "var(--space-4)", justifyContent: "center", flexWrap: "wrap" }}>
-            <Link
-              href="/quiz"
-              style={{ backgroundColor: "var(--color-red)", color: "#fff", fontFamily: "var(--font-body)", fontWeight: "var(--weight-semibold)", fontSize: "var(--text-body)", padding: "var(--space-3) var(--space-6)", borderRadius: "var(--btn-radius)", textDecoration: "none" }}
-            >
-              Find your mantle →
-            </Link>
-            <Link
-              href="/civic-mantle"
-              style={{ backgroundColor: "transparent", color: "var(--color-text-secondary)", fontFamily: "var(--font-body)", fontWeight: "var(--weight-medium)", fontSize: "var(--text-body)", padding: "var(--space-3) var(--space-6)", borderRadius: "var(--btn-radius)", textDecoration: "none", border: "1px solid var(--color-border)" }}
-            >
-              Explore all ten types
+          {/* The eight dimensions, spelled out */}
+          <div style={{ marginTop: "var(--space-16)", textAlign: "center" }}>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-micro)", fontWeight: "var(--weight-semibold)", color: "var(--color-text-subtle)", letterSpacing: "var(--tracking-wider)", textTransform: "uppercase", marginBottom: "var(--space-4)" }}>
+              Mapped across eight dimensions
+            </p>
+            <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "var(--space-2) var(--space-5)", maxWidth: "800px", margin: "0 auto" }}>
+              {DIMENSION_PAIRS.map(([a, b]) => (
+                <span key={a} style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-small)", color: "var(--color-text-secondary)", whiteSpace: "nowrap" }}>
+                  {a} <span style={{ color: "var(--color-blue)" }}>⟷</span> {b}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* The ten mantles, named */}
+          <div style={{ marginTop: "var(--space-12)", paddingTop: "var(--space-10)", borderTop: "1px solid var(--color-border)", textAlign: "center" }}>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-micro)", fontWeight: "var(--weight-semibold)", color: "var(--color-text-subtle)", letterSpacing: "var(--tracking-wider)", textTransform: "uppercase", marginBottom: "var(--space-4)" }}>
+              The ten mantles
+            </p>
+            <Link href="/civic-mantle" className="mantle-index" style={{ display: "block", maxWidth: "820px", margin: "0 auto", textDecoration: "none" }}>
+              {types.map((t, i) => (
+                <span key={t.label} style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-body-lg)", color: "var(--color-text-muted)", lineHeight: "var(--leading-relaxed)", transition: "var(--transition-fast)" }}>
+                  {t.label}
+                  {i < types.length - 1 && <span style={{ color: "var(--color-text-subtle)", margin: "0 var(--space-2)" }}>·</span>}
+                </span>
+              ))}
             </Link>
           </div>
 
         </div>
+
+        {/* Responsive + hover */}
+        <style>{`
+          .mantle-index:hover span { color: var(--color-gold); }
+          @media (max-width: 860px) {
+            .mantle-hero { grid-template-columns: 1fr !important; gap: var(--space-10) !important; }
+          }
+        `}</style>
       </section>
 
       {/* ── Three Pillars ─────────────────────────────────── */}
-      <section style={{ backgroundColor: "var(--color-bg-section)", padding: "var(--space-20) var(--space-6)" }}>
+      <section style={{ backgroundColor: "var(--color-bg-page)", padding: "var(--space-20) var(--space-6)" }}>
         <div style={{ maxWidth: "var(--max-width-wide)", margin: "0 auto" }}>
 
           {/* Bridge header */}

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Constellation from "@/components/ui/Constellation";
 
 // ── Data ────────────────────────────────────────────────────────────────────
 
@@ -121,81 +122,6 @@ const types = [
   },
 ];
 
-// ── Sample constellation (The Honest Broker) ────────────────────────────────
-// Scores: Stability=0.85, Federal=0.80, National=0.50, Rules=0.85,
-//         Markets=0.80, Pragmatism=0.60, Individual=0.45, Trust=0.80
-function SampleConstellation() {
-  const cx = 200, cy = 200, r = 140;
-  const n = 8;
-  const toRad = (deg: number) => (deg * Math.PI) / 180;
-  const angles = Array.from({ length: n }, (_, i) => (i * 360) / n - 90);
-  const pt = (score: number, idx: number) => ({
-    x: cx + score * r * Math.cos(toRad(angles[idx])),
-    y: cy + score * r * Math.sin(toRad(angles[idx])),
-  });
-
-  const scores = [0.85, 0.80, 0.50, 0.85, 0.80, 0.60, 0.45, 0.80];
-  const dataPoints = scores.map((s, i) => pt(s, i));
-  const dataPolygon = dataPoints.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(" ");
-  const gridPolygons = [0.25, 0.5, 0.75, 1.0].map(scale =>
-    Array.from({ length: n }, (_, i) => pt(scale, i))
-      .map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(" ")
-  );
-
-  // Both poles per axis: outer = high pole, inner = low pole
-  const outerLabels = ["Stability", "Federal",  "National",  "Rules",    "Markets",  "Pragmatism", "Individual", "Trust"];
-  const innerLabels = ["Change",    "Local",     "Global",    "Outcomes", "Governance","Idealism",  "Collective", "Skepticism"];
-  const outerR = r + 22;
-  const innerR = 22; // near center, opposite direction
-
-  const outerPts = angles.map(a => ({
-    x: cx + outerR * Math.cos(toRad(a)),
-    y: cy + outerR * Math.sin(toRad(a)),
-  }));
-  // inner label sits just past center in the OPPOSITE direction
-  const innerPts = angles.map(a => ({
-    x: cx + innerR * Math.cos(toRad(a + 180)),
-    y: cy + innerR * Math.sin(toRad(a + 180)),
-  }));
-
-  const anchor = (x: number) => x < cx - 8 ? "end" : x > cx + 8 ? "start" : "middle";
-
-  return (
-    <svg viewBox="0 0 400 400" width="360" height="360" style={{ display: "block", margin: "0 auto" }}>
-      {/* Grid */}
-      {gridPolygons.map((pts, i) => (
-        <polygon key={i} points={pts} fill="none" stroke="rgba(107,159,234,0.12)" strokeWidth="1" />
-      ))}
-      {/* Axis lines */}
-      {angles.map((_, i) => {
-        const end = pt(1, i);
-        return <line key={i} x1={cx} y1={cy} x2={end.x.toFixed(1)} y2={end.y.toFixed(1)} stroke="rgba(107,159,234,0.18)" strokeWidth="1" />;
-      })}
-      {/* Data polygon */}
-      <polygon points={dataPolygon} fill="rgba(107,159,234,0.2)" stroke="#6B9FEA" strokeWidth="2" strokeLinejoin="round" />
-      {dataPoints.map((p, i) => (
-        <circle key={i} cx={p.x.toFixed(1)} cy={p.y.toFixed(1)} r="4" fill="#6B9FEA" />
-      ))}
-      {/* Outer pole labels (high pole) */}
-      {outerPts.map((p, i) => (
-        <text key={i} x={p.x.toFixed(1)} y={(p.y + 4).toFixed(1)}
-          textAnchor={anchor(p.x)} fontSize="11" fontWeight="600"
-          fill="rgba(232,228,218,0.85)" fontFamily="DM Sans, sans-serif">
-          {outerLabels[i]}
-        </text>
-      ))}
-      {/* Inner pole labels (low/opposite pole) — muted, tiny */}
-      {innerPts.map((p, i) => (
-        <text key={i} x={p.x.toFixed(1)} y={(p.y + 3).toFixed(1)}
-          textAnchor={anchor(p.x)} fontSize="8"
-          fill="rgba(232,228,218,0.3)" fontFamily="DM Sans, sans-serif">
-          {innerLabels[i]}
-        </text>
-      ))}
-    </svg>
-  );
-}
-
 // ── Card component with flip ─────────────────────────────────────────────────
 function TypeCard({ type }: { type: typeof types[0] }) {
   const [flipped, setFlipped] = useState(false);
@@ -311,8 +237,22 @@ export default function CivicMantlePage() {
           A Civic Mantle isn't a label someone assigns you. It's something you claim — the civic identity that emerges from what you actually believe, not what party you belong to.
         </p>
         <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-body-lg)", color: "var(--color-text-secondary)", lineHeight: "var(--leading-relaxed)" }}>
-          The Bedrock quiz maps your values across eight dimensions — stability vs. change, local vs. federal, rules vs. outcomes, and five more. The result: one primary Civic Mantle and up to three secondary affinities.
+          The Bedrock quiz maps your values across eight dimensions. The result: one primary Civic Mantle and up to three secondary affinities.
         </p>
+      </div>
+
+      {/* The eight dimensions */}
+      <div style={{ marginBottom: "var(--space-16)" }}>
+        <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-small)", fontWeight: "var(--weight-semibold)", color: "var(--color-text-subtle)", letterSpacing: "var(--tracking-wider)", textTransform: "uppercase", marginBottom: "var(--space-5)" }}>
+          The eight dimensions
+        </p>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--space-3) var(--space-8)", maxWidth: "800px" }}>
+          {dimensions.map(d => (
+            <span key={d.a} style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-body)", color: "var(--color-text-secondary)", whiteSpace: "nowrap" }}>
+              {d.a} <span style={{ color: "var(--color-blue)" }}>⟷</span> {d.b}
+            </span>
+          ))}
+        </div>
       </div>
 
       {/* Civic Mantle Map */}
@@ -344,7 +284,7 @@ export default function CivicMantlePage() {
         </p>
         <div style={{ display: "flex", gap: "var(--space-12)", alignItems: "flex-start", flexWrap: "wrap" }}>
           <div style={{ backgroundColor: "var(--color-bg-surface)", border: "1px solid var(--color-border)", borderRadius: "var(--radius-lg)", padding: "var(--space-6)" }}>
-            <SampleConstellation />
+            <Constellation />
             <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-small)", color: "var(--color-text-muted)", textAlign: "center", marginTop: "var(--space-4)", fontStyle: "italic" }}>
               Sample — The Honest Broker
             </p>
