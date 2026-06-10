@@ -142,20 +142,21 @@ The output of the quiz. Each user gets:
 - Primary and secondary must always be different types
 - Edge case: near-pure primary acknowledged in copy ("You're one of the purest [Type]s we've seen")
 - Edge case: genuinely centered profile gets special treatment
+- Edge case: scattered profile — strong dimensional leans but no clean clustering into a type — surfaces as scattered rather than forced into a misfit primary
 
 ### Civic Mantle Directory
 
 | Label | Working Name | Dimension Profile (dominant poles) | One-liner |
 |---|---|---|---|
-| The Honest Broker | Pragmatic Constitutionalist | Stability, Federal, Rules, Markets, Trust | Plays by the rules — and expects everyone else to |
-| The System Fixer | Independent Architect | Change, Outcomes, Pragmatism, Skepticism (centered on 4 dims) | Not left or right — just tired of broken machinery |
+| The Honest Broker | Pragmatic Constitutionalist | Stability, Federal, Rules, Markets, Trust | The rules are the freedom |
+| The System Fixer | Independent Architect | Change, Outcomes, Pragmatism, Skepticism (centered on 4 dims) | Not left or right — building better machinery |
 | The Long Gamer | Principled Globalist | Global, Idealism, Collective, Federal | Thinks in decades and across borders |
 | The Good Neighbor | Rooted Pragmatist | Local, Pragmatism, Collective (local), Stability | Believes the best solutions start closest to home |
 | The Missourian | Constructive Skeptic | Skepticism, Outcomes, Pragmatism, Individual | You'll believe it when you see it — and you're usually right |
 | The Eternal Optimist | Civic Optimist | Trust, Change, Collective, Idealism | Democracy is messy and you're here for all of it |
-| The Steward | Steady Steward | Stability, Rules, Trust, Local | Someone has to protect what works — you volunteered |
+| The Steward | Steady Steward | Stability, Rules, Trust, Local | Knows what's worth conserving — and what isn't |
 | The Free Agent | Sovereign Independent | Individual, Skepticism, Local, Markets | Never fit a box and stopped trying |
-| The Standard Bearer | Principled Institutionalist | Rules, Trust, Global, Idealism, Federal | The institutions aren't perfect, but they're what we've got |
+| The Standard Bearer | Principled Institutionalist | Rules, Trust, Global, Idealism, Federal | The institutions are imperfect — and worth defending |
 | The Pioneer | Growth-First Independent | Change, Markets, National, Pragmatism | Progress is possible, and you know how to build it |
 
 ### Results Architecture
@@ -169,6 +170,22 @@ The output of the quiz. Each user gets:
 *"With strong affinities for [Secondary 1] and [Secondary 2]."* (if 2 secondaries clear threshold)
 
 **Myers-Briggs/DISC parallel:** Named type is the headline. Constellation is the visual proof. Dimensional breakdown is the supporting detail. Secondary types add nuance and make results feel personal rather than generic.
+
+### Edge Case Detection and Copy
+
+Three edge cases the recommendation engine must detect and handle with dedicated copy rather than forcing a misfit primary type.
+
+**1. Near-pure primary.** Single type clears a wide gap from all others (similarity score to top type significantly higher than to any secondary). Acknowledge in reveal copy: *"You're one of the purest [Type]s we've seen — your profile lines up with this identity more cleanly than most users'."*
+
+**2. Genuinely centered profile.** Six or more of the eight dimensions score within a narrow band around the midpoint (rough threshold: ±15% of center). Surface as a centered profile rather than forcing a primary. Reveal copy:
+
+*"Your profile is unusually centered. Across most of the eight dimensions, you sit close to the middle — you can see the case for both poles and don't reflexively favor either one. That's rarer than it sounds. It usually means one of two things: you genuinely hold the tension between competing values rather than resolving it by team, or you're still working out where you actually stand. Either way, we'll build your ballot from the dimensions where you do lean — and your recommendations may surprise you more than most users'."*
+
+**3. Scattered profile.** Strong dimensional leans, but the leans don't cluster into a recognizable type. Detection: top-type similarity score below threshold (rough: <65%) AND top three types within a tight band of each other (rough: <10% gap between primary and tertiary). Surface as scattered rather than forced. Reveal copy:
+
+*"Your profile is unusual. Your answers don't cluster around a single type — they pull from several directions at once. That's not a bug. It usually means you think about civic life across more axes than most voters, or that your worldview combines elements most people keep separate. Here's what we can tell:"* [show top 3 partial matches with similarity scores] *"Your recommendations will weight the dimensions you actually scored highest on, rather than forcing a single identity."*
+
+**Engine implication.** All three cases need the recommendation engine to fall back to dimension-weighted matching rather than type-weighted matching. Worth flagging in the engine spec — see Section 11 of recommendation-engine.md.
 
 ---
 
@@ -1344,6 +1361,13 @@ Civic identity isn't something you get assigned once. It's something you develop
 
 And transparency isn't a feature. It's the foundation. If you don't understand how a tool works, you can't trust what it produces. So we show our work — every dimension, every methodology decision, every recommendation explained.
 
+**And who it isn't for.**
+Not everyone. And that's the point.
+
+If you vote the straight ticket and you're confident that's the right call, this probably isn't built for you. The quiz will still work. You'll get a type. You'll get recommendations. But most of what makes Bedrock useful is built for people who haven't settled into a tribe — and a lot of what feels like nuance here will look like fence-sitting to someone who's already picked a side.
+
+That's fine. There are plenty of tools built for partisans. This is the one built for everyone else.
+
 **On bias.**
 Every tool has a perspective baked into it. Including this one.
 
@@ -1466,6 +1490,15 @@ Read the full story →
 Right now: me personally.
 
 If the platform grows: small user donations, nonpartisan civic foundation grants, and potentially a nonprofit structure with full financial transparency. That may happen someday. Before then — and if and when it does — no political parties, PACs, political donors, advertising, or any organization with a stake in where you land will ever fund this.
+
+**Who this is for.**
+Independent-minded voters. Registered independents and soft partisans who don't vote the straight ticket. The fastest-growing voter segment in the country — and the one with the worst civic infrastructure built for it.
+
+Bedrock will work for anyone who answers honestly. But it's optimized for voters who experience real tension between competing values — not voters who've resolved that tension by adopting a tribe.
+
+If you vote the party line and you're confident it's the right call, the ballot recommendation is work you've already done. If you trust your party's media ecosystem, the curated media diet isn't built for you. The product still works. It just won't surprise you.
+
+That's not a bug. Bedrock is built specifically for the voters every other civic tool flattens or ignores.
 
 **The core design decision.**
 Most civic quizzes map you onto a single left-right spectrum. We think that's wrong — not just imprecise, but actively misleading. Real political identity is multidimensional. Flattening it into one axis loses almost everything that matters.
@@ -1703,7 +1736,10 @@ So here they are — plain English, no hedging.
 A civic identity platform for independent-minded voters. It maps your values across eight dimensions, gives you a named civic identity and a constellation that's unique to you, then builds three things on top of it: personalized ballot recommendations, a curated media diet, and a Claude-powered conversation interface to help you talk across political difference.
 
 *Who is this for?*
-Anyone who thinks for themselves politically — especially people who don't fit neatly into either party. You don't have to be registered as an independent. You just have to be willing to answer honestly.
+Independent-minded voters — registered independents and soft partisans who don't vote the straight ticket. The fastest-growing voter segment in the country, and the one with the worst civic infrastructure built for it. You don't have to be a registered independent. You just have to be willing to answer honestly.
+
+*Who is this not for?*
+Hard partisans. The quiz will technically work if you take it, and you'll get a type and a set of recommendations. But most of what makes Bedrock useful is built for voters who experience real tension between competing values — not voters who've resolved that tension by picking a team. If you're confident your party is right about almost everything, the product won't surprise you. That's not a bug — it's the audience.
 
 *Is Bedrock partisan?*
 No. We have no party affiliation, no political donors, and no interest in where you land — only in helping you get there honestly. The quiz is designed so every position at every pole has a defensible, honorable answer. There is no right answer. There's only yours.
@@ -1895,7 +1931,7 @@ Rotating headline system — three slides, auto-advances every 5 seconds, dot in
 
 Slide 1: Eyebrow "Not red. Not blue." / Headline "All of it." (tri-color: red/white/blue, DM Sans 700 68px) / Subhead: full platform overview
 Slide 2: Eyebrow "There's got to be a better way." / Headline "Find what you *actually* believe." (Libre Baskerville, gold italic on "actually") / Subhead: values quiz focus
-Slide 3: Eyebrow "For the voters who haven't given up." / Headline "There's got to be a better way." (DM Sans 46px) / Subhead: independent voter audience
+Slide 3: Eyebrow "For the voters who haven't given up." / Headline "There's got to be a better way." (DM Sans 46px) / Subhead: "Built for the voters who don't vote the straight ticket — and the ones who suspect they shouldn't be."
 
 **3. Civic Mantle + Three Pillars**
 Civic identity is the overarching layer — not a pillar itself. Needs visual design treatment to make the hierarchy clear (above or surrounding the three pillars). Copy: "Your Civic Mantle — one of ten named types, with a constellation unique to you. Everything below is built on top of it. Not a label. A mantle. Something to claim."
