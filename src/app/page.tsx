@@ -22,7 +22,7 @@ export default function Home() {
               Ten mantles.<br />One is yours.
             </h2>
             <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-body-lg)", color: "var(--color-text-secondary)", lineHeight: "var(--leading-relaxed)" }}>
-              Not a label — a mantle, something you claim. The quiz maps your values across eight dimensions and surfaces the civic identity that&apos;s already yours.
+              Not a label — a mantle, something you claim. The quiz maps your values across eight dimensions and surfaces the civic identity that&apos;s already yours — each one a constellation traced across those dimensions, like the ten below.
             </p>
           </div>
 
@@ -59,17 +59,36 @@ export default function Home() {
             </Link>
           </div>
 
+          {/* Down cue connecting to the pillars */}
+          <div style={{ textAlign: "center", marginTop: "var(--space-16)" }}>
+            <a
+              href="#build"
+              className="scroll-cue"
+              aria-label="Then build on top of it"
+              style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: "44px", height: "44px", borderRadius: "var(--radius-full)", border: "1px solid var(--color-border)", color: "var(--color-text-muted)", textDecoration: "none", fontSize: "20px", lineHeight: 1 }}
+            >
+              ↓
+            </a>
+          </div>
+
         </div>
+
+        <style>{`
+          .scroll-cue { transition: var(--transition-base); animation: scrollCueBounce 2.2s ease-in-out infinite; }
+          .scroll-cue:hover { color: var(--color-text-primary); border-color: var(--color-border-strong); }
+          @keyframes scrollCueBounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(5px); } }
+          @media (prefers-reduced-motion: reduce) { .scroll-cue { animation: none; } }
+        `}</style>
       </section>
 
       {/* ── Three Pillars ─────────────────────────────────── */}
-      <section style={{ backgroundColor: "var(--color-bg-page)", padding: "var(--space-20) var(--space-6)" }}>
+      <section id="build" style={{ backgroundColor: "var(--color-bg-page)", padding: "var(--space-20) var(--space-6)", scrollMarginTop: "var(--nav-height)" }}>
         <div style={{ maxWidth: "var(--max-width-wide)", margin: "0 auto" }}>
 
           {/* Bridge header */}
           <div style={{ textAlign: "center", marginBottom: "var(--space-16)" }}>
             <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-small)", fontWeight: "var(--weight-semibold)", color: "var(--color-gold)", letterSpacing: "var(--tracking-wider)", textTransform: "uppercase", marginBottom: "var(--space-4)" }}>
-              Built on top of it
+              Then build on top of it
             </p>
             <h2 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-h2)", color: "var(--color-text-primary)", marginBottom: "var(--space-4)" }}>
               Three things your mantle powers.
