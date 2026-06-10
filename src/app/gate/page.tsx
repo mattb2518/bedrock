@@ -1,13 +1,12 @@
 "use client";
 
 import { useState, FormEvent, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
 function GateForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
   const searchParams = useSearchParams();
   const from = searchParams.get("from") || "/";
 
@@ -24,7 +23,10 @@ function GateForm() {
       });
       const data = await res.json();
       if (data.success) {
-        router.push(from);
+        // Full-document navigation (not router.push) so the request that hits
+        // the middleware is guaranteed to carry the just-set gate cookie.
+        // A soft navigation can race the Set-Cookie commit on iOS Safari.
+        window.location.assign(from);
       } else {
         setError("That's not it. Try again.");
         setPassword("");
