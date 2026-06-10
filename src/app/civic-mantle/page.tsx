@@ -22,7 +22,7 @@ const types = [
   {
     label: "The Honest Broker",
     workingName: "Pragmatic Constitutionalist",
-    oneLiner: "Plays by the rules — and expects everyone else to.",
+    oneLiner: "The rules are the freedom.",
     dimensions: ["Stability", "Federal", "Rules", "Markets", "Trust"],
     politicians: [
       { name: "John Kasich",  party: "R", note: "Moderate, rule-follower, bipartisan reputation" },
@@ -32,7 +32,7 @@ const types = [
   {
     label: "The System Fixer",
     workingName: "Independent Architect",
-    oneLiner: "Not left or right — just tired of broken machinery.",
+    oneLiner: "Not left or right — building better machinery.",
     dimensions: ["Change", "Outcomes", "Pragmatism", "Skepticism"],
     politicians: [
       { name: "Chris Christie",    party: "R", note: "Outcomes-first, willing to break from party" },
@@ -82,7 +82,7 @@ const types = [
   {
     label: "The Steward",
     workingName: "Steady Steward",
-    oneLiner: "Someone has to protect what works — you volunteered.",
+    oneLiner: "Knows what's worth conserving — and what isn't.",
     dimensions: ["Stability", "Rules", "Trust", "Local"],
     politicians: [
       { name: "Susan Collins", party: "R", note: "Institutional protector, defender of process" },
@@ -102,7 +102,7 @@ const types = [
   {
     label: "The Standard Bearer",
     workingName: "Principled Institutionalist",
-    oneLiner: "The institutions aren't perfect, but they're what we've got.",
+    oneLiner: "The institutions are imperfect — and worth defending.",
     dimensions: ["Rules", "Trust", "Global", "Idealism", "Federal"],
     politicians: [
       { name: "Mitt Romney", party: "R", note: "Voted conscience over party, institutional to the end" },
