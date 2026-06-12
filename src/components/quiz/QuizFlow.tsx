@@ -114,6 +114,7 @@ export default function QuizFlow() {
   const [picks, setPicks] = useState<Dimension[]>([])
   const [dbPicks, setDbPicks] = useState<string[]>([])
   const [dbOther, setDbOther] = useState('')
+  const [confirmingRetake, setConfirmingRetake] = useState(false)
 
   const layer = (session?.currentLayer ?? 1) as QuizLayer
   const questions = QUESTIONS_BY_LAYER[layer] ?? LAYER1_QUESTIONS
@@ -187,8 +188,82 @@ export default function QuizFlow() {
     setPicks([])
     setDbPicks([])
     setDbOther('')
+    setConfirmingRetake(false)
     clearTransient()
     setPhase('intro')
+  }
+
+  function retakeFromScratch() {
+    resetQuiz()
+    setPicks([])
+    setDbPicks([])
+    setDbOther('')
+    setConfirmingRetake(false)
+    clearTransient()
+    startSession()
+    setPhase('quiz')
+  }
+
+  const fullyComplete = (session?.completedLayers?.length ?? 0) >= 4
+
+  // ── RETAKE SCREEN (returning user, fully complete) ────────────────────────
+  if (phase === 'intro' && fullyComplete) {
+    return (
+      <Shell>
+        <Kicker>Welcome back</Kicker>
+        <H1>Your thinking evolves. Your profile can too.</H1>
+        <Body>
+          You’ve completed all four layers. You can revisit your answers any time — your civic identity isn’t fixed, and neither is this.
+        </Body>
+
+        <div style={{ display: 'grid', gap: 'var(--space-4)', marginTop: 'var(--space-6)' }}>
+          {/* Edit responses — coming soon */}
+          <div style={{ ...card, marginBottom: 0, cursor: 'default', opacity: 0.7, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 'var(--space-4)' }}>
+            <span>
+              <strong style={{ color: 'var(--color-text-primary)' }}>Edit responses</strong>
+              <span style={{ display: 'block', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', marginTop: 4 }}>
+                Revisit one layer at a time, with your answers pre-filled.
+              </span>
+            </span>
+            <span style={{ flexShrink: 0, fontFamily: 'var(--font-body)', fontSize: '11px', fontWeight: 'var(--weight-semibold)', color: 'var(--color-gold)', letterSpacing: 'var(--tracking-wider)', textTransform: 'uppercase', border: '1px solid var(--color-border-strong)', borderRadius: 'var(--radius-full)', padding: '4px 10px' }}>
+              Coming soon
+            </span>
+          </div>
+
+          {/* Retake from scratch */}
+          {confirmingRetake ? (
+            <div style={{ ...card, marginBottom: 0, cursor: 'default', borderColor: 'var(--color-red)' }}>
+              <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-primary)', marginBottom: 'var(--space-4)' }}>
+                This will replace your current profile. Your previous answers will be permanently deleted. Are you sure?
+              </p>
+              <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
+                <button style={primaryBtn} onClick={retakeFromScratch}>Yes, start fresh</button>
+                <button style={ghostBtn} onClick={() => setConfirmingRetake(false)}>Cancel</button>
+              </div>
+            </div>
+          ) : (
+            <button
+              onClick={() => setConfirmingRetake(true)}
+              style={{ ...card, marginBottom: 0, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 'var(--space-4)' }}
+            >
+              <span>
+                <strong style={{ color: 'var(--color-text-primary)' }}>Retake from scratch</strong>
+                <span style={{ display: 'block', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', marginTop: 4 }}>
+                  Clear everything and start over from Layer 1.
+                </span>
+              </span>
+              <span style={{ flexShrink: 0, color: 'var(--color-text-muted)' }}>→</span>
+            </button>
+          )}
+        </div>
+
+        <div style={{ marginTop: 'var(--space-8)', textAlign: 'center' }}>
+          <Link href="/results" style={{ color: 'var(--color-blue-accent)', fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)' }}>
+            View my current results →
+          </Link>
+        </div>
+      </Shell>
+    )
   }
 
   // ── INTRO (Layer 1 welcome) ───────────────────────────────────────────────

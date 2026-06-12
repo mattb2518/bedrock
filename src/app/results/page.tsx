@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useQuizStore } from '@/store/quizStore'
 import MantleReveal from '@/components/quiz/MantleReveal'
+import ProfileDetails from '@/components/quiz/ProfileDetails'
 
 export default function ResultsPage() {
   const session = useQuizStore((s) => s.session)
@@ -23,5 +24,10 @@ export default function ResultsPage() {
     )
   }
 
-  return <MantleReveal result={session.result} />
+  return (
+    <>
+      <MantleReveal result={session.result} />
+      <ProfileDetails session={session} />
+    </>
+  )
 }

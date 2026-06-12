@@ -10,6 +10,28 @@ export const LAYER_LABELS: Record<QuizLayer, string> = {
   4: 'Where you draw the line',
 }
 
+// Short topic label per question, for the results-page summaries (SPEC §8/§9
+// question headers).
+export const QUESTION_TOPICS: Record<string, string> = {
+  'L2-Q1': 'Healthcare',
+  'L2-Q2': 'Climate & Energy',
+  'L2-Q3': 'Gun Policy',
+  'L2-Q4': 'Education',
+  'L2-Q5': 'Immigration',
+  'L2-Q6': 'Fiscal Policy',
+  'L2-Q7': 'Foreign Policy',
+  'L2-Q8': 'Reproductive Healthcare',
+  'L2-Q9': 'Technology & Privacy',
+  'L3-Q1': 'Character vs. Policy',
+  'L3-Q2': 'Crossing Party Lines',
+  'L3-Q3': 'Electability',
+  'L3-Q4': 'Down-Ballot Races',
+  'L3-Q5': 'Incumbency',
+  'L3-Q6': 'Party vs. Candidate',
+  'L3-Q7': 'Time Horizon',
+  'L3-Q8': 'The One Issue',
+}
+
 // Shown after a layer's questions, teasing the next layer.
 export const LAYER_OUTRO: Record<QuizLayer, { heading: string; body: string; teaser: string }> = {
   1: {

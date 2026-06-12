@@ -99,3 +99,16 @@ export const LAYER4_SECTIONS: DealbreakerSection[] = [
 
 export const DEALBREAKER_OTHER_PROMPT =
   'Anything else that would disqualify a candidate for you, regardless of their other positions?'
+
+// Flat id → text lookup across all sections (for results-page summaries).
+export const DEALBREAKER_TEXT: Record<string, string> = LAYER4_SECTIONS.reduce(
+  (acc, section) => {
+    section.items?.forEach((it) => (acc[it.id] = it.text))
+    section.pairs?.forEach((p) => {
+      acc[p.left.id] = p.left.text
+      acc[p.right.id] = p.right.text
+    })
+    return acc
+  },
+  {} as Record<string, string>
+)
