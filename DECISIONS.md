@@ -20,7 +20,9 @@ just-in-time, when we start building that pillar.
 | 2026-06-12 | **Quiz data stays browser-only for now.** | localStorage via the quiz store. Real DB persistence (Supabase, keyed to an account) deferred until the quiz is stable and accounts are wired. |
 | 2026-06-12 | **Profile/constellation is computed from Layer 1 only.** | Layers 2–4 capture positions, voting behavior, and dealbreakers for the engine and raise completion %, but do not re-plot the constellation. Matches all three research memos (Layer 1 *is* the civic identity). |
 | 2026-06-12 | **Dealbreakers (L4) feed Ballot, never Media.** | Filtering media by your hard lines is the echo chamber the product exists to fight (pillar-2 memo). |
-| 2026-06-12 | **First pillar to build = Conversations.** | Lowest data risk: needs only Layer 1 + a Claude system prompt; the Project only has to confirm model/pricing. Ballot and Media need heavier factual research + editorial curation. |
+| 2026-06-12 | **First pillar to build = Conversations.** | Lowest data risk: needs only Layer 1 + a Claude system prompt; the Project only has to confirm model/pricing. Ballot and Media need heavier factual research + editorial curation. Reinforced by the feasibility doc §5 (cheapest, ~$0.011/turn on Sonnet 4.6 + prompt caching). |
+| 2026-06-12 | **Authoritative data-source reference: [`docs/data-sources-feasibility-june2026.md`](docs/data-sources-feasibility-june2026.md).** | From the Claude Project, web-verified June 2026. Governs all external-data, scoring, and schema work. **Supersedes SPEC.md's Tech Stack** where they conflict. Read it before any data-integration session (whole doc, or targeted: §3 Ballot sources, §6 cross-cutting, §9 schema, §10 build sequence). |
+| 2026-06-12 | **Two APIs in SPEC are dead — do not use.** | Google Civic *Representatives* endpoint sunset Apr 2025 → use `divisionByAddress` + congress.gov/Open States/Ballotpedia. ProPublica Congress API archived Feb 2025 → use congress.gov API. (Feasibility doc §2.) SPEC.md Tech Stack still needs correcting — see §8 of the doc. |
 
 ---
 
@@ -66,7 +68,12 @@ listed so nothing gets lost.
 
 ## Incoming from the Claude Project
 
-When the Project's web research lands, save it to `research/` (e.g.
-`research/project-web-findings.md`) so it's preserved and synced even before we
-act on it. It will be reconciled with the matching design memo when we start each
-pillar.
+- ✅ **Arrived 2026-06-12:** [`docs/data-sources-feasibility-june2026.md`](docs/data-sources-feasibility-june2026.md)
+  — the factual web research for all three pillars (sources, pricing, licensing,
+  coverage, schema fields, build sequence). See Decided rows above.
+- Its own open questions (§11) — recommendation-engine matching formula,
+  AllSides-vs-Ad-Fontes primary choice, 19-state down-ballot gap strategy, PBC
+  non-commercial eligibility — are **Project/design-space** questions, mirrored
+  into the per-pillar lists above where they need Matt's input.
+- Future Project research lands the same way: committed under `docs/` or
+  `research/`, then reconciled with the matching design memo per pillar.
