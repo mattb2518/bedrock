@@ -23,6 +23,10 @@ interface QuizStore {
   // The Layer 1 importance closer — up to 3 dimensions
   setTopDimensions: (dims: Dimension[]) => void
 
+  // Layer 4 dealbreakers
+  setDealbreakers: (ids: string[]) => void
+  setDealbreakerOther: (text: string) => void
+
   // Mark a layer complete and advance to the next
   completeLayer: (layer: QuizLayer) => void
 
@@ -44,6 +48,7 @@ function newSession(): QuizSession {
     currentQuestionIndex: 0,
     answers: [],
     topDimensions: [],
+    dealbreakers: [],
     completedLayers: [],
     startedAt: now,
     updatedAt: now,
@@ -103,6 +108,20 @@ export const useQuizStore = create<QuizStore>()(
             },
           }
         }),
+
+      setDealbreakers: (ids) =>
+        set((state) =>
+          state.session
+            ? { session: { ...state.session, dealbreakers: ids, updatedAt: new Date().toISOString() } }
+            : state
+        ),
+
+      setDealbreakerOther: (text) =>
+        set((state) =>
+          state.session
+            ? { session: { ...state.session, dealbreakerOther: text, updatedAt: new Date().toISOString() } }
+            : state
+        ),
 
       completeLayer: (layer) =>
         set((state) => {

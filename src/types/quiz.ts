@@ -26,6 +26,9 @@ export interface AnswerOption {
   text: string
   microReaction?: string
   scores: Partial<Record<Dimension, number>>
+  // Some options open their own text field on selection (e.g. the Layer 3
+  // capstone's "name it yourself" option) — distinct from the It-depends route.
+  followUpPrompt?: string
 }
 
 // One question. Every Layer 1 question also offers an implicit "It depends"
@@ -100,6 +103,8 @@ export interface QuizSession {
   currentQuestionIndex: number
   answers: QuizAnswer[]
   topDimensions: Dimension[] // from the Layer 1 importance closer (≤3)
+  dealbreakers: string[] // selected Layer 4 item ids (hard exclusion filters)
+  dealbreakerOther?: string // free-text dealbreaker
   completedLayers: QuizLayer[]
   startedAt: string
   updatedAt: string
