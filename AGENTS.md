@@ -7,3 +7,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 At the start of every new session, run git pull to make sure you're working from the latest code. Tell me if there were any updates pulled.
 
 After completing any task that modifies files, commit the changes with a clear, descriptive message and push to main. Don't ask for permission — just do it as part of finishing the task. The goal is keeping the repo in sync across multiple working copies, so don't wait for an explicit cue.
+
+# Committing instruction files
+
+Exception to the auto-commit rule above: after a substantial block of edits to `CLAUDE.md` or `AGENTS.md`, stop and prompt the user to commit, including a ready-to-use commit message. Do not commit these files without the user's explicit go-ahead.
