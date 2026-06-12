@@ -553,7 +553,7 @@ export default function QuizFlow() {
         </div>
       )}
 
-      {question.easterEgg && picked && <Aside muted>{question.easterEgg}</Aside>}
+      {question.easterEgg && picked && <FunFact>{question.easterEgg}</FunFact>}
 
       {picked && (
         <div style={{ marginTop: 'var(--space-6)', textAlign: 'right' }}>
@@ -586,6 +586,20 @@ function Aside({ children, muted }: { children: React.ReactNode; muted?: boolean
   return (
     <div style={{ marginTop: 'var(--space-4)', padding: 'var(--space-4)', borderLeft: `2px solid ${muted ? 'var(--color-border)' : 'var(--color-gold)'}`, backgroundColor: 'rgba(255,255,255,0.02)' }}>
       <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: muted ? 'var(--color-text-muted)' : 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', fontStyle: 'italic', margin: 0 }}>
+        {children}
+      </p>
+    </div>
+  )
+}
+// A set-apart "reward" box for the per-question easter eggs — visually distinct
+// from the in-flow micro-reaction so it reads as a bonus aside, not another step.
+function FunFact({ children }: { children: React.ReactNode }) {
+  return (
+    <div style={{ marginTop: 'var(--space-6)', padding: 'var(--space-5)', backgroundColor: 'rgba(200,169,110,0.06)', border: '1px solid rgba(200,169,110,0.28)', borderRadius: 'var(--radius-lg)' }}>
+      <p style={{ fontFamily: 'var(--font-body)', fontSize: '11px', fontWeight: 'var(--weight-semibold)', color: 'var(--color-gold)', letterSpacing: 'var(--tracking-wider)', textTransform: 'uppercase', margin: '0 0 var(--space-3)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+        <span aria-hidden="true">✦</span> Did you know?
+      </p>
+      <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', margin: 0 }}>
         {children}
       </p>
     </div>
