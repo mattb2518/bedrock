@@ -1,19 +1,33 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { QuizAnswer, QuizLayer, QuizSession } from '@/types/quiz'
+import type {
+  Dimension,
+  QuizAnswer,
+  QuizLayer,
+  QuizResult,
+  QuizSession,
+} from '@/types/quiz'
 
 interface QuizStore {
   session: QuizSession | null
-  isLoading: boolean
 
   // Start a fresh quiz (anonymous)
   startSession: () => void
 
-  // Record an answer and advance
+  // Record/replace an answer (keyed by questionId) and advance one step
   submitAnswer: (answer: QuizAnswer) => void
 
-  // Mark a layer complete
+  // Step back one question (no-op at the start)
+  goBack: () => void
+
+  // The Layer 1 importance closer — up to 3 dimensions
+  setTopDimensions: (dims: Dimension[]) => void
+
+  // Mark a layer complete and advance to the next
   completeLayer: (layer: QuizLayer) => void
+
+  // Store the computed result
+  setResult: (result: QuizResult) => void
 
   // Clear everything (e.g. user wants to retake)
   resetQuiz: () => void
@@ -23,14 +37,16 @@ interface QuizStore {
 }
 
 function newSession(): QuizSession {
+  const now = new Date().toISOString()
   return {
     id: crypto.randomUUID(),
     currentLayer: 1,
     currentQuestionIndex: 0,
     answers: [],
+    topDimensions: [],
     completedLayers: [],
-    startedAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    startedAt: now,
+    updatedAt: now,
   }
 }
 
@@ -38,15 +54,19 @@ export const useQuizStore = create<QuizStore>()(
   persist(
     (set) => ({
       session: null,
-      isLoading: false,
 
-      startSession: () =>
-        set({ session: newSession() }),
+      startSession: () => set({ session: newSession() }),
 
       submitAnswer: (answer) =>
         set((state) => {
           if (!state.session) return state
-          const answers = [...state.session.answers, answer]
+          // Replace any prior answer to this question, else append.
+          const existing = state.session.answers.findIndex(
+            (a) => a.questionId === answer.questionId
+          )
+          const answers = [...state.session.answers]
+          if (existing >= 0) answers[existing] = answer
+          else answers.push(answer)
           return {
             session: {
               ...state.session,
@@ -57,10 +77,39 @@ export const useQuizStore = create<QuizStore>()(
           }
         }),
 
+      goBack: () =>
+        set((state) => {
+          if (!state.session) return state
+          return {
+            session: {
+              ...state.session,
+              currentQuestionIndex: Math.max(
+                0,
+                state.session.currentQuestionIndex - 1
+              ),
+              updatedAt: new Date().toISOString(),
+            },
+          }
+        }),
+
+      setTopDimensions: (dims) =>
+        set((state) => {
+          if (!state.session) return state
+          return {
+            session: {
+              ...state.session,
+              topDimensions: dims.slice(0, 3),
+              updatedAt: new Date().toISOString(),
+            },
+          }
+        }),
+
       completeLayer: (layer) =>
         set((state) => {
           if (!state.session) return state
-          const completedLayers = [...state.session.completedLayers, layer]
+          const completedLayers = state.session.completedLayers.includes(layer)
+            ? state.session.completedLayers
+            : [...state.session.completedLayers, layer]
           const nextLayer = (layer + 1) as QuizLayer
           return {
             session: {
@@ -73,18 +122,24 @@ export const useQuizStore = create<QuizStore>()(
           }
         }),
 
+      setResult: (result) =>
+        set((state) => {
+          if (!state.session) return state
+          return {
+            session: { ...state.session, result, updatedAt: new Date().toISOString() },
+          }
+        }),
+
       resetQuiz: () => set({ session: null }),
 
       attachUser: (userId) =>
         set((state) => {
           if (!state.session) return state
-          return {
-            session: { ...state.session, userId },
-          }
+          return { session: { ...state.session, userId } }
         }),
     }),
     {
-      name: 'bedrock-quiz',  // key in browser localStorage
+      name: 'bedrock-quiz', // key in browser localStorage
     }
   )
 )

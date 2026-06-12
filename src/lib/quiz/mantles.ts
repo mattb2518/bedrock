@@ -12,20 +12,22 @@ import { DIMENSIONS } from '@/lib/quiz/dimensions'
 export interface Mantle {
   type: CivicType
   name: string
+  workingName: string // SPEC Civic Mantle Directory
+  oneLiner: string
   profile: DimensionalProfile
 }
 
 export const MANTLES: Mantle[] = [
-  { type: 'honest_broker',   name: 'The Honest Broker',    profile: { stability_change: 15, local_federal: 85, national_global: 50, rules_outcomes: 15, markets_governance: 15, pragmatism_idealism: 50, individual_collective: 50, trust_skepticism: 15 } },
-  { type: 'system_fixer',    name: 'The System Fixer',     profile: { stability_change: 82, local_federal: 50, national_global: 50, rules_outcomes: 82, markets_governance: 50, pragmatism_idealism: 15, individual_collective: 50, trust_skepticism: 82 } },
-  { type: 'long_gamer',      name: 'The Long Gamer',       profile: { stability_change: 50, local_federal: 85, national_global: 82, rules_outcomes: 50, markets_governance: 50, pragmatism_idealism: 82, individual_collective: 82, trust_skepticism: 50 } },
-  { type: 'good_neighbor',   name: 'The Good Neighbor',    profile: { stability_change: 15, local_federal: 18, national_global: 50, rules_outcomes: 50, markets_governance: 50, pragmatism_idealism: 15, individual_collective: 82, trust_skepticism: 50 } },
-  { type: 'missourian',      name: 'The Missourian',       profile: { stability_change: 50, local_federal: 50, national_global: 50, rules_outcomes: 82, markets_governance: 50, pragmatism_idealism: 15, individual_collective: 15, trust_skepticism: 82 } },
-  { type: 'eternal_optimist',name: 'The Eternal Optimist', profile: { stability_change: 82, local_federal: 50, national_global: 50, rules_outcomes: 50, markets_governance: 50, pragmatism_idealism: 82, individual_collective: 82, trust_skepticism: 15 } },
-  { type: 'steward',         name: 'The Steward',          profile: { stability_change: 15, local_federal: 18, national_global: 50, rules_outcomes: 15, markets_governance: 50, pragmatism_idealism: 50, individual_collective: 50, trust_skepticism: 15 } },
-  { type: 'free_agent',      name: 'The Free Agent',       profile: { stability_change: 50, local_federal: 18, national_global: 50, rules_outcomes: 50, markets_governance: 15, pragmatism_idealism: 50, individual_collective: 15, trust_skepticism: 82 } },
-  { type: 'standard_bearer', name: 'The Standard Bearer',  profile: { stability_change: 50, local_federal: 85, national_global: 82, rules_outcomes: 15, markets_governance: 50, pragmatism_idealism: 82, individual_collective: 50, trust_skepticism: 15 } },
-  { type: 'pioneer',         name: 'The Pioneer',          profile: { stability_change: 82, local_federal: 50, national_global: 15, rules_outcomes: 50, markets_governance: 15, pragmatism_idealism: 15, individual_collective: 50, trust_skepticism: 50 } },
+  { type: 'honest_broker',   name: 'The Honest Broker',    workingName: 'Pragmatic Constitutionalist', oneLiner: 'The rules are the freedom',                              profile: { stability_change: 15, local_federal: 85, national_global: 50, rules_outcomes: 15, markets_governance: 15, pragmatism_idealism: 50, individual_collective: 50, trust_skepticism: 15 } },
+  { type: 'system_fixer',    name: 'The System Fixer',     workingName: 'Independent Architect',        oneLiner: 'Not left or right — building better machinery',           profile: { stability_change: 82, local_federal: 50, national_global: 50, rules_outcomes: 82, markets_governance: 50, pragmatism_idealism: 15, individual_collective: 50, trust_skepticism: 82 } },
+  { type: 'long_gamer',      name: 'The Long Gamer',       workingName: 'Principled Globalist',         oneLiner: 'Thinks in decades and across borders',                    profile: { stability_change: 50, local_federal: 85, national_global: 82, rules_outcomes: 50, markets_governance: 50, pragmatism_idealism: 82, individual_collective: 82, trust_skepticism: 50 } },
+  { type: 'good_neighbor',   name: 'The Good Neighbor',    workingName: 'Rooted Pragmatist',            oneLiner: 'Believes the best solutions start closest to home',        profile: { stability_change: 15, local_federal: 18, national_global: 50, rules_outcomes: 50, markets_governance: 50, pragmatism_idealism: 15, individual_collective: 82, trust_skepticism: 50 } },
+  { type: 'missourian',      name: 'The Missourian',       workingName: 'Constructive Skeptic',         oneLiner: "You'll believe it when you see it — and you're usually right", profile: { stability_change: 50, local_federal: 50, national_global: 50, rules_outcomes: 82, markets_governance: 50, pragmatism_idealism: 15, individual_collective: 15, trust_skepticism: 82 } },
+  { type: 'eternal_optimist',name: 'The Eternal Optimist', workingName: 'Civic Optimist',               oneLiner: "Democracy is messy and you're here for all of it",         profile: { stability_change: 82, local_federal: 50, national_global: 50, rules_outcomes: 50, markets_governance: 50, pragmatism_idealism: 82, individual_collective: 82, trust_skepticism: 15 } },
+  { type: 'steward',         name: 'The Steward',          workingName: 'Steady Steward',               oneLiner: "Knows what's worth conserving — and what isn't",           profile: { stability_change: 15, local_federal: 18, national_global: 50, rules_outcomes: 15, markets_governance: 50, pragmatism_idealism: 50, individual_collective: 50, trust_skepticism: 15 } },
+  { type: 'free_agent',      name: 'The Free Agent',       workingName: 'Sovereign Independent',        oneLiner: 'Never fit a box and stopped trying',                      profile: { stability_change: 50, local_federal: 18, national_global: 50, rules_outcomes: 50, markets_governance: 15, pragmatism_idealism: 50, individual_collective: 15, trust_skepticism: 82 } },
+  { type: 'standard_bearer', name: 'The Standard Bearer',  workingName: 'Principled Institutionalist',  oneLiner: 'The institutions are imperfect — and worth defending',     profile: { stability_change: 50, local_federal: 85, national_global: 82, rules_outcomes: 15, markets_governance: 50, pragmatism_idealism: 82, individual_collective: 50, trust_skepticism: 15 } },
+  { type: 'pioneer',         name: 'The Pioneer',          workingName: 'Growth-First Independent',     oneLiner: 'Progress is possible, and you know how to build it',       profile: { stability_change: 82, local_federal: 50, national_global: 15, rules_outcomes: 50, markets_governance: 15, pragmatism_idealism: 15, individual_collective: 50, trust_skepticism: 50 } },
 ]
 
 export function mantleFor(type: CivicType): Mantle {
