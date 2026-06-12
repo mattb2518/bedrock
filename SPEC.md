@@ -1262,6 +1262,14 @@ If you could move the needle on exactly one issue in American public life — on
 *All of these go in `.env.local` at the project root. This file is gitignored and never committed.*
 *Claude Code should create this file during initial scaffolding and populate it with placeholders.*
 
+> **⚠️ Data-source status (June 2026):** The authoritative reference for all external
+> data sources is [`docs/data-sources-feasibility-june2026.md`](docs/data-sources-feasibility-june2026.md),
+> which **supersedes this section** where they conflict. Two previously assumed APIs are
+> dead: the **Google Civic *Representatives*** endpoint (sunset Apr 2025 — use the
+> Divisions + Elections endpoints instead) and the **ProPublica Congress API** (archived
+> Feb 2025 — use the **congress.gov** API). Federal data now comes from congress.gov +
+> FEC openFEC, both free and public domain.
+
 ```
 # GitHub
 GITHUB_TOKEN=your_token_here
@@ -1274,13 +1282,19 @@ NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 
-# Google Civic Information API
+# congress.gov API (Library of Congress) — federal legislative (replaces ProPublica Congress API, archived Feb 2025)
+CONGRESS_GOV_API_KEY=your_key_here
+
+# FEC openFEC — federal campaign finance (primary)
+FEC_API_KEY=your_key_here
+
+# Google Civic Information API — Elections + Divisions endpoints ONLY (Representatives endpoint sunset Apr 2025)
 GOOGLE_CIVIC_API_KEY=your_key_here
 
-# OpenStates
+# OpenStates API v3 (Plural Open Data) — state legislative
 OPENSTATES_API_KEY=your_key_here
 
-# OpenSecrets
+# OpenSecrets — optional/secondary (FEC openFEC above is the primary campaign-finance source)
 OPENSECRETS_API_KEY=your_key_here
 
 # VoteSmart (free for nonprofits — apply at votesmart.org)

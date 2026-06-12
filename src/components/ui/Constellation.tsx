@@ -77,7 +77,7 @@ export default function Constellation({
   const anchor = (x: number) => (x < cx - 8 ? "end" : x > cx + 8 ? "start" : "middle");
 
   return (
-    <svg viewBox={viewBox} width={size} height={size} style={{ display: "block", margin: "0 auto" }}>
+    <svg viewBox={viewBox} width={size} height={size} style={{ display: "block", margin: "0 auto", maxWidth: "100%", height: "auto" }}>
       {/* Grid */}
       {showGrid && gridPolygons.map((pts, i) => (
         <polygon key={i} points={pts} fill="none" stroke="rgba(107,159,234,0.12)" strokeWidth="1" />
