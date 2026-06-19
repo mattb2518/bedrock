@@ -7,6 +7,7 @@ const columns = [
     links: [
       { label: "Take the Quiz", href: "/quiz" },
       { label: "Your Ballot", href: "/ballot" },
+      { label: "Beyond Your Ballot", href: "/beyond-ballot" },
       { label: "Your Media Diet", href: "/media" },
       { label: "Your Conversations", href: "/conversations" },
       { label: "My Profile", href: "/profile" },

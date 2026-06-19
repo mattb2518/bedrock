@@ -81,7 +81,7 @@ export default function Home() {
         `}</style>
       </section>
 
-      {/* ── Three Pillars ─────────────────────────────────── */}
+      {/* ── Four Pillars ──────────────────────────────────── */}
       <section id="build" style={{ backgroundColor: "var(--color-bg-page)", padding: "var(--space-20) var(--space-6)", scrollMarginTop: "var(--nav-height)" }}>
         <div style={{ maxWidth: "var(--max-width-wide)", margin: "0 auto" }}>
 
@@ -91,15 +91,15 @@ export default function Home() {
               Then build on top of it
             </p>
             <h2 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-h2)", color: "var(--color-text-primary)", marginBottom: "var(--space-4)" }}>
-              Three things your mantle powers.
+              Four things your mantle powers.
             </h2>
             <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-body-lg)", color: "var(--color-text-secondary)", maxWidth: "600px", margin: "0 auto", lineHeight: "var(--leading-relaxed)" }}>
               Your Civic Mantle isn't just a label — it's the engine. Everything below is built on top of it.
             </p>
           </div>
 
-          {/* Three pillars */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "var(--space-6)" }}>
+          {/* Four pillars */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "var(--space-6)" }}>
 
             <Link href="/ballot" style={{ textDecoration: "none" }}>
               <div style={{ backgroundColor: "var(--color-bg-surface)", border: "1px solid var(--color-border)", borderRadius: "var(--radius-lg)", padding: "var(--space-8)", borderTop: "3px solid var(--color-red)", transition: "var(--transition-base)", cursor: "pointer" }}>
@@ -139,6 +139,20 @@ export default function Home() {
                 </h3>
                 <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-body)", color: "var(--color-text-secondary)", lineHeight: "var(--leading-relaxed)" }}>
                   Claude-powered prep for difficult conversations across difference.
+                </p>
+              </div>
+            </Link>
+
+            <Link href="/beyond-ballot" style={{ textDecoration: "none" }}>
+              <div style={{ backgroundColor: "var(--color-bg-surface)", border: "1px solid var(--color-border)", borderRadius: "var(--radius-lg)", padding: "var(--space-8)", borderTop: "3px solid var(--color-gold)", transition: "var(--transition-base)", cursor: "pointer" }}>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-micro)", fontWeight: "var(--weight-semibold)", color: "var(--color-gold)", letterSpacing: "var(--tracking-wider)", textTransform: "uppercase", marginBottom: "var(--space-3)" }}>
+                  Pillar Four
+                </p>
+                <h3 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-h3)", color: "var(--color-text-primary)", marginBottom: "var(--space-3)" }}>
+                  Beyond Your Ballot
+                </h3>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-body)", color: "var(--color-text-secondary)", lineHeight: "var(--leading-relaxed)" }}>
+                  Candidates you can&apos;t vote for, but whose presence in Congress would shape the country.
                 </p>
               </div>
             </Link>

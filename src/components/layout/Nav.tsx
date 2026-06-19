@@ -10,6 +10,7 @@ import type { User } from "@supabase/supabase-js";
 const topNavLinks = [
   { label: "Civic Mantle", href: "/civic-mantle" },
   { label: "Your Ballot", href: "/ballot" },
+  { label: "Beyond Your Ballot", href: "/beyond-ballot" },
   { label: "Your Media", href: "/media" },
   { label: "Your Conversations", href: "/conversations" },
 ];
