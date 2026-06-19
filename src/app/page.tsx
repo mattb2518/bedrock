@@ -135,7 +135,7 @@ export default function Home() {
             </Link>
 
             <Link href="/beyond-ballot" style={{ textDecoration: "none" }}>
-              <div style={{ backgroundColor: "var(--color-bg-surface)", border: "1px solid var(--color-border)", borderRadius: "var(--radius-lg)", padding: "var(--space-8)", borderTop: "3px solid var(--color-gold)", transition: "var(--transition-base)", cursor: "pointer" }}>
+              <div style={{ backgroundColor: "var(--color-bg-surface)", border: "1px solid var(--color-border)", borderRadius: "var(--radius-lg)", padding: "var(--space-8)", borderTop: "3px solid var(--color-rose)", transition: "var(--transition-base)", cursor: "pointer" }}>
                 <h3 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-h3)", color: "var(--color-text-primary)", marginBottom: "var(--space-3)" }}>
                   Beyond Your Ballot
                 </h3>

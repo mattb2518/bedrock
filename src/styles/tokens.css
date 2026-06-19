@@ -42,6 +42,7 @@
   --color-red-light:        #F05040;
   --color-red-dark:         #A02820;
   --color-red-muted:        rgba(212, 64, 53, 0.15);
+  --color-rose:             #E27A86;   /* Soft red-family tint — Beyond Your Ballot pillar */
 
   /* Off-white — primary text, warmth */
   --color-white:            #E8E4DA;
@@ -319,7 +320,7 @@
   --pillar-accent-1:        var(--color-red);    /* Your Ballot */
   --pillar-accent-2:        var(--color-white);  /* Your Media Diet */
   --pillar-accent-3:        var(--color-blue);   /* Your Conversations */
-  --pillar-accent-4:        var(--color-gold);   /* Beyond Your Ballot */
+  --pillar-accent-4:        var(--color-rose);   /* Beyond Your Ballot */
 
 
   /* ============================================================
