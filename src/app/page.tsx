@@ -103,9 +103,6 @@ export default function Home() {
 
             <Link href="/ballot" style={{ textDecoration: "none" }}>
               <div style={{ backgroundColor: "var(--color-bg-surface)", border: "1px solid var(--color-border)", borderRadius: "var(--radius-lg)", padding: "var(--space-8)", borderTop: "3px solid var(--color-red)", transition: "var(--transition-base)", cursor: "pointer" }}>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-micro)", fontWeight: "var(--weight-semibold)", color: "var(--color-red)", letterSpacing: "var(--tracking-wider)", textTransform: "uppercase", marginBottom: "var(--space-3)" }}>
-                  Pillar One
-                </p>
                 <h3 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-h3)", color: "var(--color-text-primary)", marginBottom: "var(--space-3)" }}>
                   Your Ballot
                 </h3>
@@ -117,9 +114,6 @@ export default function Home() {
 
             <Link href="/media" style={{ textDecoration: "none" }}>
               <div style={{ backgroundColor: "var(--color-bg-surface)", border: "1px solid var(--color-border)", borderRadius: "var(--radius-lg)", padding: "var(--space-8)", borderTop: "3px solid var(--color-white-warm)", transition: "var(--transition-base)", cursor: "pointer" }}>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-micro)", fontWeight: "var(--weight-semibold)", color: "var(--color-white-warm)", letterSpacing: "var(--tracking-wider)", textTransform: "uppercase", marginBottom: "var(--space-3)" }}>
-                  Pillar Two
-                </p>
                 <h3 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-h3)", color: "var(--color-text-primary)", marginBottom: "var(--space-3)" }}>
                   Your Media Diet
                 </h3>
@@ -131,9 +125,6 @@ export default function Home() {
 
             <Link href="/conversations" style={{ textDecoration: "none" }}>
               <div style={{ backgroundColor: "var(--color-bg-surface)", border: "1px solid var(--color-border)", borderRadius: "var(--radius-lg)", padding: "var(--space-8)", borderTop: "3px solid var(--color-blue-accent)", transition: "var(--transition-base)", cursor: "pointer" }}>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-micro)", fontWeight: "var(--weight-semibold)", color: "var(--color-blue-accent)", letterSpacing: "var(--tracking-wider)", textTransform: "uppercase", marginBottom: "var(--space-3)" }}>
-                  Pillar Three
-                </p>
                 <h3 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-h3)", color: "var(--color-text-primary)", marginBottom: "var(--space-3)" }}>
                   Your Conversations
                 </h3>
@@ -145,9 +136,6 @@ export default function Home() {
 
             <Link href="/beyond-ballot" style={{ textDecoration: "none" }}>
               <div style={{ backgroundColor: "var(--color-bg-surface)", border: "1px solid var(--color-border)", borderRadius: "var(--radius-lg)", padding: "var(--space-8)", borderTop: "3px solid var(--color-gold)", transition: "var(--transition-base)", cursor: "pointer" }}>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-micro)", fontWeight: "var(--weight-semibold)", color: "var(--color-gold)", letterSpacing: "var(--tracking-wider)", textTransform: "uppercase", marginBottom: "var(--space-3)" }}>
-                  Pillar Four
-                </p>
                 <h3 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-h3)", color: "var(--color-text-primary)", marginBottom: "var(--space-3)" }}>
                   Beyond Your Ballot
                 </h3>
