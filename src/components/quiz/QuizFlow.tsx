@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useQuizStore } from '@/store/quizStore'
 import { LAYER1_QUESTIONS, IMPORTANCE_CLOSER } from '@/lib/quiz/layer1'
@@ -17,11 +17,23 @@ type Phase =
   | 'intro'
   | 'layerIntro'
   | 'quiz'
+  | 'interstitial'
   | 'importance'
   | 'reveal'
   | 'outro'
   | 'dealbreakers'
   | 'done'
+
+// A between-questions "Did you know?" intermission, shown only when the
+// just-answered question carries an easter egg. It defers the layer transition
+// until the user clicks Next, so the egg reads as a beat between questions
+// rather than noise tacked onto the answer.
+interface Interstitial {
+  egg: string
+  reaction?: string // micro-reaction of the option the user picked, if any
+  wasLast: boolean // was this the final question of the layer?
+  layerAtAnswer: QuizLayer
+}
 
 const QUESTIONS_BY_LAYER: Record<number, QuizQuestion[]> = {
   1: LAYER1_QUESTIONS,
@@ -111,6 +123,7 @@ export default function QuizFlow() {
   const [pendingOption, setPendingOption] = useState<string | null>(null)
   const [followText, setFollowText] = useState('')
   const [followChoices, setFollowChoices] = useState<string[]>([])
+  const [interstitial, setInterstitial] = useState<Interstitial | null>(null)
   const [picks, setPicks] = useState<Dimension[]>([])
   const [dbPicks, setDbPicks] = useState<string[]>([])
   const [dbOther, setDbOther] = useState('')
@@ -128,6 +141,28 @@ export default function QuizFlow() {
     setFollowChoices([])
   }
 
+  // Has the user already answered the question now on screen? If so we're
+  // revisiting via the Back link — pre-fill their prior answer and require an
+  // explicit Next rather than auto-advancing, so they can review and move on.
+  const storedAnswer = session?.answers.find((a) => a.questionId === question?.id)
+  const isRevisiting = !!storedAnswer
+
+  // Sync the transient selection to the question on screen: restore a prior
+  // answer when revisiting, clear it when arriving at a fresh question.
+  useEffect(() => {
+    if (phase !== 'quiz') return
+    if (storedAnswer) {
+      setPendingOption(storedAnswer.optionId)
+      setFollowText(storedAnswer.dependsText ?? '')
+      setFollowChoices(storedAnswer.dependsChoices ?? [])
+    } else {
+      setPendingOption(null)
+      setFollowText('')
+      setFollowChoices([])
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [question?.id, phase])
+
   function begin() {
     if (!session) startSession()
     setPhase('quiz')
@@ -139,33 +174,77 @@ export default function QuizFlow() {
     return result
   }
 
-  function advance() {
-    if (!pendingOption || !question) return
-    const opt = question.options.find((o) => o.id === pendingOption)
+  // Record the answer and move on. If the question carries an easter egg, pause
+  // on an intermission screen first; otherwise transition straight away.
+  function finalizeAnswer(optId: string, text: string, choices: string[]) {
+    if (!question) return
+    const opt = question.options.find((o) => o.id === optId)
+    const isDepends = optId === IT_DEPENDS
     submitAnswer({
       questionId: question.id,
-      optionId: pendingOption,
+      optionId: optId,
       dependsText:
-        (pendingOption === IT_DEPENDS && question.dependsFollowUp.type === 'open_text') || opt?.followUpPrompt
-          ? followText
+        (isDepends && question.dependsFollowUp.type === 'open_text') || opt?.followUpPrompt
+          ? text
           : undefined,
       dependsChoices:
-        pendingOption === IT_DEPENDS && question.dependsFollowUp.type === 'multiple_choice'
-          ? followChoices
-          : undefined,
+        isDepends && question.dependsFollowUp.type === 'multiple_choice' ? choices : undefined,
     })
+
+    const wasLast = index + 1 >= questions.length
+    const layerAtAnswer = layer
     clearTransient()
 
-    const isLast = index + 1 >= questions.length
-    if (!isLast) return
-    if (layer === 1) {
+    if (question.easterEgg) {
+      setInterstitial({ egg: question.easterEgg, reaction: opt?.microReaction, wasLast, layerAtAnswer })
+      setPhase('interstitial')
+    } else {
+      runTransition(wasLast, layerAtAnswer)
+    }
+  }
+
+  // Where to go after a question (or its intermission). Non-last questions just
+  // fall through to the next one (the index already advanced on submit).
+  function runTransition(wasLast: boolean, layerAtAnswer: QuizLayer) {
+    if (!wasLast) {
+      setPhase('quiz')
+      return
+    }
+    if (layerAtAnswer === 1) {
       setPhase('importance')
     } else {
-      const completed = [...(session?.completedLayers ?? []), layer]
+      const completed = [...(session?.completedLayers ?? []), layerAtAnswer]
       recompute(completed, session?.topDimensions ?? [])
-      completeLayer(layer)
+      completeLayer(layerAtAnswer)
       setPhase('outro')
     }
+  }
+
+  function leaveInterstitial() {
+    const it = interstitial
+    setInterstitial(null)
+    if (it) runTransition(it.wasLast, it.layerAtAnswer)
+    else setPhase('quiz')
+  }
+
+  // Click an answer. Fresh single-answer questions advance immediately; options
+  // with their own follow-up field, and any answer while revisiting, wait.
+  function selectOption(optId: string) {
+    const opt = question?.options.find((o) => o.id === optId)
+    if (pendingOption !== optId) {
+      setFollowText('')
+      setFollowChoices([])
+    }
+    setPendingOption(optId)
+    if (!isRevisiting && !opt?.followUpPrompt) finalizeAnswer(optId, '', [])
+  }
+
+  function selectItDepends() {
+    if (pendingOption !== IT_DEPENDS) {
+      setFollowText('')
+      setFollowChoices([])
+    }
+    setPendingOption(IT_DEPENDS)
   }
 
   function finishImportance() {
@@ -470,6 +549,32 @@ export default function QuizFlow() {
     )
   }
 
+  // ── INTERSTITIAL (between questions, when an easter egg is present) ───────
+  if (phase === 'interstitial' && interstitial) {
+    return (
+      <Shell>
+        <div style={{ textAlign: 'center', marginBottom: 'var(--space-6)' }}>
+          <Kicker>Pause for a moment</Kicker>
+        </div>
+        {interstitial.reaction && <Aside>{interstitial.reaction}</Aside>}
+        <FunFact>{interstitial.egg}</FunFact>
+        <div style={{ marginTop: 'var(--space-8)', textAlign: 'right' }}>
+          <button style={primaryBtn} onClick={leaveInterstitial}>
+            {interstitial.wasLast ? 'Continue →' : 'Next question →'}
+          </button>
+        </div>
+        <div style={{ marginTop: 'var(--space-4)', textAlign: 'left' }}>
+          <button
+            onClick={() => { setInterstitial(null); goBack(); setPhase('quiz') }}
+            style={{ background: 'none', border: 'none', color: 'var(--color-text-muted)', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', cursor: 'pointer', padding: 0 }}
+          >
+            ← Back to the question
+          </button>
+        </div>
+      </Shell>
+    )
+  }
+
   // ── QUESTION (all layers) ─────────────────────────────────────────────────
   if (!question) return null
   const hasItDepends = question.dependsFollowUp.prompt !== ''
@@ -490,11 +595,16 @@ export default function QuizFlow() {
         <Kicker>
           Layer {layer} · Question {index + 1} of {questions.length}
         </Kicker>
-        {index > 0 && (
-          <button onClick={() => { goBack(); clearTransient() }} style={{ background: 'none', border: 'none', color: 'var(--color-text-muted)', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', cursor: 'pointer' }}>
-            ← Back
-          </button>
-        )}
+        <button
+          onClick={() => {
+            clearTransient()
+            if (index > 0) goBack()
+            else setPhase(layer === 1 ? 'intro' : 'layerIntro')
+          }}
+          style={{ background: 'none', border: 'none', color: 'var(--color-text-muted)', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', cursor: 'pointer', padding: 0 }}
+        >
+          ← Back
+        </button>
       </div>
 
       <div style={{ height: 4, backgroundColor: 'var(--color-bg-surface)', borderRadius: 'var(--radius-full)', marginBottom: 'var(--space-8)' }}>
@@ -510,7 +620,7 @@ export default function QuizFlow() {
         return (
           <button
             key={opt.id}
-            onClick={() => { setPendingOption(opt.id); setFollowText(''); setFollowChoices([]) }}
+            onClick={() => selectOption(opt.id)}
             style={{ ...card, borderColor: selected ? 'var(--color-blue-accent)' : 'var(--color-border)', backgroundColor: selected ? 'rgba(107,159,234,0.08)' : 'var(--color-bg-surface)' }}
           >
             {opt.text}
@@ -519,14 +629,12 @@ export default function QuizFlow() {
       })}
       {hasItDepends && (
         <button
-          onClick={() => setPendingOption(IT_DEPENDS)}
+          onClick={selectItDepends}
           style={{ ...card, fontStyle: 'italic', color: 'var(--color-text-secondary)', borderColor: isDepends ? 'var(--color-blue-accent)' : 'var(--color-border)', backgroundColor: isDepends ? 'rgba(107,159,234,0.08)' : 'var(--color-bg-surface)' }}
         >
           It depends…
         </button>
       )}
-
-      {pickedOption?.microReaction && <Aside>{pickedOption.microReaction}</Aside>}
 
       {/* Follow-up: It-depends open text / multiple choice, OR an option's own text field */}
       {(needsFollowText || needsFollowChoices) && (
@@ -548,16 +656,39 @@ export default function QuizFlow() {
               )
             })
           ) : (
-            <textarea value={followText} onChange={(e) => setFollowText(e.target.value)} rows={3} placeholder="A sentence or two…" style={textarea} />
+            <>
+              <textarea
+                value={followText}
+                onChange={(e) => setFollowText(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey && followReady) {
+                    e.preventDefault()
+                    finalizeAnswer(picked!, followText, followChoices)
+                  }
+                }}
+                rows={3}
+                placeholder="A sentence or two…"
+                style={textarea}
+                autoFocus
+              />
+              <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-micro)', color: 'var(--color-text-muted)', marginTop: 'var(--space-2)' }}>
+                Press Enter to continue · Shift+Enter for a new line
+              </p>
+            </>
           )}
         </div>
       )}
 
-      {question.easterEgg && picked && <FunFact>{question.easterEgg}</FunFact>}
-
-      {picked && (
+      {/* A continue affordance only when something still needs confirming — a
+          follow-up field to fill, or a revisit where we don't auto-advance.
+          Fresh single-answer questions advance the moment you click. */}
+      {picked && (isRevisiting || needsFollowText || needsFollowChoices) && (
         <div style={{ marginTop: 'var(--space-6)', textAlign: 'right' }}>
-          <button style={{ ...primaryBtn, opacity: followReady ? 1 : 0.4, cursor: followReady ? 'pointer' : 'not-allowed' }} onClick={advance} disabled={!followReady}>
+          <button
+            style={{ ...primaryBtn, opacity: followReady ? 1 : 0.4, cursor: followReady ? 'pointer' : 'not-allowed' }}
+            onClick={() => finalizeAnswer(picked, followText, followChoices)}
+            disabled={!followReady}
+          >
             {index + 1 >= questions.length ? 'Continue →' : 'Next →'}
           </button>
         </div>
