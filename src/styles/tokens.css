@@ -316,9 +316,10 @@
      ============================================================ */
 
   --pillar-bg:              var(--color-bg-section);
-  --pillar-accent-1:        var(--color-red);
-  --pillar-accent-2:        var(--color-white);
-  --pillar-accent-3:        var(--color-blue);
+  --pillar-accent-1:        var(--color-red);    /* Your Ballot */
+  --pillar-accent-2:        var(--color-white);  /* Your Media Diet */
+  --pillar-accent-3:        var(--color-blue);   /* Your Conversations */
+  --pillar-accent-4:        var(--color-gold);   /* Beyond Your Ballot */
 
 
   /* ============================================================
