@@ -8,22 +8,68 @@ app code involved. Two separate jobs: (A) the look, (B) the sender address.
 
 ---
 
-## A. Make the emails branded (5 min, no DNS)
+## A. Make the emails branded
 
-For each file below, open the matching Supabase template, replace the body, Save.
-**Supabase dashboard → Authentication → Email Templates.** Keep every
-`{{ .ConfirmationURL }}` exactly as-is — Supabase fills it in.
+For each file below, open the matching Supabase template, switch to the **Source**
+view, replace the body, Save. **Supabase dashboard → Authentication → Emails →
+Templates.** Keep every template variable (`{{ .ConfirmationURL }}`, `{{ .Token }}`,
+etc.) exactly as-is — Supabase fills them in.
 
-| File | Supabase template |
+> Heads-up: the dashboard **locks the Source editor until custom SMTP is enabled**
+> (see section B). So section B is now a prerequisite for editing any template, not
+> an optional follow-up.
+
+### Core auth flows (the 5 every user hits)
+
+| File | Supabase template | Variables |
+|---|---|---|
+| [`confirm-signup.html`](confirm-signup.html) | **Confirm sign up** | `{{ .ConfirmationURL }}` |
+| [`invite.html`](invite.html) | **Invite user** | `{{ .ConfirmationURL }}` |
+| [`magic-link.html`](magic-link.html) | **Magic link or OTP** | `{{ .ConfirmationURL }}` |
+| [`change-email.html`](change-email.html) | **Change email address** | `{{ .ConfirmationURL }}` |
+| [`reset-password.html`](reset-password.html) | **Reset password** | `{{ .ConfirmationURL }}` |
+
+### Reauthentication (shows a code, not a link)
+
+| File | Supabase template | Variables |
+|---|---|---|
+| [`reauthentication.html`](reauthentication.html) | **Reauthentication** | `{{ .Token }}` |
+
+### Security notifications (informational, no button)
+
+These only send if the matching notification is enabled at the project level
+(Authentication → Emails → and the per-notification toggles).
+
+| File | Supabase template | Variables |
+|---|---|---|
+| [`password-changed.html`](password-changed.html) | **Password changed** | — |
+| [`email-changed-notification.html`](email-changed-notification.html) | **Email address changed** | `{{ .OldEmail }}` `{{ .Email }}` |
+| [`phone-changed-notification.html`](phone-changed-notification.html) | **Phone number changed** | `{{ .OldPhone }}` `{{ .Phone }}` |
+| [`signin-method-linked.html`](signin-method-linked.html) | **Sign-in method linked** | `{{ .Provider }}` `{{ .Email }}` |
+| [`signin-method-removed.html`](signin-method-removed.html) | **Sign-in method removed** | `{{ .Provider }}` `{{ .Email }}` |
+| [`mfa-added.html`](mfa-added.html) | **MFA method added** | `{{ .FactorType }}` |
+| [`mfa-removed.html`](mfa-removed.html) | **MFA method removed** | `{{ .FactorType }}` |
+
+### Suggested subject lines
+
+The **Subject** is a separate one-line field from the body — pasting the HTML
+doesn't change it. Optional, but more on-brand:
+
+| Template | Subject |
 |---|---|
-| [`confirm-signup.html`](confirm-signup.html) | **Confirm signup** |
-| [`magic-link.html`](magic-link.html) | **Magic Link** |
-| [`reset-password.html`](reset-password.html) | **Reset Password** |
-| [`change-email.html`](change-email.html) | **Change Email Address** |
-| [`invite.html`](invite.html) | **Invite user** |
-
-Optional but nice: also set a friendlier **Subject** on each (e.g. "Confirm your
-Bedrock account", "Your Bedrock sign-in link", "Reset your Bedrock password").
+| Confirm sign up | `Confirm your Bedrock account` |
+| Invite user | `You're invited to Bedrock` |
+| Magic link or OTP | `Your Bedrock sign-in link` |
+| Change email address | `Confirm your new Bedrock email` |
+| Reset password | `Reset your Bedrock password` |
+| Reauthentication | `Your Bedrock verification code` |
+| Password changed | `Your Bedrock password was changed` |
+| Email address changed | `Your Bedrock email was changed` |
+| Phone number changed | `Your Bedrock phone number was changed` |
+| Sign-in method linked | `A sign-in method was added to your Bedrock account` |
+| Sign-in method removed | `A sign-in method was removed from your Bedrock account` |
+| MFA method added | `Two-factor authentication was turned on` |
+| MFA method removed | `Two-factor authentication was turned off` |
 
 > Note: email clients can't load web fonts (Libre Baskerville / DM Sans) or SVG,
 > so these use Georgia/Arial fallbacks and a CSS tri-color bar instead of the logo
