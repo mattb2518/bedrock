@@ -57,19 +57,23 @@ doesn't change it. Optional, but more on-brand:
 
 | Template | Subject |
 |---|---|
-| Confirm sign up | `Confirm your Bedrock account` |
-| Invite user | `You're invited to Bedrock` |
-| Magic link or OTP | `Your Bedrock sign-in link` |
-| Change email address | `Confirm your new Bedrock email` |
-| Reset password | `Reset your Bedrock password` |
-| Reauthentication | `Your Bedrock verification code` |
-| Password changed | `Your Bedrock password was changed` |
-| Email address changed | `Your Bedrock email was changed` |
-| Phone number changed | `Your Bedrock phone number was changed` |
-| Sign-in method linked | `A sign-in method was added to your Bedrock account` |
-| Sign-in method removed | `A sign-in method was removed from your Bedrock account` |
-| MFA method added | `Two-factor authentication was turned on` |
-| MFA method removed | `Two-factor authentication was turned off` |
+| Confirm sign up | `Welcome to Bedrock.guide — confirm your email` |
+| Invite user | `You're invited to Bedrock.guide` |
+| Magic link or OTP | `Your Bedrock.guide sign-in link` |
+| Change email address | `Confirm your new email for Bedrock.guide` |
+| Reset password | `Reset your Bedrock.guide password` |
+| Reauthentication | `Your Bedrock.guide verification code` |
+| Password changed | `Your Bedrock.guide password was changed` |
+| Email address changed | `Your Bedrock.guide email address was changed` |
+| Phone number changed | `Your Bedrock.guide phone number was changed` |
+| Sign-in method linked | `New sign-in method added to Bedrock.guide` |
+| Sign-in method removed | `Sign-in method removed from Bedrock.guide` |
+| MFA method added | `Two-factor authentication is on for Bedrock.guide` |
+| MFA method removed | `Two-factor authentication is off for Bedrock.guide` |
+
+> Brand note: subjects and the wordmark use the full **Bedrock.guide** (the
+> unusual TLD is part of the brand). Body sentences intentionally keep the
+> shorter "Bedrock" where it reads more naturally.
 
 > Note: email clients can't load web fonts (Libre Baskerville / DM Sans) or SVG,
 > so these use Georgia/Arial fallbacks and a CSS tri-color bar instead of the logo
