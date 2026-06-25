@@ -2,6 +2,8 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import SignOutButton from "@/components/auth/SignOutButton";
+import ChangePassword from "@/components/auth/ChangePassword";
+import ChangeEmail from "@/components/auth/ChangeEmail";
 
 export default async function ProfilePage() {
   const supabase = await createClient();
@@ -59,6 +61,16 @@ export default async function ProfilePage() {
         <div style={{ backgroundColor: "var(--color-bg-surface)", border: "1px solid var(--color-border)", borderRadius: "var(--radius-lg)", padding: "var(--space-6)" }}>
           <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-small)", fontWeight: "var(--weight-semibold)", color: "var(--color-text-subtle)", textTransform: "uppercase", letterSpacing: "var(--tracking-wider)", marginBottom: "var(--space-4)" }}>Account Actions</p>
           <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
+            {provider === "google" ? (
+              <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-small)", color: "var(--color-text-muted)", lineHeight: "var(--leading-relaxed)" }}>
+                Your email and password are managed through your Google account.
+              </p>
+            ) : (
+              <>
+                <ChangePassword email={user.email ?? ""} />
+                <ChangeEmail currentEmail={user.email ?? ""} />
+              </>
+            )}
             <SignOutButton />
             <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-small)", color: "var(--color-text-muted)", marginTop: "var(--space-2)" }}>
               To delete your account and all data permanently, email <a href="mailto:hello@bedrock.guide" style={{ color: "var(--color-blue-accent)" }}>hello@bedrock.guide</a>. We'll handle it within 24 hours. (Self-serve delete coming soon.)
