@@ -5,7 +5,7 @@ const GATE_PASSWORD = "redwhiteblue";
 const GATE_COOKIE = "bedrock_gate";
 
 // Routes that bypass the password gate entirely
-const GATE_BYPASS = ["/gate", "/signin", "/signup", "/auth/callback"];
+const GATE_BYPASS = ["/gate", "/signin", "/signup", "/forgot-password", "/reset-password", "/auth/callback"];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;

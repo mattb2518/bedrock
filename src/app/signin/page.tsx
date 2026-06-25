@@ -143,6 +143,9 @@ function SignInForm() {
           <div>
             <label style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-small)", fontWeight: "var(--weight-semibold)", color: "var(--color-text-secondary)", display: "block", marginBottom: "var(--space-2)" }}>Password</label>
             <input type="password" required value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" style={inputStyle} />
+            <div style={{ textAlign: "right", marginTop: "var(--space-2)" }}>
+              <Link href="/forgot-password" style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-small)", color: "var(--color-blue-accent)" }}>Forgot password?</Link>
+            </div>
           </div>
           {error && <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-small)", color: "var(--color-red)" }}>{error}</p>}
           <button type="submit" disabled={loading} style={btnPrimary}>{loading ? "Signing in…" : "Sign in →"}</button>
