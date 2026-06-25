@@ -4,6 +4,7 @@ import Link from "next/link";
 import SignOutButton from "@/components/auth/SignOutButton";
 import ChangePassword from "@/components/auth/ChangePassword";
 import ChangeEmail from "@/components/auth/ChangeEmail";
+import DeleteAccount from "@/components/auth/DeleteAccount";
 
 export default async function ProfilePage() {
   const supabase = await createClient();
@@ -72,8 +73,9 @@ export default async function ProfilePage() {
               </>
             )}
             <SignOutButton />
+            <DeleteAccount />
             <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-small)", color: "var(--color-text-muted)", marginTop: "var(--space-2)" }}>
-              To delete your account and all data permanently, email <a href="mailto:hello@bedrock.guide" style={{ color: "var(--color-blue-accent)" }}>hello@bedrock.guide</a>. We'll handle it within 24 hours. (Self-serve delete coming soon.)
+              Trouble deleting? Email <a href="mailto:hello@bedrock.guide" style={{ color: "var(--color-blue-accent)" }}>hello@bedrock.guide</a> and we'll handle it within 24 hours.
             </p>
           </div>
         </div>
