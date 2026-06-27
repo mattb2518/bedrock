@@ -99,7 +99,7 @@ export default function Home() {
           </div>
 
           {/* Four pillars — 2×2 on desktop, single column on mobile */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "var(--space-6)", maxWidth: "720px", margin: "0 auto" }}>
+          <div className="pillar-grid">
 
             <Link href="/ballot" style={{ textDecoration: "none" }}>
               <div style={{ backgroundColor: "var(--color-bg-surface)", border: "1px solid var(--color-border)", borderRadius: "var(--radius-lg)", padding: "var(--space-8)", borderTop: "3px solid var(--color-red)", transition: "var(--transition-base)", cursor: "pointer" }}>
@@ -147,6 +147,19 @@ export default function Home() {
 
           </div>
         </div>
+
+        <style>{`
+          .pillar-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: var(--space-6);
+            max-width: 760px;
+            margin: 0 auto;
+          }
+          @media (max-width: 640px) {
+            .pillar-grid { grid-template-columns: 1fr; }
+          }
+        `}</style>
       </section>
 
       {/* ── Tagline band ──────────────────────────────────── */}
