@@ -98,8 +98,8 @@ export default function Home() {
             </p>
           </div>
 
-          {/* Four pillars */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "var(--space-6)" }}>
+          {/* Four pillars — 2×2 on desktop, single column on mobile */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "var(--space-6)", maxWidth: "720px", margin: "0 auto" }}>
 
             <Link href="/ballot" style={{ textDecoration: "none" }}>
               <div style={{ backgroundColor: "var(--color-bg-surface)", border: "1px solid var(--color-border)", borderRadius: "var(--radius-lg)", padding: "var(--space-8)", borderTop: "3px solid var(--color-red)", transition: "var(--transition-base)", cursor: "pointer" }}>
