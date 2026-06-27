@@ -101,8 +101,8 @@ export default function Home() {
           {/* Four pillars — 2×2 on desktop, single column on mobile */}
           <div className="pillar-grid">
 
-            <Link href="/ballot" style={{ textDecoration: "none" }}>
-              <div style={{ backgroundColor: "var(--color-bg-surface)", border: "1px solid var(--color-border)", borderRadius: "var(--radius-lg)", padding: "var(--space-8)", borderTop: "3px solid var(--color-red)", transition: "var(--transition-base)", cursor: "pointer" }}>
+            <Link href="/ballot" style={{ textDecoration: "none", display: "block", height: "100%" }}>
+              <div style={{ backgroundColor: "var(--color-bg-surface)", border: "1px solid var(--color-border)", borderRadius: "var(--radius-lg)", padding: "var(--space-8)", borderTop: "3px solid var(--color-red)", transition: "var(--transition-base)", cursor: "pointer", height: "100%", boxSizing: "border-box" }}>
                 <h3 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-h3)", color: "var(--color-text-primary)", marginBottom: "var(--space-3)" }}>
                   Your Ballot
                 </h3>
@@ -112,8 +112,8 @@ export default function Home() {
               </div>
             </Link>
 
-            <Link href="/media" style={{ textDecoration: "none" }}>
-              <div style={{ backgroundColor: "var(--color-bg-surface)", border: "1px solid var(--color-border)", borderRadius: "var(--radius-lg)", padding: "var(--space-8)", borderTop: "3px solid var(--color-white-warm)", transition: "var(--transition-base)", cursor: "pointer" }}>
+            <Link href="/media" style={{ textDecoration: "none", display: "block", height: "100%" }}>
+              <div style={{ backgroundColor: "var(--color-bg-surface)", border: "1px solid var(--color-border)", borderRadius: "var(--radius-lg)", padding: "var(--space-8)", borderTop: "3px solid var(--color-white-warm)", transition: "var(--transition-base)", cursor: "pointer", height: "100%", boxSizing: "border-box" }}>
                 <h3 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-h3)", color: "var(--color-text-primary)", marginBottom: "var(--space-3)" }}>
                   Your Media Diet
                 </h3>
@@ -123,8 +123,8 @@ export default function Home() {
               </div>
             </Link>
 
-            <Link href="/conversations" style={{ textDecoration: "none" }}>
-              <div style={{ backgroundColor: "var(--color-bg-surface)", border: "1px solid var(--color-border)", borderRadius: "var(--radius-lg)", padding: "var(--space-8)", borderTop: "3px solid var(--color-blue-accent)", transition: "var(--transition-base)", cursor: "pointer" }}>
+            <Link href="/conversations" style={{ textDecoration: "none", display: "block", height: "100%" }}>
+              <div style={{ backgroundColor: "var(--color-bg-surface)", border: "1px solid var(--color-border)", borderRadius: "var(--radius-lg)", padding: "var(--space-8)", borderTop: "3px solid var(--color-blue-accent)", transition: "var(--transition-base)", cursor: "pointer", height: "100%", boxSizing: "border-box" }}>
                 <h3 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-h3)", color: "var(--color-text-primary)", marginBottom: "var(--space-3)" }}>
                   Your Conversations
                 </h3>
@@ -134,8 +134,8 @@ export default function Home() {
               </div>
             </Link>
 
-            <Link href="/beyond-ballot" style={{ textDecoration: "none" }}>
-              <div style={{ backgroundColor: "var(--color-bg-surface)", border: "1px solid var(--color-border)", borderRadius: "var(--radius-lg)", padding: "var(--space-8)", borderTop: "3px solid var(--color-rose)", transition: "var(--transition-base)", cursor: "pointer" }}>
+            <Link href="/beyond-ballot" style={{ textDecoration: "none", display: "block", height: "100%" }}>
+              <div style={{ backgroundColor: "var(--color-bg-surface)", border: "1px solid var(--color-border)", borderRadius: "var(--radius-lg)", padding: "var(--space-8)", borderTop: "3px solid var(--color-rose)", transition: "var(--transition-base)", cursor: "pointer", height: "100%", boxSizing: "border-box" }}>
                 <h3 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-h3)", color: "var(--color-text-primary)", marginBottom: "var(--space-3)" }}>
                   Beyond Your Ballot
                 </h3>
@@ -152,12 +152,13 @@ export default function Home() {
           .pillar-grid {
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
+            grid-auto-rows: 1fr;
             gap: var(--space-6);
             max-width: 760px;
             margin: 0 auto;
           }
           @media (max-width: 640px) {
-            .pillar-grid { grid-template-columns: 1fr; }
+            .pillar-grid { grid-template-columns: 1fr; grid-auto-rows: auto; }
           }
         `}</style>
       </section>

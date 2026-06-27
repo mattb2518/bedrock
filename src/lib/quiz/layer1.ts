@@ -52,8 +52,9 @@ export const LAYER1_QUESTIONS: QuizQuestion[] = [
       prompt:
         'What shapes your answer — the stakes, who’s affected, the track record of change in that area?',
     },
-    easterEgg:
-      'In the 1920s the United States amended the Constitution to ban alcohol, then amended it again to unban alcohol thirteen years later. The GI Bill of 1944 paid for the education of 7.8 million veterans and is widely credited with creating the postwar middle class. Two consequential acts of bold change, one generation apart.',
+    // No easterEgg on A1 by design: the first question must auto-advance straight
+    // to Q2 so the very first interaction proves the quiz moves fast, rather than
+    // landing on a "Did you know?" intermission.
     note: 'A1 carries four substantive options instead of the usual three — deliberate on the foundational dimension; the original three were all change-positive and missed the strong-stability position.',
   },
   {
