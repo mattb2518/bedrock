@@ -8,10 +8,29 @@ import { LAYER2_QUESTIONS } from '@/lib/quiz/layer2'
 import { LAYER3_QUESTIONS } from '@/lib/quiz/layer3'
 import { LAYER4_SECTIONS, FRAMING, DEALBREAKER_OTHER_PROMPT } from '@/lib/quiz/layer4'
 import { LAYER_INTRO, LAYER_OUTRO, LAYER_LABELS } from '@/lib/quiz/layerCopy'
+import {
+  DEMOGRAPHIC_INTRO,
+  PARTY_RELATIONSHIP,
+  POLITICAL_LINEAGE,
+  LINEAGE_TRIGGERS,
+  AGE_RANGES,
+  GEOGRAPHIES,
+  REGIONS,
+  DEMOGRAPHIC_OTHER_PROMPT,
+} from '@/lib/quiz/demographics'
 import { buildResult } from '@/lib/quiz/scoring'
 import { DIMENSIONS } from '@/lib/quiz/dimensions'
-import { IT_DEPENDS, type Dimension, type QuizLayer, type QuizQuestion } from '@/types/quiz'
+import { IT_DEPENDS, type Demographics, type Dimension, type QuizLayer, type QuizQuestion } from '@/types/quiz'
 import MantleReveal from '@/components/quiz/MantleReveal'
+
+// Fire a Plausible custom event if the cookieless script is present. No-ops in
+// dev / when the script hasn't loaded. Used to learn whether users actually read
+// the easter eggs or skip past them (so we can decide their fate with data).
+function track(event: string, props?: Record<string, string | number | boolean>) {
+  if (typeof window === 'undefined') return
+  const p = (window as unknown as { plausible?: (e: string, o?: { props: Record<string, unknown> }) => void }).plausible
+  if (typeof p === 'function') p(event, props ? { props } : undefined)
+}
 
 type Phase =
   | 'intro'
@@ -22,6 +41,7 @@ type Phase =
   | 'reveal'
   | 'outro'
   | 'dealbreakers'
+  | 'demographics'
   | 'done'
 
 // A between-questions "Did you know?" intermission, shown only when the
@@ -30,7 +50,6 @@ type Phase =
 // rather than noise tacked onto the answer.
 interface Interstitial {
   egg: string
-  reaction?: string // micro-reaction of the option the user picked, if any
   wasLast: boolean // was this the final question of the layer?
   layerAtAnswer: QuizLayer
 }
@@ -92,6 +111,17 @@ const ghostBtn: React.CSSProperties = {
   border: '1px solid var(--color-border)',
 }
 
+const mutedLinkBtn: React.CSSProperties = {
+  background: 'none',
+  border: 'none',
+  color: 'var(--color-text-muted)',
+  fontFamily: 'var(--font-body)',
+  fontSize: 'var(--text-small)',
+  cursor: 'pointer',
+  padding: 0,
+  textAlign: 'left',
+}
+
 const textarea: React.CSSProperties = {
   width: '100%',
   backgroundColor: 'var(--color-bg-surface)',
@@ -115,6 +145,8 @@ export default function QuizFlow() {
     setResult,
     setDealbreakers,
     setDealbreakerOther,
+    setDemographics,
+    setSkipEasterEggs,
     resetQuiz,
   } = useQuizStore()
   const [phase, setPhase] = useState<Phase>('intro')
@@ -122,12 +154,18 @@ export default function QuizFlow() {
   // Transient per-question UI state
   const [pendingOption, setPendingOption] = useState<string | null>(null)
   const [followText, setFollowText] = useState('')
-  const [followChoices, setFollowChoices] = useState<string[]>([])
   const [interstitial, setInterstitial] = useState<Interstitial | null>(null)
   const [picks, setPicks] = useState<Dimension[]>([])
   const [dbPicks, setDbPicks] = useState<string[]>([])
   const [dbOther, setDbOther] = useState('')
   const [confirmingRetake, setConfirmingRetake] = useState(false)
+
+  // How many easter-egg intermissions the user has seen this sitting. Drives the
+  // "skip the rest" button, which appears once they're past the second egg.
+  const [eggsSeen, setEggsSeen] = useState(0)
+
+  // Post-quiz demographic module (all optional)
+  const [demo, setDemo] = useState<Demographics>({})
 
   const layer = (session?.currentLayer ?? 1) as QuizLayer
   const questions = QUESTIONS_BY_LAYER[layer] ?? LAYER1_QUESTIONS
@@ -138,7 +176,6 @@ export default function QuizFlow() {
   function clearTransient() {
     setPendingOption(null)
     setFollowText('')
-    setFollowChoices([])
   }
 
   // Has the user already answered the question now on screen? If so we're
@@ -153,11 +190,9 @@ export default function QuizFlow() {
     if (storedAnswer) {
       setPendingOption(storedAnswer.optionId)
       setFollowText(storedAnswer.dependsText ?? '')
-      setFollowChoices(storedAnswer.dependsChoices ?? [])
     } else {
       setPendingOption(null)
       setFollowText('')
-      setFollowChoices([])
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [question?.id, phase])
@@ -173,29 +208,28 @@ export default function QuizFlow() {
     return result
   }
 
-  // Record the answer and move on. If the question carries an easter egg, pause
-  // on an intermission screen first; otherwise transition straight away.
-  function finalizeAnswer(optId: string, text: string, choices: string[]) {
+  // Record the answer and move on. If the question carries an easter egg — and
+  // the user hasn't opted out — pause on an intermission first; otherwise
+  // transition straight away. "It depends" always stores the user's free text.
+  function finalizeAnswer(optId: string, text: string) {
     if (!question) return
     const opt = question.options.find((o) => o.id === optId)
     const isDepends = optId === IT_DEPENDS
     submitAnswer({
       questionId: question.id,
       optionId: optId,
-      dependsText:
-        (isDepends && question.dependsFollowUp.type === 'open_text') || opt?.followUpPrompt
-          ? text
-          : undefined,
-      dependsChoices:
-        isDepends && question.dependsFollowUp.type === 'multiple_choice' ? choices : undefined,
+      dependsText: isDepends || opt?.followUpPrompt ? text : undefined,
     })
 
     const wasLast = index + 1 >= questions.length
     const layerAtAnswer = layer
     clearTransient()
 
-    if (question.easterEgg) {
-      setInterstitial({ egg: question.easterEgg, reaction: opt?.microReaction, wasLast, layerAtAnswer })
+    if (question.easterEgg && !session?.skipEasterEggs) {
+      const seen = eggsSeen + 1
+      setEggsSeen(seen)
+      track('Easter Egg Shown', { layer: layerAtAnswer, n: seen })
+      setInterstitial({ egg: question.easterEgg, wasLast, layerAtAnswer })
       setPhase('interstitial')
     } else {
       runTransition(wasLast, layerAtAnswer)
@@ -230,19 +264,13 @@ export default function QuizFlow() {
   // revisit. Only options with their own follow-up field wait for input.
   function selectOption(optId: string) {
     const opt = question?.options.find((o) => o.id === optId)
-    if (pendingOption !== optId) {
-      setFollowText('')
-      setFollowChoices([])
-    }
+    if (pendingOption !== optId) setFollowText('')
     setPendingOption(optId)
-    if (!opt?.followUpPrompt) finalizeAnswer(optId, '', [])
+    if (!opt?.followUpPrompt) finalizeAnswer(optId, '')
   }
 
   function selectItDepends() {
-    if (pendingOption !== IT_DEPENDS) {
-      setFollowText('')
-      setFollowChoices([])
-    }
+    if (pendingOption !== IT_DEPENDS) setFollowText('')
     setPendingOption(IT_DEPENDS)
   }
 
@@ -258,6 +286,12 @@ export default function QuizFlow() {
     setDealbreakerOther(dbOther)
     recompute([1, 2, 3, 4], session?.topDimensions ?? [])
     completeLayer(4)
+    setPhase('demographics')
+  }
+
+  function finishDemographics(save: boolean) {
+    setDemographics(save ? { ...demo, completed: true } : { completed: true })
+    track(save ? 'Demographics Submitted' : 'Demographics Skipped')
     setPhase('done')
   }
 
@@ -266,6 +300,8 @@ export default function QuizFlow() {
     setPicks([])
     setDbPicks([])
     setDbOther('')
+    setDemo({})
+    setEggsSeen(0)
     setConfirmingRetake(false)
     clearTransient()
     setPhase('intro')
@@ -276,6 +312,8 @@ export default function QuizFlow() {
     setPicks([])
     setDbPicks([])
     setDbOther('')
+    setDemo({})
+    setEggsSeen(0)
     setConfirmingRetake(false)
     clearTransient()
     startSession()
@@ -375,7 +413,7 @@ export default function QuizFlow() {
         <Body>{intro.body}</Body>
         <div style={{ marginTop: 'var(--space-8)' }}>
           <button style={primaryBtn} onClick={() => setPhase(layer === 4 ? 'dealbreakers' : 'quiz')}>
-            {layer === 4 ? 'Draw my lines →' : `Begin Layer ${layer} →`}
+            {layer === 4 ? 'Mark my dealbreakers →' : `Begin Layer ${layer} →`}
           </button>
         </div>
       </Shell>
@@ -400,7 +438,7 @@ export default function QuizFlow() {
                 Continue to Layer 2 →
               </button>
               <Link href="/results" style={{ ...ghostBtn, textDecoration: 'none' }}>
-                Save & view results
+                See where I stand →
               </Link>
             </div>
           </div>
@@ -426,7 +464,7 @@ export default function QuizFlow() {
             Continue to Layer {layer} →
           </button>
           <Link href="/results" style={{ ...ghostBtn, textDecoration: 'none' }}>
-            View results so far
+            See where I stand →
           </Link>
         </div>
       </Shell>
@@ -512,6 +550,9 @@ export default function QuizFlow() {
       <Shell>
         <Kicker>Layer 4 · {LAYER_LABELS[4]}</Kicker>
         <H2>{FRAMING}</H2>
+        <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', textAlign: 'center', maxWidth: 480, margin: '0 auto var(--space-2)' }}>
+          Most people land on a handful. These are your true non-negotiables — not every position you mildly dislike. The more you check, the fewer candidates survive the filter.
+        </p>
         <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', textAlign: 'center', marginBottom: 'var(--space-8)' }}>
           Select as many or as few as apply. ({dbPicks.length} selected)
         </p>
@@ -548,27 +589,109 @@ export default function QuizFlow() {
     )
   }
 
-  // ── INTERSTITIAL (between questions, when an easter egg is present) ───────
-  if (phase === 'interstitial' && interstitial) {
+  // ── DEMOGRAPHIC MODULE (optional, after Layer 4) ──────────────────────────
+  if (phase === 'demographics') {
+    const showLineage = !!demo.partyRelationship && LINEAGE_TRIGGERS.includes(demo.partyRelationship)
+    const sectionLabel = (text: string) => (
+      <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-primary)', margin: 'var(--space-8) 0 var(--space-3)' }}>{text}</p>
+    )
+    const microLabel = (text: string) => (
+      <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-micro)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-muted)', letterSpacing: 'var(--tracking-wider)', textTransform: 'uppercase', marginBottom: 'var(--space-3)' }}>{text}</p>
+    )
+    const choiceCard = (selected: boolean, label: string, onClick: () => void) => (
+      <button
+        key={label}
+        onClick={onClick}
+        style={{ ...card, marginBottom: 'var(--space-2)', borderColor: selected ? 'var(--color-blue-accent)' : 'var(--color-border)', backgroundColor: selected ? 'rgba(107,159,234,0.08)' : 'var(--color-bg-surface)' }}
+      >
+        {label}
+      </button>
+    )
+    const pillRow = (options: string[], value: string | undefined, set: (v: string | undefined) => void) => (
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)', marginBottom: 'var(--space-4)' }}>
+        {options.map((o) => {
+          const on = value === o
+          return (
+            <button key={o} onClick={() => set(on ? undefined : o)} style={{ ...card, width: 'auto', marginBottom: 0, padding: 'var(--space-2) var(--space-4)', fontSize: 'var(--text-small)', borderColor: on ? 'var(--color-gold)' : 'var(--color-border)', backgroundColor: on ? 'rgba(200,169,110,0.08)' : 'var(--color-bg-surface)' }}>
+              {o}
+            </button>
+          )
+        })}
+      </div>
+    )
     return (
       <Shell>
-        <div style={{ textAlign: 'center', marginBottom: 'var(--space-6)' }}>
-          <Kicker>Pause for a moment</Kicker>
+        <Kicker>{DEMOGRAPHIC_INTRO.kicker}</Kicker>
+        <H1>{DEMOGRAPHIC_INTRO.heading}</H1>
+        <Body>{DEMOGRAPHIC_INTRO.body}</Body>
+
+        {sectionLabel(PARTY_RELATIONSHIP.prompt)}
+        {PARTY_RELATIONSHIP.options.map((o) =>
+          choiceCard(demo.partyRelationship === o, o, () =>
+            setDemo((d) => ({ ...d, partyRelationship: o, lineage: LINEAGE_TRIGGERS.includes(o) ? d.lineage : undefined }))
+          )
+        )}
+
+        {showLineage && (
+          <>
+            {sectionLabel(POLITICAL_LINEAGE.prompt)}
+            {POLITICAL_LINEAGE.options.map((o) =>
+              choiceCard(demo.lineage === o, o, () => setDemo((d) => ({ ...d, lineage: o })))
+            )}
+          </>
+        )}
+
+        {sectionLabel('A little more context — optional, and never used for anything but improving recommendations.')}
+        {microLabel('Age')}
+        {pillRow(AGE_RANGES, demo.ageRange, (v) => setDemo((d) => ({ ...d, ageRange: v })))}
+        {microLabel('Where you live')}
+        {pillRow(GEOGRAPHIES, demo.geography, (v) => setDemo((d) => ({ ...d, geography: v })))}
+        {microLabel('Region')}
+        {pillRow(REGIONS, demo.region, (v) => setDemo((d) => ({ ...d, region: v })))}
+
+        {sectionLabel(DEMOGRAPHIC_OTHER_PROMPT)}
+        <textarea value={demo.note ?? ''} onChange={(e) => setDemo((d) => ({ ...d, note: e.target.value }))} rows={3} placeholder="Optional…" style={{ ...textarea, marginBottom: 'var(--space-8)' }} />
+
+        <div style={{ display: 'flex', gap: 'var(--space-4)', flexWrap: 'wrap' }}>
+          <button style={primaryBtn} onClick={() => finishDemographics(true)}>Done → see my results</button>
+          <button style={ghostBtn} onClick={() => finishDemographics(false)}>Skip this</button>
         </div>
-        {interstitial.reaction && <Aside>{interstitial.reaction}</Aside>}
+      </Shell>
+    )
+  }
+
+  // ── INTERSTITIAL (between questions, when an easter egg is present) ───────
+  if (phase === 'interstitial' && interstitial) {
+    // The "skip the rest" escape hatch appears once the user is past their
+    // second easter egg (i.e. on the third and beyond).
+    const canSkip = eggsSeen >= 3
+    return (
+      <Shell>
         <FunFact>{interstitial.egg}</FunFact>
         <div style={{ marginTop: 'var(--space-8)', textAlign: 'right' }}>
           <button style={primaryBtn} onClick={leaveInterstitial}>
             {interstitial.wasLast ? 'Continue →' : 'Next question →'}
           </button>
         </div>
-        <div style={{ marginTop: 'var(--space-4)', textAlign: 'left' }}>
+        <div style={{ marginTop: 'var(--space-4)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 'var(--space-4)', flexWrap: 'wrap' }}>
           <button
             onClick={() => { setInterstitial(null); goBack(); setPhase('quiz') }}
-            style={{ background: 'none', border: 'none', color: 'var(--color-text-muted)', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', cursor: 'pointer', padding: 0 }}
+            style={mutedLinkBtn}
           >
             ← Back to the question
           </button>
+          {canSkip && (
+            <button
+              onClick={() => {
+                track('Easter Eggs Skipped', { atEgg: eggsSeen })
+                setSkipEasterEggs(true)
+                leaveInterstitial()
+              }}
+              style={mutedLinkBtn}
+            >
+              Skip the rest of the “Did You Know” moments and focus on the quiz →
+            </button>
+          )}
         </div>
       </Shell>
     )
@@ -580,13 +703,14 @@ export default function QuizFlow() {
   const picked = pendingOption
   const pickedOption = question.options.find((o) => o.id === picked)
   const isDepends = picked === IT_DEPENDS
-  const needsFollowText =
-    (isDepends && question.dependsFollowUp.type === 'open_text') || !!pickedOption?.followUpPrompt
-  const needsFollowChoices = isDepends && question.dependsFollowUp.type === 'multiple_choice'
-  const followReady =
-    (!needsFollowText || followText.trim().length > 0) &&
-    (!needsFollowChoices || followChoices.length > 0)
+  // "It depends" always opens a free-text box now; an option may also carry its
+  // own follow-up field. Either way we collect text, never multiple-choice chips.
+  const needsFollowText = isDepends || !!pickedOption?.followUpPrompt
+  const followReady = !needsFollowText || followText.trim().length > 0
   const followPrompt = pickedOption?.followUpPrompt ?? question.dependsFollowUp.prompt
+  // Authored prompt themes (formerly chips) become optional example hints under
+  // the box — they help the user know what to write without forcing a choice.
+  const followExamples = isDepends ? question.dependsFollowUp.choices ?? [] : []
 
   return (
     <Shell>
@@ -635,56 +759,45 @@ export default function QuizFlow() {
         </button>
       )}
 
-      {/* Follow-up: It-depends open text / multiple choice, OR an option's own text field */}
-      {(needsFollowText || needsFollowChoices) && (
+      {/* Follow-up: a free-text box for "It depends" or an option's own field.
+          You can always say it in your own words. */}
+      {needsFollowText && (
         <div style={{ marginTop: 'var(--space-4)' }}>
-          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', marginBottom: 'var(--space-3)' }}>
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', marginBottom: followExamples.length ? 'var(--space-2)' : 'var(--space-3)' }}>
             {followPrompt}
           </p>
-          {needsFollowChoices ? (
-            (question.dependsFollowUp.choices ?? []).map((choice) => {
-              const on = followChoices.includes(choice)
-              return (
-                <button
-                  key={choice}
-                  onClick={() => setFollowChoices((prev) => (on ? prev.filter((c) => c !== choice) : [...prev, choice]))}
-                  style={{ ...card, marginBottom: 'var(--space-2)', fontSize: 'var(--text-small)', borderColor: on ? 'var(--color-blue-accent)' : 'var(--color-border)', backgroundColor: on ? 'rgba(107,159,234,0.08)' : 'var(--color-bg-surface)' }}
-                >
-                  {on ? '✓ ' : ''}{choice}
-                </button>
-              )
-            })
-          ) : (
-            <>
-              <textarea
-                value={followText}
-                onChange={(e) => setFollowText(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey && followReady) {
-                    e.preventDefault()
-                    finalizeAnswer(picked!, followText, followChoices)
-                  }
-                }}
-                rows={3}
-                placeholder="A sentence or two…"
-                style={textarea}
-                autoFocus
-              />
-              <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-micro)', color: 'var(--color-text-muted)', marginTop: 'var(--space-2)' }}>
-                Press Enter to continue · Shift+Enter for a new line
-              </p>
-            </>
+          {followExamples.length > 0 && (
+            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-micro)', color: 'var(--color-text-muted)', fontStyle: 'italic', marginBottom: 'var(--space-3)', lineHeight: 'var(--leading-relaxed)' }}>
+              For instance: {followExamples.join(' · ')}
+            </p>
           )}
+          <textarea
+            value={followText}
+            onChange={(e) => setFollowText(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey && followReady) {
+                e.preventDefault()
+                finalizeAnswer(picked!, followText)
+              }
+            }}
+            rows={3}
+            placeholder="A sentence or two…"
+            style={textarea}
+            autoFocus
+          />
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-micro)', color: 'var(--color-text-muted)', marginTop: 'var(--space-2)' }}>
+            Press Enter to continue · Shift+Enter for a new line
+          </p>
         </div>
       )}
 
       {/* A continue affordance only when a follow-up field still needs input.
           Every other answer advances the moment you click. */}
-      {picked && (needsFollowText || needsFollowChoices) && (
+      {picked && needsFollowText && (
         <div style={{ marginTop: 'var(--space-6)', textAlign: 'right' }}>
           <button
             style={{ ...primaryBtn, opacity: followReady ? 1 : 0.4, cursor: followReady ? 'pointer' : 'not-allowed' }}
-            onClick={() => finalizeAnswer(picked, followText, followChoices)}
+            onClick={() => finalizeAnswer(picked, followText)}
             disabled={!followReady}
           >
             {index + 1 >= questions.length ? 'Continue →' : 'Next →'}
@@ -711,17 +824,8 @@ function H2({ children }: { children: React.ReactNode }) {
 function Body({ children }: { children: React.ReactNode }) {
   return <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body-lg)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', marginBottom: 'var(--space-4)' }}>{children}</p>
 }
-function Aside({ children, muted }: { children: React.ReactNode; muted?: boolean }) {
-  return (
-    <div style={{ marginTop: 'var(--space-4)', padding: 'var(--space-4)', borderLeft: `2px solid ${muted ? 'var(--color-border)' : 'var(--color-gold)'}`, backgroundColor: 'rgba(255,255,255,0.02)' }}>
-      <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: muted ? 'var(--color-text-muted)' : 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', fontStyle: 'italic', margin: 0 }}>
-        {children}
-      </p>
-    </div>
-  )
-}
 // A set-apart "reward" box for the per-question easter eggs — visually distinct
-// from the in-flow micro-reaction so it reads as a bonus aside, not another step.
+// so it reads as a bonus aside, not another step.
 function FunFact({ children }: { children: React.ReactNode }) {
   return (
     <div style={{ marginTop: 'var(--space-6)', padding: 'var(--space-5)', backgroundColor: 'rgba(200,169,110,0.06)', border: '1px solid rgba(200,169,110,0.28)', borderRadius: 'var(--radius-lg)' }}>

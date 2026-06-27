@@ -79,7 +79,7 @@ export const LAYER3_QUESTIONS: QuizQuestion[] = [
     text: 'The candidate from your usual party is mediocre — not corrupt, just unremarkable. The candidate from the other party is genuinely impressive. How do you vote?',
     dimensions: [],
     options: [
-      { id: 'L3-Q6-a', text: 'Vote the party — a mediocre member of the right caucus votes with the right majority and advances the right agenda. Individual quality matters less than which team controls the chamber.', microReaction: 'Congress is a team sport. A brilliant independent-minded member of the minority has less influence than a mediocre member of the majority.', scores: {} },
+      { id: 'L3-Q6-a', text: 'Vote the party — a mediocre member of your own party still votes with that caucus, helps it control the chamber, and advances its agenda. Individual quality matters less than which team holds the majority.', microReaction: 'Congress is a team sport. A brilliant independent-minded member of the minority has less influence than a mediocre member of the majority.', scores: {} },
       { id: 'L3-Q6-b', text: 'Vote the candidate — democracy works better when voters reward quality and punish mediocrity regardless of party.', microReaction: 'The sorting of Congress into two rigid teams where quality is irrelevant has produced exactly the Congress you’d expect.', scores: {} },
       { id: 'L3-Q6-c', text: 'Depends on the stakes — in a year when chamber control is on the line, the structural argument wins. In a safe year, voting for the better candidate costs nothing and signals something.', microReaction: 'Principles are easier to act on when the stakes are low.', scores: {} },
     ],

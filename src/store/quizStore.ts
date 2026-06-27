@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type {
+  Demographics,
   Dimension,
   QuizAnswer,
   QuizLayer,
@@ -26,6 +27,12 @@ interface QuizStore {
   // Layer 4 dealbreakers
   setDealbreakers: (ids: string[]) => void
   setDealbreakerOther: (text: string) => void
+
+  // Post-quiz demographic module (optional calibration)
+  setDemographics: (demo: Demographics) => void
+
+  // User opted out of the between-question easter-egg beats
+  setSkipEasterEggs: (skip: boolean) => void
 
   // Mark a layer complete and advance to the next
   completeLayer: (layer: QuizLayer) => void
@@ -120,6 +127,20 @@ export const useQuizStore = create<QuizStore>()(
         set((state) =>
           state.session
             ? { session: { ...state.session, dealbreakerOther: text, updatedAt: new Date().toISOString() } }
+            : state
+        ),
+
+      setDemographics: (demo) =>
+        set((state) =>
+          state.session
+            ? { session: { ...state.session, demographics: demo, updatedAt: new Date().toISOString() } }
+            : state
+        ),
+
+      setSkipEasterEggs: (skip) =>
+        set((state) =>
+          state.session
+            ? { session: { ...state.session, skipEasterEggs: skip, updatedAt: new Date().toISOString() } }
             : state
         ),
 

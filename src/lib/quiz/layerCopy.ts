@@ -7,7 +7,7 @@ export const LAYER_LABELS: Record<QuizLayer, string> = {
   1: 'What you believe',
   2: 'How you apply it',
   3: 'What drives your vote',
-  4: 'Where you draw the line',
+  4: 'Dealbreakers',
 }
 
 // Short topic label per question, for the results-page summaries (SPEC §8/§9
@@ -40,18 +40,18 @@ export const LAYER_OUTRO: Record<QuizLayer, { heading: string; body: string; tea
     teaser: 'Layer 2 — How You Apply It — takes about 4 minutes. Your ballot recommendations get significantly sharper.',
   },
   2: {
-    heading: 'Your profile is getting specific.',
-    body: 'Your values are mapped. Your policy instincts are on record. Your recommendations are already meaningfully better than they were twenty minutes ago. But two people can hold identical values and still vote very differently. What matters next is what actually drives your vote when you’re standing in the booth.',
-    teaser: 'Layer 3 — What Drives Your Vote — takes about 4 minutes. This is where recommendations go from good to genuinely yours.',
+    heading: 'You just mapped your values onto the real world.',
+    body: 'Anyone can hold values in the abstract. You just showed where yours actually land — healthcare, climate, guns, immigration, and the rest. Two people with identical values can still vote differently. Now we know exactly where you’d part ways.',
+    teaser: 'Next is the most revealing layer: what actually moves you when you vote. About 4 minutes.',
   },
   3: {
-    heading: 'Almost complete.',
-    body: 'Your civic identity is fully formed. Your constellation reflects how you think, how you apply it, and what drives your decisions. One more layer — and it’s different from everything before it.',
-    teaser: 'Layer 4 — Where You Draw the Line — isn’t a quiz. It’s a declaration. About five minutes. Completely optional. And the thing that separates a good recommendation from an airtight one.',
+    heading: 'Most people can’t explain why they vote the way they do.',
+    body: 'You just did — character vs. policy, party vs. person, what you’d trade and what you won’t. This is what makes a recommendation genuinely yours, instead of a profile that vaguely resembles you.',
+    teaser: 'One layer left, and it’s unlike the others. Your dealbreakers — about 5 minutes. The line between a good match and an airtight one.',
   },
   4: {
-    heading: 'That’s everything.',
-    body: 'Values, positions, what drives your vote, and the lines you won’t cross. Your civic identity is as complete as it gets — and it’s entirely yours.',
+    heading: 'That’s the whole picture — and it’s entirely yours.',
+    body: 'Values, positions, what drives your vote, and the lines you won’t cross. Most people never draw a civic self-portrait this sharp. You just did.',
     teaser: 'Your profile is 100% mapped.',
   },
 }

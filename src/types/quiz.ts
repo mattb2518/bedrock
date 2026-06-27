@@ -95,6 +95,19 @@ export interface QuizResult {
   completionPercent: number // 40 / 65 / 85 / 100
 }
 
+// Optional post-quiz demographic context (SPEC §12). Calibration only — never
+// part of dimensional scoring. Every field is optional; the whole module is
+// skippable.
+export interface Demographics {
+  partyRelationship?: string
+  lineage?: string
+  ageRange?: string
+  geography?: string
+  region?: string
+  note?: string
+  completed?: boolean // user reached and dismissed the module (answered or skipped)
+}
+
 // A quiz session — tracks where the user is
 export interface QuizSession {
   id: string
@@ -105,6 +118,8 @@ export interface QuizSession {
   topDimensions: Dimension[] // from the Layer 1 importance closer (≤3)
   dealbreakers: string[] // selected Layer 4 item ids (hard exclusion filters)
   dealbreakerOther?: string // free-text dealbreaker
+  demographics?: Demographics // optional post-quiz calibration context
+  skipEasterEggs?: boolean // user opted out of the between-question "Did you know?" beats
   completedLayers: QuizLayer[]
   startedAt: string
   updatedAt: string

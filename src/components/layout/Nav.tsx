@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useState, useRef, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { useQuizStore } from "@/store/quizStore";
 import type { User } from "@supabase/supabase-js";
 
 const topNavLinks = [
@@ -48,6 +49,17 @@ export default function Nav() {
   const isAboutActive = aboutLinks.some(
     (l) => pathname === l.href || pathname.startsWith(l.href)
   );
+
+  // Once the user has a mantle, surface a way back to it from anywhere — the
+  // results/mantle pages were previously unreachable from the nav. Gated on a
+  // mounted flag so the persisted store doesn't cause a hydration mismatch.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const hasResult = useQuizStore((s) => !!s.session?.result);
+  const navLinks =
+    mounted && hasResult
+      ? [...topNavLinks, { label: "My Mantle", href: "/your-mantle" }]
+      : topNavLinks;
 
   // Subscribe to auth state
   useEffect(() => {
@@ -150,7 +162,7 @@ export default function Nav() {
             gap: "var(--space-6)",
           }}
         >
-          {topNavLinks.map((link) => {
+          {navLinks.map((link) => {
             const active =
               pathname === link.href ||
               (link.href !== "/" && pathname.startsWith(link.href));
@@ -460,7 +472,7 @@ export default function Nav() {
             gap: "var(--space-4)",
           }}
         >
-          {topNavLinks.map((link) => (
+          {navLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
