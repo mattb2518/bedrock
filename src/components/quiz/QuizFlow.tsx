@@ -142,10 +142,9 @@ export default function QuizFlow() {
   }
 
   // Has the user already answered the question now on screen? If so we're
-  // revisiting via the Back link — pre-fill their prior answer and require an
-  // explicit Next rather than auto-advancing, so they can review and move on.
+  // revisiting via the Back link — pre-fill their prior answer so it shows as
+  // selected. Answering still auto-advances, exactly like a fresh question.
   const storedAnswer = session?.answers.find((a) => a.questionId === question?.id)
-  const isRevisiting = !!storedAnswer
 
   // Sync the transient selection to the question on screen: restore a prior
   // answer when revisiting, clear it when arriving at a fresh question.
@@ -227,8 +226,8 @@ export default function QuizFlow() {
     else setPhase('quiz')
   }
 
-  // Click an answer. Fresh single-answer questions advance immediately; options
-  // with their own follow-up field, and any answer while revisiting, wait.
+  // Click an answer. Any single-answer pick advances immediately — fresh or a
+  // revisit. Only options with their own follow-up field wait for input.
   function selectOption(optId: string) {
     const opt = question?.options.find((o) => o.id === optId)
     if (pendingOption !== optId) {
@@ -236,7 +235,7 @@ export default function QuizFlow() {
       setFollowChoices([])
     }
     setPendingOption(optId)
-    if (!isRevisiting && !opt?.followUpPrompt) finalizeAnswer(optId, '', [])
+    if (!opt?.followUpPrompt) finalizeAnswer(optId, '', [])
   }
 
   function selectItDepends() {
@@ -679,10 +678,9 @@ export default function QuizFlow() {
         </div>
       )}
 
-      {/* A continue affordance only when something still needs confirming — a
-          follow-up field to fill, or a revisit where we don't auto-advance.
-          Fresh single-answer questions advance the moment you click. */}
-      {picked && (isRevisiting || needsFollowText || needsFollowChoices) && (
+      {/* A continue affordance only when a follow-up field still needs input.
+          Every other answer advances the moment you click. */}
+      {picked && (needsFollowText || needsFollowChoices) && (
         <div style={{ marginTop: 'var(--space-6)', textAlign: 'right' }}>
           <button
             style={{ ...primaryBtn, opacity: followReady ? 1 : 0.4, cursor: followReady ? 'pointer' : 'not-allowed' }}
