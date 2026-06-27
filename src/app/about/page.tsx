@@ -44,6 +44,15 @@ export default function AboutPage() {
 
         <p>Country over self isn't only a presidential virtue. It starts with citizens who know what they actually believe and show up ready to act on it.</p>
 
+        <blockquote style={{ margin: "var(--space-2) 0", paddingLeft: "var(--space-5)", borderLeft: "3px solid var(--color-gold)" }}>
+          <p style={{ fontFamily: "var(--font-display)", fontStyle: "italic", fontSize: "var(--text-body-lg)", color: "var(--color-gold)", lineHeight: "var(--leading-relaxed)", marginBottom: "var(--space-2)" }}>
+            "Democracy is not a spectator sport."
+          </p>
+          <cite style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-small)", color: "var(--color-text-muted)", fontStyle: "normal" }}>
+            — Richard Haass, on the obligations of citizenship
+          </cite>
+        </blockquote>
+
         <h2 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-h3)", color: "var(--color-text-primary)", marginTop: "var(--space-4)" }}>Where this comes from.</h2>
 
         <p>I'm Matt Blumberg — technology entrepreneur, business author, and for the last several years, host of a podcast called <em>Country Over Self</em>. Vibe coded with Claude.</p>
@@ -59,6 +68,8 @@ export default function AboutPage() {
         <h2 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-h3)", color: "var(--color-text-primary)", marginTop: "var(--space-4)" }}>What I believe.</h2>
 
         <p>Democracy works better when more citizens understand what they actually believe and act on it. That's not a partisan position. It's a precondition for everything else.</p>
+
+        <p>America is the rare country founded not on blood or soil, but on a set of ideas and ideals. That makes pluralism — taking other people's convictions seriously, even when you can't stand them — part of the original design, not a concession to it. That's the bet Bedrock is built on: a country of arguments held in good faith is stronger than a country that agrees by force.</p>
 
         <p>Civic identity isn't something you get assigned once. It's something you develop over time. Bedrock is built around that idea.</p>
 
