@@ -401,6 +401,28 @@ export default function QuizFlow() {
             {session && session.answers.length > 0 ? 'Resume →' : 'Begin →'}
           </button>
         </div>
+
+        {/* Start over — for a partial session, so you can reset without the
+            full-completion retake screen. Confirmed, since it wipes progress. */}
+        {session && session.answers.length > 0 && (
+          confirmingRetake ? (
+            <div style={{ ...card, marginTop: 'var(--space-6)', marginBottom: 0, cursor: 'default', borderColor: 'var(--color-red)' }}>
+              <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-primary)', marginBottom: 'var(--space-4)' }}>
+                This deletes your current answers and starts you at Question 1. Sure?
+              </p>
+              <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
+                <button style={primaryBtn} onClick={restart}>Yes, start over</button>
+                <button style={ghostBtn} onClick={() => setConfirmingRetake(false)}>Cancel</button>
+              </div>
+            </div>
+          ) : (
+            <div style={{ marginTop: 'var(--space-5)' }}>
+              <button onClick={() => setConfirmingRetake(true)} style={mutedLinkBtn}>
+                Start over from scratch
+              </button>
+            </div>
+          )
+        )}
       </Shell>
     )
   }
