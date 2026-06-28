@@ -10,7 +10,7 @@ export const DEMOGRAPHIC_INTRO = {
 }
 
 export interface DemographicChoiceQuestion {
-  id: 'partyRelationship' | 'lineage'
+  id: 'partyRelationship' | 'currentRegistration' | 'upbringing' | 'lineage'
   prompt: string
   options: string[]
 }
@@ -28,8 +28,39 @@ export const PARTY_RELATIONSHIP: DemographicChoiceQuestion = {
   ],
 }
 
-// Question 2 — political lineage. Shown only if Q1 is one of the "had a party"
-// answers. Labels are deliberately specific and historically grounded.
+// Current voter registration — a hard fact that complements the attitudinal
+// relationship question above. No "prefer not to say": the whole module is
+// optional, so skipping is the opt-out.
+export const CURRENT_REGISTRATION: DemographicChoiceQuestion = {
+  id: 'currentRegistration',
+  prompt: 'How are you registered to vote today?',
+  options: [
+    'Independent / unaffiliated',
+    'Democrat',
+    'Republican',
+    'Another party',
+    'Not registered',
+  ],
+}
+
+// The political environment the user grew up in — party identification is one of
+// the most strongly inherited political traits, so this is genuinely formative
+// calibration context.
+export const UPBRINGING: DemographicChoiceQuestion = {
+  id: 'upbringing',
+  prompt: 'The politics you grew up around:',
+  options: [
+    'Mostly Democratic / left-leaning',
+    'Mostly Republican / right-leaning',
+    'Mixed — leaned different ways',
+    'Independent / nonpartisan',
+    'Apolitical — rarely discussed',
+    'Not sure',
+  ],
+}
+
+// Political lineage. Shown only if the relationship question is one of the "had a
+// party" answers. Labels are deliberately specific and historically grounded.
 export const LINEAGE_TRIGGERS = [
   'Drifted away from a party — used to be closer to one',
   'Registered with a party but vote differently',

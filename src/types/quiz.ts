@@ -100,6 +100,8 @@ export interface QuizResult {
 // skippable.
 export interface Demographics {
   partyRelationship?: string
+  currentRegistration?: string // how the user is registered to vote today
+  upbringing?: string // the political environment they grew up in (formative)
   lineage?: string
   ageRange?: string
   geography?: string

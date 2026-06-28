@@ -34,7 +34,10 @@ just-in-time, when we start building that pillar.
   answers pre-filled and individually editable, soft cascade prompt when Layer 1
   answers change, profile re-scores on save. This is the path most returning
   users will actually use.
-- **DB persistence + accounts** — see Decided row above.
+- **DB persistence + accounts** — see Decided row above. **Proposal now drafted
+  for review:** [`docs/supabase-persistence-plan.md`](docs/supabase-persistence-plan.md)
+  (schema, RLS, anonymous→account merge, rollout phases, open questions). Awaiting
+  Matt's sign-off before any build.
 - **Surface "your positions / your lines"** — ✅ done on the results page
   (2026-06-12). Listed here only so the history is complete.
 

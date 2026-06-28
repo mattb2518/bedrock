@@ -10,6 +10,8 @@ import Link from 'next/link'
 import { useQuizStore } from '@/store/quizStore'
 import {
   PARTY_RELATIONSHIP,
+  CURRENT_REGISTRATION,
+  UPBRINGING,
   POLITICAL_LINEAGE,
   LINEAGE_TRIGGERS,
   AGE_RANGES,
@@ -113,7 +115,14 @@ export default function DemographicsCard() {
   const demo = session?.demographics
   const hasAny = !!(
     demo &&
-    (demo.partyRelationship || demo.lineage || demo.ageRange || demo.geography || demo.region || demo.note)
+    (demo.partyRelationship ||
+      demo.currentRegistration ||
+      demo.upbringing ||
+      demo.lineage ||
+      demo.ageRange ||
+      demo.geography ||
+      demo.region ||
+      demo.note)
   )
 
   function startEdit() {
@@ -185,6 +194,24 @@ export default function DemographicsCard() {
           </>
         )}
 
+        <p style={{ ...fieldLabel, color: 'var(--color-text-primary)', fontWeight: 'var(--weight-semibold)', marginTop: 'var(--space-5)', marginBottom: 'var(--space-3)' }}>
+          {CURRENT_REGISTRATION.prompt}
+        </p>
+        {CURRENT_REGISTRATION.options.map((o) => (
+          <button key={o} onClick={() => setDraft((d) => ({ ...d, currentRegistration: o }))} style={optionCard(draft.currentRegistration === o)}>
+            {o}
+          </button>
+        ))}
+
+        <p style={{ ...fieldLabel, color: 'var(--color-text-primary)', fontWeight: 'var(--weight-semibold)', marginTop: 'var(--space-5)', marginBottom: 'var(--space-3)' }}>
+          {UPBRINGING.prompt}
+        </p>
+        {UPBRINGING.options.map((o) => (
+          <button key={o} onClick={() => setDraft((d) => ({ ...d, upbringing: o }))} style={optionCard(draft.upbringing === o)}>
+            {o}
+          </button>
+        ))}
+
         {(
           [
             ['Age', AGE_RANGES, 'ageRange'],
@@ -239,6 +266,8 @@ export default function DemographicsCard() {
       {hasAny ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
           <Row label="Relationship to parties" value={demo?.partyRelationship} />
+          <Row label="Registered today as" value={demo?.currentRegistration} />
+          <Row label="Grew up around" value={demo?.upbringing} />
           {demo?.lineage && <Row label="Political lineage" value={demo.lineage} />}
           <Row label="Age" value={demo?.ageRange} />
           <Row label="Where you live" value={demo?.geography} />

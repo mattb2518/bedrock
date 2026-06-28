@@ -11,6 +11,8 @@ import { LAYER_INTRO, LAYER_OUTRO, LAYER_LABELS } from '@/lib/quiz/layerCopy'
 import {
   DEMOGRAPHIC_INTRO,
   PARTY_RELATIONSHIP,
+  CURRENT_REGISTRATION,
+  UPBRINGING,
   POLITICAL_LINEAGE,
   LINEAGE_TRIGGERS,
   AGE_RANGES,
@@ -639,6 +641,16 @@ export default function QuizFlow() {
               choiceCard(demo.lineage === o, o, () => setDemo((d) => ({ ...d, lineage: o })))
             )}
           </>
+        )}
+
+        {sectionLabel(CURRENT_REGISTRATION.prompt)}
+        {CURRENT_REGISTRATION.options.map((o) =>
+          choiceCard(demo.currentRegistration === o, o, () => setDemo((d) => ({ ...d, currentRegistration: o })))
+        )}
+
+        {sectionLabel(UPBRINGING.prompt)}
+        {UPBRINGING.options.map((o) =>
+          choiceCard(demo.upbringing === o, o, () => setDemo((d) => ({ ...d, upbringing: o })))
         )}
 
         {sectionLabel('A little more context — optional, and never used for anything but improving recommendations.')}
