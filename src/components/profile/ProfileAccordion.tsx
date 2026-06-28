@@ -6,10 +6,12 @@
 // component) rather than in the server page — which is also why the old static
 // "you haven't taken the quiz" card was always wrong.
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useQuizStore } from '@/store/quizStore'
 import { mantleFor } from '@/lib/quiz/mantles'
+import { LINEAGE_TRIGGERS } from '@/lib/quiz/demographics'
+import type { Demographics } from '@/types/quiz'
 import DemographicsBody from '@/components/profile/DemographicsCard'
 import ChangePassword from '@/components/auth/ChangePassword'
 import ChangeEmail from '@/components/auth/ChangeEmail'
@@ -43,6 +45,24 @@ const fieldValue: React.CSSProperties = {
   fontFamily: 'var(--font-body)',
   fontSize: 'var(--text-body)',
   color: 'var(--color-text-primary)',
+}
+
+// How many demographic items the user hasn't answered yet. Drives the "to add"
+// flag on the collapsed tile. Lineage only counts when the relationship answer
+// triggers it; the free-text note is a catch-all, not a required item.
+const DEMO_FIELDS: (keyof Demographics)[] = [
+  'partyRelationship',
+  'currentRegistration',
+  'upbringing',
+  'ageRange',
+  'geography',
+  'region',
+  'regionGrewUp',
+]
+function openDemoItems(demo?: Demographics): number {
+  let open = DEMO_FIELDS.filter((f) => !demo?.[f]).length
+  if (demo?.partyRelationship && LINEAGE_TRIGGERS.includes(demo.partyRelationship) && !demo.lineage) open += 1
+  return open
 }
 
 function AccountBody({ email, provider, joinedAt }: { email: string; provider: string; joinedAt: string }) {
@@ -121,9 +141,35 @@ function AccountActionsBody({ email, provider }: { email: string; provider: stri
 export default function ProfileAccordion({ email, provider, joinedAt }: { email: string; provider: string; joinedAt: string }) {
   const [open, setOpen] = useState<string | null>(null)
 
-  const sections: { id: string; title: string; body: React.ReactNode }[] = [
+  // Store-derived flags are gated on a mounted flag so the persisted store can't
+  // cause a hydration mismatch on the collapsed tile.
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
+  const demographics = useQuizStore((s) => s.session?.demographics)
+  const openItems = mounted ? openDemoItems(demographics) : 0
+
+  const badge =
+    openItems > 0 ? (
+      <span
+        style={{
+          fontFamily: 'var(--font-body)',
+          fontSize: '11px',
+          fontWeight: 'var(--weight-semibold)',
+          color: 'var(--color-gold)',
+          border: '1px solid var(--color-gold)',
+          borderRadius: 'var(--radius-full)',
+          padding: '2px 9px',
+          letterSpacing: 'var(--tracking-wide, 0.02em)',
+          whiteSpace: 'nowrap',
+        }}
+      >
+        {openItems} to add
+      </span>
+    ) : null
+
+  const sections: { id: string; title: string; body: React.ReactNode; badge?: React.ReactNode }[] = [
     { id: 'civic', title: 'Civic profile', body: <CivicProfileBody /> },
-    { id: 'background', title: 'Political background', body: <DemographicsBody /> },
+    { id: 'background', title: 'Political background', body: <DemographicsBody />, badge },
     { id: 'account', title: 'Account', body: <AccountBody email={email} provider={provider} joinedAt={joinedAt} /> },
     { id: 'actions', title: 'Account actions', body: <AccountActionsBody email={email} provider={provider} /> },
   ]
@@ -155,18 +201,21 @@ export default function ProfileAccordion({ email, provider, joinedAt }: { email:
               }}
             >
               {s.title}
-              <span
-                aria-hidden="true"
-                style={{
-                  display: 'inline-block',
-                  color: 'var(--color-text-muted)',
-                  fontSize: '18px',
-                  lineHeight: 1,
-                  transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)',
-                  transition: 'transform 0.2s ease',
-                }}
-              >
-                ›
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+                {s.badge}
+                <span
+                  aria-hidden="true"
+                  style={{
+                    display: 'inline-block',
+                    color: 'var(--color-text-muted)',
+                    fontSize: '18px',
+                    lineHeight: 1,
+                    transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)',
+                    transition: 'transform 0.2s ease',
+                  }}
+                >
+                  ›
+                </span>
               </span>
             </button>
             {isOpen && (
