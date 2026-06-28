@@ -20,7 +20,7 @@ function isCentered(profile: DimensionalProfile): boolean {
   return DIMENSIONS.filter((d) => Math.abs(profile[d.key] - 50) <= 15).length >= 6
 }
 
-export default function MantleReveal({ result }: { result: QuizResult }) {
+export default function MantleReveal({ result, headerCta }: { result: QuizResult; headerCta?: React.ReactNode }) {
   const mantle = mantleFor(result.primaryType)
   const radar = profileToRadar(result.profile)
   const centered = isCentered(result.profile)
@@ -65,6 +65,12 @@ export default function MantleReveal({ result }: { result: QuizResult }) {
             {mantle.workingName}
           </p>
         </div>
+      )}
+
+      {/* Optional header CTA (e.g. "Continue to Layer 2") so the next step is
+          reachable above the fold, not only after scrolling the whole reveal. */}
+      {headerCta && (
+        <div style={{ ...rise(0.15), textAlign: 'center', marginBottom: 'var(--space-8)' }}>{headerCta}</div>
       )}
 
       {/* Constellation — pops in after the header */}

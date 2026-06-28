@@ -199,6 +199,12 @@ export default function QuizFlow() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [question?.id, phase])
 
+  // Land at the top whenever the screen changes (phase or question), so payoff
+  // screens and module transitions never drop you mid-page.
+  useEffect(() => {
+    if (typeof window !== 'undefined') window.scrollTo({ top: 0 })
+  }, [phase, index])
+
   function begin() {
     if (!session) startSession()
     setPhase('quiz')
@@ -448,7 +454,14 @@ export default function QuizFlow() {
   if (phase === 'reveal' && session?.result) {
     return (
       <>
-        <MantleReveal result={session.result} />
+        <MantleReveal
+          result={session.result}
+          headerCta={
+            <button style={primaryBtn} onClick={() => setPhase('layerIntro')}>
+              Continue to Layer 2 →
+            </button>
+          }
+        />
         <Shell>
           <div style={{ textAlign: 'center' }}>
             <p style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-h3, var(--text-body-lg))', color: 'var(--color-text-primary)', marginBottom: 'var(--space-3)' }}>
