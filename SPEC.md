@@ -35,7 +35,7 @@
 The quiz is the shared engine. It produces a civic identity — a named type and dimensional constellation — which is the overarching layer that powers everything else.
 
 **Civic Identity** (overarching layer, not a pillar)
-Values quiz → dimensional profile → named Civic Mantle type (one of ten) + unique constellation radar chart. This is the foundation on which all three pillars rest. Displayed prominently above or around the three pillars on the homepage and results page — needs visual design treatment to make the hierarchy clear.
+Values quiz → dimensional profile → named Civic Mantle type (one of ten) + unique constellation radar chart. This is the foundation on which all four pillars rest. Displayed prominently above or around the four pillars on the homepage and results page — needs visual design treatment to make the hierarchy clear.
 
 **Pillar 1 — Your Ballot**
 Civic identity → personalized ballot recommendations for every race (president to school board) → printable guide → transparent sourcing
@@ -1253,7 +1253,7 @@ If you could move the needle on exactly one issue in American public life — on
 13. Data sources and coverage limitations for ballot recommendations — confirm before launch. FAQ currently flags this.
 14. Media ratings methodology — confirm AllSides and Ad Fontes Media as primary sources before launch. FAQ currently flags this.
 15. Your Conversations — scope and UX to be fully specced. See Section 14.
-16. Homepage visual design — civic identity layer needs visual treatment above/around the three pillars. Design decision required before build.
+16. Homepage visual design — civic identity layer needs visual treatment above/around the four pillars. Design decision required before build.
 17. Demographic module interaction with scoring — **confirm before build:** how political lineage data interacts with dimensional scores in candidate matching. See Section 12.
 
 **REMINDER FOR MATT — two sessions to run with a more powerful model before build:**
@@ -1371,6 +1371,8 @@ The podcast grew out of a simple obsession: I've read over 150 presidential biog
 What I found, over and over, was that courage in public life isn't partisan. It shows up on the left and the right. It always has.
 
 Bedrock is the same question pointed in a different direction. Not at the presidents. At the rest of us. The bedrock of democratic life isn't in Washington. It's in what ordinary citizens actually believe — and whether they show up knowing it.
+
+The method behind Your Conversations — Argyris's ladder of inference, inquiry before advocacy — is something I've taught at every company I've built for thirty years. Turns out the same instinct that helps a team argue well helps a country do it too.
 
 Listen to *Country Over Self* on Spotify, Apple Podcasts, or YouTube →
 
@@ -1616,7 +1618,9 @@ Your answers produce a profile across all eight dimensions — a multidimensiona
 [FLAG: Full scoring logic to be documented and open-sourced before launch. This section will link to the published methodology on GitHub.]
 
 **What your profile powers.**
-Your civic identity — one of ten named types, with a constellation unique to you. Three things built on top of it: your ballot recommendations, your media diet, your conversations. Full descriptions in How It Works →
+Your civic identity — one of ten named types, with a constellation unique to you. Four things built on top of it: your ballot recommendations, your media diet, your conversations, and federal candidates outside your district worth supporting. Full descriptions in How It Works →
+
+Your Conversations isn't a chatbot with a personality. It's built on a real method for navigating disagreement — Chris Argyris's work on how people reason and argue, popularized by Peter Senge in The Fifth Discipline, and taught in organizations for decades. The core ideas: most arguments are people trading conclusions while hiding the facts and assumptions underneath them; the way through is to find what both people can actually observe, get genuinely curious about how the other person reached their view, and lead with inquiry before advocacy. The pillar applies that method to civic conversation. We name the foundation because you should be able to check it.
 
 **How we handle mistakes.**
 We'll make them. Here's the commitment:
@@ -1848,6 +1852,20 @@ No. It helps you think. The goal isn't a script — it's clarity about where you
 
 *Does it use my values profile?*
 Yes. Claude knows your dimensional profile before you say a word. You don't have to explain yourself from scratch every time. It meets you where you are.
+
+*Is Your Conversations just a chatbot?*
+No. It's built on a decades-old method for difficult conversations — the ladder of inference, from Chris Argyris and Peter Senge's The Fifth Discipline — that helps you find what you and the other person actually agree on, understand how they got where they got, and respond as yourself without caving or escalating. The AI runs that method. It doesn't improvise.
+
+**About Beyond Your Ballot**
+
+*What is Beyond Your Ballot?*
+Civic identity → candidates outside your own district worth supporting — matched to your values, focused on federal races where a presence in Congress would shift the balance toward independent-minded governance. The races that aren't on your ballot still shape your country.
+
+*Why does it exist?*
+Because Congress is a team sport. The balance of power in the House and Senate isn't decided by your representative alone — it's decided by 435 House members and 100 senators. Races across the country shape the legislative agenda you live under. Beyond Your Ballot surfaces the ones where your values and a candidate's record line up well enough to be worth your attention.
+
+*What's the scope at launch?*
+Federal races. Congressional candidates outside your district whose presence in Congress would shift the balance toward independent-minded governance. Coverage expands as candidate data matures.
 
 **About Your Account and Data**
 
