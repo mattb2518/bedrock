@@ -94,8 +94,6 @@ export const LAYER1_QUESTIONS: QuizQuestion[] = [
         'Whether equal treatment across states matters for this issue',
       ],
     },
-    easterEgg:
-      "The 10th Amendment — 'powers not delegated to the United States are reserved to the States' — is the shortest and most fought-over sentence in the Bill of Rights. Invoked to defend slavery. Invoked to legalize marijuana. Same 28 words.",
   },
   {
     id: 'A3',
@@ -283,8 +281,6 @@ export const LAYER1_QUESTIONS: QuizQuestion[] = [
         'Whether government or community is doing the asking',
       ],
     },
-    easterEgg:
-      'Eighteen states still have laws requiring citizens to help a neighbor in distress. Vermont’s is the most famous — you can be fined for walking past someone drowning. One of the few places American law says being a decent neighbor is mandatory.',
   },
   {
     id: 'A8',
@@ -510,8 +506,6 @@ export const LAYER1_QUESTIONS: QuizQuestion[] = [
       prompt:
         'What would determine how much executive emergency authority you’d support — the nature of the threat, the specific powers, the track record of the president?',
     },
-    easterEgg:
-      "The federal income tax was introduced in 1861 as a temporary Civil War measure. Repealed in 1872. Back in 1894. Struck down by the Supreme Court. Back via constitutional amendment in 1913. The United States has been arguing about a tax that was supposed to last four years for over 160 years. 'Temporary' is doing a lot of work in American governance.",
   },
   {
     id: 'S4',

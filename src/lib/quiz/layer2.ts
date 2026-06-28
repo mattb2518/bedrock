@@ -21,7 +21,6 @@ export const LAYER2_QUESTIONS: QuizQuestion[] = [
       { id: 'L2-Q1-d', text: 'Move toward single-payer or Medicare-for-All — every other wealthy democracy covers everyone for less per capita, and the patchwork of private insurance is what makes American healthcare uniquely expensive.', microReaction: 'The simplifying answer. Administrative overhead consumes about 30 cents of every American healthcare dollar — a cost most other systems don’t carry.', scores: {} },
     ],
     dependsFollowUp: { type: 'open_text', prompt: 'What do you think is the most broken part — costs, access, quality, insurance complexity?' },
-    easterEgg: 'American healthcare spends roughly $1 trillion a year on administrative costs alone — more than the entire GDP of Sweden or Switzerland. A 2021 federal rule required hospitals to publish their prices. Most still haven’t.',
   },
   {
     id: 'L2-Q2',
@@ -35,7 +34,6 @@ export const LAYER2_QUESTIONS: QuizQuestion[] = [
       { id: 'L2-Q2-d', text: 'Slow down — the science is more contested than presented, the costs of aggressive transition fall heaviest on working families and energy-intensive industries, and prudence argues for waiting on clearer evidence before locking in expensive policy.', microReaction: 'The cost-benefit caution. Energy transitions are real, but so is the price of getting them wrong — and the people paying that price aren’t usually the people making the decisions.', scores: {} },
     ],
     dependsFollowUp: { type: 'multiple_choice', prompt: 'What shapes your view?', choices: ['How fast you think the transition needs to happen', 'How much you trust government to pick the right technologies', 'Whether international competitiveness matters as much as domestic emissions', 'How you weigh costs on current energy users against future generations'] },
-    easterEgg: 'The United States has more wind energy capacity than any country except China — enough to power about 46 million homes. Texas alone generates more wind power than most countries. The state that built its economy on oil is now one of the largest wind energy producers in the world.',
   },
   {
     id: 'L2-Q3',
@@ -100,7 +98,6 @@ export const LAYER2_QUESTIONS: QuizQuestion[] = [
       { id: 'L2-Q7-c', text: 'Rebalance toward economic and diplomatic tools — military superiority hasn’t produced the outcomes in Afghanistan, Iraq, or Libya that justified the investment.', microReaction: 'The United States has the most powerful military in human history and has fought four major wars since 1950 with mixed results. At some point the question isn’t whether we can win militarily — it’s whether winning militarily solves the problem.', scores: {} },
     ],
     dependsFollowUp: { type: 'multiple_choice', prompt: 'What shapes your view?', choices: ['Whether great-power competition with China changes the calculus', 'Whether military strength deters conflict or invites it', 'Whether domestic investment should take priority'] },
-    easterEgg: 'Iceland is a full NATO member with no standing army. Its contribution to collective defense is primarily its geography and its Coast Guard, which has fought three “Cod Wars” against the United Kingdom over fishing rights. The alliance that has kept the peace in Europe for 75 years includes a country whose most recent military conflict was about fish.',
   },
   {
     id: 'L2-Q8',

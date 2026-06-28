@@ -21,7 +21,6 @@ export const LAYER3_QUESTIONS: QuizQuestion[] = [
       { id: 'L3-Q1-c', text: 'Depends on whether the character issue is relevant to the job — financial fraud tells you something about how someone will handle public money. A messy divorce probably doesn’t.', microReaction: 'Not all character flaws are created equal.', scores: {} },
     ],
     dependsFollowUp: { type: 'open_text', prompt: 'What would push you to “disqualifying” — the type of conduct, how recent, the volume of incidents, whether they’ve acknowledged it?' },
-    easterEgg: 'Grover Cleveland was elected president in 1884 despite his opponents publicizing that he’d fathered a child out of wedlock. They chanted “Ma, ma, where’s my pa?” His supporters responded: “Gone to the White House, ha ha ha.” He won.',
   },
   {
     id: 'L3-Q2',

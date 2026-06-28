@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useQuizStore } from '@/store/quizStore'
 import { LAYER1_QUESTIONS, IMPORTANCE_CLOSER } from '@/lib/quiz/layer1'
 import { LAYER2_QUESTIONS } from '@/lib/quiz/layer2'
@@ -192,6 +193,7 @@ export default function QuizFlow() {
     setSkipEasterEggs,
     resetQuiz,
   } = useQuizStore()
+  const router = useRouter()
   const [phase, setPhase] = useState<Phase>('intro')
 
   // Transient per-question UI state
@@ -361,7 +363,7 @@ export default function QuizFlow() {
     const d = demoOverride ?? demo
     setDemographics(save ? { ...d, completed: true } : { completed: true })
     track(save ? 'Demographics Submitted' : 'Demographics Skipped')
-    setPhase('done')
+    router.push('/results')
   }
 
   function restart() {
