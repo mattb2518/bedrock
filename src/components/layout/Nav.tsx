@@ -58,7 +58,7 @@ export default function Nav() {
   const hasResult = useQuizStore((s) => !!s.session?.result);
   const navLinks =
     mounted && hasResult
-      ? [...topNavLinks, { label: "My Mantle", href: "/your-mantle" }]
+      ? [...topNavLinks, { label: "Your Mantle", href: "/your-mantle" }]
       : topNavLinks;
 
   // Subscribe to auth state

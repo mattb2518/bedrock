@@ -7,7 +7,7 @@ import { LAYER1_QUESTIONS, IMPORTANCE_CLOSER } from '@/lib/quiz/layer1'
 import { LAYER2_QUESTIONS } from '@/lib/quiz/layer2'
 import { LAYER3_QUESTIONS } from '@/lib/quiz/layer3'
 import { LAYER4_SECTIONS, FRAMING, DEALBREAKER_OTHER_PROMPT } from '@/lib/quiz/layer4'
-import { LAYER_INTRO, LAYER_OUTRO, LAYER_LABELS } from '@/lib/quiz/layerCopy'
+import { LAYER_INTRO, LAYER_OUTRO, LAYER_LABELS, LAYER_SUBTITLES } from '@/lib/quiz/layerCopy'
 import {
   DEMOGRAPHIC_INTRO,
   PARTY_RELATIONSHIP,
@@ -395,6 +395,7 @@ export default function QuizFlow() {
     return (
       <Shell>
         <Kicker>Layer 1 · {LAYER_LABELS[1]}</Kicker>
+        <LayerSubtitle>{LAYER_SUBTITLES[1]}</LayerSubtitle>
         <H1>Find your bedrock.</H1>
         <Body>
           Most civic tools ask where you stand on the issues. We’re asking something different — and harder. We want to know how you <em>think</em>: the underlying values that drive your positions.
@@ -439,6 +440,7 @@ export default function QuizFlow() {
     return (
       <Shell>
         <Kicker>Layer {layer} · {LAYER_LABELS[layer]}</Kicker>
+        <LayerSubtitle>{LAYER_SUBTITLES[layer]}</LayerSubtitle>
         <H1>{intro.heading}</H1>
         <Body>{intro.body}</Body>
         <div style={{ marginTop: 'var(--space-8)' }}>
@@ -586,6 +588,7 @@ export default function QuizFlow() {
     return (
       <Shell>
         <Kicker>Layer 4 · {LAYER_LABELS[4]}</Kicker>
+        <LayerSubtitle>{LAYER_SUBTITLES[4]}</LayerSubtitle>
         <H2>{FRAMING}</H2>
         <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', textAlign: 'center', maxWidth: 480, margin: '0 auto var(--space-2)' }}>
           Most people land on a handful. These are your true non-negotiables — not every position you mildly dislike. The more you check, the fewer candidates survive the filter.
@@ -863,6 +866,9 @@ function Shell({ children }: { children: React.ReactNode }) {
 }
 function Kicker({ children }: { children: React.ReactNode }) {
   return <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-gold)', letterSpacing: 'var(--tracking-wider)', textTransform: 'uppercase', margin: 0 }}>{children}</p>
+}
+function LayerSubtitle({ children }: { children: React.ReactNode }) {
+  return <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', fontStyle: 'italic', margin: '4px 0 0' }}>{children}</p>
 }
 function H1({ children }: { children: React.ReactNode }) {
   return <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-h1)', color: 'var(--color-text-primary)', lineHeight: 'var(--leading-tight)', margin: 'var(--space-4) 0 var(--space-6)' }}>{children}</h1>

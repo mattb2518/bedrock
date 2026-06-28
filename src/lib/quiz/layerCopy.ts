@@ -3,11 +3,20 @@
 
 import type { QuizLayer } from '@/types/quiz'
 
+// Layer names — evocative, to bring each stage to life — paired with a plain
+// descriptor (LAYER_SUBTITLES) shown beneath on the intro screens.
 export const LAYER_LABELS: Record<QuizLayer, string> = {
-  1: 'What you believe',
-  2: 'How you apply it',
-  3: 'What drives your vote',
+  1: 'Bedrock',
+  2: 'The Arena',
+  3: 'The Booth',
   4: 'Dealbreakers',
+}
+
+export const LAYER_SUBTITLES: Record<QuizLayer, string> = {
+  1: 'what you believe',
+  2: 'how you apply it',
+  3: 'what drives your vote',
+  4: 'the lines you won’t cross',
 }
 
 // Short topic label per question, for the results-page summaries (SPEC §8/§9
@@ -37,7 +46,7 @@ export const LAYER_OUTRO: Record<QuizLayer, { heading: string; body: string; tea
   1: {
     heading: 'You just did something most voters never do.',
     body: 'You articulated what you actually believe — not what your party believes, not what your feed believes. Yours. Your constellation is taking shape. But right now it’s based purely on values. The next layer connects those values to real policy debates happening right now.',
-    teaser: 'Layer 2 — How You Apply It — takes about 4 minutes. Your ballot recommendations get significantly sharper.',
+    teaser: 'Layer 2 — The Arena — takes about 4 minutes. Your ballot recommendations get significantly sharper.',
   },
   2: {
     heading: 'You just mapped your values onto the real world.',
