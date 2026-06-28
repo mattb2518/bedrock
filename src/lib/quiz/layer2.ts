@@ -63,7 +63,6 @@ export const LAYER2_QUESTIONS: QuizQuestion[] = [
       { id: 'L2-Q4-d', text: 'Expand school choice broadly — vouchers, education savings accounts, and tax credits that let public funds follow students to the school their parents choose, public or private, secular or religious.', microReaction: 'The parent-power answer. The premise: parents allocate education resources better than school districts do, and competition raises quality across the board.', scores: {} },
     ],
     dependsFollowUp: { type: 'multiple_choice', prompt: 'What shapes your view?', choices: ['Whether your concern is primarily equity or quality', 'Whether you distinguish between charter schools and private vouchers', 'Whether you think the problem starts before kindergarten'] },
-    easterEgg: 'The Perry Preschool Project, launched in 1962 in Ypsilanti, Michigan, enrolled 58 low-income children in a high-quality preschool and tracked them for 40 years. Those who attended were more likely to graduate high school, hold steady jobs, own homes, and stay out of prison. One of the most studied interventions in American social policy.',
   },
   {
     id: 'L2-Q5',
@@ -77,7 +76,6 @@ export const LAYER2_QUESTIONS: QuizQuestion[] = [
       { id: 'L2-Q5-d', text: 'Reduce overall numbers — current levels exceed what the labor market, public services, and assimilation infrastructure can absorb. Lower numbers would raise wages for existing workers and ease pressure on housing.', microReaction: 'The level-the-curve answer. Labor unions and environmentalists have historically held versions of this position alongside restrictionist conservatives — the coalition is older and stranger than it looks.', scores: {} },
     ],
     dependsFollowUp: { type: 'multiple_choice', prompt: 'What shapes your view?', choices: ['Whether you prioritize economic contribution or family unity', 'Whether current overall levels are too high, too low, or about right', 'Whether immigration levels affect wages for existing workers'] },
-    easterEgg: 'In 1977 ABC aired a Schoolhouse Rock segment called “The Great American Melting Pot” — a three-minute animated song about immigration that ended with the Statue of Liberty serving soup. Watched by roughly every American child of that generation.',
   },
   {
     id: 'L2-Q6',

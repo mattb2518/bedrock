@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Constellation from "@/components/ui/Constellation";
+import { useQuizStore } from "@/store/quizStore";
 
 // ── Data ────────────────────────────────────────────────────────────────────
 
@@ -178,6 +179,8 @@ function TypeCard({ type, flipped, onToggle }: { type: typeof types[0]; flipped:
 // ── Page ─────────────────────────────────────────────────────────────────────
 export default function CivicMantlePage() {
   const [flippedLabel, setFlippedLabel] = useState<string | null>(null);
+  const { session } = useQuizStore();
+  const hasMantle = (session?.completedLayers?.length ?? 0) >= 1 && !!session?.result;
 
   return (
     <div style={{ maxWidth: "var(--max-width-full)", margin: "0 auto", padding: "var(--space-16) var(--space-6)" }}>
@@ -274,15 +277,31 @@ export default function CivicMantlePage() {
 
       {/* CTA */}
       <div style={{ borderTop: "1px solid var(--color-border)", paddingTop: "var(--space-12)", textAlign: "center" }}>
-        <h2 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-h2)", color: "var(--color-text-primary)", marginBottom: "var(--space-4)", lineHeight: "var(--leading-tight)" }}>
-          Ready to find yours?
-        </h2>
-        <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-body-lg)", color: "var(--color-text-secondary)", marginBottom: "var(--space-8)" }}>
-          Twenty questions. Your constellation. One mantle — and the affinities that come with it.
-        </p>
-        <Link href="/quiz" style={{ display: "inline-block", backgroundColor: "var(--color-red)", color: "#fff", fontFamily: "var(--font-body)", fontWeight: "var(--weight-semibold)", fontSize: "var(--text-body)", padding: "var(--space-4) var(--space-8)", borderRadius: "var(--btn-radius)", textDecoration: "none" }}>
-          Find your Civic Mantle →
-        </Link>
+        {hasMantle ? (
+          <>
+            <h2 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-h2)", color: "var(--color-text-primary)", marginBottom: "var(--space-4)", lineHeight: "var(--leading-tight)" }}>
+              You have a Civic Mantle.
+            </h2>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-body-lg)", color: "var(--color-text-secondary)", marginBottom: "var(--space-8)" }}>
+              See your constellation, your mantle, and your full civic profile.
+            </p>
+            <Link href="/results" style={{ display: "inline-block", backgroundColor: "var(--color-red)", color: "#fff", fontFamily: "var(--font-body)", fontWeight: "var(--weight-semibold)", fontSize: "var(--text-body)", padding: "var(--space-4) var(--space-8)", borderRadius: "var(--btn-radius)", textDecoration: "none" }}>
+              View your Civic Mantle →
+            </Link>
+          </>
+        ) : (
+          <>
+            <h2 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-h2)", color: "var(--color-text-primary)", marginBottom: "var(--space-4)", lineHeight: "var(--leading-tight)" }}>
+              Ready to find yours?
+            </h2>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-body-lg)", color: "var(--color-text-secondary)", marginBottom: "var(--space-8)" }}>
+              Fourteen questions. Your constellation. One mantle — and the affinities that come with it.
+            </p>
+            <Link href="/quiz" style={{ display: "inline-block", backgroundColor: "var(--color-red)", color: "#fff", fontFamily: "var(--font-body)", fontWeight: "var(--weight-semibold)", fontSize: "var(--text-body)", padding: "var(--space-4) var(--space-8)", borderRadius: "var(--btn-radius)", textDecoration: "none" }}>
+              Find your Civic Mantle →
+            </Link>
+          </>
+        )}
       </div>
 
       {/* Responsive grid */}

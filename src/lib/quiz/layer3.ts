@@ -84,7 +84,6 @@ export const LAYER3_QUESTIONS: QuizQuestion[] = [
       { id: 'L3-Q6-c', text: 'Depends on the stakes — in a year when chamber control is on the line, the structural argument wins. In a safe year, voting for the better candidate costs nothing and signals something.', microReaction: 'Principles are easier to act on when the stakes are low.', scores: {} },
     ],
     dependsFollowUp: { type: 'open_text', prompt: 'What would push you toward the better candidate — how impressive they are, how mediocre your usual party’s candidate is, how safe the seat is?' },
-    easterEgg: 'In 2006 Joe Lieberman lost his Democratic primary in Connecticut, ran as an Independent, won the general, caucused with Democrats, and two years later delivered a keynote speech endorsing John McCain at the Republican National Convention.',
   },
   {
     id: 'L3-Q7',

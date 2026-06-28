@@ -248,7 +248,24 @@ export default function QuizFlow() {
   }, [phase, index])
 
   function begin() {
-    if (!session) startSession()
+    if (!session) { startSession(); setPhase('quiz'); return }
+
+    const idx = session.currentQuestionIndex
+    const l = (session.currentLayer ?? 1) as QuizLayer
+    const qs = QUESTIONS_BY_LAYER[l] ?? LAYER1_QUESTIONS
+
+    // Guard: all questions answered but transition not yet completed (jail fix)
+    if (idx >= qs.length) {
+      setPhase(l === 1 ? 'importance' : 'outro')
+      return
+    }
+
+    // Past Layer 1 — skip the L1-flavored intro and jump to the right place
+    if ((session.completedLayers ?? []).includes(1)) {
+      setPhase(idx === 0 ? 'layerIntro' : 'quiz')
+      return
+    }
+
     setPhase('quiz')
   }
 
@@ -434,8 +451,46 @@ export default function QuizFlow() {
     )
   }
 
-  // ── INTRO (Layer 1 welcome) ───────────────────────────────────────────────
+  // ── INTRO (Layer 1 welcome, or mid-quiz resume) ───────────────────────────
   if (phase === 'intro') {
+    // Mid-quiz resume: user has completed L1 and is somewhere in L2–L4.
+    // Show layer-appropriate copy instead of the L1 welcome screen.
+    const midQuizResume = session && (session.completedLayers ?? []).includes(1)
+    if (midQuizResume) {
+      return (
+        <Shell>
+          <Kicker>Layer {layer} · {LAYER_LABELS[layer]}</Kicker>
+          <LayerSubtitle>{LAYER_SUBTITLES[layer]}</LayerSubtitle>
+          <H1>Pick up where you left off.</H1>
+          {index > 0 && (
+            <Body>Question {index + 1} of {questions.length} in Layer {layer}.</Body>
+          )}
+          <div style={{ marginTop: 'var(--space-8)' }}>
+            <button style={primaryBtn} onClick={begin}>
+              {index === 0 ? `Continue to Layer ${layer} →` : 'Resume →'}
+            </button>
+          </div>
+          {confirmingRetake ? (
+            <div style={{ ...card, marginTop: 'var(--space-6)', marginBottom: 0, cursor: 'default', borderColor: 'var(--color-red)' }}>
+              <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-primary)', marginBottom: 'var(--space-4)' }}>
+                This deletes all your answers and starts over from Layer 1. Sure?
+              </p>
+              <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
+                <button style={primaryBtn} onClick={restart}>Yes, start over</button>
+                <button style={ghostBtn} onClick={() => setConfirmingRetake(false)}>Cancel</button>
+              </div>
+            </div>
+          ) : (
+            <div style={{ marginTop: 'var(--space-5)' }}>
+              <button onClick={() => setConfirmingRetake(true)} style={mutedLinkBtn}>
+                Start over from scratch
+              </button>
+            </div>
+          )}
+        </Shell>
+      )
+    }
+
     return (
       <Shell>
         <Kicker>Layer 1 · {LAYER_LABELS[1]}</Kicker>
@@ -445,7 +500,7 @@ export default function QuizFlow() {
           Most civic tools ask where you stand on the issues. We’re asking something different — and harder. We want to know how you <em>think</em>: the underlying values that drive your positions.
         </Body>
         <Body>
-          Twenty questions. About twelve minutes. No wrong answers — only honest ones. Every question has an “It depends” option — it’s not a cop-out, it’s often the most accurate answer. Your nuance is the point.
+          Fourteen questions. About ten minutes. No wrong answers — only honest ones. Every question has an “It depends” option — it’s not a cop-out, it’s often the most accurate answer. Your nuance is the point.
         </Body>
         <div style={{ marginTop: 'var(--space-8)' }}>
           <button style={primaryBtn} onClick={begin}>
@@ -516,13 +571,10 @@ export default function QuizFlow() {
             <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', maxWidth: 520, margin: '0 auto var(--space-6)', lineHeight: 'var(--leading-relaxed)' }}>
               {LAYER_OUTRO[1].teaser}
             </p>
-            <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
+            <div style={{ textAlign: 'center' }}>
               <button style={primaryBtn} onClick={() => setPhase('layerIntro')}>
                 Continue to Layer 2 →
               </button>
-              <Link href="/results" style={{ ...ghostBtn, textDecoration: 'none' }}>
-                See where I stand →
-              </Link>
             </div>
           </div>
         </Shell>
@@ -546,9 +598,6 @@ export default function QuizFlow() {
           <button style={primaryBtn} onClick={() => setPhase('layerIntro')}>
             Continue to Layer {layer} →
           </button>
-          <Link href="/results" style={{ ...ghostBtn, textDecoration: 'none' }}>
-            See where I stand →
-          </Link>
         </div>
       </Shell>
     )
@@ -605,6 +654,19 @@ export default function QuizFlow() {
           <button style={primaryBtn} onClick={finishImportance}>
             Reveal my constellation →
           </button>
+          <div style={{ marginTop: 'var(--space-4)' }}>
+            <button
+              onClick={() => {
+                setTopDimensions(picks)
+                recompute([1], picks)
+                completeLayer(1)
+                setPhase('layerIntro')
+              }}
+              style={mutedLinkBtn}
+            >
+              Skip for now — continue to Layer 2 →
+            </button>
+          </div>
         </div>
       </Shell>
     )
