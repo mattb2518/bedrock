@@ -95,33 +95,48 @@ export default function MantleReveal({ result, headerCta }: { result: QuizResult
         </div>
       )}
 
-      {/* Dimensional breakdown */}
-      <div style={{ ...rise(0.65), marginTop: 'var(--space-10)', maxWidth: 560, marginInline: 'auto' }}>
-        <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-muted)', letterSpacing: 'var(--tracking-wider)', textTransform: 'uppercase', marginBottom: 'var(--space-5)' }}>
+      {/* Dimensional breakdown — collapsed by default */}
+      <DimAccordion result={result} shown={shown} rise={rise} />
+    </div>
+  )
+}
+
+function DimAccordion({ result, shown, rise }: { result: QuizResult; shown: boolean; rise: (d: number) => React.CSSProperties }) {
+  const [open, setOpen] = useState(false)
+  return (
+    <div style={{ ...rise(0.65), marginTop: 'var(--space-10)', maxWidth: 560, marginInline: 'auto' }}>
+      <button
+        onClick={() => setOpen((o) => !o)}
+        style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', background: 'none', border: 'none', cursor: 'pointer', padding: '0 0 var(--space-3)', borderBottom: '1px solid var(--color-border)' }}
+      >
+        <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-muted)', letterSpacing: 'var(--tracking-wider)', textTransform: 'uppercase' }}>
           Your eight dimensions
-        </p>
-        {DIMENSIONS.map((d, i) => {
-          const v = result.profile[d.key]
-          const isTop = result.topDimensions.includes(d.key)
-          return (
-            <div key={d.key} style={{ marginBottom: 'var(--space-5)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', marginBottom: 'var(--space-2)' }}>
-                <span style={{ color: v < 50 ? 'var(--color-text-primary)' : 'var(--color-text-muted)', fontWeight: v < 50 ? 'var(--weight-semibold)' : 'normal' }}>{d.poleA}</span>
-                {isTop && (
-                  <span style={{ color: 'var(--color-gold)', fontSize: '11px', letterSpacing: 'var(--tracking-wider)', textTransform: 'uppercase' }}>most central</span>
-                )}
-                <span style={{ color: v > 50 ? 'var(--color-text-primary)' : 'var(--color-text-muted)', fontWeight: v > 50 ? 'var(--weight-semibold)' : 'normal' }}>{d.poleB}</span>
+        </span>
+        <span style={{ color: 'var(--color-text-muted)', fontSize: '14px', transition: 'transform 0.2s', display: 'inline-block', transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}>▾</span>
+      </button>
+      {open && (
+        <div style={{ paddingTop: 'var(--space-5)' }}>
+          {DIMENSIONS.map((d, i) => {
+            const v = result.profile[d.key]
+            const isTop = result.topDimensions.includes(d.key)
+            return (
+              <div key={d.key} style={{ marginBottom: 'var(--space-5)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', marginBottom: 'var(--space-2)' }}>
+                  <span style={{ color: v < 50 ? 'var(--color-text-primary)' : 'var(--color-text-muted)', fontWeight: v < 50 ? 'var(--weight-semibold)' : 'normal' }}>{d.poleA}</span>
+                  {isTop && (
+                    <span style={{ color: 'var(--color-gold)', fontSize: '11px', letterSpacing: 'var(--tracking-wider)', textTransform: 'uppercase' }}>most central</span>
+                  )}
+                  <span style={{ color: v > 50 ? 'var(--color-text-primary)' : 'var(--color-text-muted)', fontWeight: v > 50 ? 'var(--weight-semibold)' : 'normal' }}>{d.poleB}</span>
+                </div>
+                <div style={{ position: 'relative', height: 6, backgroundColor: 'var(--color-bg-surface)', borderRadius: 'var(--radius-full)', border: '1px solid var(--color-border)' }}>
+                  <div style={{ position: 'absolute', left: '50%', top: -2, bottom: -2, width: 1, backgroundColor: 'var(--color-border-strong)' }} />
+                  <div style={{ position: 'absolute', left: `${shown ? v : 50}%`, top: '50%', transform: 'translate(-50%, -50%)', width: 12, height: 12, borderRadius: 'var(--radius-full)', backgroundColor: isTop ? 'var(--color-gold)' : '#6B9FEA', boxShadow: isTop ? '0 0 8px rgba(200,169,110,0.6)' : 'none', transition: `left 0.8s cubic-bezier(0.22,1,0.36,1) ${0.7 + i * 0.05}s` }} />
+                </div>
               </div>
-              <div style={{ position: 'relative', height: 6, backgroundColor: 'var(--color-bg-surface)', borderRadius: 'var(--radius-full)', border: '1px solid var(--color-border)' }}>
-                {/* center tick */}
-                <div style={{ position: 'absolute', left: '50%', top: -2, bottom: -2, width: 1, backgroundColor: 'var(--color-border-strong)' }} />
-                {/* marker animates from center to value */}
-                <div style={{ position: 'absolute', left: `${shown ? v : 50}%`, top: '50%', transform: 'translate(-50%, -50%)', width: 12, height: 12, borderRadius: 'var(--radius-full)', backgroundColor: isTop ? 'var(--color-gold)' : '#6B9FEA', boxShadow: isTop ? '0 0 8px rgba(200,169,110,0.6)' : 'none', transition: `left 0.8s cubic-bezier(0.22,1,0.36,1) ${0.7 + i * 0.05}s` }} />
-              </div>
-            </div>
-          )
-        })}
-      </div>
+            )
+          })}
+        </div>
+      )}
     </div>
   )
 }

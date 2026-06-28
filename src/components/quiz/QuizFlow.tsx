@@ -249,6 +249,57 @@ export default function QuizFlow() {
     if (typeof window !== 'undefined') window.scrollTo({ top: 0 })
   }, [phase, index])
 
+  // Push a history entry on each screen change so browser back navigates within
+  // the quiz rather than leaving the page.
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    window.history.pushState({ phase }, '', '/quiz')
+  }, [phase, index, demoStep])
+
+  // Intercept browser back — apply quiz-internal back logic.
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    function handlePop() {
+      switch (phase) {
+        case 'quiz':
+          setPendingOption(null)
+          setFollowText('')
+          if (index > 0) goBack()
+          else setPhase(layer === 1 ? 'intro' : 'layerIntro')
+          break
+        case 'interstitial':
+          setInterstitial(null)
+          goBack()
+          setPhase('quiz')
+          break
+        case 'importance':
+          setPhase('quiz')
+          break
+        case 'reveal':
+          setPhase('importance')
+          break
+        case 'layerIntro':
+          setPhase(layer === 2 ? 'reveal' : 'outro')
+          break
+        case 'outro':
+          setPhase('quiz')
+          break
+        case 'dealbreakers':
+          setPhase('layerIntro')
+          break
+        case 'demographics':
+          if (demoStep > 0) setDemoStep(prevDemoStep(demoStep, demo))
+          else setPhase('dealbreakers')
+          break
+        default:
+          break
+      }
+    }
+    window.addEventListener('popstate', handlePop)
+    return () => window.removeEventListener('popstate', handlePop)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase, index, layer, demoStep, demo, goBack])
+
   function begin() {
     if (!session) { startSession(); setPhase('quiz'); return }
 

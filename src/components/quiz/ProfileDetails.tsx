@@ -2,6 +2,7 @@
 // voting behavior, and Layer 4 dealbreakers. Each section renders only if the
 // user has data for it (progressive depth). Reads straight off the session.
 
+import { useState } from 'react'
 import { LAYER2_QUESTIONS } from '@/lib/quiz/layer2'
 import { LAYER3_QUESTIONS } from '@/lib/quiz/layer3'
 import { QUESTION_TOPICS } from '@/lib/quiz/layerCopy'
@@ -31,6 +32,7 @@ function Section({
   questions: QuizQuestion[]
   answers: QuizAnswer[]
 }) {
+  const [open, setOpen] = useState(false)
   const rows = questions
     .map((q) => {
       const a = answers.find((x) => x.questionId === q.id)
@@ -41,11 +43,17 @@ function Section({
   if (rows.length === 0) return null
 
   return (
-    <div style={{ marginBottom: 'var(--space-10)' }}>
-      <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-muted)', letterSpacing: 'var(--tracking-wider)', textTransform: 'uppercase', marginBottom: 'var(--space-5)' }}>
-        {title}
-      </p>
-      {rows.map((r) => (
+    <div style={{ marginBottom: 'var(--space-6)' }}>
+      <button
+        onClick={() => setOpen((o) => !o)}
+        style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', background: 'none', border: 'none', cursor: 'pointer', padding: 'var(--space-4) 0', borderBottom: '1px solid var(--color-border)' }}
+      >
+        <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-muted)', letterSpacing: 'var(--tracking-wider)', textTransform: 'uppercase' }}>
+          {title} · {rows.length}
+        </span>
+        <span style={{ color: 'var(--color-text-muted)', fontSize: '14px', transition: 'transform 0.2s', display: 'inline-block', transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}>▾</span>
+      </button>
+      {open && rows.map((r) => (
         <div key={r.topic} style={{ display: 'flex', gap: 'var(--space-4)', padding: 'var(--space-4) 0', borderBottom: '1px solid var(--color-border)' }}>
           <span style={{ flexShrink: 0, width: 150, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-gold)' }}>
             {r.topic}
@@ -59,26 +67,22 @@ function Section({
   )
 }
 
-export default function ProfileDetails({ session }: { session: QuizSession }) {
-  const { answers, dealbreakers, dealbreakerOther } = session
-  const hasLines = dealbreakers.length > 0 || !!dealbreakerOther?.trim()
-  const hasAny =
-    answers.some((a) => a.questionId.startsWith('L2-')) ||
-    answers.some((a) => a.questionId.startsWith('L3-')) ||
-    hasLines
-
-  if (!hasAny) return null
-
+function LinesSection({ dealbreakers, dealbreakerOther }: { dealbreakers: string[]; dealbreakerOther?: string }) {
+  const [open, setOpen] = useState(false)
+  const count = dealbreakers.length + (dealbreakerOther?.trim() ? 1 : 0)
   return (
-    <div style={{ maxWidth: 700, margin: '0 auto', padding: '0 var(--space-6) var(--space-12)' }}>
-      <Section title="Your positions" questions={LAYER2_QUESTIONS} answers={answers} />
-      <Section title="What drives your vote" questions={LAYER3_QUESTIONS} answers={answers} />
-
-      {hasLines && (
-        <div>
-          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-muted)', letterSpacing: 'var(--tracking-wider)', textTransform: 'uppercase', marginBottom: 'var(--space-5)' }}>
-            Your lines · {dealbreakers.length + (dealbreakerOther?.trim() ? 1 : 0)}
-          </p>
+    <div style={{ marginBottom: 'var(--space-6)' }}>
+      <button
+        onClick={() => setOpen((o) => !o)}
+        style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', background: 'none', border: 'none', cursor: 'pointer', padding: 'var(--space-4) 0', borderBottom: '1px solid var(--color-border)' }}
+      >
+        <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-muted)', letterSpacing: 'var(--tracking-wider)', textTransform: 'uppercase' }}>
+          Your lines · {count}
+        </span>
+        <span style={{ color: 'var(--color-text-muted)', fontSize: '14px', transition: 'transform 0.2s', display: 'inline-block', transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}>▾</span>
+      </button>
+      {open && (
+        <div style={{ paddingTop: 'var(--space-3)' }}>
           <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', marginBottom: 'var(--space-4)' }}>
             A candidate who crosses any of these is disqualified — regardless of how well they otherwise match.
           </p>
@@ -100,6 +104,25 @@ export default function ProfileDetails({ session }: { session: QuizSession }) {
           )}
         </div>
       )}
+    </div>
+  )
+}
+
+export default function ProfileDetails({ session }: { session: QuizSession }) {
+  const { answers, dealbreakers, dealbreakerOther } = session
+  const hasLines = dealbreakers.length > 0 || !!dealbreakerOther?.trim()
+  const hasAny =
+    answers.some((a) => a.questionId.startsWith('L2-')) ||
+    answers.some((a) => a.questionId.startsWith('L3-')) ||
+    hasLines
+
+  if (!hasAny) return null
+
+  return (
+    <div style={{ maxWidth: 700, margin: '0 auto', padding: '0 var(--space-6) var(--space-12)' }}>
+      <Section title="Your positions" questions={LAYER2_QUESTIONS} answers={answers} />
+      <Section title="What drives your vote" questions={LAYER3_QUESTIONS} answers={answers} />
+      {hasLines && <LinesSection dealbreakers={dealbreakers} dealbreakerOther={dealbreakerOther} />}
     </div>
   )
 }

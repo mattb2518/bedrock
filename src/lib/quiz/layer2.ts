@@ -111,7 +111,6 @@ export const LAYER2_QUESTIONS: QuizQuestion[] = [
       { id: 'L2-Q8-d', text: 'Codify federal protection with no gestational limits — abortion access as a constitutional right of bodily autonomy, no state restrictions, public funding for those who can’t afford it.', microReaction: 'The bodily-autonomy answer. The position that government’s proper role in pregnancy decisions is, ultimately, none.', scores: {} },
     ],
     dependsFollowUp: { type: 'open_text', prompt: 'What factors matter most — stage of pregnancy, specific circumstances, role of religious belief, federal vs. state authority, whether to focus on the narrower contraception and IVF protections that command broader consensus?' },
-    easterEgg: 'In 1972 — the year before Roe — the Republican platform supported abortion access and the Democratic platform was silent on it. George H.W. Bush was pro-choice before becoming Reagan’s running mate. Al Gore was pro-life before running for president. Jesse Jackson opposed abortion until 1988. The sorting of both parties into hard positions happened gradually, then suddenly — entirely within living memory. The issue didn’t change. The parties around it did.',
   },
   {
     id: 'L2-Q9',
