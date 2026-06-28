@@ -660,6 +660,8 @@ export default function QuizFlow() {
         {pillRow(GEOGRAPHIES, demo.geography, (v) => setDemo((d) => ({ ...d, geography: v })))}
         {microLabel('Region')}
         {pillRow(REGIONS, demo.region, (v) => setDemo((d) => ({ ...d, region: v })))}
+        {microLabel('Region you grew up in')}
+        {pillRow(REGIONS, demo.regionGrewUp, (v) => setDemo((d) => ({ ...d, regionGrewUp: v })))}
 
         {sectionLabel(DEMOGRAPHIC_OTHER_PROMPT)}
         <textarea value={demo.note ?? ''} onChange={(e) => setDemo((d) => ({ ...d, note: e.target.value }))} rows={3} placeholder="Optional…" style={{ ...textarea, marginBottom: 'var(--space-8)' }} />

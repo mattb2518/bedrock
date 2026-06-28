@@ -106,6 +106,7 @@ export interface Demographics {
   ageRange?: string
   geography?: string
   region?: string
+  regionGrewUp?: string // region they grew up in (formative, pairs with age + upbringing)
   note?: string
   completed?: boolean // user reached and dismissed the module (answered or skipped)
 }
