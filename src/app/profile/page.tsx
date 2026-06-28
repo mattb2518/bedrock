@@ -5,6 +5,7 @@ import SignOutButton from "@/components/auth/SignOutButton";
 import ChangePassword from "@/components/auth/ChangePassword";
 import ChangeEmail from "@/components/auth/ChangeEmail";
 import DeleteAccount from "@/components/auth/DeleteAccount";
+import DemographicsCard from "@/components/profile/DemographicsCard";
 
 export default async function ProfilePage() {
   const supabase = await createClient();
@@ -57,6 +58,9 @@ export default async function ProfilePage() {
             Take the quiz →
           </Link>
         </div>
+
+        {/* Political background (demographics) — view / edit / add */}
+        <DemographicsCard />
 
         {/* Actions */}
         <div style={{ backgroundColor: "var(--color-bg-surface)", border: "1px solid var(--color-border)", borderRadius: "var(--radius-lg)", padding: "var(--space-6)" }}>
