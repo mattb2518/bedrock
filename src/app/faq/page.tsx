@@ -51,6 +51,14 @@ const faqs = [
     a: "Claude-powered preparation for difficult political conversations with people who see things differently. Know where you stand. Understand where they're likely coming from. Navigate the disagreement productively rather than defensively. It's not debate prep — it's bridge-building prep.",
   },
   {
+    q: "Does it use my values profile?",
+    a: "Yes — but carefully. Your Mantle, the values behind it, your issue positions, and your voting priorities give Claude meaningful context about where you're coming from. Your age, location, and region are never used. The goal is to help Claude understand you as a person — not to categorize you by demographics or infer how others think based on where they're from.",
+  },
+  {
+    q: "Does it remember my past conversations?",
+    a: "No. Each conversation starts clean — no history, no memory of what you discussed before. This is intentional. You're not being tracked, and what you explored last time doesn't follow you into the next session. Saved history is something we may offer later as an opt-in feature. Right now, it doesn't exist.",
+  },
+  {
     q: "Is Bedrock available outside the US?",
     a: "The current version is US-focused — the ballot guide requires US races and the framework is built around American civic tensions. International versions are possible long-term, but not in the current roadmap.",
   },

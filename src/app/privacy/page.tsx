@@ -24,6 +24,7 @@ export default function PrivacyPage() {
           <h2 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-h3)", color: "var(--color-text-primary)", marginBottom: "var(--space-4)" }}>What we use it for.</h2>
           {[
             ["Powering your experience", "Your quiz results are used to build Your Ballot, Your Media Diet, and Your Conversations. That's the whole point."],
+            ["Your conversations", "Your Mantle, your issue positions, and your voting priorities give Claude context about where you're coming from. Your age, your location, and your region are never used — the tool treats you as a thinking person, not a demographic."],
             ["Improving the platform", "Aggregate, anonymous patterns help us improve questions, scoring, and recommendations. Individual profiles are never used for this."],
             ["Contacting you", "Only for account-related communication (password reset, significant platform changes). No marketing email without your explicit opt-in."],
           ].map(([title, desc]) => (
@@ -35,6 +36,7 @@ export default function PrivacyPage() {
               </div>
             </div>
           ))}
+          <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-body)", color: "var(--color-text-secondary)", lineHeight: "var(--leading-relaxed)", marginTop: "var(--space-2)" }}>Your conversations start fresh every time. We don't build a history of what you discussed, who you discussed it with, or what advice you received. What happens in a conversation stays in that conversation.</p>
         </section>
 
         <section>
