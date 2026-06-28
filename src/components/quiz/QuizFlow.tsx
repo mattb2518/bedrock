@@ -62,6 +62,47 @@ const QUESTIONS_BY_LAYER: Record<number, QuizQuestion[]> = {
   3: LAYER3_QUESTIONS,
 }
 
+// Per-step config for the demographics stepper. Conditional steps are skipped
+// automatically when their condition isn't met — the next/prev helpers below
+// handle the traversal so the step index stays stable.
+interface DemoStepDef {
+  key: keyof Demographics
+  type: 'choice' | 'pills' | 'text'
+  prompt: string
+  options?: string[]
+  condition?: (d: Demographics) => boolean
+}
+
+const DEMO_STEPS: DemoStepDef[] = [
+  { key: 'partyRelationship', type: 'choice', prompt: PARTY_RELATIONSHIP.prompt, options: PARTY_RELATIONSHIP.options },
+  { key: 'lineage', type: 'choice', prompt: POLITICAL_LINEAGE.prompt, options: POLITICAL_LINEAGE.options, condition: (d) => !!d.partyRelationship && LINEAGE_TRIGGERS.includes(d.partyRelationship) },
+  { key: 'currentRegistration', type: 'choice', prompt: CURRENT_REGISTRATION.prompt, options: CURRENT_REGISTRATION.options },
+  { key: 'upbringing', type: 'choice', prompt: UPBRINGING.prompt, options: UPBRINGING.options },
+  { key: 'ageRange', type: 'pills', prompt: 'Age range', options: AGE_RANGES },
+  { key: 'geography', type: 'pills', prompt: 'Where you live', options: GEOGRAPHIES },
+  { key: 'region', type: 'pills', prompt: 'Your region', options: REGIONS },
+  { key: 'regionGrewUp', type: 'pills', prompt: 'Region you grew up in', options: REGIONS },
+  { key: 'note', type: 'text', prompt: DEMOGRAPHIC_OTHER_PROMPT },
+]
+
+function nextDemoStep(step: number, d: Demographics): number {
+  let n = step + 1
+  while (n < DEMO_STEPS.length) {
+    if (!DEMO_STEPS[n].condition || DEMO_STEPS[n].condition!(d)) break
+    n++
+  }
+  return n
+}
+
+function prevDemoStep(step: number, d: Demographics): number {
+  let n = step - 1
+  while (n >= 0) {
+    if (!DEMO_STEPS[n].condition || DEMO_STEPS[n].condition!(d)) break
+    n--
+  }
+  return Math.max(n, 0)
+}
+
 // Stable per-question shuffle (SPEC §5). Options that open their own text field
 // (followUpPrompt — e.g. the Layer 3 capstone's "name it yourself") are pinned
 // last, like "It depends".
@@ -161,6 +202,7 @@ export default function QuizFlow() {
   const [dbPicks, setDbPicks] = useState<string[]>([])
   const [dbOther, setDbOther] = useState('')
   const [confirmingRetake, setConfirmingRetake] = useState(false)
+  const [demoStep, setDemoStep] = useState(0)
 
   // How many easter-egg intermissions the user has seen this sitting. Drives the
   // "skip the rest" button, which appears once they're past the second egg.
@@ -294,11 +336,13 @@ export default function QuizFlow() {
     setDealbreakerOther(dbOther)
     recompute([1, 2, 3, 4], session?.topDimensions ?? [])
     completeLayer(4)
+    setDemoStep(0)
     setPhase('demographics')
   }
 
-  function finishDemographics(save: boolean) {
-    setDemographics(save ? { ...demo, completed: true } : { completed: true })
+  function finishDemographics(save: boolean, demoOverride?: Demographics) {
+    const d = demoOverride ?? demo
+    setDemographics(save ? { ...d, completed: true } : { completed: true })
     track(save ? 'Demographics Submitted' : 'Demographics Skipped')
     setPhase('done')
   }
@@ -629,85 +673,134 @@ export default function QuizFlow() {
     )
   }
 
-  // ── DEMOGRAPHIC MODULE (optional, after Layer 4) ──────────────────────────
+  // ── DEMOGRAPHIC MODULE — one question at a time stepper ──────────────────
   if (phase === 'demographics') {
-    const showLineage = !!demo.partyRelationship && LINEAGE_TRIGGERS.includes(demo.partyRelationship)
-    const sectionLabel = (text: string) => (
-      <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-primary)', margin: 'var(--space-8) 0 var(--space-3)' }}>{text}</p>
-    )
-    const microLabel = (text: string) => (
-      <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-micro)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-muted)', letterSpacing: 'var(--tracking-wider)', textTransform: 'uppercase', marginBottom: 'var(--space-3)' }}>{text}</p>
-    )
-    const choiceCard = (selected: boolean, label: string, onClick: () => void) => (
-      <button
-        key={label}
-        onClick={onClick}
-        style={{ ...card, marginBottom: 'var(--space-2)', borderColor: selected ? 'var(--color-blue-accent)' : 'var(--color-border)', backgroundColor: selected ? 'rgba(107,159,234,0.08)' : 'var(--color-bg-surface)' }}
-      >
-        {label}
-      </button>
-    )
-    const pillRow = (options: string[], value: string | undefined, set: (v: string | undefined) => void) => (
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)', marginBottom: 'var(--space-4)' }}>
-        {options.map((o) => {
-          const on = value === o
-          return (
-            <button key={o} onClick={() => set(on ? undefined : o)} style={{ ...card, width: 'auto', marginBottom: 0, padding: 'var(--space-2) var(--space-4)', fontSize: 'var(--text-small)', borderColor: on ? 'var(--color-gold)' : 'var(--color-border)', backgroundColor: on ? 'rgba(200,169,110,0.08)' : 'var(--color-bg-surface)' }}>
-              {o}
-            </button>
-          )
-        })}
-      </div>
-    )
+    const stepDef = DEMO_STEPS[demoStep]
+
+    // All steps exhausted — save and exit (shouldn't normally render)
+    if (!stepDef) {
+      finishDemographics(true)
+      return null
+    }
+
+    // Visible steps change as partyRelationship is set (lineage conditional).
+    // Compute progress based on visible steps only so the bar doesn't jump.
+    const visibleSteps = DEMO_STEPS.filter((s) => !s.condition || s.condition(demo))
+    const visibleIdx = visibleSteps.findIndex((s) => s.key === stepDef.key)
+    const progress = ((visibleIdx + 0.5) / visibleSteps.length) * 100
+
+    // Advance to the next active step, or finish if past the last one.
+    function advanceDemoStep(updatedDemo: Demographics) {
+      const next = nextDemoStep(demoStep, updatedDemo)
+      if (next >= DEMO_STEPS.length) {
+        finishDemographics(true, updatedDemo)
+      } else {
+        setDemoStep(next)
+      }
+    }
+
+    const currentValue = (demo as Record<string, string | undefined>)[stepDef.key]
+
     return (
       <Shell>
-        <Kicker>{DEMOGRAPHIC_INTRO.kicker}</Kicker>
-        <H1>{DEMOGRAPHIC_INTRO.heading}</H1>
-        <Body>{DEMOGRAPHIC_INTRO.body}</Body>
+        {/* Header: kicker + escape hatch */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-4)' }}>
+          <Kicker>{DEMOGRAPHIC_INTRO.kicker}</Kicker>
+          <button onClick={() => finishDemographics(true)} style={mutedLinkBtn}>
+            Skip remaining →
+          </button>
+        </div>
 
-        {sectionLabel(PARTY_RELATIONSHIP.prompt)}
-        {PARTY_RELATIONSHIP.options.map((o) =>
-          choiceCard(demo.partyRelationship === o, o, () =>
-            setDemo((d) => ({ ...d, partyRelationship: o, lineage: LINEAGE_TRIGGERS.includes(o) ? d.lineage : undefined }))
-          )
+        {/* Progress bar */}
+        <div style={{ height: 4, backgroundColor: 'var(--color-bg-surface)', borderRadius: 'var(--radius-full)', marginBottom: 'var(--space-6)' }}>
+          <div style={{ height: '100%', width: `${progress}%`, backgroundColor: 'var(--color-gold)', borderRadius: 'var(--radius-full)', transition: 'width 0.3s' }} />
+        </div>
+
+        {/* Back (not on first step) */}
+        {demoStep > 0 && (
+          <button
+            onClick={() => setDemoStep(prevDemoStep(demoStep, demo))}
+            style={{ ...mutedLinkBtn, display: 'block', marginBottom: 'var(--space-6)' }}
+          >
+            ← Back
+          </button>
         )}
 
-        {showLineage && (
+        {/* Intro blurb on first step only */}
+        {demoStep === 0 && <Body>{DEMOGRAPHIC_INTRO.body}</Body>}
+
+        <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-h3, var(--text-body-lg))', color: 'var(--color-text-primary)', lineHeight: 'var(--leading-snug, 1.4)', marginBottom: 'var(--space-6)' }}>
+          {stepDef.prompt}
+        </h2>
+
+        {/* Choice: full-width cards, auto-advance on tap */}
+        {stepDef.type === 'choice' && stepDef.options?.map((o) => (
+          <button
+            key={o}
+            onClick={() => {
+              const updated: Demographics = { ...demo, [stepDef.key]: o }
+              if (stepDef.key === 'partyRelationship' && !LINEAGE_TRIGGERS.includes(o)) {
+                updated.lineage = undefined
+              }
+              setDemo(updated)
+              advanceDemoStep(updated)
+            }}
+            style={{ ...card, borderColor: currentValue === o ? 'var(--color-blue-accent)' : 'var(--color-border)', backgroundColor: currentValue === o ? 'rgba(107,159,234,0.08)' : 'var(--color-bg-surface)' }}
+          >
+            {o}
+          </button>
+        ))}
+
+        {/* Pills: compact row, auto-advance on tap, skippable */}
+        {stepDef.type === 'pills' && (
           <>
-            {sectionLabel(POLITICAL_LINEAGE.prompt)}
-            {POLITICAL_LINEAGE.options.map((o) =>
-              choiceCard(demo.lineage === o, o, () => setDemo((d) => ({ ...d, lineage: o })))
-            )}
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)', marginBottom: 'var(--space-6)' }}>
+              {stepDef.options?.map((o) => (
+                <button
+                  key={o}
+                  onClick={() => {
+                    const updated: Demographics = { ...demo, [stepDef.key]: o }
+                    setDemo(updated)
+                    advanceDemoStep(updated)
+                  }}
+                  style={{ ...card, width: 'auto', marginBottom: 0, padding: 'var(--space-2) var(--space-4)', fontSize: 'var(--text-small)', borderColor: currentValue === o ? 'var(--color-gold)' : 'var(--color-border)', backgroundColor: currentValue === o ? 'rgba(200,169,110,0.08)' : 'var(--color-bg-surface)' }}
+                >
+                  {o}
+                </button>
+              ))}
+            </div>
+            <button onClick={() => advanceDemoStep(demo)} style={mutedLinkBtn}>
+              Skip this question →
+            </button>
           </>
         )}
 
-        {sectionLabel(CURRENT_REGISTRATION.prompt)}
-        {CURRENT_REGISTRATION.options.map((o) =>
-          choiceCard(demo.currentRegistration === o, o, () => setDemo((d) => ({ ...d, currentRegistration: o })))
+        {/* Text: textarea, Enter or button to finish */}
+        {stepDef.type === 'text' && (
+          <>
+            <textarea
+              value={demo.note ?? ''}
+              onChange={(e) => setDemo((d) => ({ ...d, note: e.target.value }))}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault()
+                  finishDemographics(true)
+                }
+              }}
+              rows={3}
+              placeholder="Optional…"
+              style={{ ...textarea, marginBottom: 'var(--space-3)' }}
+              autoFocus
+            />
+            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-micro)', color: 'var(--color-text-muted)', marginBottom: 'var(--space-6)' }}>
+              Press Enter to continue · Shift+Enter for a new line
+            </p>
+            <div style={{ display: 'flex', gap: 'var(--space-4)', flexWrap: 'wrap' }}>
+              <button style={primaryBtn} onClick={() => finishDemographics(true)}>Done → see my results</button>
+              <button style={ghostBtn} onClick={() => finishDemographics(true)}>Skip this note</button>
+            </div>
+          </>
         )}
-
-        {sectionLabel(UPBRINGING.prompt)}
-        {UPBRINGING.options.map((o) =>
-          choiceCard(demo.upbringing === o, o, () => setDemo((d) => ({ ...d, upbringing: o })))
-        )}
-
-        {sectionLabel('A little more context — optional, and never used for anything but improving recommendations.')}
-        {microLabel('Age')}
-        {pillRow(AGE_RANGES, demo.ageRange, (v) => setDemo((d) => ({ ...d, ageRange: v })))}
-        {microLabel('Where you live')}
-        {pillRow(GEOGRAPHIES, demo.geography, (v) => setDemo((d) => ({ ...d, geography: v })))}
-        {microLabel('Region')}
-        {pillRow(REGIONS, demo.region, (v) => setDemo((d) => ({ ...d, region: v })))}
-        {microLabel('Region you grew up in')}
-        {pillRow(REGIONS, demo.regionGrewUp, (v) => setDemo((d) => ({ ...d, regionGrewUp: v })))}
-
-        {sectionLabel(DEMOGRAPHIC_OTHER_PROMPT)}
-        <textarea value={demo.note ?? ''} onChange={(e) => setDemo((d) => ({ ...d, note: e.target.value }))} rows={3} placeholder="Optional…" style={{ ...textarea, marginBottom: 'var(--space-8)' }} />
-
-        <div style={{ display: 'flex', gap: 'var(--space-4)', flexWrap: 'wrap' }}>
-          <button style={primaryBtn} onClick={() => finishDemographics(true)}>Done → see my results</button>
-          <button style={ghostBtn} onClick={() => finishDemographics(false)}>Skip this</button>
-        </div>
       </Shell>
     )
   }

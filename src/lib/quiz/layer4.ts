@@ -29,8 +29,6 @@ export const LAYER4_SECTIONS: DealbreakerSection[] = [
     items: [
       { id: 'DB-1', text: 'Questioned the legitimacy of a certified election result without credible evidence' },
       { id: 'DB-2', text: 'Used public office for personal financial gain' },
-      { id: 'DB-3', text: 'Accepted gifts or payments from industries they regulate' },
-      { id: 'DB-4', text: 'Supports removing or threatening judges for their rulings' },
       { id: 'DB-5', text: 'Has a documented pattern of lying about verifiable facts' },
     ],
   },
@@ -38,14 +36,7 @@ export const LAYER4_SECTIONS: DealbreakerSection[] = [
     title: 'Civil Liberties',
     items: [
       { id: 'DB-6', text: 'Supports deploying federal law enforcement against peaceful protesters' },
-      { id: 'DB-7', text: 'Supports warrantless surveillance of American citizens' },
       { id: 'DB-8', text: 'Supports restricting access to legal voting without evidence of fraud' },
-    ],
-  },
-  {
-    title: 'National Security',
-    items: [
-      { id: 'DB-9', text: 'Supports withdrawing from NATO or other core defense alliances unilaterally' },
     ],
   },
   {
@@ -66,32 +57,19 @@ export const LAYER4_SECTIONS: DealbreakerSection[] = [
         left: { id: 'DB-14', text: 'Supports an immediate single-payer transition that eliminates employer-sponsored insurance' },
         right: { id: 'DB-15', text: 'Supports eliminating Medicare, Medicaid, or other public health coverage entirely' },
       },
-      {
-        issue: 'Policing',
-        left: { id: 'DB-16', text: 'Supports significantly reducing police department funding without an alternative public safety plan' },
-        right: { id: 'DB-17', text: 'Supports eliminating civilian oversight of law enforcement' },
-      },
     ],
   },
   {
     title: 'Other',
     items: [
-      { id: 'DB-18', text: 'Supports race or gender-based preferences in hiring or admissions without accountability measures' },
       { id: 'DB-19', text: 'Supports eliminating LGBTQ+ anti-discrimination protections' },
       { id: 'DB-20', text: 'Denies that human activity contributes to climate change' },
-      { id: 'DB-21', text: 'Rejects taking any meaningful policy action on climate' },
-      { id: 'DB-22', text: 'Supports directing public education funds primarily to religious institutions' },
-      { id: 'DB-23', text: 'Supports federal speech restrictions on “hate speech” or “misinformation” beyond current First Amendment limits' },
-      { id: 'DB-24', text: 'Supports federal regulation of political campaign speech or content beyond current First Amendment limits' },
-      { id: 'DB-25', text: 'Supports legalizing all federally controlled substances including hard drugs' },
     ],
   },
   {
     title: 'Character',
     items: [
       { id: 'DB-26', text: 'Credibly accused of sexual misconduct' },
-      { id: 'DB-27', text: 'Has made public statements that explicitly denigrate people based on race, ethnicity, religion, gender identity, or sexual orientation' },
-      { id: 'DB-28', text: 'Has supported policies that materially disadvantage people based on race, ethnicity, religion, gender identity, or sexual orientation' },
       { id: 'DB-29', text: 'Has been convicted of a felony involving fraud, violence, or abuse of office' },
     ],
   },

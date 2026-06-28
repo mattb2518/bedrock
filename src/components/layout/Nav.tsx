@@ -10,6 +10,9 @@ import type { User } from "@supabase/supabase-js";
 
 const topNavLinks = [
   { label: "Civic Mantle", href: "/civic-mantle" },
+];
+
+const actionsLinks = [
   { label: "Your Ballot", href: "/ballot" },
   { label: "Beyond Your Ballot", href: "/beyond-ballot" },
   { label: "Your Media", href: "/media" },
@@ -41,12 +44,17 @@ function LogoMark() {
 export default function Nav() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
+  const [actionsOpen, setActionsOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const aboutRef = useRef<HTMLDivElement>(null);
+  const actionsRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
   const router = useRouter();
 
   const isAboutActive = aboutLinks.some(
+    (l) => pathname === l.href || pathname.startsWith(l.href)
+  );
+  const isActionsActive = actionsLinks.some(
     (l) => pathname === l.href || pathname.startsWith(l.href)
   );
 
@@ -81,11 +89,14 @@ export default function Nav() {
   // Initials from email for avatar
   const initials = user?.email ? user.email[0].toUpperCase() : "";
 
-  // Close About dropdown on outside click
+  // Close dropdowns on outside click
   useEffect(() => {
     function handleClick(e: MouseEvent) {
       if (aboutRef.current && !aboutRef.current.contains(e.target as Node)) {
         setAboutOpen(false);
+      }
+      if (actionsRef.current && !actionsRef.current.contains(e.target as Node)) {
+        setActionsOpen(false);
       }
     }
     document.addEventListener("mousedown", handleClick);
@@ -200,6 +211,125 @@ export default function Nav() {
               </Link>
             );
           })}
+
+          {/* Your Actions dropdown */}
+          <div ref={actionsRef} style={{ position: "relative" }}>
+            <button
+              onClick={() => setActionsOpen((o) => !o)}
+              style={{
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                fontFamily: "var(--font-body)",
+                fontSize: "var(--text-small)",
+                fontWeight: isActionsActive
+                  ? "var(--weight-semibold)"
+                  : "var(--weight-medium)",
+                color: isActionsActive
+                  ? "var(--color-text-primary)"
+                  : "var(--color-text-secondary)",
+                borderBottom: isActionsActive
+                  ? "2px solid var(--color-gold)"
+                  : "2px solid transparent",
+                paddingBottom: "2px",
+                display: "flex",
+                alignItems: "center",
+                gap: "4px",
+                whiteSpace: "nowrap",
+                transition: "var(--transition-fast)",
+              }}
+              onMouseEnter={(e) =>
+                ((e.currentTarget as HTMLElement).style.color =
+                  "var(--color-text-primary)")
+              }
+              onMouseLeave={(e) =>
+                ((e.currentTarget as HTMLElement).style.color = isActionsActive
+                  ? "var(--color-text-primary)"
+                  : "var(--color-text-secondary)")
+              }
+            >
+              Your Actions
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 12 12"
+                fill="none"
+                style={{
+                  transform: actionsOpen ? "rotate(180deg)" : "rotate(0deg)",
+                  transition: "transform 0.15s ease",
+                }}
+              >
+                <path
+                  d="M2 4l4 4 4-4"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+
+            {actionsOpen && (
+              <div
+                style={{
+                  position: "absolute",
+                  top: "calc(100% + 12px)",
+                  right: 0,
+                  backgroundColor: "var(--color-bg-surface)",
+                  border: "1px solid var(--color-border)",
+                  borderRadius: "var(--radius-lg)",
+                  padding: "var(--space-2)",
+                  minWidth: "200px",
+                  boxShadow: "0 8px 24px rgba(0,0,0,0.3)",
+                  zIndex: 100,
+                }}
+              >
+                {actionsLinks.map((link) => {
+                  const active = pathname === link.href;
+                  return (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      onClick={() => setActionsOpen(false)}
+                      style={{
+                        display: "block",
+                        fontFamily: "var(--font-body)",
+                        fontSize: "var(--text-small)",
+                        fontWeight: active
+                          ? "var(--weight-semibold)"
+                          : "var(--weight-medium)",
+                        color: active
+                          ? "var(--color-text-primary)"
+                          : "var(--color-text-secondary)",
+                        textDecoration: "none",
+                        padding: "var(--space-3) var(--space-4)",
+                        borderRadius: "var(--radius-md)",
+                        backgroundColor: active
+                          ? "var(--color-bg-deep, #0f1f33)"
+                          : "transparent",
+                        transition: "var(--transition-fast)",
+                      }}
+                      onMouseEnter={(e) => {
+                        (e.currentTarget as HTMLElement).style.backgroundColor =
+                          "var(--color-bg-deep, #0f1f33)";
+                        (e.currentTarget as HTMLElement).style.color =
+                          "var(--color-text-primary)";
+                      }}
+                      onMouseLeave={(e) => {
+                        (e.currentTarget as HTMLElement).style.backgroundColor =
+                          active ? "var(--color-bg-deep, #0f1f33)" : "transparent";
+                        (e.currentTarget as HTMLElement).style.color = active
+                          ? "var(--color-text-primary)"
+                          : "var(--color-text-secondary)";
+                      }}
+                    >
+                      {link.label}
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
+          </div>
 
           {/* About dropdown */}
           <div ref={aboutRef} style={{ position: "relative" }}>
@@ -488,6 +618,47 @@ export default function Nav() {
               {link.label}
             </Link>
           ))}
+          {/* Your Actions group in mobile */}
+          <div
+            style={{
+              borderTop: "1px solid var(--color-border)",
+              paddingTop: "var(--space-3)",
+              display: "flex",
+              flexDirection: "column",
+              gap: "var(--space-3)",
+            }}
+          >
+            <span
+              style={{
+                fontFamily: "var(--font-body)",
+                fontSize: "var(--text-micro)",
+                fontWeight: "var(--weight-semibold)",
+                color: "var(--color-text-muted)",
+                textTransform: "uppercase",
+                letterSpacing: "var(--tracking-wider)",
+              }}
+            >
+              Your Actions
+            </span>
+            {actionsLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={() => setMenuOpen(false)}
+                style={{
+                  fontFamily: "var(--font-body)",
+                  fontSize: "var(--text-body)",
+                  fontWeight: "var(--weight-medium)",
+                  color: "var(--color-text-secondary)",
+                  textDecoration: "none",
+                  paddingLeft: "var(--space-3)",
+                }}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
+
           {/* About group in mobile */}
           <div
             style={{

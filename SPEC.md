@@ -12,10 +12,11 @@
 **Registrars:** bedrock.guide at Cloudflare; bedrock.vote at Network Solutions (Cloudflare SSL/routing on both)
 **Status:** Passion project, no incorporated entity. Moving toward nonprofit or public benefit corporation.
 
-**What Bedrock is:** A civic identity platform for independent-minded voters. Three things, powered by one values quiz:
+**What Bedrock is:** A civic identity platform for independent-minded voters. Four things, powered by one values quiz:
 1. Help voters understand what they actually believe — underneath partisan noise
 2. Translate those beliefs into personalized ballot recommendations for every race, top to bottom
 3. Match voters to an independent media diet — journalists, Substacks, podcasts — that reflects how they actually think
+4. Surface candidates outside their own district worth supporting — matched to their values, focused on federal races where a presence in Congress would shift the balance of power toward independent-minded governance
 
 **What Bedrock is not:** A party voter guide, a polling tool, a debate platform, an advocacy organization. Not the Bedrock at bedrock.us (different mission, different domain).
 
@@ -29,7 +30,7 @@
 
 ## 2. Product Architecture
 
-### Three Pillars, One Quiz, One Civic Identity
+### Four Pillars, One Quiz, One Civic Identity
 
 The quiz is the shared engine. It produces a civic identity — a named type and dimensional constellation — which is the overarching layer that powers everything else.
 
@@ -44,6 +45,9 @@ Civic identity → recommended independent journalists, Substacks, podcasts in t
 
 **Pillar 3 — Your Conversations**
 Civic identity → Claude-powered chat interface for preparing and navigating difficult civic conversations across political difference. Uses the user's dimensional profile as persistent context. Broad scope — any civic disagreement, any time, not limited to election season.
+
+**Pillar 4 — Beyond Your Ballot**
+Civic identity → candidates outside your own district worth supporting — matched to your values, focused on federal races where a presence in Congress would shift the balance of power toward independent-minded governance.
 
 ### Quiz Architecture — Four Layers
 
@@ -1470,13 +1474,15 @@ Not a party label. Not a left-right score. A plain-English summary of where you 
 
 *[COMPONENT: Constellation map — 10 Civic Mantle types, dominant dimensions, one-liner descriptions. Required on this page. Radar/spider chart, 8 axes, blue fill on dark navy. Shareable artifact.]*
 
-Three things built on top of it:
+Four things built on top of it:
 
 *Your ballot.* Every race we can reliably cover, matched to your values with a plain-English explanation of why. Transparent sourcing so you can check our work. Printable guide you can take to the polls.
 
 *Your media diet.* A three-tier recommendation — sources that deepen what you know, sources that expand how you think, and sources that challenge you where it counts. Not just media that agrees with you. Media that makes you smarter.
 
 *Your conversations.* A Claude-powered chat interface that uses your values profile to help you have difficult civic conversations across difference — with your uncle about immigration, your neighbor about guns, anyone across any divide. Knowing where you actually stand makes it easier to understand where someone else does.
+
+*Beyond your ballot.* Federal candidates outside your own district worth supporting — matched to your values, focused on races where a presence in Congress would shift the balance of power toward independent-minded governance. Because Congress is a team sport.
 
 **Your profile is yours.**
 It lives in your account. It's used only to power your recommendations and conversations. No ads. No third parties. No political organizations. Ever.
@@ -1751,7 +1757,7 @@ So here they are — plain English, no hedging.
 **About Bedrock**
 
 *What is Bedrock?*
-A civic identity platform for independent-minded voters. It maps your values across eight dimensions, gives you a named civic identity and a constellation that's unique to you, then builds three things on top of it: personalized ballot recommendations, a curated media diet, and a Claude-powered conversation interface to help you talk across political difference.
+A civic identity platform for independent-minded voters. It maps your values across eight dimensions, gives you a named civic identity and a constellation that's unique to you, then builds four things on top of it: personalized ballot recommendations, a curated media diet, a Claude-powered conversation interface to help you talk across political difference, and a way to surface federal candidates outside your own district worth supporting — because Congress is a team sport and the balance of power matters.
 
 *Who is this for?*
 Independent-minded voters — registered independents and soft partisans who don't vote the straight ticket. The fastest-growing voter segment in the country, and the one with the worst civic infrastructure built for it. You don't have to be a registered independent. You just have to be willing to answer honestly.
@@ -1951,13 +1957,14 @@ Slide 1: Eyebrow "Not red. Not blue." / Headline "All of it." (tri-color: red/wh
 Slide 2: Eyebrow "There's got to be a better way." / Headline "Find what you *actually* believe." (Libre Baskerville, gold italic on "actually") / Subhead: values quiz focus
 Slide 3: Eyebrow "For the voters who haven't given up." / Headline "There's got to be a better way." (DM Sans 46px) / Subhead: "Built for the voters who don't vote the straight ticket — and the ones who suspect they shouldn't be."
 
-**3. Civic Mantle + Three Pillars**
-Civic identity is the overarching layer — not a pillar itself. Needs visual design treatment to make the hierarchy clear (above or surrounding the three pillars). Copy: "Your Civic Mantle — one of ten named types, with a constellation unique to you. Everything below is built on top of it. Not a label. A mantle. Something to claim."
+**3. Civic Mantle + Four Pillars**
+Civic identity is the overarching layer — not a pillar itself. Needs visual design treatment to make the hierarchy clear (above or surrounding the four pillars). Copy: "Your Civic Mantle — one of ten named types, with a constellation unique to you. Everything below is built on top of it. Not a label. A mantle. Something to claim."
 
-Three pillars in order, each with tri-color accent bar:
+Four pillars in order, each with tri-color accent bar:
 - Your ballot (red accent) — "Every race, matched to your values. From president to school board."
 - Your media diet (white accent) — "Independent journalism matched to how you actually think."
 - Your conversations (blue accent) — "Claude-powered prep for difficult conversations across difference."
+- Beyond your ballot (gold accent) — "Federal candidates outside your district worth supporting — because Congress is a team sport."
 
 **4. Tagline band**
 *"Not red, not blue — red, white, and blue."* (gold italic Libre Baskerville 22px)
@@ -1969,7 +1976,7 @@ Attribution: "From the *Country Over Self* podcast." (*Country Over Self* italic
 Mark + wordmark · Civic Mantle · How It Works · About · Take the Quiz (primary CTA button)
 
 **App nav (post-login):**
-Mark + wordmark · Quiz · Your Ballot · Your Media · Your Conversations · My Profile · [account avatar]
+Mark + wordmark · Quiz · Your Ballot · Your Media · Your Conversations · Beyond Your Ballot · My Profile · [account avatar]
 
 **Quiz nav item — three states:**
 - Not started → label "Take the Quiz" → begins quiz
