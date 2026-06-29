@@ -59,7 +59,7 @@ const faqs = [
     a: "No. Each conversation starts clean — no history, no memory of what you discussed before. This is intentional. You're not being tracked, and what you explored last time doesn't follow you into the next session. Saved history is something we may offer later as an opt-in feature. Right now, it doesn't exist.",
   },
   {
-    q: "What is 'Back-and-forth' practice?",
+    q: "How does 'Back-and-forth' practice in Your Conversations work?",
     a: "Back-and-forth is an experimental mode where Claude plays the other person in your practice conversation — a real human being who holds those views, not a caricature or a pushover. You get the actual back-and-forth experience: real responses, real pushback, real practice. It's marked Beta because it's newer and more complex than the Openers and Responses modes — it works best when you come in with a clear setup and realistic expectations.",
   },
   {
