@@ -77,7 +77,7 @@ function LinesSection({ dealbreakers, dealbreakerOther }: { dealbreakers: string
         style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', background: 'none', border: 'none', cursor: 'pointer', padding: 'var(--space-4) 0', borderBottom: '1px solid var(--color-border)' }}
       >
         <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-muted)', letterSpacing: 'var(--tracking-wider)', textTransform: 'uppercase' }}>
-          Your lines · {count}
+          Your dealbreakers · {count}
         </span>
         <span style={{ color: 'var(--color-text-muted)', fontSize: '14px', transition: 'transform 0.2s', display: 'inline-block', transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}>▾</span>
       </button>

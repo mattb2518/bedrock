@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useQuizStore } from '@/store/quizStore'
@@ -249,17 +249,27 @@ export default function QuizFlow() {
     if (typeof window !== 'undefined') window.scrollTo({ top: 0 })
   }, [phase, index])
 
-  // Push a history entry on each screen change so browser back navigates within
-  // the quiz rather than leaving the page.
+  // True while a popstate is being handled — tells the push effect to use
+  // replaceState instead of pushState so we don't add a spurious extra entry.
+  const handlingPopRef = useRef(false)
+
+  // Push (or replace) a history entry on each screen change so browser back
+  // navigates within the quiz rather than leaving the page.
   useEffect(() => {
     if (typeof window === 'undefined') return
-    window.history.pushState({ phase }, '', '/quiz')
+    if (handlingPopRef.current) {
+      handlingPopRef.current = false
+      window.history.replaceState({ phase }, '', '/quiz')
+    } else {
+      window.history.pushState({ phase }, '', '/quiz')
+    }
   }, [phase, index, demoStep])
 
   // Intercept browser back — apply quiz-internal back logic.
   useEffect(() => {
     if (typeof window === 'undefined') return
     function handlePop() {
+      handlingPopRef.current = true
       switch (phase) {
         case 'quiz':
           setPendingOption(null)
@@ -819,12 +829,15 @@ export default function QuizFlow() {
     return (
       <Shell>
         {/* Header: kicker + escape hatch */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-4)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-2)' }}>
           <Kicker>{DEMOGRAPHIC_INTRO.kicker}</Kicker>
           <button onClick={() => finishDemographics(true)} style={mutedLinkBtn}>
             Skip remaining →
           </button>
         </div>
+        <p style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-h3, var(--text-body-lg))', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: 'var(--space-4)' }}>
+          Basic political demographics
+        </p>
 
         {/* Progress bar */}
         <div style={{ height: 4, backgroundColor: 'var(--color-bg-surface)', borderRadius: 'var(--radius-full)', marginBottom: 'var(--space-6)' }}>
@@ -974,9 +987,9 @@ export default function QuizFlow() {
 
   return (
     <Shell>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-6)' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-1)' }}>
         <Kicker>
-          Layer {layer} · Question {index + 1} of {questions.length}
+          Layer {layer} · {LAYER_LABELS[layer]} · Question {index + 1} of {questions.length}
         </Kicker>
         <button
           onClick={() => {
@@ -989,8 +1002,9 @@ export default function QuizFlow() {
           ← Back
         </button>
       </div>
+      <LayerSubtitle>{LAYER_SUBTITLES[layer]}</LayerSubtitle>
 
-      <div style={{ height: 4, backgroundColor: 'var(--color-bg-surface)', borderRadius: 'var(--radius-full)', marginBottom: 'var(--space-8)' }}>
+      <div style={{ height: 4, backgroundColor: 'var(--color-bg-surface)', borderRadius: 'var(--radius-full)', marginBottom: 'var(--space-8)', marginTop: 'var(--space-4)' }}>
         <div style={{ height: '100%', width: `${(index / questions.length) * 100}%`, backgroundColor: 'var(--color-gold)', borderRadius: 'var(--radius-full)', transition: 'width 0.3s' }} />
       </div>
 
