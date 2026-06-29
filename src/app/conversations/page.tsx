@@ -376,6 +376,9 @@ export default function ConversationsPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [chatMessages, chatLoading])
 
+  // Keep focus on chat input after each send so spacebar doesn't land on Send button
+  const chatInputRef = useRef<HTMLTextAreaElement>(null)
+
   function toggleChip(rowKey: string, chip: string) {
     setChips(prev => {
       const current = prev[rowKey] ?? []
@@ -545,6 +548,8 @@ export default function ConversationsPage() {
       setError(e instanceof Error ? e.message : 'Something went wrong — try again')
     } finally {
       setChatLoading(false)
+      // Restore focus so the next keystroke (including space) goes to the textarea, not the Send button
+      setTimeout(() => chatInputRef.current?.focus(), 50)
     }
   }
 
@@ -1071,6 +1076,7 @@ export default function ConversationsPage() {
           {!chatEnded ? (
             <div style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-end' }}>
               <textarea
+                ref={chatInputRef}
                 value={chatInput}
                 onChange={e => setChatInput(e.target.value)}
                 onKeyDown={e => {
