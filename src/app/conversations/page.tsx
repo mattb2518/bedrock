@@ -888,20 +888,8 @@ export default function ConversationsPage() {
       {activeMode === 'chat' && !chatStarted && !chatLoading && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
 
-          {/* Guardrails callout */}
-          <div style={{
-            backgroundColor: 'var(--color-bg-surface)',
-            border: '1px solid var(--color-border)',
-            borderRadius: 'var(--radius-md)',
-            padding: 'var(--space-4) var(--space-5)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 'var(--space-4)',
-            flexWrap: 'wrap',
-          }}>
-            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', flex: 1, margin: 0 }}>
-              Claude plays the other person — charitably, not as a caricature. Real practice against something real.
-            </p>
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', margin: 0 }}>
+            Claude plays the other person — charitably, not as a caricature. Real practice against something real.{' '}
             <button
               onClick={() => setShowGuardrails(true)}
               style={{
@@ -912,13 +900,13 @@ export default function ConversationsPage() {
                 background: 'none',
                 border: 'none',
                 cursor: 'pointer',
-                whiteSpace: 'nowrap',
                 padding: 0,
+                display: 'inline',
               }}
             >
               How this works &rarr;
             </button>
-          </div>
+          </p>
 
           <InputSection
             submitLabel="Start chatting →"
