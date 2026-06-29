@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 // The Civic Mantle reveal — named type + constellation + secondary affinities +
 // the eight-dimension breakdown. Reused by the end of the quiz and /results.
@@ -10,8 +10,46 @@
 import { useEffect, useState } from 'react'
 import Constellation from '@/components/ui/Constellation'
 import { DIMENSIONS, profileToRadar } from '@/lib/quiz/dimensions'
-import { mantleFor } from '@/lib/quiz/mantles'
+import { mantleFor, type Mantle } from '@/lib/quiz/mantles'
 import type { DimensionalProfile, QuizResult } from '@/types/quiz'
+
+function FlipCard({ mantle, large = false, flipped, onFlip }: { mantle: Mantle; large?: boolean; flipped: boolean; onFlip: () => void }) {
+  const pad = large ? 'var(--space-8)' : 'var(--space-5)'
+  const nameSize = large ? 'var(--text-h2)' : 'var(--text-body-lg)'
+  const height = large ? 260 : 200
+  const face: React.CSSProperties = {
+    position: 'absolute',
+    inset: 0,
+    backfaceVisibility: 'hidden',
+    borderRadius: 'var(--radius-lg)',
+    border: '1px solid var(--color-border)',
+    padding: pad,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--space-2)',
+    boxSizing: 'border-box',
+  }
+  return (
+    <div onClick={onFlip} style={{ cursor: 'pointer', perspective: '1200px', height }} title={flipped ? 'Click to flip back' : 'Click to flip'}>
+      <div style={{ position: 'relative', width: '100%', height: '100%', transformStyle: 'preserve-3d', transition: 'transform 0.5s ease', transform: flipped ? 'rotateY(180deg)' : 'rotateY(0deg)' }}>
+        <div style={{ ...face, backgroundColor: 'var(--color-bg-surface)' }}>
+          <p style={{ fontFamily: 'var(--font-display)', fontSize: nameSize, color: 'var(--color-text-primary)', lineHeight: 'var(--leading-tight)', margin: 0 }}>{mantle.name}</p>
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', margin: 0 }}>{mantle.workingName}</p>
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: large ? 'var(--text-body-lg)' : 'var(--text-body)', color: 'var(--color-gold)', fontStyle: 'italic', lineHeight: 'var(--leading-relaxed)', margin: 0, flex: 1 }}>"{mantle.oneLiner}."</p>
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: '11px', color: 'var(--color-text-muted)', margin: 0, textAlign: 'right', opacity: 0.6 }}>flip to meet your forebear →</p>
+        </div>
+        <div style={{ ...face, backgroundColor: 'var(--color-bg-deep, #0f1f33)', transform: 'rotateY(180deg)' }}>
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-micro)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-muted)', letterSpacing: 'var(--tracking-wider)', textTransform: 'uppercase', margin: 0 }}>
+            An early {mantle.name.replace(/^The /, '')}
+          </p>
+          <p style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: nameSize, color: 'var(--color-text-primary)', margin: 0, lineHeight: 'var(--leading-tight)' }}>{mantle.figure.name}</p>
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: large ? 'var(--text-body)' : 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', margin: 0, flex: 1 }}>{mantle.figure.why}</p>
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: '11px', color: 'var(--color-text-muted)', margin: 0, textAlign: 'right', opacity: 0.6 }}>← flip back</p>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 // Centered-profile detection (SPEC §4 edge case 2): 6+ of 8 dims within ±15 of
 // the midpoint. Provisional; near-pure/scattered detection comes with the real
@@ -27,6 +65,7 @@ export default function MantleReveal({ result, headerCta }: { result: QuizResult
   const secondaries = result.secondaryTypes.slice(0, 2).map(mantleFor)
 
   const [shown, setShown] = useState(false)
+  const [activeFlip, setActiveFlip] = useState<string | null>(null)
   useEffect(() => {
     const t = requestAnimationFrame(() => setShown(true))
     return () => cancelAnimationFrame(t)
@@ -37,6 +76,8 @@ export default function MantleReveal({ result, headerCta }: { result: QuizResult
     transform: shown ? 'translateY(0)' : 'translateY(16px)',
     transition: `opacity 0.6s ease ${delay}s, transform 0.6s ease ${delay}s`,
   })
+
+  const toggleFlip = (id: string) => setActiveFlip((cur) => (cur === id ? null : id))
 
   return (
     <div style={{ maxWidth: 'var(--max-width-content)', margin: '0 auto', padding: 'var(--space-12) var(--space-6)' }}>
@@ -50,24 +91,21 @@ export default function MantleReveal({ result, headerCta }: { result: QuizResult
             An unusually centered profile.
           </h1>
           <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body-lg)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', maxWidth: 620, margin: '0 auto var(--space-8)', textAlign: 'center' }}>
-            Across most of the eight dimensions, you sit close to the middle — you can see the case for both poles and don’t reflexively favor either one. That’s rarer than it sounds. We’ll build your recommendations from the dimensions where you do lean.
+            Across most of the eight dimensions, you sit close to the middle — you can see the case for both poles and don't reflexively favor either one. That's rarer than it sounds. We'll build your recommendations from the dimensions where you do lean.
           </p>
         </div>
       ) : (
         <div style={rise(0.1)}>
-          <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-h1)', color: 'var(--color-text-primary)', textAlign: 'center', lineHeight: 'var(--leading-tight)', marginBottom: 'var(--space-4)' }}>
-            You are {mantle.name}.
+          <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-h1)', color: 'var(--color-text-primary)', textAlign: 'center', lineHeight: 'var(--leading-tight)', marginBottom: 'var(--space-6)' }}>
+            You are
           </h1>
-          <p style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-h3, var(--text-body-lg))', fontStyle: 'italic', color: 'var(--color-gold)', textAlign: 'center', marginBottom: 'var(--space-2)' }}>
-            “{mantle.oneLiner}.”
-          </p>
-          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-muted)', textAlign: 'center', marginBottom: 'var(--space-8)' }}>
-            {mantle.workingName}
-          </p>
+          <div style={{ maxWidth: 520, margin: '0 auto var(--space-8)' }}>
+            <FlipCard mantle={mantle} large flipped={activeFlip === mantle.type} onFlip={() => toggleFlip(mantle.type)} />
+          </div>
         </div>
       )}
 
-      {/* Optional header CTA (e.g. "Continue to Layer 2") so the next step is
+      {/* Optional header CTA (e.g. “Continue to Layer 2”) so the next step is
           reachable above the fold, not only after scrolling the whole reveal. */}
       {headerCta && (
         <div style={{ ...rise(0.15), textAlign: 'center', marginBottom: 'var(--space-8)' }}>{headerCta}</div>
@@ -86,10 +124,7 @@ export default function MantleReveal({ result, headerCta }: { result: QuizResult
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: secondaries.length > 1 ? '1fr 1fr' : '1fr', gap: 'var(--space-3)' }}>
             {secondaries.map((s) => (
-              <div key={s.type} style={{ backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-5)', textAlign: 'center' }}>
-                <p style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-body-lg)', color: 'var(--color-text-primary)', marginBottom: 'var(--space-2)' }}>{s.name}</p>
-                <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', fontStyle: 'italic', lineHeight: 'var(--leading-relaxed)' }}>“{s.oneLiner}.”</p>
-              </div>
+              <FlipCard key={s.type} mantle={s} flipped={activeFlip === s.type} onFlip={() => toggleFlip(s.type)} />
             ))}
           </div>
         </div>
