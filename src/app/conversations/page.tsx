@@ -30,9 +30,14 @@ interface ConversationOutput {
   responses: ConversationResponse[]
 }
 
+interface ChatMove {
+  label: string
+  tip: string
+}
+
 interface ChatHint {
   read: string
-  moves: string[]
+  moves: ChatMove[]
 }
 
 interface ChatMessage {
@@ -535,6 +540,9 @@ export default function ConversationsPage() {
   // Modal
   const [showGuardrails, setShowGuardrails] = useState(false)
 
+  // Expanded coaching tip — key is `${msgIndex}-${moveLabel}`
+  const [expandedTipKey, setExpandedTipKey] = useState<string | null>(null)
+
   // Auto-scroll chat to bottom
   const messagesEndRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
@@ -716,16 +724,17 @@ export default function ConversationsPage() {
 
     setChatMessages(updatedMessages)
     setChatInput('')
+    if (chatInputRef.current) chatInputRef.current.style.height = 'auto'
     setChatLoading(true)
     setError(null)
 
     // turnCount = number of assistant turns in history (before this response)
     const turnCount = updatedMessages.filter(m => m.role === 'assistant').length
 
-    // Full API message history: __START__ + all displayed messages
+    // Full API message history: __START__ + all displayed messages (strip hint — API only accepts role+content)
     const apiMessages = [
       { role: 'user' as const, content: '__START__' },
-      ...updatedMessages,
+      ...updatedMessages.map(m => ({ role: m.role, content: m.content })),
     ]
 
     try {
@@ -1110,7 +1119,7 @@ export default function ConversationsPage() {
           }}>
             <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', margin: 0 }}>
               <strong style={{ color: 'var(--color-text-secondary)' }}>Practicing:</strong>{' '}
-              {chatContext.length > 120 ? chatContext.slice(0, 120) + '…' : chatContext}
+              {chatContext}
             </p>
           </div>
 
@@ -1176,10 +1185,10 @@ export default function ConversationsPage() {
                       lineHeight: 'var(--leading-relaxed)',
                       margin: '0 0 var(--space-2) 0',
                     }}>
-                      <strong style={{ color: 'var(--color-gold)' }}>Reading this:</strong>{' '}
+                      <strong style={{ color: 'var(--color-gold)' }}>Decoding this:</strong>{' '}
                       {msg.hint.read}
                     </p>
-                    <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 'var(--space-2)', marginBottom: 'var(--space-1)' }}>
                       <span style={{
                         fontFamily: 'var(--font-body)',
                         fontSize: '11px',
@@ -1191,20 +1200,49 @@ export default function ConversationsPage() {
                       }}>
                         Try:
                       </span>
-                      {msg.hint.moves.map(move => (
-                        <span key={move} style={{
-                          fontFamily: 'var(--font-body)',
-                          fontSize: '11px',
-                          color: 'var(--color-text-secondary)',
-                          backgroundColor: 'var(--color-bg)',
-                          border: '1px solid rgba(196,150,53,0.3)',
-                          borderRadius: 'var(--radius-full)',
-                          padding: '2px 10px',
-                        }}>
-                          {move}
-                        </span>
-                      ))}
+                      {msg.hint.moves.map((move, mi) => {
+                        const tipKey = `${i}-${mi}`
+                        const isOpen = expandedTipKey === tipKey
+                        return (
+                          <button
+                            key={mi}
+                            onClick={() => setExpandedTipKey(isOpen ? null : tipKey)}
+                            style={{
+                              fontFamily: 'var(--font-body)',
+                              fontSize: '11px',
+                              color: isOpen ? '#fff' : 'var(--color-text-secondary)',
+                              backgroundColor: isOpen ? 'var(--color-gold)' : 'var(--color-bg)',
+                              border: `1px solid ${isOpen ? 'var(--color-gold)' : 'rgba(196,150,53,0.3)'}`,
+                              borderRadius: 'var(--radius-full)',
+                              padding: '2px 10px',
+                              cursor: 'pointer',
+                              transition: 'all 0.15s',
+                            }}
+                          >
+                            {typeof move === 'string' ? move : move.label}
+                          </button>
+                        )
+                      })}
                     </div>
+                    {/* Expanded coaching tip */}
+                    {msg.hint.moves.map((move, mi) => {
+                      const tipKey = `${i}-${mi}`
+                      const tip = typeof move === 'string' ? null : move.tip
+                      return expandedTipKey === tipKey && tip ? (
+                        <p key={mi} style={{
+                          fontFamily: 'var(--font-body)',
+                          fontSize: 'var(--text-small)',
+                          color: 'var(--color-text-secondary)',
+                          lineHeight: 'var(--leading-relaxed)',
+                          margin: 'var(--space-2) 0 0',
+                          paddingTop: 'var(--space-2)',
+                          borderTop: '1px solid rgba(196,150,53,0.2)',
+                          fontStyle: 'italic',
+                        }}>
+                          {tip}
+                        </p>
+                      ) : null
+                    })}
                   </div>
                 )}
               </div>
@@ -1253,7 +1291,12 @@ export default function ConversationsPage() {
               <textarea
                 ref={chatInputRef}
                 value={chatInput}
-                onChange={e => setChatInput(e.target.value)}
+                onChange={e => {
+                  setChatInput(e.target.value)
+                  // Auto-expand
+                  e.target.style.height = 'auto'
+                  e.target.style.height = `${e.target.scrollHeight}px`
+                }}
                 onKeyDown={e => {
                   if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault()
@@ -1274,8 +1317,10 @@ export default function ConversationsPage() {
                   padding: 'var(--space-3) var(--space-4)',
                   lineHeight: 'var(--leading-relaxed)',
                   resize: 'none',
+                  overflow: 'hidden',
                   boxSizing: 'border-box',
                   opacity: chatLoading ? 0.6 : 1,
+                  minHeight: '64px',
                 }}
               />
               <button
