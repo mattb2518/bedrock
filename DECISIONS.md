@@ -21,6 +21,10 @@ just-in-time, when we start building that pillar.
 | 2026-06-12 | **Profile/constellation is computed from Layer 1 only.** | Layers 2–4 capture positions, voting behavior, and dealbreakers for the engine and raise completion %, but do not re-plot the constellation. Matches all three research memos (Layer 1 *is* the civic identity). |
 | 2026-06-12 | **Dealbreakers (L4) feed Ballot, never Media.** | Filtering media by your hard lines is the echo chamber the product exists to fight (pillar-2 memo). |
 | 2026-06-12 | **First pillar to build = Conversations.** | Lowest data risk: needs only Layer 1 + a Claude system prompt; the Project only has to confirm model/pricing. Ballot and Media need heavier factual research + editorial curation. Reinforced by the feasibility doc §5 (cheapest, ~$0.011/turn on Sonnet 4.6 + prompt caching). |
+| 2026-06-29 | **Conversations pillar complete — declared ready for user testing.** | All three modes shipped: Openers, Responses, Back-and-forth. Back-and-forth evolved significantly beyond the "Rehearse one" spec stub into a full live practice chat: iMessage-style bubbles, per-turn coaching hints (Decoding this + Try: chips with Add-to-chat), pre-practice coach brief, sensitive-topic guardrail, session restart/home nav, print-to-PDF transcripts with Bedrock.guide branding. SPEC.md §18 needs a Project session update to reflect the shipped design. |
+| 2026-06-29 | **Conversations: v1 no save, clean slate.** | Confirmed in build. Each session starts fresh — no history stored. The bottom-of-pillar copy already promises this. True memory (Bedrock recalling a prior conversation) is a deliberate v2 feature. |
+| 2026-06-29 | **Conversations: model confirmed as claude-sonnet-4-6 with prompt caching.** | System prompt cached with `cache_control: { type: 'ephemeral' }`. Back-and-forth at ~$0.011/turn as projected. |
+| 2026-06-29 | **Conversations: neutrality guardrails confirmed in system prompt.** | No conspiracy theories, no demonstrably false claims, no personal attacks, character never references the practice session. Guardrails are prompt-level, not UI-level. |
 | 2026-06-12 | **Authoritative data-source reference: [`docs/data-sources-feasibility-june2026.md`](docs/data-sources-feasibility-june2026.md).** | From the Claude Project, web-verified June 2026. Governs all external-data, scoring, and schema work. **Supersedes SPEC.md's Tech Stack** where they conflict. Read it before any data-integration session (whole doc, or targeted: §3 Ballot sources, §6 cross-cutting, §9 schema, §10 build sequence). |
 | 2026-06-12 | **Two APIs in SPEC are dead — do not use.** | Google Civic *Representatives* endpoint sunset Apr 2025 → use `divisionByAddress` + congress.gov/Open States/Ballotpedia. ProPublica Congress API archived Feb 2025 → use congress.gov API. (Feasibility doc §2.) SPEC.md Tech Stack still needs correcting — see §8 of the doc. |
 
@@ -63,9 +67,7 @@ listed so nothing gets lost.
 - Do we score **mainstream/institutional outlets** too, or independents only?
 
 ### Pillar 3 — Conversations
-- **Save chat history** or not? (Memo recommends opt-in, off by default.)
-- Sign-off on the **neutrality guardrails** (P1–P9 in the memo) before launch.
-- Confirm the **model + pricing** (Project research) — memo flagged these VERIFY.
+✅ **Complete — all open questions resolved in build (2026-06-29). See Decided rows above.**
 
 ---
 
