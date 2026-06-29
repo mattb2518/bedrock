@@ -34,6 +34,7 @@ interface ConversationOutput {
 interface ChatMove {
   label: string
   tip: string
+  phrase?: string
 }
 
 interface ChatHint {
@@ -1320,7 +1321,7 @@ export default function ConversationsPage() {
                           </p>
                           <button
                             onClick={() => {
-                              void navigator.clipboard.writeText(tip)
+                              void navigator.clipboard.writeText(move.phrase ?? tip)
                               setCopiedKey(tipKey)
                               setTimeout(() => setCopiedKey(k => k === tipKey ? null : k), 2000)
                             }}
