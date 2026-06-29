@@ -384,8 +384,11 @@ function InputSection({
   // Sync textarea value when parent pushes a new value (mode reset, example load).
   // useLayoutEffect runs before paint to avoid a one-frame flash.
   useLayoutEffect(() => {
-    if (textareaRef.current && textareaRef.current.value !== freeform) {
-      textareaRef.current.value = freeform
+    const el = textareaRef.current
+    if (el && el.value !== freeform) {
+      el.value = freeform
+      el.style.height = 'auto'
+      el.style.height = `${el.scrollHeight}px`
     }
   }, [freeform])
 
@@ -395,7 +398,11 @@ function InputSection({
         <textarea
           ref={textareaRef}
           defaultValue={freeform}
-          onChange={e => onFreeformChange(e.target.value)}
+          onChange={e => {
+            onFreeformChange(e.target.value)
+            e.target.style.height = 'auto'
+            e.target.style.height = `${e.target.scrollHeight}px`
+          }}
           placeholder={placeholder}
           rows={4}
           style={{
@@ -408,7 +415,8 @@ function InputSection({
             borderRadius: 'var(--radius-md)',
             padding: 'var(--space-4)',
             lineHeight: 'var(--leading-relaxed)',
-            resize: 'vertical',
+            resize: 'none',
+            overflow: 'hidden',
             boxSizing: 'border-box',
           }}
         />
