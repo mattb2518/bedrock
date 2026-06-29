@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useLayoutEffect } from 'react'
 import { useQuizStore } from '@/store/quizStore'
 import type { QuizSession } from '@/types/quiz'
 
@@ -368,11 +368,22 @@ function InputSection({
   chipRows, chips, onToggleChip,
   error, submitLabel, onSubmit, submitDisabled,
 }: InputSectionProps) {
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
+
+  // Sync textarea value when parent pushes a new value (mode reset, example load).
+  // useLayoutEffect runs before paint to avoid a one-frame flash.
+  useLayoutEffect(() => {
+    if (textareaRef.current && textareaRef.current.value !== freeform) {
+      textareaRef.current.value = freeform
+    }
+  }, [freeform])
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
       <div>
         <textarea
-          value={freeform}
+          ref={textareaRef}
+          defaultValue={freeform}
           onChange={e => onFreeformChange(e.target.value)}
           placeholder={placeholder}
           rows={4}
