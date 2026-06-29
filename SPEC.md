@@ -54,11 +54,11 @@ Civic identity → candidates outside your own district worth supporting — mat
 | Layer | Name | Questions | Type | Output |
 |---|---|---|---|---|
 | 1 | Who you are | 20 | Values tensions (8 anchor + 8 crossover + 4 synthesis) | Constellation + primary type |
-| 2 | How you apply it | 8 | Issue positions | Sharper recommendations |
+| 2 | How you apply it | 9 | Issue positions | Sharper recommendations |
 | 3 | What drives your vote | 8 | Voting behavior + priority intensity | Personalized matching |
-| 4 | Where you draw the line | 12-15 | Binary dealbreaker filters | Exclusion rules for engine |
+| 4 | Where you draw the line | 32 | Binary dealbreaker filters | Exclusion rules for engine |
 
-**Total:** ~48-51 items for full completion. Each layer has a distinct job and feel. Never a slog.
+**Total:** roughly 38 questions across Layers 1–3, plus the Layer 4 dealbreaker checklist (32 items) and an optional context module. Each layer has a distinct job and feel. Never a slog.
 
 **Progressive depth model:** Users get real value from Layer 1 alone. Each subsequent layer deepens the profile and sharpens recommendations. Profile completeness indicator: ~40% after L1, ~65% after L2, ~85% after L3, ~100% after L4.
 
@@ -380,7 +380,7 @@ Most problems affecting Americans day-to-day — housing, school quality, public
 *"Subsidiarity — decisions made at the lowest level capable of making them well. Older than America, but America made it famous."*
 
 **B.** The federal government — national problems need national solutions, and local governments too often protect local interests at the expense of people who need help most.
-*"The equity argument. Local control can mean local exclusion — child labor laws and food safety required federal action because states weren't going there on their own."*
+*"The equity argument — some protections, like child labor laws and food safety, needed a national floor because they weren't going to emerge state by state. The tradeoff is real: a national floor can flatten genuine local difference."*
 
 **C.** Whoever has the strongest track record on that specific problem — some things states have solved brilliantly, others have required federal action.
 *"Federalism by track record — let the level that's working own it."*
@@ -399,10 +399,10 @@ Most problems affecting Americans day-to-day — housing, school quality, public
 When American and global interests conflict, the United States should generally:
 
 **A.** Prioritize American interests — a government's first obligation is to its own citizens, and influence abroad is only sustainable when we're strong at home.
-*"There's a reason we have a State Department and not a World Department."*
+*"There's a reason we have a State Department and not a World Department — every government answers first to the people who can vote it out."*
 
 **B.** Weigh global interests seriously — in an interconnected world, what's bad for the world tends to become bad for America, and global leadership builds influence money can't buy.
-*"The post-WWII alliance system has shaped the global order for 75 years — the longest stretch without great-power war in modern history."*
+*"The post-WWII alliance system has shaped the global order for 75 years — a period that has coincided with the longest absence of great-power war in modern history."*
 
 **C.** Lead by example rather than intervention — America's most durable influence has always come from being worth emulating.
 *"John Winthrop called it a city on a hill in 1630. Still the most distinctly American theory of foreign policy."*
@@ -466,7 +466,7 @@ In politics and civic life, lasting change usually comes from:
 *"The hold-the-line theory of change. Movements that settle for less rarely get more."*
 
 **C.** Building the coalition first — the limiting factor is rarely the idea, it's the political will, and you build will by bringing more people along before you ask for the vote.
-*"The community organizer theory of change. Obama called it 'the long game.' So did Madison, in different words."*
+*"The coalition-building theory of change — the limiting factor is rarely the idea, it's the will, and will gets built one person at a time. Madison called it the slow work of assembling majorities."*
 
 **It depends** → OT: *"What shapes your answer — whether the moment is politically ripe, how much harm is accumulating, whether a partial win forecloses the fuller one?"*
 
@@ -508,7 +508,7 @@ When a major American expert institution — a federal regulatory agency, a scie
 *"Major institutional failures in American history — from the Tuskegee study to early COVID guidance reversals to repeated FBI surveillance overreach — were preceded by too much deference."*
 
 **C.** Calibrate based on the institution's track record on this specific type of question — the CDC gets more benefit of the doubt on epidemiology than on nutrition.
-*"Trust by track record — calibrate based on how the institution has done on this kind of question before. The CDC gets more benefit of the doubt on epidemiology than on nutrition."*
+*"Trust by track record — the same institution can be rigorous in one domain and out over its skis in another. Calibrate to the domain, not the logo."*
 
 **It depends** → OT: *"What shapes how much trust you extend — the type of institution, whether you can see their reasoning, whether they have a stake in the outcome?"*
 
@@ -549,8 +549,8 @@ The federal government is considering a large public investment — infrastructu
 **B.** Supportive — some things markets won't build because the return is too diffuse or too long-term, and a society that can't make collective investments in shared infrastructure is slowly eating itself.
 *"Broadband in rural America wasn't going to happen through market incentives alone. Sometimes the only entity with the right time horizon is the public one."*
 
-**C.** Depends on the investment — some infrastructure requires collective action, others are better left to markets, and 'public investment' covers a lot of very different bets.
-*"The Hoover Dam and Solyndra are both 'government investments.' The details matter enormously."*
+**C.** Fund it like a private investor would — only with clear milestones, hard sunset clauses, and clawbacks if it fails. Public money should face at least the discipline private capital demands before a dollar goes out.
+*"The Hoover Dam and Solyndra were both 'government investments.' The difference wasn't the label — it was whether anyone built in a way to fail fast and cut losses."*
 
 **It depends** → MC (select all that apply): *"What shapes your view?"*
 - Whether the private sector has already tried and failed
@@ -669,7 +669,7 @@ Major economic transitions — manufacturing decline, the shift to clean energy,
 A major industry — pharmaceuticals, social media, financial services — has produced serious harm at scale. Investigations confirm it was foreseeable and the industry knew. What should happen?
 
 **A.** Enforce existing laws and let markets correct — companies that harm people should face legal consequences, but new regulation tends to protect the bad actor from the competitor who might replace them.
-*"Regulation written for yesterday's bad actor tends to entrench that actor. Courts and competition have teeth too, without the capture problem."*
+*"Regulation written for yesterday's bad actor tends to entrench it — airline routes and fares were frozen by regulation for forty years until deregulation cut prices roughly in half. Courts and competition have teeth too, without the capture problem."*
 
 **B.** Write new rules with real teeth — courts are too slow, competition takes too long, and the people harmed in the meantime are real.
 *"After 2008, 'let the market correct' meant millions lost their homes while the institutions that caused it got bailouts."*
@@ -724,7 +724,7 @@ A large wave of people is arriving at the southern border — some fleeing viole
 
 **It depends** → OT: *"What factors matter most — the distinction between asylum seekers and economic migrants, security screening, fairness to people immigrating legally?"*
 
-**[EE]:** *"The United States has no official national language. Roughly 350 languages are spoken in American homes today. New York City alone has residents who speak over 200 languages — more linguistic diversity in one city than most countries have in their entire territory."*
+**[EE]:** *"America has swung between openness and restriction for two centuries. The 1924 Johnson-Reed Act slammed the door nearly shut, with national-origin quotas that lasted four decades. The 1965 Hart-Celler Act reopened it and remade the country. Every generation has reopened the same question — and answered it differently."*
 
 ---
 
@@ -762,7 +762,7 @@ During a severe pandemic, the federal government mandates vaccines, masks, and b
 
 **It depends** → OT: *"What would have made the response feel more legitimate — different policies, more honest communication, more local control, clearer expiration dates?"*
 
-**[EE]:** *"During the 1918 influenza pandemic Philadelphia held a Liberty Loan parade despite warnings from its public health director. Cases exploded within days. San Francisco, which closed schools and banned public gatherings, fared significantly better. The Philadelphia health director who was overruled was named Wilmer Krusen. Almost nobody knows his name, which is its own kind of lesson about how we remember these things."*
+**[EE]:** *"The 1918 influenza pandemic killed an estimated 675,000 Americans — more than every U.S. war of the twentieth century combined. There was no national policy; every city decided for itself, and the country argued bitterly over masks, closures, and quarantines, just as it would a century later. Within a generation it had largely faded from public memory."*
 
 
 ---
@@ -791,6 +791,9 @@ The United States spends more on healthcare per person than any other wealthy co
 **D.** Move toward single-payer or Medicare-for-All — every other wealthy democracy covers everyone for less per capita, and the patchwork of private insurance is what makes American healthcare uniquely expensive.
 *"The simplifying answer. Administrative overhead consumes about 30 cents of every American healthcare dollar — a cost most other systems don't carry."*
 
+**E.** Put patients in control of the dollars — expand health savings accounts and direct-pay primary care, allow insurance to be bought across state lines, and let price-sensitive patients, not third-party payers, discipline costs. The reason healthcare has no real prices is that almost no one spends their own money on it.
+*"Cosmetic surgery and LASIK aren't covered by insurance — and their prices have fallen for decades while everything insurance touches has risen. Make people the buyers and prices start behaving."*
+
 **It depends** → OT: *"What do you think is the most broken part — costs, access, quality, insurance complexity?"*
 
 **[EE]:** *"American healthcare spends roughly $1 trillion a year on administrative costs alone — more than the entire GDP of Sweden or Switzerland. A 2021 federal rule required hospitals to publish their prices. Most still haven't."*
@@ -811,7 +814,7 @@ Climate and energy policy is one of the major questions of the era. Of the follo
 **C.** Win the technology race — the country that leads on solar, battery storage, and next-generation nuclear wins both the climate and the economic competition.
 *"Solar cost $75 per watt in 1977. It costs less than $0.20 today. That's the learning curve. The question is how fast we want to accelerate it."*
 
-**D.** Slow down — the science is more contested than presented, the costs of aggressive transition fall heaviest on working families and energy-intensive industries, and prudence argues for waiting on clearer evidence before locking in expensive policy.
+**D.** Go slower and prioritize affordability and reliability — let the transition follow cost and proven technology rather than mandated deadlines, keep energy cheap and the grid stable, and don't lock in expensive bets before they pencil out. The costs of moving too fast fall hardest on working families and energy-intensive regions.
 *"The cost-benefit caution. Energy transitions are real, but so is the price of getting them wrong — and the people paying that price aren't usually the people making the decisions."*
 
 **It depends** → MC (select all that apply): *"What shapes your view?"*
@@ -835,7 +838,7 @@ The Second Amendment protects an individual right to own firearms. The debate is
 *"Every constitutional right has limits where it imposes serious costs on others. The question is where those limits are, not whether they exist."*
 
 **C.** Address the root causes — gun violence is concentrated in communities with high poverty, low opportunity, and inadequate mental health resources.
-*"The countries with the lowest gun violence rates aren't just countries with stricter laws — they're countries with stronger safety nets and less concentrated poverty."*
+*"Gun violence tracks closely with concentrated poverty, untreated mental illness, and gang activity — the places with the least of it differ on more than their gun laws."*
 
 **D.** Pass major new restrictions — universal background checks, a federal permit-to-purchase requirement, restrictions on military-style weapons, and stricter limits on who can carry where.
 *"The structural-change answer. Most other wealthy democracies treat firearms more like vehicles — licensed, regulated, and limited by type — and have dramatically lower gun violence rates."*
@@ -845,7 +848,7 @@ The Second Amendment protects an individual right to own firearms. The debate is
 - Whether the focus should be on handguns or military-style rifles
 - Whether mental health is more central than access
 
-**[EE]:** *"Dodge City — the most iconic frontier town in American history — had a strict ordinance requiring all visitors to check their firearms at the sheriff's office upon arrival. The sign at the city limits read 'The Carrying of Firearms Strictly Prohibited.' Wyatt Earp enforced it. The Old West was more complicated than the legend."*
+**[EE]:** *"The Second Amendment is twenty-seven words long and has produced some of the most contested litigation in American history — yet for most of that history it was barely litigated at all. The modern body of individual-rights jurisprudence is only about fifty years old. Americans have been arguing about those twenty-seven words for far longer than the courts have."*
 
 ---
 
@@ -882,7 +885,7 @@ Setting aside border enforcement, the legal immigration system determines who ge
 *"About two-thirds of American green cards go to family members of existing residents — a policy designed in 1965 that changed the composition of immigration considerably."*
 
 **B.** Clear the backlog and fix the wait times — before redesigning the system, make the existing one function. People who followed the rules deserve an answer in their lifetime.
-*"The average wait for a green card from certain countries exceeds 50 years. That's not a backlog — that's a closed door with a waiting room."*
+*"A skilled worker from India can wait decades for a green card that takes months for someone from a smaller country. The line isn't slow — for some nationalities it barely moves at all."*
 
 **C.** Significantly raise the overall numbers — the United States has an aging population, a below-replacement birth rate, and industries that can't find enough workers.
 *"Japan chose restriction and is now managing a shrinking, aging population with severe labor shortages. The United States has a different option — but the window may be narrower than most people realize."*
@@ -952,8 +955,8 @@ Since the Supreme Court overturned Roe v. Wade in 2022, abortion policy has been
 **B.** Let the democratic process work at the state level — the Court returned this question to elected legislatures, and different states reaching different conclusions reflects genuine moral disagreement no national consensus can resolve right now.
 *"When the Court settled this nationally for fifty years it didn't resolve the disagreement — it suppressed it."*
 
-**C.** Pass a national legislative framework — rights that vary by zip code aren't really rights, and a functioning democracy should reach a durable compromise reflecting where most Americans actually are: access in early pregnancy, restrictions later.
-*"Polling consistently shows most Americans support access in early pregnancy and restrictions later — a position held by neither party's base but by a significant majority of the country."*
+**C.** Pass a national legislative framework — rights that vary by zip code aren't really rights, and a functioning democracy should try to reach a durable compromise rather than leaving it to the courts or the swing of state legislatures: access in early pregnancy, restrictions later.
+*"Polling tends to find more support for access early and limits later than either party's base holds — though what counts as a fair compromise here varies enormously, and for some it isn't a question that admits one."*
 
 **D.** Codify federal protection with no gestational limits — abortion access as a constitutional right of bodily autonomy, no state restrictions, public funding for those who can't afford it.
 *"The bodily-autonomy answer. The position that government's proper role in pregnancy decisions is, ultimately, none."*
@@ -1006,7 +1009,7 @@ A candidate you mostly agree with has a serious and credible character issue —
 *"The most reliable predictor of how someone will exercise power is how they've exercised it before — in relationships, in business, in private moments when they thought no one was watching."*
 
 **B.** Policy mostly wins — I'm electing someone to do a job, not be a role model. If the record is strong and the alternative is worse, I can hold my nose.
-*"FDR had a famously complicated personal life. LBJ was legendarily cruel to his staff. Both transformed the country."*
+*"FDR had a famously complicated personal life. LBJ was legendarily cruel to his staff. Nixon opened China while keeping an enemies list. Personal flaws and consequential records have coexisted in plenty of presidents."*
 
 **C.** Depends on whether the character issue is relevant to the job — financial fraud tells you something about how someone will handle public money. A messy divorce probably doesn't.
 *"Not all character flaws are created equal."*
@@ -1136,7 +1139,7 @@ When deciding how to vote, are you primarily thinking about the next two to four
 
 If you could move the needle on exactly one issue in American public life — one thing that, if fixed, would matter most to you — what would it be?
 
-**A.** The machinery of democracy itself — gerrymandering, money in politics, voting access, judicial independence. Fix the system that produces all the other decisions.
+**A.** The machinery of democracy itself — gerrymandering, money in politics, voting access, judicial independence. How decisions get made, and whether the process is one people can trust.
 
 **B.** Economic security and opportunity — healthcare costs, housing affordability, wages, childcare. The material conditions of most Americans' lives are harder than they should be.
 
@@ -1147,7 +1150,7 @@ If you could move the needle on exactly one issue in American public life — on
 
 ## 10. Layer 4 — Dealbreaker Screen — Complete
 
-*12-24 binary filters presented as a distinct module after Layer 3*
+*32 binary filters presented as a distinct module after Layer 3*
 *Not a quiz — a declaration. Different register, different UI, different emotional weight.*
 *Completely optional but strongly encouraged.*
 *Balanced list: paired items on contested issues so neither side feels targeted.*
@@ -1168,44 +1171,47 @@ If you could move the needle on exactly one issue in American public life — on
 **CIVIL LIBERTIES**
 6. Supports deploying federal law enforcement against peaceful protesters
 7. Supports warrantless surveillance of American citizens
-8. Supports restricting access to legal voting without evidence of fraud
+8. Supports making it materially harder for eligible citizens to cast a ballot
+9. Opposes any measure to verify that voters are eligible to vote
 
 **NATIONAL SECURITY**
-9. Supports withdrawing from NATO or other core defense alliances unilaterally
+10. Supports withdrawing from NATO or other core defense alliances unilaterally
+11. Supports cutting U.S. defense capability below what's needed to deter major adversaries
 
 **POLICY ABSOLUTES — paired by issue**
 
 *Abortion*
-10. Supports a complete abortion ban with no exceptions
-11. Supports unrestricted abortion access at any point in pregnancy with no limitations
+12. Supports a complete abortion ban with no exceptions
+13. Supports unrestricted abortion access at any point in pregnancy with no limitations
 
 *Firearms*
-12. Supports confiscating legally owned firearms from legal owners
-13. Opposes all restrictions on firearms including military-style weapons
+14. Supports confiscating legally owned firearms from legal owners
+15. Opposes all restrictions on firearms including military-style weapons
 
 *Healthcare*
-14. Supports an immediate single-payer transition that eliminates employer-sponsored insurance
-15. Supports eliminating Medicare, Medicaid, or other public health coverage entirely
+16. Supports an immediate single-payer transition that eliminates employer-sponsored insurance
+17. Supports eliminating Medicare, Medicaid, or other public health coverage entirely
 
 *Policing*
-16. Supports significantly reducing police department funding without an alternative public safety plan
-17. Supports eliminating civilian oversight of law enforcement
+18. Supports significantly reducing police department funding without an alternative public safety plan
+19. Supports eliminating civilian oversight of law enforcement
 
 *Other*
-18. Supports race or gender-based preferences in hiring or admissions without accountability measures
-19. Supports eliminating LGBTQ+ anti-discrimination protections
-20. Denies that human activity contributes to climate change
-21. Rejects taking any meaningful policy action on climate
-22. Supports directing public education funds primarily to religious institutions
-23. Supports federal speech restrictions on "hate speech" or "misinformation" beyond current First Amendment limits
-24. Supports federal regulation of political campaign speech or content beyond current First Amendment limits
-25. Supports legalizing all federally controlled substances including hard drugs
+20. Supports race- or gender-based preferences in hiring, contracting, or admissions
+21. Supports eliminating LGBTQ+ anti-discrimination protections
+22. Denies that human activity contributes to climate change
+23. Rejects taking any meaningful policy action on climate
+24. Supports directing public education funds primarily to religious institutions
+25. Supports federal speech restrictions on "hate speech" or "misinformation" beyond current First Amendment limits
+26. Supports federal regulation of political campaign speech or content beyond current First Amendment limits
+27. Supports banning books or restricting what can be taught in public schools based on political or ideological viewpoint
+28. Supports legalizing all federally controlled substances including hard drugs
 
 **CHARACTER**
-26. Credibly accused of sexual misconduct
-27. Has made public statements that explicitly denigrate people based on race, ethnicity, religion, gender identity, or sexual orientation
-28. Has supported policies that materially disadvantage people based on race, ethnicity, religion, gender identity, or sexual orientation
-29. Has been convicted of a felony involving fraud, violence, or abuse of office
+29. Credibly accused of sexual misconduct
+30. Has made public statements that explicitly denigrate people based on race, ethnicity, religion, gender identity, or sexual orientation
+31. Has supported policies that materially disadvantage people based on race, ethnicity, religion, gender identity, or sexual orientation
+32. Has been convicted of a felony involving fraud, violence, or abuse of office
 
 **Open text:** *"Anything else that would disqualify a candidate for you, regardless of their other positions?"*
 
@@ -1217,15 +1223,15 @@ If you could move the needle on exactly one issue in American public life — on
 - Results from this layer applied as hard exclusion filters in recommendation engine — a candidate who crosses a user's line is excluded regardless of dimensional alignment score
 
 ### Balance Notes
-- 5 process/institutional items — genuinely cross-partisan
-- 3 civil liberties items — genuinely cross-partisan
-- 1 national security item — cross-partisan
-- 16 policy absolute items:
-  - 8 paired items (10/11, 12/13, 14/15, 16/17) — 4 filter left-leaning candidates, 4 filter right-leaning
-  - 8 Other items (18–25) — 4 filter left-leaning (18 race/gender preferences, 23 speech restrictions, 24 campaign-speech regulation, 25 drug legalization), 4 filter right-leaning (19 LGBTQ protections, 20 climate-cause denial, 21 climate-policy rejection, 22 religious-school funding)
-  - Net policy-absolute filter split: 8 left-leaning, 8 right-leaning — balanced
-- 4 character items — genuinely cross-partisan
-- Total: 29 items + open text
+- 5 process/institutional items — neutrally framed, but worth naming honestly: in today's environment several of these (election-legitimacy denial, a pattern of lying, certain conduct items) fire more often on candidates associated with one side. We keep them because the underlying principle is non-negotiable regardless of who currently tests it — not because they are symmetric in current application.
+- 4 civil liberties items — paired both directions: item 8 fires on candidates who burden eligible voters, item 9 on candidates who oppose any eligibility verification; items 6–7 are cross-partisan
+- 2 national security items — paired: item 10 fires on unilateral alliance withdrawal, item 11 on gutting deterrence
+- 16 policy-absolute items:
+  - 8 paired items (12/13, 14/15, 16/17, 18/19) — 4 filter left-leaning candidates, 4 filter right-leaning
+  - 9 "Other" items (20–28) — left-firing: 20 race/gender preferences, 25 speech restrictions, 26 campaign-speech regulation, 28 drug legalization; right-firing: 21 LGBTQ protections, 22 climate-cause denial, 23 climate-policy rejection, 24 religious-school funding, 27 viewpoint-based book/curriculum restrictions
+- 4 character items — neutrally framed; the protected-class items (30, 31) lean toward firing on one side in current application, same caveat as the process items
+- Net firing split across all policy and conduct items: roughly even, with the residual asymmetry concentrated in the principled process and character items, which we keep on principle rather than for balance
+- Total: 32 items + open text
 
 ---
 
@@ -1596,12 +1602,27 @@ We ran five stress tests before finalizing the model:
 
 *The output test* — would two candidates with genuinely different governing philosophies score differently across these dimensions? We tested against real political figures. They do.
 
+**How we bias-checked every question.**
+The five tests above are about the model. But a neutral model can still be undermined by a single leading question, a loaded answer option, or a "fun fact" that quietly takes a side. So before launch, every question, every answer option, every micro-reaction, and every historical easter egg went through a separate, item-by-item review.
+
+The method is adversarial, and we run it twice. For each item we ask: what would a sharp, good-faith critic *from the left* say — does any option read as the obviously wrong answer for a progressive, does the framing assume a center-right baseline, does a reaction reward one direction over the other? Then we ask the identical question *from the right*. An item only passes when it survives both.
+
+Three things we specifically check:
+
+*Every option has a home.* On every question, all of the options — not just the middle one — have to be a position a thoughtful person actually holds, stated in its own strongest terms. If one side's real view is missing, or shows up only as a straw man, that's a defect we fix — even when fixing it means adding an option or rewriting one we liked.
+
+*The easter eggs don't argue.* The historical asides are there to be interesting, not to make a point. A true fact selected because it flatters one side is still a thumb on the scale, so the eggs are held to history and Americana that illuminate a tension rather than resolve it.
+
+*Structure does some of the work.* Answer order is randomized for every user, so no position gets a permanent advantage from sitting first. Internal scoring keys to the position of an option's *content*, never its letter. And the Layer 4 dealbreakers are deliberately paired left and right so the balance is visible at a glance — including, where the honest answer required it, items that filter candidates on our own founder's positions.
+
+We're not going to claim the result is perfect. Bias-checking is a practice, not a one-time certificate — language drifts, the news cycle re-codes old words, and a sharp critic will always find something we missed. When that happens, the feedback button on every question comes straight to us, and the commitment below holds: if a question is biased, we fix it and say so.
+
 **How the quiz is structured.**
 Four layers, each going deeper than the last. Full description in How It Works →
 
 *Layer 1 — Values foundation:* Twenty questions across three tiers — eight anchor questions establishing your baseline on each dimension, eight crossover questions loading on two dimensions simultaneously, and four synthesis questions loading on three or more at once. Closes with a dimension importance rating, then your first constellation reveal.
 
-*Layer 2 — Reality check:* Eight questions — real policy debates and actual events chosen specifically because they produce cross-partisan discomfort.
+*Layer 2 — Reality check:* Nine questions — real policy debates and actual events chosen specifically because they produce cross-partisan discomfort.
 
 *Layer 3 — Voting behavior:* Eight questions about what actually drives your vote — priority intensity, past patterns, decisive factors.
 
@@ -1772,6 +1793,9 @@ Hard partisans. The quiz will technically work if you take it, and you'll get a 
 *Is Bedrock partisan?*
 No. We have no party affiliation, no political donors, and no interest in where you land — only in helping you get there honestly. The quiz is designed so every position at every pole has a defensible, honorable answer. There is no right answer. There's only yours.
 
+*How do you make sure the questions aren't biased?*
+Two ways. First, structurally: answer order is randomized for every user, scoring keys to an option's content rather than its position, and the Layer 4 dealbreakers are paired left and right. Second, by review: before launch, every question, answer option, micro-reaction, and historical aside was checked item by item from two directions at once — what a sharp critic on the left would object to, and what a sharp critic on the right would object to. An item only passed if it survived both, with a real home for every honest position and no "fun fact" that quietly takes a side. We don't claim it's perfect — bias-checking is ongoing, there's a feedback button on every question, and when we get one wrong we fix it and say so. The full method is in our Methodology →
+
 *Who built this?*
 Matt Blumberg — technology entrepreneur, business author, and host of the *Country Over Self* podcast. Vibe coded with Claude. No political backing. No institutional agenda. Read the full story →
 
@@ -1925,8 +1949,9 @@ Appears only if user selects "drifted away," "registered but vote differently," 
 
 "Which tradition feels most like your political background — even if you've moved away from it?"
 
-- Progressive / liberal Democrat
-- Moderate / centrist Democrat
+- Progressive / democratic socialist
+- Liberal Democrat
+- Moderate / New Democrat
 - Blue Dog / conservative Democrat
 - Moderate / Rockefeller Republican
 - Chamber of Commerce / business Republican
