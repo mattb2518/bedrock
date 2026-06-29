@@ -1076,6 +1076,22 @@ export default function ConversationsPage() {
             >
               Change the input
             </button>
+            <button
+              onClick={() => window.print()}
+              style={{
+                fontFamily: 'var(--font-body)',
+                fontWeight: 'var(--weight-semibold)',
+                fontSize: 'var(--text-body)',
+                color: 'var(--color-text-secondary)',
+                backgroundColor: 'transparent',
+                border: '1px solid var(--color-border)',
+                borderRadius: 'var(--btn-radius)',
+                padding: 'var(--btn-padding-y) var(--btn-padding-x)',
+                cursor: 'pointer',
+              }}
+            >
+              Print / Save as PDF
+            </button>
           </div>
         </div>
       )}
@@ -1644,6 +1660,114 @@ export default function ConversationsPage() {
     {/* Print layout — portal into body, hidden on screen, shown @media print */}
     {portalMounted && createPortal(
       <div className="bedrock-print-layout" style={{ fontFamily: 'system-ui, sans-serif', color: '#1a1a18', background: 'white' }}>
+        {output && activeMode && activeMode !== 'chat' && (() => {
+          const modeTitle = activeMode === 'openers' ? 'Your Openers' : 'Your Responses'
+          const situationLabel = activeMode === 'openers' ? 'The situation' : 'What was said'
+          const descriptor = activeMode === 'openers'
+            ? 'This is a simulated, AI-generated analysis from bedrock.guide to help you start a difficult conversation. The situation has been decoded and several ways in are surfaced below. These are starting points, not scripts — the words are yours to change.'
+            : 'This is a simulated, AI-generated analysis from bedrock.guide to help you respond to something that was said. The subtext has been decoded and several response options are surfaced below. These are starting points, not scripts — the words are yours to change.'
+          const chipLines = Object.entries(chips).filter(([, v]) => v.length > 0).map(([k, v]) => `${k}: ${v.join(', ')}`)
+          return (
+            <>
+              {/* Header */}
+              <div style={{ borderBottom: '1.5px solid #1a1a18', paddingBottom: '18px', marginBottom: '22px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <svg width="26" height="26" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+                    <clipPath id="op-peak"><polygon points="4,52 24,14 38,30 48,20 56,52"/></clipPath>
+                    <g clipPath="url(#op-peak)">
+                      <rect x="0" y="14" width="60" height="14" fill="#6B9FEA"/>
+                      <rect x="0" y="28" width="60" height="13" fill="#D44035"/>
+                      <rect x="0" y="41" width="60" height="13" fill="#E8E4DA"/>
+                    </g>
+                  </svg>
+                  <span style={{ fontSize: '20px', fontWeight: 500, fontStyle: 'italic', letterSpacing: '-0.3px' }}>
+                    Bedrock<span style={{ fontStyle: 'normal', fontWeight: 400, color: '#888', fontSize: '17px' }}>.guide</span>
+                  </span>
+                </div>
+                <span style={{ fontSize: '12px', color: '#888' }}>{printDate}</span>
+              </div>
+
+              <p style={{ fontSize: '14px', fontWeight: 600, letterSpacing: '-0.2px', color: '#1a1a18', marginBottom: '6px' }}>{modeTitle}</p>
+              <p style={{ fontSize: '13px', color: '#555', lineHeight: 1.65, marginBottom: '20px' }}>{descriptor}</p>
+
+              {/* Situation box */}
+              <p style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#888', marginBottom: '8px' }}>{situationLabel}</p>
+              <div style={{ background: '#f6f5f2', borderRadius: '8px', padding: '14px 18px', marginBottom: '24px' }}>
+                <p style={{ fontSize: '13px', color: '#1a1a18', lineHeight: 1.65, margin: 0 }}>{freeform}</p>
+                {chipLines.length > 0 && (
+                  <p style={{ fontSize: '12px', color: '#888', marginTop: '8px', marginBottom: 0 }}>{chipLines.join(' · ')}</p>
+                )}
+              </div>
+
+              {/* reflectBack */}
+              <p style={{ fontSize: '14px', color: '#444', lineHeight: 1.7, fontStyle: 'italic', marginBottom: '28px', paddingBottom: '24px', borderBottom: '0.5px solid #ddd' }}>
+                {output.reflectBack}
+              </p>
+
+              {/* The decode */}
+              <p style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#b8922a', marginBottom: '16px' }}>The decode</p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '28px', paddingBottom: '24px', borderBottom: '0.5px solid #ddd' }}>
+                {([
+                  { label: 'The surface', text: output.surface },
+                  { label: 'The worry underneath', text: output.worry },
+                  { label: 'The opening', text: output.opening },
+                ] as { label: string; text: string }[]).map(({ label, text }) => (
+                  <div key={label} style={{ display: 'flex', gap: '14px' }}>
+                    <div style={{ width: '3px', background: '#b8922a', borderRadius: '2px', flexShrink: 0, marginTop: '2px' }} />
+                    <div>
+                      <p style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#1a1a18', marginBottom: '4px' }}>{label}</p>
+                      <p style={{ fontSize: '13px', color: '#444', lineHeight: 1.65, margin: 0 }}>{text}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Ways in */}
+              <p style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#b8922a', marginBottom: '16px' }}>Ways in</p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginBottom: '32px' }}>
+                {[...output.responses]
+                  .sort((a, b) => (b.recommended ? 1 : 0) - (a.recommended ? 1 : 0))
+                  .map((r, i) => {
+                    const color = ENERGY_COLORS[r.energy] ?? '#888'
+                    return (
+                      <div key={i} style={{ border: r.recommended ? `2px solid ${color}` : '1px solid #ddd', borderRadius: '8px', padding: '14px 18px' }}>
+                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '10px', flexWrap: 'wrap' }}>
+                          <span style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.07em', textTransform: 'uppercase', color, background: `${color}18`, padding: '2px 8px', borderRadius: '12px' }}>{r.energy}</span>
+                          {r.recommended && <span style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#555', border: '1px solid #ddd', padding: '2px 8px', borderRadius: '12px' }}>recommended</span>}
+                        </div>
+                        <p style={{ fontSize: '14px', color: '#1a1a18', lineHeight: 1.65, fontStyle: 'italic', marginBottom: '8px' }}>&ldquo;{r.text}&rdquo;</p>
+                        <p style={{ fontSize: '12.5px', color: '#666', lineHeight: 1.6, margin: 0 }}>
+                          {r.doing}{r.recommended && r.reason ? ` — ${r.reason}` : ''}
+                        </p>
+                      </div>
+                    )
+                  })}
+              </div>
+
+              <hr style={{ border: 'none', borderTop: '0.5px solid #ddd', marginBottom: '28px' }} />
+
+              {/* Footer — same as chat */}
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
+                  <svg width="18" height="18" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+                    <clipPath id="op-peak-foot"><polygon points="4,52 24,14 38,30 48,20 56,52"/></clipPath>
+                    <g clipPath="url(#op-peak-foot)">
+                      <rect x="0" y="14" width="60" height="14" fill="#6B9FEA"/>
+                      <rect x="0" y="28" width="60" height="13" fill="#D44035"/>
+                      <rect x="0" y="41" width="60" height="13" fill="#E8E4DA"/>
+                    </g>
+                  </svg>
+                  <span style={{ fontSize: '15px', fontWeight: 500, fontStyle: 'italic' }}>Bedrock<span style={{ fontStyle: 'normal', fontWeight: 400, color: '#888', fontSize: '13px' }}>.guide</span></span>
+                </div>
+                <p style={{ fontSize: '12.5px', color: '#555', lineHeight: 1.75, marginBottom: '14px' }}>Hard conversations don&rsquo;t get easier by avoiding them — but they get more manageable with practice. Bedrock.guide is a free civic tool that helps you understand where you actually stand on the issues, see how your values connect to real policy choices, and rehearse the conversations that matter before they happen in real life.</p>
+                <p style={{ fontSize: '13px', color: '#1a1a18', lineHeight: 1.75, marginBottom: '14px' }}>Most civic tools are built to tell you what to think. Bedrock.guide is built to help you think — starting with your own values, not a party line or an algorithm&rsquo;s agenda. A short quiz maps your civic identity (your &ldquo;mantle&rdquo;), then four tools put it to work: your ballot matched to your values, a curated media diet, a window into Congress beyond your own races, and practice for the hard conversations before they happen. All grounded in how you actually think, not someone else&rsquo;s agenda.</p>
+                <p style={{ fontSize: '12.5px', color: '#555', lineHeight: 1.75, marginBottom: '16px' }}>If someone shared this with you, you can try it yourself — it&rsquo;s free and takes about five minutes to get started.</p>
+                <p style={{ fontSize: '13px', fontWeight: 600, color: '#185FA5' }}>bedrock.guide</p>
+              </div>
+            </>
+          )
+        })()}
+
         {chatStarted && chatMessages.length > 0 && (
           <>
             {/* Header */}
