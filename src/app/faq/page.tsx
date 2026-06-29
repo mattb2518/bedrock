@@ -59,6 +59,18 @@ const faqs = [
     a: "No. Each conversation starts clean — no history, no memory of what you discussed before. This is intentional. You're not being tracked, and what you explored last time doesn't follow you into the next session. Saved history is something we may offer later as an opt-in feature. Right now, it doesn't exist.",
   },
   {
+    q: "What is 'Back-and-forth' practice?",
+    a: "Back-and-forth is an experimental mode where Claude plays the other person in your practice conversation — a real human being who holds those views, not a caricature or a pushover. You get the actual back-and-forth experience: real responses, real pushback, real practice. It's marked Beta because it's newer and more complex than the Openers and Responses modes — it works best when you come in with a clear setup and realistic expectations.",
+  },
+  {
+    q: "What guardrails are in place for Back-and-forth?",
+    a: "Several. Claude plays the other person charitably — a reasonable version of them, not the worst-faith caricature. It won't make personal attacks, won't use conspiracy theories or fabricated facts, and will redirect if the conversation drifts into unproductive territory. It won't help you 'win' the practice — the goal is a real conversation, not a debate victory. If anything feels off, end the session with the 'End practice' button and let us know at hello@bedrock.guide.",
+  },
+  {
+    q: "Can the Back-and-forth session end on its own?",
+    a: "Yes — and sometimes it should. Claude will close the session when the conversation reaches a natural landing (a moment of genuine connection or a good stopping point), when it senses diminishing returns (you're going in circles, the practice has peaked), or after roughly ten exchanges. When it closes, it steps briefly out of character with a coach's note — one specific observation about what worked or what to try differently. You can also end the session anytime with the 'End practice' button.",
+  },
+  {
     q: "Is Bedrock available outside the US?",
     a: "The current version is US-focused — the ballot guide requires US races and the framework is built around American civic tensions. International versions are possible long-term, but not in the current roadmap.",
   },

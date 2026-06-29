@@ -80,9 +80,8 @@ function buildUserMessage(
   freeform: string
 ): string {
   const modeLabels: Record<string, string> = {
-    start: 'Start one (opening a conversation with someone who sees it differently)',
-    respond: 'Respond to one (someone said the provocative thing)',
-    rehearse: 'Rehearse one (preparing for a conversation coming up)',
+    openers: 'Openers (opening a conversation with someone who sees it differently)',
+    responses: 'Responses (someone said the provocative thing)',
   }
 
   const lines: string[] = [`Mode: ${modeLabels[mode] ?? mode}`]
