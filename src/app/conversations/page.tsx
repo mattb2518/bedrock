@@ -562,6 +562,10 @@ export default function ConversationsPage() {
 
   // Pre-practice coach brief from __START__ response
   const [coachBrief, setCoachBrief] = useState<string | null>(null)
+  const [coachBriefVisible, setCoachBriefVisible] = useState(true)
+
+  // Sensitive-topic warning banner
+  const [showSensitiveBanner, setShowSensitiveBanner] = useState(false)
 
   // Stable print date (computed once on mount)
   const [printDate] = useState(() => new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }))
@@ -612,6 +616,9 @@ export default function ConversationsPage() {
         setChatEndMessage('')
         setChatContext('')
         setCoachBrief(null)
+        setCoachBriefVisible(true)
+        setShowSensitiveBanner(false)
+        setExpandedTipKey(null)
         setError(null)
       } else if (step === 'output') {
         // Back between two output states — show the form
@@ -632,11 +639,20 @@ export default function ConversationsPage() {
         setChatEndMessage('')
         setChatContext('')
         setCoachBrief(null)
+        setCoachBriefVisible(true)
+        setShowSensitiveBanner(false)
+        setExpandedTipKey(null)
       }
     }
     window.addEventListener('popstate', handlePop)
     return () => window.removeEventListener('popstate', handlePop)
   }, []) // state setters are stable — empty deps is correct
+
+  const SENSITIVE_KEYWORDS = ['abuse', 'abusive', 'violence', 'violent', 'assault', 'hitting', 'hurt me', 'hurting me', 'threatening', 'stalking', 'harassment', 'suicid', 'self-harm', 'self harm', 'cutting myself', 'crisis', 'domestic', 'ptsd', 'trauma']
+  function isSensitiveTopic(text: string): boolean {
+    const lower = text.toLowerCase()
+    return SENSITIVE_KEYWORDS.some(kw => lower.includes(kw))
+  }
 
   function toggleChip(rowKey: string, chip: string) {
     setChips(prev => {
@@ -663,6 +679,9 @@ export default function ConversationsPage() {
     setChatEndMessage('')
     setChatContext('')
     setCoachBrief(null)
+    setCoachBriefVisible(true)
+    setShowSensitiveBanner(false)
+    setExpandedTipKey(null)
     window.history.pushState({ bedrockStep: 'mode', mode }, '')
   }
 
@@ -685,6 +704,28 @@ export default function ConversationsPage() {
     setChatEndMessage('')
     setChatContext('')
     setCoachBrief(null)
+    setCoachBriefVisible(true)
+    setShowSensitiveBanner(false)
+    setExpandedTipKey(null)
+  }
+
+  function goHome() {
+    reset()
+    setActiveMode(null)
+  }
+
+  async function restartChat() {
+    setChatMessages([])
+    setChatInput('')
+    if (chatInputRef.current) chatInputRef.current.style.height = 'auto'
+    setChatEnded(false)
+    setChatEndMessage('')
+    setCoachBrief(null)
+    setCoachBriefVisible(true)
+    setExpandedTipKey(null)
+    setError(null)
+    // handleStartChat recomputes context from freeform/chips and re-calls the API
+    await handleStartChat()
   }
 
   async function handleSubmit() {
@@ -728,6 +769,7 @@ export default function ConversationsPage() {
     setChatContext(context)
     setChatLoading(true)
     setError(null)
+    if (isSensitiveTopic(freeform)) setShowSensitiveBanner(true)
 
     try {
       const res = await fetch('/api/conversations/chat', {
@@ -1138,6 +1180,24 @@ export default function ConversationsPage() {
               >
                 How this works
               </button>
+              {coachBrief && !coachBriefVisible && (
+                <button
+                  onClick={() => setCoachBriefVisible(true)}
+                  style={{
+                    fontFamily: 'var(--font-body)',
+                    fontSize: 'var(--text-small)',
+                    color: 'var(--color-gold)',
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    textDecoration: 'underline',
+                    textUnderlineOffset: '2px',
+                    padding: 0,
+                  }}
+                >
+                  Coach&rsquo;s note
+                </button>
+              )}
             </div>
             {!chatEnded && (
               <button
@@ -1172,18 +1232,51 @@ export default function ConversationsPage() {
             </p>
           </div>
 
+          {/* Sensitive-topic banner */}
+          {showSensitiveBanner && (
+            <div style={{
+              backgroundColor: 'var(--color-bg-surface)',
+              border: '1px solid var(--color-border)',
+              borderRadius: 'var(--radius-md)',
+              padding: 'var(--space-3) var(--space-4)',
+              display: 'flex',
+              gap: 'var(--space-3)',
+              alignItems: 'flex-start',
+            }}>
+              <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', margin: 0, flex: 1 }}>
+                <strong style={{ color: 'var(--color-text-primary)' }}>This sounds like a sensitive situation.</strong>{' '}
+                Back-and-forth is a conversation practice tool, not a substitute for professional support. If you or someone you know needs help, please reach out to a counselor or crisis line.
+              </p>
+              <button
+                onClick={() => setShowSensitiveBanner(false)}
+                style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', background: 'none', border: 'none', cursor: 'pointer', padding: 0, flexShrink: 0 }}
+              >
+                ✕
+              </button>
+            </div>
+          )}
+
           {/* Pre-practice coach brief */}
-          {coachBrief && (
+          {coachBrief && coachBriefVisible && (
             <div style={{
               backgroundColor: 'rgba(196,150,53,0.07)',
               border: '1px solid rgba(196,150,53,0.3)',
               borderRadius: 'var(--radius-md)',
               padding: 'var(--space-3) var(--space-4)',
+              display: 'flex',
+              gap: 'var(--space-3)',
+              alignItems: 'flex-start',
             }}>
-              <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', margin: 0 }}>
+              <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', margin: 0, flex: 1 }}>
                 <strong style={{ color: 'var(--color-gold)' }}>Coach&rsquo;s note:</strong>{' '}
                 {coachBrief}
               </p>
+              <button
+                onClick={() => setCoachBriefVisible(false)}
+                style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', background: 'none', border: 'none', cursor: 'pointer', padding: 0, flexShrink: 0 }}
+              >
+                ✕
+              </button>
             </div>
           )}
 
@@ -1321,23 +1414,30 @@ export default function ConversationsPage() {
                           </p>
                           <button
                             onClick={() => {
-                              void navigator.clipboard.writeText(move.phrase ?? tip)
-                              setCopiedKey(tipKey)
-                              setTimeout(() => setCopiedKey(k => k === tipKey ? null : k), 2000)
+                              const phrase = move.phrase ?? tip
+                              setChatInput(phrase)
+                              setExpandedTipKey(null)
+                              setTimeout(() => {
+                                if (chatInputRef.current) {
+                                  chatInputRef.current.style.height = 'auto'
+                                  chatInputRef.current.style.height = `${chatInputRef.current.scrollHeight}px`
+                                  chatInputRef.current.focus()
+                                }
+                              }, 0)
                             }}
                             style={{
                               fontFamily: 'var(--font-body)',
                               fontSize: '11px',
-                              color: copiedKey === tipKey ? 'var(--color-gold)' : 'var(--color-text-muted)',
+                              color: 'var(--color-blue-accent)',
                               backgroundColor: 'transparent',
-                              border: `1px solid ${copiedKey === tipKey ? 'rgba(196,150,53,0.4)' : 'var(--color-border)'}`,
+                              border: '1px solid var(--color-blue-accent)',
                               borderRadius: 'var(--radius-full)',
                               padding: '2px 10px',
                               cursor: 'pointer',
                               transition: 'all 0.15s',
                             }}
                           >
-                            {copiedKey === tipKey ? 'Copied!' : 'Copy'}
+                            Add to chat
                           </button>
                         </div>
                       ) : null
@@ -1369,7 +1469,7 @@ export default function ConversationsPage() {
                   fontStyle: 'italic',
                   margin: 0,
                 }}>
-                  {chatEndMessage}
+                  {chatEndMessage.replace(/^\(|\)$/g, '')}
                 </p>
               </div>
             )}
@@ -1481,7 +1581,7 @@ export default function ConversationsPage() {
                 Try another &rarr;
               </button>
               <button
-                onClick={() => selectMode('chat')}
+                onClick={() => void restartChat()}
                 style={{
                   fontFamily: 'var(--font-body)',
                   fontWeight: 'var(--weight-semibold)',
@@ -1494,7 +1594,23 @@ export default function ConversationsPage() {
                   cursor: 'pointer',
                 }}
               >
-                Practice again
+                Practice same conversation again
+              </button>
+              <button
+                onClick={goHome}
+                style={{
+                  fontFamily: 'var(--font-body)',
+                  fontWeight: 'var(--weight-semibold)',
+                  fontSize: 'var(--text-body)',
+                  color: 'var(--color-text-secondary)',
+                  backgroundColor: 'transparent',
+                  border: '1px solid var(--color-border)',
+                  borderRadius: 'var(--btn-radius)',
+                  padding: 'var(--btn-padding-y) var(--btn-padding-x)',
+                  cursor: 'pointer',
+                }}
+              >
+                Back to Conversations
               </button>
               <button
                 onClick={() => window.print()}
@@ -1550,7 +1666,7 @@ export default function ConversationsPage() {
 
             {/* Descriptor */}
             <p style={{ fontSize: '13px', color: '#555', lineHeight: 1.65, marginBottom: '20px' }}>
-              This is a Back-and-forth practice transcript from <strong>bedrock.guide</strong> — a civic conversation tool that helps you prepare for hard conversations before they happen. Coaching notes appear below each response from the other person.
+              This is a simulated, AI-generated practice transcript from <strong>bedrock.guide</strong>. The responses attributed to &ldquo;Them&rdquo; are entirely fabricated by an AI and do not represent any real person&rsquo;s words or views. This is a conversation rehearsal tool — not a record of any actual exchange. Coaching notes appear below each AI response.
             </p>
 
             {/* Setup box */}
