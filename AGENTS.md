@@ -12,6 +12,12 @@ After completing any task that modifies files, commit the changes with a clear, 
 
 Before any work that touches external data integration, candidate/race/media schemas, or the scoring/recommendation engine, read `docs/data-sources-feasibility-june2026.md` — the authoritative, web-verified reference for which sources are live, their cost/licensing/coverage, schema starter fields, and the build sequence. It supersedes `SPEC.md`'s data-source notes where they conflict. (Two once-standard APIs are dead: Google Civic's Representatives endpoint and the ProPublica Congress API — the doc names replacements.) Product/strategy decisions and their status live in `DECISIONS.md`.
 
+# Keep SPEC.md in sync with the code
+
+`SPEC.md` is the single source of truth. Whenever you change any user-facing content in the codebase — quiz questions, answer options, micro-reactions, easter eggs, dealbreaker items, demographic options, page copy, FAQ entries, or any other text a user sees — update the corresponding section of `SPEC.md` in the same commit. The spec and the code must always match. If they disagree, the code is wrong, not the spec — unless you are in a session explicitly reconciling the two, in which case flag every conflict rather than silently resolving it.
+
+**Before running any bias audit or content review:** always read the current code files (not just the spec) to confirm the spec reflects what is actually running. If they diverge, update the spec to match the code first, then run the audit against that.
+
 # Committing instruction files
 
 Exception to the auto-commit rule above: after a substantial block of edits to `CLAUDE.md` or `AGENTS.md`, stop and prompt the user to commit, including a ready-to-use commit message. Do not commit these files without the user's explicit go-ahead.
