@@ -47,10 +47,12 @@ function buildChatSystemPrompt(session: QuizSession | null, context: string, tur
 - When you close, step briefly out of character with a coach's note in parentheses: what the user did that worked, one specific observation${turnNote}
 
 **Response format:** Return ONLY valid JSON, no markdown fences:
-{"reply": "your in-character response", "ended": false}
+{"reply": "your in-character response", "ended": false, "hint": {"read": "one sentence: what you (as the other person) are really signaling or doing in this line — the real subtext, not just the surface", "moves": ["move 1", "move 2"]}}
+
+The "hint" is coaching for the user — it steps briefly outside the fiction after your reply. "read" is your honest decode of what just happened in your line: what's the real signal, tactic, or fear underneath it? "moves" are 2–3 suggested response energies. Pick from: "disarm with warmth", "get curious", "name it lightly", "find the shared question", "push back gently", "stand your ground", "acknowledge their point", "redirect to shared facts". Choose the ones most useful for this exact moment — the ones a skilled conversationalist would actually reach for here.
 
 When ending the session:
-{"reply": "your final in-character line or reaction", "ended": true, "endMessage": "(Coach's note: what worked, one specific thing the user did well or could try next time)"}`
+{"reply": "your final in-character line or reaction", "ended": true, "endMessage": "(Coach's note: what worked, one specific thing the user did well or could try next time)", "hint": {"read": "what this closing line is doing", "moves": ["move 1", "move 2"]}}`
 }
 
 export async function POST(request: NextRequest) {

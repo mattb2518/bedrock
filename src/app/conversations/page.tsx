@@ -30,9 +30,15 @@ interface ConversationOutput {
   responses: ConversationResponse[]
 }
 
+interface ChatHint {
+  read: string
+  moves: string[]
+}
+
 interface ChatMessage {
   role: 'user' | 'assistant'
   content: string
+  hint?: ChatHint
 }
 
 // ─── Static data ─────────────────────────────────────────────────────────────
@@ -642,10 +648,10 @@ export default function ConversationsPage() {
         throw new Error((data as Record<string, string>).error ?? 'Request failed')
       }
 
-      const data = await res.json() as { reply: string; ended: boolean; endMessage?: string }
+      const data = await res.json() as { reply: string; ended: boolean; endMessage?: string; hint?: ChatHint }
 
       setChatStarted(true)
-      setChatMessages([{ role: 'assistant', content: data.reply }])
+      setChatMessages([{ role: 'assistant', content: data.reply, hint: data.hint }])
 
       if (data.ended) {
         setChatEnded(true)
@@ -695,9 +701,9 @@ export default function ConversationsPage() {
         throw new Error((data as Record<string, string>).error ?? 'Request failed')
       }
 
-      const data = await res.json() as { reply: string; ended: boolean; endMessage?: string }
+      const data = await res.json() as { reply: string; ended: boolean; endMessage?: string; hint?: ChatHint }
 
-      setChatMessages(prev => [...prev, { role: 'assistant', content: data.reply }])
+      setChatMessages(prev => [...prev, { role: 'assistant', content: data.reply, hint: data.hint }])
 
       if (data.ended) {
         setChatEnded(true)
@@ -1051,44 +1057,117 @@ export default function ConversationsPage() {
             )}
           </div>
 
+          {/* Context strip */}
+          <div style={{
+            backgroundColor: 'var(--color-bg-surface)',
+            border: '1px solid var(--color-border)',
+            borderRadius: 'var(--radius-md)',
+            padding: 'var(--space-3) var(--space-4)',
+          }}>
+            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', margin: 0 }}>
+              <strong style={{ color: 'var(--color-text-secondary)' }}>Practicing:</strong>{' '}
+              {chatContext.length > 120 ? chatContext.slice(0, 120) + '…' : chatContext}
+            </p>
+          </div>
+
           {/* Message area */}
           <div style={{
             display: 'flex',
             flexDirection: 'column',
-            gap: 'var(--space-3)',
+            gap: 'var(--space-1)',
             minHeight: '200px',
-            maxHeight: '450px',
+            maxHeight: '500px',
             overflowY: 'auto',
-            padding: 'var(--space-2) 0',
+            padding: 'var(--space-3) 0',
           }}>
             {chatMessages.map((msg, i) => (
-              <div
-                key={i}
-                style={{
-                  display: 'flex',
-                  justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start',
-                }}
-              >
-                <div style={{
-                  maxWidth: '76%',
-                  backgroundColor: msg.role === 'user' ? 'var(--color-blue-accent)' : 'var(--color-bg-surface)',
-                  color: msg.role === 'user' ? '#fff' : 'var(--color-text-primary)',
-                  border: msg.role === 'user' ? 'none' : '1px solid var(--color-border)',
-                  borderRadius: msg.role === 'user'
-                    ? 'var(--radius-lg) var(--radius-lg) var(--radius-sm) var(--radius-lg)'
-                    : 'var(--radius-lg) var(--radius-lg) var(--radius-lg) var(--radius-sm)',
-                  padding: 'var(--space-3) var(--space-4)',
+              <div key={i}>
+                {/* Sender label */}
+                <p style={{
                   fontFamily: 'var(--font-body)',
-                  fontSize: 'var(--text-body)',
-                  lineHeight: 'var(--leading-relaxed)',
+                  fontSize: '11px',
+                  fontWeight: 'var(--weight-semibold)',
+                  color: 'var(--color-text-muted)',
+                  textAlign: msg.role === 'user' ? 'right' : 'left',
+                  margin: '0 4px var(--space-1)',
+                  letterSpacing: 'var(--tracking-wider)',
+                  textTransform: 'uppercase',
                 }}>
-                  {msg.content}
+                  {msg.role === 'user' ? 'You' : 'Them'}
+                </p>
+
+                {/* Bubble */}
+                <div style={{ display: 'flex', justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start' }}>
+                  <div style={{
+                    maxWidth: '78%',
+                    backgroundColor: msg.role === 'user' ? 'var(--color-blue-accent)' : 'var(--color-bg-surface)',
+                    color: msg.role === 'user' ? '#fff' : 'var(--color-text-primary)',
+                    border: msg.role === 'user' ? 'none' : '1px solid var(--color-border)',
+                    borderRadius: msg.role === 'user' ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
+                    padding: 'var(--space-3) var(--space-4)',
+                    fontFamily: 'var(--font-body)',
+                    fontSize: 'var(--text-body)',
+                    lineHeight: 'var(--leading-relaxed)',
+                  }}>
+                    {msg.content}
+                  </div>
                 </div>
+
+                {/* Coaching hint (assistant messages only) */}
+                {msg.role === 'assistant' && msg.hint && (
+                  <div style={{
+                    marginTop: 'var(--space-2)',
+                    marginBottom: 'var(--space-3)',
+                    marginLeft: '4px',
+                    backgroundColor: 'rgba(196,150,53,0.06)',
+                    border: '1px solid rgba(196,150,53,0.25)',
+                    borderRadius: 'var(--radius-md)',
+                    padding: 'var(--space-3) var(--space-4)',
+                    maxWidth: '78%',
+                  }}>
+                    <p style={{
+                      fontFamily: 'var(--font-body)',
+                      fontSize: 'var(--text-small)',
+                      color: 'var(--color-text-secondary)',
+                      lineHeight: 'var(--leading-relaxed)',
+                      margin: '0 0 var(--space-2) 0',
+                    }}>
+                      <strong style={{ color: 'var(--color-gold)' }}>Reading this:</strong>{' '}
+                      {msg.hint.read}
+                    </p>
+                    <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+                      <span style={{
+                        fontFamily: 'var(--font-body)',
+                        fontSize: '11px',
+                        fontWeight: 'var(--weight-semibold)',
+                        color: 'var(--color-gold)',
+                        letterSpacing: 'var(--tracking-wider)',
+                        textTransform: 'uppercase',
+                        flexShrink: 0,
+                      }}>
+                        Try:
+                      </span>
+                      {msg.hint.moves.map(move => (
+                        <span key={move} style={{
+                          fontFamily: 'var(--font-body)',
+                          fontSize: '11px',
+                          color: 'var(--color-text-secondary)',
+                          backgroundColor: 'var(--color-bg)',
+                          border: '1px solid rgba(196,150,53,0.3)',
+                          borderRadius: 'var(--radius-full)',
+                          padding: '2px 10px',
+                        }}>
+                          {move}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             ))}
 
             {chatLoading && (
-              <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+              <div style={{ display: 'flex', justifyContent: 'flex-start', paddingLeft: '4px' }}>
                 <TypingIndicator />
               </div>
             )}
@@ -1099,7 +1178,7 @@ export default function ConversationsPage() {
                 border: '1px solid var(--color-gold)',
                 borderRadius: 'var(--radius-lg)',
                 padding: 'var(--space-4) var(--space-5)',
-                marginTop: 'var(--space-2)',
+                marginTop: 'var(--space-3)',
               }}>
                 <p style={{
                   fontFamily: 'var(--font-body)',
