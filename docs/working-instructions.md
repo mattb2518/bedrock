@@ -49,23 +49,32 @@ Paste this prompt:
 
 I'm continuing work on **Bedrock** — a civic identity platform for independent-minded voters at bedrock.guide and bedrock.vote.
 
-The master spec lives at https://github.com/mattb2518/bedrock/blob/main/SPEC.md. Please read it before we start. It contains the complete product architecture, all quiz questions across four layers, the ten civic type system, brand guidelines, context module, layer intros/outros, tech stack, environment variables, and build sequence.
+Before we start, read these three documents from GitHub:
+- **SPEC.md** — master product spec (quiz, type system, brand, all three pillars)
+- **DECISIONS.md** — log of all decided questions and deferred items
+- **docs/data-sources-feasibility-june2026.md** — authoritative, web-verified reference for all external data sources; governs all data-integration work
 
-Where we are: all quiz content and architecture are complete. Brand and visual identity are locked. The spec is live in GitHub. Claude Code has been briefed on infrastructure.
+Where we are (June 2026):
+- Quiz: complete and live
+- Brand and visual identity: locked
+- Pillar 1 — Conversations: **complete**, declared ready for user testing. All three modes shipped (Openers, Responses, Back-and-forth live chat). See SPEC.md §18.6b for the shipped architecture and DECISIONS.md for all resolved questions.
+- Pillar 2 — Ballot: not started
+- Pillar 3 — Media Diet: not started
+- Pillar 4 — Beyond Your Ballot: not started
+- Recommendation engine: not built — design must precede build
 
-What's left to spec before the build:
-1. Recommendation engine logic — flag for dedicated Opus 4.7 or Deep Thinking session before finalizing
-2. Candidate data model — how candidate positions get quantified on the eight dimensions
-3. Media diet pillar (Pillar 2) — source database structure, bias/quality tagging, three-tier recommendation logic
-4. Page inventory — all pages with copy, updated with Bedrock name
+What's next (in order):
+1. **Engine design** — flag for Opus with extended thinking. Read feasibility doc §6 and §9–10 before this session. The matching formula, scoring model, and schema are the main open questions.
+2. **Pillar designs** (Ballot, Media, Beyond Your Ballot) — run these in parallel with or right after engine design so pillar requirements inform the engine before it's built. Open design questions for each pillar are in DECISIONS.md.
 
 Working conventions:
-- After completing each section, push spec updates to GitHub (I'll provide the token when needed)
+- After completing each section, push spec updates to GitHub
 - Run a bias check before showing any new question drafts
-- Flag complexity creep — I have a known tendency toward over-engineering
-- Two sessions flagged for a more powerful model: recommendation engine logic, and a full bias/competitive landscape check on the complete quiz
+- Flag complexity creep — known tendency toward over-engineering
+- Engine design session: use Opus with extended thinking
+- Read feasibility doc before any data-source or scoring work — it supersedes SPEC.md's tech stack notes where they conflict, and names two dead APIs (Google Civic Representatives, ProPublica Congress) with their replacements
 
-Start by reading the spec, flag anything incomplete or worth revisiting, then we'll tackle the remaining sections in order.
+Start by reading the three docs above, note anything that needs reconciling, then let's tackle the next item.
 
 ---
 
@@ -77,49 +86,42 @@ Paste this prompt:
 
 I'm building **Bedrock** (bedrock.guide / bedrock.vote) — a civic identity platform for independent-minded voters, built for public scale.
 
-Read the spec first: clone https://github.com/mattb2518/bedrock and read SPEC.md thoroughly before advising on anything. It contains the complete product architecture, quiz questions, type system, brand guidelines, tech stack, environment variables (Section 17), build sequence, and open design questions (Section 16).
+Read these before advising on anything:
+- **SPEC.md** — master spec (quiz, type system, brand, all three pillars, system prompt)
+- **DECISIONS.md** — all decided questions and deferred items; check before raising a question that may already be answered
+- **docs/data-sources-feasibility-june2026.md** — authoritative data-source reference; supersedes SPEC.md's tech stack notes where they conflict. Two APIs in the spec are dead — this doc names replacements.
 
-This is a standalone public-facing application with its own domain and infrastructure. It is not connected to any existing personal tools. Build it for public scale from the start.
+Environment and infrastructure (already settled — do not re-litigate):
+- **OS:** Windows 11
+- **Framework:** Next.js 15 App Router, React 19, TypeScript, Tailwind CSS, Zustand
+- **Hosting:** Vercel
+- **Database:** Supabase (dedicated instance)
+- **AI:** Anthropic Claude API (`claude-sonnet-4-6` for Conversations; engine TBD)
+- **Analytics:** Plausible only — no Google Analytics, no exceptions
+- **DNS:** Cloudflare (bedrock.guide and bedrock.vote)
+- **Repo:** github.com/mattb2518/bedrock
 
-My environment: Windows. Check whether WSL2 is configured and help me set it up if not — it will make the Next.js development environment smoother.
+Where we are (June 2026):
+- Quiz: complete and live
+- Brand and visual identity: locked
+- Pillar 1 — Conversations: **complete**, ready for user testing. Three modes: Openers, Responses, Back-and-forth (live chat with per-turn coaching, print transcripts, session management). See SPEC.md §18.6b.
+- Recommendation engine: not built — must be designed in Claude Project before building
+- Pillars 2–4 (Ballot, Media, Beyond Your Ballot): not started — design precedes build
 
-Planned tech stack:
-- Frontend: Next.js, Tailwind CSS, Framer Motion
-- State management: Zustand
-- Database: Supabase (dedicated instance for Bedrock)
-- AI: Claude API (Sonnet)
-- Analytics: Plausible (privacy-first — no Google Analytics, no exceptions)
-- Hosting/DNS: Cloudflare (bedrock.guide registered there; bedrock.vote at Network Solutions with Cloudflare SSL)
-- Data APIs: Google Civic Information API, OpenStates, VoteSmart, OpenSecrets free tier, Ballotpedia (pending)
+Build sequence going forward:
+1. Engine design in Claude Project (use Opus with extended thinking)
+2. Pillar designs in Claude Project (parallel with engine design)
+3. Build engine in Claude Code once design is settled
+4. Build remaining pillars against the live engine
 
-Infrastructure questions to answer before writing any code:
-1. Hosting — Cloudflare Pages vs. Vercel vs. other, given public scale requirements
-2. Database — dedicated Supabase instance, schema design for user profiles and quiz responses
-3. Repository structure — repo exists at github.com/mattb2518/bedrock
-4. CI/CD pipeline
-5. Local development environment on Windows/WSL2
+Working conventions:
+- Auto-commit and push after every task that modifies files — keep the repo in sync
+- Read AGENTS.md and CLAUDE.md at session start; they contain standing instructions that override defaults
+- Flag open questions from SPEC.md rather than resolving them independently — decisions come back to the Claude Project
+- Never use Google Civic Representatives endpoint (sunset Apr 2025) or ProPublica Congress API (archived Feb 2025) — feasibility doc has replacements
+- Privacy is non-negotiable: Plausible only, exactly two cookies, no third-party tracking
 
-Before doing anything else, ask me for the GitHub personal access token. I'll paste it in chat. Store it in .env.local as GITHUB_TOKEN once the project is scaffolded — do not store it anywhere else or include it in any committed file.
-
-When you scaffold the project:
-- Create .env.local at the project root with all variables from SPEC.md Section 17 as placeholders
-- Add GITHUB_TOKEN with the value I provide
-- .gitignore already excludes .env.local — do not commit it
-- I will fill in the remaining actual values
-
-Build sequence from the spec:
-Phase 1: Design system + quiz flow with mocked data
-Phase 2: Recommendation engine as pure function
-Phase 3: Google Civic API integration
-Phase 4: Data layer (Ballotpedia/VoteMate)
-Phase 5: Claude API integration
-Phase 6: Print view
-
-Privacy commitments are non-negotiable: Plausible only for analytics, no Google Analytics, exactly two cookies, no third-party tracking scripts.
-
-Section 16 of the spec lists open design questions — flag them and do not resolve them independently. Raise them explicitly before proceeding with build work that depends on them.
-
-Start by reading SPEC.md, then give me a clear infrastructure recommendation before writing any code.
+Start by reading SPEC.md and DECISIONS.md, note the current state, then wait for the specific task.
 
 ---
 

@@ -2137,7 +2137,7 @@ Three clear cards on the pillar landing, not one box with a mode-switcher. The i
 
 - **Start one** — the user wants to open a conversation with someone who sees it differently.
 - **Respond to one** — someone said the provocative thing; the user wants a better answer than the one they'd fire back.
-- **Rehearse one** — the user knows the conversation is coming and wants to practice it first.
+- **Back-and-forth** — the user knows the conversation is coming and wants to practice it first. Live multi-turn chat: Claude plays the other person, per-turn coaching surfaces after every exchange.
 
 Each mode = one freeform box (carries the irreducible, unpredictable part) + optional chips (frame the predictable scaffolding in a few taps). All chips optional; freeform alone is always a valid submission.
 
@@ -2162,8 +2162,8 @@ Freeform box: *"What did they say? Paste it, or describe it."*
 - **Topic** → (same topic list)
 - **Or is it more of a posture?** → (same posture list)
 
-**MODE 3 — Rehearse one**
-Freeform box: *"What do you want to say — and who's it going to?"*
+**MODE 3 — Back-and-forth**
+Freeform box: *"What's the conversation about — and who are you practicing with?"*
 - **Who are you rehearsing for?** → (same "who" list)
 - **What are you worried about?** → I'll get too heated · I'll cave · I'll freeze · I'll say it wrong · it'll blow up the relationship · other
 - **Topic** → (same topic list)
@@ -2215,6 +2215,48 @@ The output is **only** these blocks, in this order. No raw model preamble ("Grea
 4. **Quiet footer line:** *"These are starting points, not scripts. The words are yours to change."* Always present, low-key.
 
 **Not in v1:** no "regenerate / give me different options" button. It turns the tool into a slot machine (pull until you get the comeback you wanted) — exactly the "help me win" pressure the design fights. If a user wants different output, the honest path is editing the inputs (change the vibe chip, rephrase), which produces a genuinely different read. Flag for v2 if usage shows demand.
+
+---
+
+### 18.6b Mode 3 (Back-and-forth): Shipped Chat Architecture
+
+Mode 3 shipped as a full live practice chat — not a static output like Modes 1 and 2. Everything below reflects the built product as of June 2026.
+
+**What it is:** An iMessage-style multi-turn conversation where Claude plays the "other person" charitably and realistically, while a side panel surfaces per-turn coaching after every exchange.
+
+**Session start:**
+- Claude receives a `__START__` signal on the first turn
+- Response includes a `brief` field: 1–2 sentences as the coach (out of character), orienting the user before the first in-character line — what to expect from this person, where they'll push or soften
+- Exception: if the setup text suggests the user doesn't know how to initiate ("don't know how to bring up," "want to start the conversation"), Claude opens with a neutral/inviting line so the user has the first real move
+
+**Per-turn structure:**
+- User types → sends → Claude replies in character
+- After each reply, the coaching panel updates with:
+  - **Decoding this** (`read`): what Claude (as the other person) was really doing in that line — the subtext
+  - **Try:** chips (2–3 options), each with a label (energy name), a `tip` (coaching voice — what to do and why), and a `phrase` (first-person, 5–15 words, ready to speak). Tapping "Add to chat" pastes the phrase into the textarea and focuses it.
+
+**Session length:** 8–10 exchanges. Claude ends naturally when the conversation lands or hits the limit. Hard limit at 10 exchanges enforced server-side. Ending: final in-character line + a coach's note in parentheses (what worked, one specific observation).
+
+**Coach brief card:** Shown before the first user message; dismissable. Re-showable via a "Coach's note" link in the header.
+
+**Sensitive topic guardrail:** Keyword scan on setup text. If triggered, a dismissable banner appears pointing toward professional support.
+
+**Post-session navigation:**
+- **Try another** — resets the session (new scenario)
+- **Practice same conversation again** — restarts with same setup
+- **Back to Conversations** — returns to pillar home
+- **Print / Save as PDF** — opens a branded print layout
+
+**Print layout (chat transcript):** Portal-rendered (not a route). Includes: Bedrock.guide logo, explicit simulated/fabricated disclaimer, setup summary, coach's brief, full YOU/THEM transcript, Decoding boxes with move chips, end coach's note, and a footer describing Bedrock.guide.
+
+**Character rules specific to Back-and-forth** (beyond §18.11):
+- Never references the practice session, the exercise, or the fact that it's playing a role — stays fully in character at all times
+- No conspiracy theories or demonstrably false claims, even in character
+- No personal attacks; redirects to substance if the pull arises in character
+- Stays on topic; redirects in character after more than one drift
+- Hard demographics (age/region) not injected into character play
+
+**API:** `POST /api/conversations/chat`. System prompt cached with `cache_control: { type: 'ephemeral' }`. Model: `claude-sonnet-4-6`. ~$0.011/turn with caching.
 
 ---
 
@@ -2299,7 +2341,7 @@ A compact block at the top of the system prompt, built from the user's stored pr
 >
 > **Start one** — you want to open a conversation with someone who sees it differently.
 > **Respond to one** — someone said the provocative thing, and you want a better answer than the one you'd fire back.
-> **Rehearse one** — you know the conversation's coming. Practice it here first.
+> **Back-and-forth** — you know the conversation's coming. Practice it here first.
 >
 > *One thing it doesn't do yet: remember. Each conversation starts fresh — it won't recall that you talked to your brother-in-law last week and ask how it went. That's coming. For now, it's a sharp first read, every time.*
 
