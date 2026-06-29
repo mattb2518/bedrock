@@ -99,6 +99,7 @@ export interface QuizResult {
 // part of dimensional scoring. Every field is optional; the whole module is
 // skippable.
 export interface Demographics {
+  zipCode?: string // U.S. ZIP — used to match local races in Your Ballot and Beyond Your Ballot
   partyRelationship?: string
   currentRegistration?: string // how the user is registered to vote today
   upbringing?: string // the political environment they grew up in (formative)

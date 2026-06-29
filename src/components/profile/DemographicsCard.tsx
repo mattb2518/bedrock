@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 // Political-background body for the profile accordion. Demographics live in the
 // client quiz store (calibration data, SPEC §12); this is the obvious place to
@@ -110,7 +110,8 @@ export default function DemographicsBody() {
   const demo = session?.demographics
   const hasAny = !!(
     demo &&
-    (demo.partyRelationship ||
+    (demo.zipCode ||
+      demo.partyRelationship ||
       demo.currentRegistration ||
       demo.upbringing ||
       demo.lineage ||
@@ -147,6 +148,29 @@ export default function DemographicsBody() {
   if (editing) {
     return (
       <div>
+        {/* ZIP code — functional field for ballot matching, shown first */}
+        <div style={{ marginBottom: 'var(--space-6)', paddingBottom: 'var(--space-6)', borderBottom: '1px solid var(--color-border)' }}>
+          <label style={{ display: 'block', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-primary)', marginBottom: 'var(--space-1)' }}>
+            ZIP Code
+            <span style={{ fontWeight: 'normal', color: 'var(--color-text-muted)', marginLeft: 'var(--space-2)' }}>optional</span>
+          </label>
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', marginBottom: 'var(--space-2)', lineHeight: 'var(--leading-relaxed)' }}>
+            For U.S. voters — lets us match you to the races on your actual ballot and flag national candidates whose views align with yours. Leave it blank and those pillars still work; they just won't filter by your district.
+          </p>
+          <input
+            type="text"
+            inputMode="numeric"
+            maxLength={5}
+            placeholder="e.g. 10001"
+            value={draft.zipCode ?? ''}
+            onChange={(e) => {
+              const val = e.target.value.replace(/\D/g, '').slice(0, 5)
+              setDraft((d) => ({ ...d, zipCode: val || undefined }))
+            }}
+            style={{ width: 140, backgroundColor: 'var(--color-bg-input)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md, 8px)', padding: 'var(--space-3) var(--space-4)', fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-primary)', boxSizing: 'border-box' }}
+          />
+        </div>
+
         <p style={heading(PARTY_RELATIONSHIP.prompt, false)}>{PARTY_RELATIONSHIP.prompt}</p>
         {PARTY_RELATIONSHIP.options.map((o) => (
           <button
@@ -233,6 +257,7 @@ export default function DemographicsBody() {
       </div>
       {hasAny ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+          {demo?.zipCode && <Row label="ZIP Code" value={demo.zipCode} />}
           <Row label="Relationship to parties" value={demo?.partyRelationship} />
           <Row label="Registered today as" value={demo?.currentRegistration} />
           <Row label="Grew up around" value={demo?.upbringing} />
@@ -245,7 +270,7 @@ export default function DemographicsBody() {
         </div>
       ) : (
         <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)' }}>
-          Optional context — your relationship to parties, where you’re coming from, and basic geography. It’s never used for anything but improving your recommendations, and you can change or remove it any time.
+          Optional context — your relationship to parties, where you're coming from, and basic geography. It's never used for anything but improving your recommendations, and you can change or remove it any time.
         </p>
       )}
     </div>
