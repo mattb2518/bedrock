@@ -343,6 +343,154 @@ function TypingIndicator() {
   )
 }
 
+// ─── Input section (standalone to avoid unmount-on-rerender focus loss) ─────
+
+interface InputSectionProps {
+  freeform: string
+  onFreeformChange: (v: string) => void
+  placeholder: string
+  showExamples: boolean
+  onToggleExamples: () => void
+  examples: { left: string; right: string }[]
+  onLoadExample: (text: string) => void
+  chipRows: ChipRow[]
+  chips: Record<string, string[]>
+  onToggleChip: (rowKey: string, chip: string) => void
+  error: string | null
+  submitLabel: string
+  onSubmit: () => void
+  submitDisabled: boolean
+}
+
+function InputSection({
+  freeform, onFreeformChange, placeholder,
+  showExamples, onToggleExamples, examples, onLoadExample,
+  chipRows, chips, onToggleChip,
+  error, submitLabel, onSubmit, submitDisabled,
+}: InputSectionProps) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
+      <div>
+        <textarea
+          value={freeform}
+          onChange={e => onFreeformChange(e.target.value)}
+          placeholder={placeholder}
+          rows={4}
+          style={{
+            width: '100%',
+            fontFamily: 'var(--font-body)',
+            fontSize: 'var(--text-body)',
+            color: 'var(--color-text-primary)',
+            backgroundColor: 'var(--color-bg-surface)',
+            border: '1px solid var(--color-border)',
+            borderRadius: 'var(--radius-md)',
+            padding: 'var(--space-4)',
+            lineHeight: 'var(--leading-relaxed)',
+            resize: 'vertical',
+            boxSizing: 'border-box',
+          }}
+        />
+        <button
+          onClick={onToggleExamples}
+          style={{
+            fontFamily: 'var(--font-body)',
+            fontSize: 'var(--text-small)',
+            color: 'var(--color-text-muted)',
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            padding: 'var(--space-2) 0',
+            textDecoration: 'underline',
+            textUnderlineOffset: '2px',
+          }}
+        >
+          {showExamples ? 'Hide examples' : 'Not sure what to type? Show me examples.'}
+        </button>
+
+        {showExamples && (
+          <div style={{ backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-5)', marginTop: 'var(--space-2)' }}>
+            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', marginBottom: 'var(--space-4)', fontStyle: 'italic' }}>
+              Real kinds of conversations people bring here &mdash; from every direction. Tap one to start, then make it yours.
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+              {examples.map((pair, i) => (
+                <div key={i} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-3)' }}>
+                  {([pair.left, pair.right] as string[]).map((ex, j) => (
+                    <button
+                      key={j}
+                      onClick={() => onLoadExample(ex)}
+                      style={{
+                        fontFamily: 'var(--font-body)',
+                        fontSize: 'var(--text-small)',
+                        color: 'var(--color-text-secondary)',
+                        backgroundColor: 'var(--color-bg)',
+                        border: '1px solid var(--color-border)',
+                        borderRadius: 'var(--radius-md)',
+                        padding: 'var(--space-3)',
+                        textAlign: 'left',
+                        cursor: 'pointer',
+                        lineHeight: 'var(--leading-relaxed)',
+                      }}
+                    >
+                      {ex}
+                    </button>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+        {chipRows.map(row => (
+          <div key={row.key}>
+            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', fontWeight: 'var(--weight-semibold)', margin: '0 0 var(--space-2) 0' }}>
+              {row.label}
+            </p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+              {row.chips.map(chip => (
+                <ChipButton
+                  key={chip}
+                  label={chip}
+                  selected={(chips[row.key] ?? []).includes(chip)}
+                  onClick={() => onToggleChip(row.key, chip)}
+                />
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div>
+        {error && (
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-red)', marginBottom: 'var(--space-3)' }}>
+            {error}
+          </p>
+        )}
+        <button
+          onClick={onSubmit}
+          disabled={submitDisabled}
+          style={{
+            fontFamily: 'var(--font-body)',
+            fontWeight: 'var(--weight-semibold)',
+            fontSize: 'var(--text-body)',
+            color: '#fff',
+            backgroundColor: submitDisabled ? 'var(--color-text-muted)' : 'var(--color-blue-accent)',
+            border: 'none',
+            borderRadius: 'var(--btn-radius)',
+            padding: 'var(--btn-padding-y) var(--btn-padding-x)',
+            cursor: submitDisabled ? 'not-allowed' : 'pointer',
+            transition: 'background-color 0.15s',
+          }}
+        >
+          {submitLabel}
+        </button>
+      </div>
+    </div>
+  )
+}
+
 // ─── Main page ────────────────────────────────────────────────────────────────
 
 export default function ConversationsPage() {
@@ -561,135 +709,6 @@ export default function ConversationsPage() {
   const chipRows = activeMode ? CHIP_ROWS[activeMode] : []
   const examples = activeMode ? EXAMPLES[activeMode] : []
 
-  // ─── Shared input section (chips + freeform + examples) ──────────────────
-  function InputSection({ submitLabel, onSubmit, submitDisabled }: {
-    submitLabel: string
-    onSubmit: () => void
-    submitDisabled: boolean
-  }) {
-    return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
-        <div>
-          <textarea
-            value={freeform}
-            onChange={e => setFreeform(e.target.value)}
-            placeholder={activeMode ? FREEFORM_PLACEHOLDER[activeMode] : ''}
-            rows={4}
-            style={{
-              width: '100%',
-              fontFamily: 'var(--font-body)',
-              fontSize: 'var(--text-body)',
-              color: 'var(--color-text-primary)',
-              backgroundColor: 'var(--color-bg-surface)',
-              border: '1px solid var(--color-border)',
-              borderRadius: 'var(--radius-md)',
-              padding: 'var(--space-4)',
-              lineHeight: 'var(--leading-relaxed)',
-              resize: 'vertical',
-              boxSizing: 'border-box',
-            }}
-          />
-          <button
-            onClick={() => setShowExamples(s => !s)}
-            style={{
-              fontFamily: 'var(--font-body)',
-              fontSize: 'var(--text-small)',
-              color: 'var(--color-text-muted)',
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              padding: 'var(--space-2) 0',
-              textDecoration: 'underline',
-              textUnderlineOffset: '2px',
-            }}
-          >
-            {showExamples ? 'Hide examples' : 'Not sure what to type? Show me examples.'}
-          </button>
-
-          {showExamples && (
-            <div style={{ backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-5)', marginTop: 'var(--space-2)' }}>
-              <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', marginBottom: 'var(--space-4)', fontStyle: 'italic' }}>
-                Real kinds of conversations people bring here &mdash; from every direction. Tap one to start, then make it yours.
-              </p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
-                {examples.map((pair, i) => (
-                  <div key={i} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-3)' }}>
-                    {([pair.left, pair.right] as string[]).map((ex, j) => (
-                      <button
-                        key={j}
-                        onClick={() => loadExample(ex)}
-                        style={{
-                          fontFamily: 'var(--font-body)',
-                          fontSize: 'var(--text-small)',
-                          color: 'var(--color-text-secondary)',
-                          backgroundColor: 'var(--color-bg)',
-                          border: '1px solid var(--color-border)',
-                          borderRadius: 'var(--radius-md)',
-                          padding: 'var(--space-3)',
-                          textAlign: 'left',
-                          cursor: 'pointer',
-                          lineHeight: 'var(--leading-relaxed)',
-                        }}
-                      >
-                        {ex}
-                      </button>
-                    ))}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
-          {chipRows.map(row => (
-            <div key={row.key}>
-              <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', fontWeight: 'var(--weight-semibold)', margin: '0 0 var(--space-2) 0' }}>
-                {row.label}
-              </p>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
-                {row.chips.map(chip => (
-                  <ChipButton
-                    key={chip}
-                    label={chip}
-                    selected={(chips[row.key] ?? []).includes(chip)}
-                    onClick={() => toggleChip(row.key, chip)}
-                  />
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div>
-          {error && (
-            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-red)', marginBottom: 'var(--space-3)' }}>
-              {error}
-            </p>
-          )}
-          <button
-            onClick={onSubmit}
-            disabled={submitDisabled}
-            style={{
-              fontFamily: 'var(--font-body)',
-              fontWeight: 'var(--weight-semibold)',
-              fontSize: 'var(--text-body)',
-              color: '#fff',
-              backgroundColor: submitDisabled ? 'var(--color-text-muted)' : 'var(--color-blue-accent)',
-              border: 'none',
-              borderRadius: 'var(--btn-radius)',
-              padding: 'var(--btn-padding-y) var(--btn-padding-x)',
-              cursor: submitDisabled ? 'not-allowed' : 'pointer',
-              transition: 'background-color 0.15s',
-            }}
-          >
-            {submitLabel}
-          </button>
-        </div>
-      </div>
-    )
-  }
-
   return (
     <div style={{ maxWidth: 'var(--max-width-content)', margin: '0 auto', padding: 'var(--space-16) var(--space-6)' }}>
       <style>{ANIMATIONS}</style>
@@ -777,6 +796,17 @@ export default function ConversationsPage() {
       {/* Openers / Responses — input */}
       {activeMode && activeMode !== 'chat' && !output && (
         <InputSection
+          freeform={freeform}
+          onFreeformChange={setFreeform}
+          placeholder={FREEFORM_PLACEHOLDER[activeMode]}
+          showExamples={showExamples}
+          onToggleExamples={() => setShowExamples(s => !s)}
+          examples={examples}
+          onLoadExample={loadExample}
+          chipRows={chipRows}
+          chips={chips}
+          onToggleChip={toggleChip}
+          error={error}
           submitLabel={loading ? 'Decoding…' : 'Decode this →'}
           onSubmit={handleSubmit}
           submitDisabled={!freeform.trim() || loading}
@@ -914,6 +944,17 @@ export default function ConversationsPage() {
           </p>
 
           <InputSection
+            freeform={freeform}
+            onFreeformChange={setFreeform}
+            placeholder={FREEFORM_PLACEHOLDER['chat']}
+            showExamples={showExamples}
+            onToggleExamples={() => setShowExamples(s => !s)}
+            examples={examples}
+            onLoadExample={loadExample}
+            chipRows={chipRows}
+            chips={chips}
+            onToggleChip={toggleChip}
+            error={error}
             submitLabel="Start chatting →"
             onSubmit={handleStartChat}
             submitDisabled={!freeform.trim()}
