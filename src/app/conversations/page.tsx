@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect, useLayoutEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { useQuizStore } from '@/store/quizStore'
 import type { QuizSession } from '@/types/quiz'
 
@@ -554,8 +555,35 @@ export default function ConversationsPage() {
   // Modal
   const [showGuardrails, setShowGuardrails] = useState(false)
 
-  // Expanded coaching tip — key is `${msgIndex}-${moveLabel}`
+  // Expanded coaching tip — key is `${msgIndex}-${moveIndex}`
   const [expandedTipKey, setExpandedTipKey] = useState<string | null>(null)
+  const [copiedKey, setCopiedKey] = useState<string | null>(null)
+
+  // Pre-practice coach brief from __START__ response
+  const [coachBrief, setCoachBrief] = useState<string | null>(null)
+
+  // Stable print date (computed once on mount)
+  const [printDate] = useState(() => new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }))
+
+  // SSR guard for portal
+  const [portalMounted, setPortalMounted] = useState(false)
+  useEffect(() => { setPortalMounted(true) }, [])
+
+  // Inject print styles once on mount
+  useEffect(() => {
+    const style = document.createElement('style')
+    style.id = 'bedrock-print-styles'
+    style.textContent = `
+      @media screen { .bedrock-print-layout { display: none !important; } }
+      @media print {
+        body > *:not(.bedrock-print-layout) { display: none !important; }
+        .bedrock-print-layout { display: block !important; background: white; font-family: system-ui, sans-serif; color: #1a1a18; padding: 0; margin: 0; }
+        @page { margin: 0.75in; }
+      }
+    `
+    document.head.appendChild(style)
+    return () => { document.getElementById('bedrock-print-styles')?.remove() }
+  }, [])
 
   // Scroll new messages into view as they arrive
   const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -582,6 +610,7 @@ export default function ConversationsPage() {
         setChatEnded(false)
         setChatEndMessage('')
         setChatContext('')
+        setCoachBrief(null)
         setError(null)
       } else if (step === 'output') {
         // Back between two output states — show the form
@@ -601,6 +630,7 @@ export default function ConversationsPage() {
         setChatEnded(false)
         setChatEndMessage('')
         setChatContext('')
+        setCoachBrief(null)
       }
     }
     window.addEventListener('popstate', handlePop)
@@ -631,6 +661,7 @@ export default function ConversationsPage() {
     setChatEnded(false)
     setChatEndMessage('')
     setChatContext('')
+    setCoachBrief(null)
     window.history.pushState({ bedrockStep: 'mode', mode }, '')
   }
 
@@ -652,6 +683,7 @@ export default function ConversationsPage() {
     setChatEnded(false)
     setChatEndMessage('')
     setChatContext('')
+    setCoachBrief(null)
   }
 
   async function handleSubmit() {
@@ -713,9 +745,10 @@ export default function ConversationsPage() {
         throw new Error((data as Record<string, string>).error ?? 'Request failed')
       }
 
-      const data = await res.json() as { reply: string; ended: boolean; endMessage?: string; hint?: ChatHint }
+      const data = await res.json() as { brief?: string; reply: string; ended: boolean; endMessage?: string; hint?: ChatHint }
 
       setChatStarted(true)
+      setCoachBrief(data.brief ?? null)
       setChatMessages([{ role: 'assistant', content: data.reply, hint: data.hint }])
       window.history.pushState({ bedrockStep: 'chatActive' }, '')
 
@@ -794,6 +827,7 @@ export default function ConversationsPage() {
   const examples = activeMode ? EXAMPLES[activeMode] : []
 
   return (
+    <>
     <div style={{ maxWidth: 'var(--max-width-content)', margin: '0 auto', padding: 'var(--space-16) var(--space-6)' }}>
       <style>{ANIMATIONS}</style>
       {showGuardrails && <GuardrailsModal onClose={() => setShowGuardrails(false)} />}
@@ -1137,6 +1171,21 @@ export default function ConversationsPage() {
             </p>
           </div>
 
+          {/* Pre-practice coach brief */}
+          {coachBrief && (
+            <div style={{
+              backgroundColor: 'rgba(196,150,53,0.07)',
+              border: '1px solid rgba(196,150,53,0.3)',
+              borderRadius: 'var(--radius-md)',
+              padding: 'var(--space-3) var(--space-4)',
+            }}>
+              <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', margin: 0 }}>
+                <strong style={{ color: 'var(--color-gold)' }}>Coach&rsquo;s note:</strong>{' '}
+                {coachBrief}
+              </p>
+            </div>
+          )}
+
           {/* Message area */}
           <div style={{
             display: 'flex',
@@ -1199,7 +1248,7 @@ export default function ConversationsPage() {
                       <strong style={{ color: 'var(--color-gold)' }}>Decoding this:</strong>{' '}
                       {msg.hint.read}
                     </p>
-                    <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 'var(--space-2)', marginBottom: 'var(--space-1)' }}>
+                    <div style={{ marginBottom: 'var(--space-2)' }}>
                       <span style={{
                         fontFamily: 'var(--font-body)',
                         fontSize: '11px',
@@ -1207,10 +1256,20 @@ export default function ConversationsPage() {
                         color: 'var(--color-gold)',
                         letterSpacing: 'var(--tracking-wider)',
                         textTransform: 'uppercase',
-                        flexShrink: 0,
                       }}>
                         Try:
                       </span>
+                      <span style={{
+                        fontFamily: 'var(--font-body)',
+                        fontSize: '11px',
+                        color: 'var(--color-text-muted)',
+                        marginLeft: 'var(--space-2)',
+                        fontStyle: 'italic',
+                      }}>
+                        tap any for coaching
+                      </span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 'var(--space-2)', marginBottom: 'var(--space-1)' }}>
                       {msg.hint.moves.map((move, mi) => {
                         const tipKey = `${i}-${mi}`
                         const isOpen = expandedTipKey === tipKey
@@ -1228,30 +1287,58 @@ export default function ConversationsPage() {
                               padding: '2px 10px',
                               cursor: 'pointer',
                               transition: 'all 0.15s',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '4px',
                             }}
                           >
                             {typeof move === 'string' ? move : move.label}
+                            <span style={{ fontSize: '9px', opacity: 0.7 }}>{isOpen ? '▲' : '▼'}</span>
                           </button>
                         )
                       })}
                     </div>
-                    {/* Expanded coaching tip */}
+                    {/* Expanded coaching tip with copy button */}
                     {msg.hint.moves.map((move, mi) => {
                       const tipKey = `${i}-${mi}`
                       const tip = typeof move === 'string' ? null : move.tip
                       return expandedTipKey === tipKey && tip ? (
-                        <p key={mi} style={{
-                          fontFamily: 'var(--font-body)',
-                          fontSize: 'var(--text-small)',
-                          color: 'var(--color-text-secondary)',
-                          lineHeight: 'var(--leading-relaxed)',
-                          margin: 'var(--space-2) 0 0',
+                        <div key={mi} style={{
+                          marginTop: 'var(--space-2)',
                           paddingTop: 'var(--space-2)',
                           borderTop: '1px solid rgba(196,150,53,0.2)',
-                          fontStyle: 'italic',
                         }}>
-                          {tip}
-                        </p>
+                          <p style={{
+                            fontFamily: 'var(--font-body)',
+                            fontSize: 'var(--text-small)',
+                            color: 'var(--color-text-secondary)',
+                            lineHeight: 'var(--leading-relaxed)',
+                            margin: '0 0 var(--space-2) 0',
+                            fontStyle: 'italic',
+                          }}>
+                            {tip}
+                          </p>
+                          <button
+                            onClick={() => {
+                              void navigator.clipboard.writeText(tip)
+                              setCopiedKey(tipKey)
+                              setTimeout(() => setCopiedKey(k => k === tipKey ? null : k), 2000)
+                            }}
+                            style={{
+                              fontFamily: 'var(--font-body)',
+                              fontSize: '11px',
+                              color: copiedKey === tipKey ? 'var(--color-gold)' : 'var(--color-text-muted)',
+                              backgroundColor: 'transparent',
+                              border: `1px solid ${copiedKey === tipKey ? 'rgba(196,150,53,0.4)' : 'var(--color-border)'}`,
+                              borderRadius: 'var(--radius-full)',
+                              padding: '2px 10px',
+                              cursor: 'pointer',
+                              transition: 'all 0.15s',
+                            }}
+                          >
+                            {copiedKey === tipKey ? 'Copied!' : 'Copy'}
+                          </button>
+                        </div>
                       ) : null
                     })}
                   </div>
@@ -1408,6 +1495,22 @@ export default function ConversationsPage() {
               >
                 Practice again
               </button>
+              <button
+                onClick={() => window.print()}
+                style={{
+                  fontFamily: 'var(--font-body)',
+                  fontWeight: 'var(--weight-semibold)',
+                  fontSize: 'var(--text-body)',
+                  color: 'var(--color-text-secondary)',
+                  backgroundColor: 'transparent',
+                  border: '1px solid var(--color-border)',
+                  borderRadius: 'var(--btn-radius)',
+                  padding: 'var(--btn-padding-y) var(--btn-padding-x)',
+                  cursor: 'pointer',
+                }}
+              >
+                Print / Save as PDF
+              </button>
             </div>
           )}
         </div>
@@ -1420,5 +1523,121 @@ export default function ConversationsPage() {
         </p>
       )}
     </div>
+
+    {/* Print layout — portal into body, hidden on screen, shown @media print */}
+    {portalMounted && createPortal(
+      <div className="bedrock-print-layout" style={{ fontFamily: 'system-ui, sans-serif', color: '#1a1a18', background: 'white' }}>
+        {chatStarted && chatMessages.length > 0 && (
+          <>
+            {/* Header */}
+            <div style={{ borderBottom: '1.5px solid #1a1a18', paddingBottom: '18px', marginBottom: '22px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <svg width="26" height="26" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+                  <clipPath id="print-peak"><polygon points="4,52 24,14 38,30 48,20 56,52"/></clipPath>
+                  <g clipPath="url(#print-peak)">
+                    <rect x="0" y="14" width="60" height="14" fill="#6B9FEA"/>
+                    <rect x="0" y="28" width="60" height="13" fill="#D44035"/>
+                    <rect x="0" y="41" width="60" height="13" fill="#E8E4DA"/>
+                  </g>
+                </svg>
+                <span style={{ fontSize: '20px', fontWeight: 500, fontStyle: 'italic', letterSpacing: '-0.3px' }}>
+                  Bedrock<span style={{ fontStyle: 'normal', fontWeight: 400, color: '#888', fontSize: '17px' }}>.guide</span>
+                </span>
+              </div>
+              <span style={{ fontSize: '12px', color: '#888' }}>{printDate}</span>
+            </div>
+
+            {/* Descriptor */}
+            <p style={{ fontSize: '13px', color: '#555', lineHeight: 1.65, marginBottom: '20px' }}>
+              This is a Back-and-forth practice transcript from <strong>bedrock.guide</strong> — a civic conversation tool that helps you prepare for hard conversations before they happen. Coaching notes appear below each response from the other person.
+            </p>
+
+            {/* Setup box */}
+            <p style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#888', marginBottom: '8px' }}>Your setup</p>
+            <div style={{ background: '#f6f5f2', borderRadius: '8px', padding: '14px 18px', marginBottom: '24px' }}>
+              <p style={{ fontSize: '13px', color: '#1a1a18', lineHeight: 1.65, margin: 0 }}>{chatContext}</p>
+            </div>
+
+            {/* Coach brief */}
+            {coachBrief && (
+              <div style={{ background: '#fdf8ee', border: '1px solid #e8d49a', borderRadius: '8px', padding: '12px 16px', marginBottom: '24px' }}>
+                <p style={{ fontSize: '12px', color: '#555', lineHeight: 1.6, margin: 0 }}>
+                  <strong style={{ color: '#8a6c1a' }}>Coach&rsquo;s note:</strong> {coachBrief}
+                </p>
+              </div>
+            )}
+
+            <hr style={{ border: 'none', borderTop: '0.5px solid #ddd', marginBottom: '24px' }} />
+
+            {/* Transcript */}
+            {chatMessages.map((msg, i) => (
+              <div key={i} style={{ marginBottom: '20px' }}>
+                <p style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: msg.role === 'user' ? '#185FA5' : '#888', marginBottom: '5px' }}>
+                  {msg.role === 'user' ? 'You' : 'Them'}
+                </p>
+                <p style={{ fontSize: '14px', color: '#1a1a18', lineHeight: 1.65, marginBottom: msg.role === 'assistant' && msg.hint ? '8px' : 0 }}>
+                  {msg.content}
+                </p>
+                {msg.role === 'assistant' && msg.hint && (
+                  <div style={{ background: '#f6f5f2', borderRadius: '8px', padding: '12px 16px' }}>
+                    <p style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#555', marginBottom: '5px' }}>Decoding this</p>
+                    <p style={{ fontSize: '12.5px', color: '#444', lineHeight: 1.6, fontStyle: 'italic', marginBottom: msg.hint.moves.length ? '8px' : 0 }}>
+                      {msg.hint.read}
+                    </p>
+                    {msg.hint.moves.length > 0 && (
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                        {msg.hint.moves.map((move, mi) => (
+                          <span key={mi} style={{ fontSize: '11px', color: '#185FA5', background: '#e6f1fb', borderRadius: '4px', padding: '3px 8px' }}>
+                            {typeof move === 'string' ? move : move.label}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            ))}
+
+            {/* End message */}
+            {chatEndMessage && chatEndMessage !== '(You ended the practice session.)' && (
+              <div style={{ background: '#fdf8ee', border: '1px solid #e8d49a', borderRadius: '8px', padding: '14px 18px', marginBottom: '24px', marginTop: '8px' }}>
+                <p style={{ fontSize: '13px', color: '#555', lineHeight: 1.65, fontStyle: 'italic', margin: 0 }}>{chatEndMessage}</p>
+              </div>
+            )}
+
+            <hr style={{ border: 'none', borderTop: '0.5px solid #ddd', marginTop: '32px', marginBottom: '28px' }} />
+
+            {/* Footer */}
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
+                <svg width="18" height="18" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+                  <clipPath id="print-peak-foot"><polygon points="4,52 24,14 38,30 48,20 56,52"/></clipPath>
+                  <g clipPath="url(#print-peak-foot)">
+                    <rect x="0" y="14" width="60" height="14" fill="#6B9FEA"/>
+                    <rect x="0" y="28" width="60" height="13" fill="#D44035"/>
+                    <rect x="0" y="41" width="60" height="13" fill="#E8E4DA"/>
+                  </g>
+                </svg>
+                <span style={{ fontSize: '15px', fontWeight: 500, fontStyle: 'italic' }}>
+                  Bedrock<span style={{ fontStyle: 'normal', fontWeight: 400, color: '#888', fontSize: '13px' }}>.guide</span>
+                </span>
+              </div>
+              <p style={{ fontSize: '12.5px', color: '#555', lineHeight: 1.75, marginBottom: '14px' }}>
+                Hard conversations don&rsquo;t get easier by avoiding them — but they get more manageable with practice. Bedrock.guide is a free civic tool that helps you understand where you actually stand on the issues, see how your values connect to real policy choices, and rehearse the conversations that matter before they happen in real life.
+              </p>
+              <p style={{ fontSize: '13px', color: '#1a1a18', lineHeight: 1.75, marginBottom: '14px' }}>
+                Most civic tools are built to tell you what to think. Bedrock.guide is built to help you think — starting with your own values, not a party line or an algorithm&rsquo;s agenda. A short quiz maps your civic identity (your &ldquo;mantle&rdquo;), then four tools put it to work: your ballot matched to your values, a curated media diet, a window into Congress beyond your own races, and — as in this transcript — practice for the hard conversations before they happen. All grounded in how you actually think, not someone else&rsquo;s agenda.
+              </p>
+              <p style={{ fontSize: '12.5px', color: '#555', lineHeight: 1.75, marginBottom: '16px' }}>
+                If someone shared this with you, you can try it yourself — it&rsquo;s free and takes about five minutes to get started.
+              </p>
+              <p style={{ fontSize: '13px', fontWeight: 600, color: '#185FA5' }}>bedrock.guide</p>
+            </div>
+          </>
+        )}
+      </div>,
+      document.body
+    )}
+    </>
   )
 }

@@ -38,7 +38,7 @@ function buildChatSystemPrompt(session: QuizSession | null, context: string, tur
 - Short, natural responses: 2–4 sentences. Conversation, not essay
 - Don't help the user "win" — the point is practice, not a debate victory
 
-**If the user's message is "__START__":** Open the conversation naturally — start in-character with something the other person might plausibly say to kick things off. Brief, realistic, maybe a little pointed (that's why they're practicing).
+**If the user's message is "__START__":** Open the conversation naturally — start in-character with something the other person might plausibly say to kick things off. Brief, realistic, maybe a little pointed (that's why they're practicing). Also include a "brief" field: 1–2 sentences as the coach (stepping fully out of character), orienting the user before the conversation begins — what to expect from this person, where they tend to push or soften. Keep it crisp and specific to the setup.
 
 **Ending the session:** You can and should end when the time is right:
 - After 8–10 exchanges, close naturally if the conversation has run its course
@@ -48,6 +48,9 @@ function buildChatSystemPrompt(session: QuizSession | null, context: string, tur
 
 **Response format:** Return ONLY valid JSON, no markdown fences:
 {"reply": "your in-character response", "ended": false, "hint": {"read": "one sentence: what you (as the other person) are really signaling or doing in this line — the real subtext, not just the surface", "moves": [{"label": "energy name", "tip": "one sentence of specific coaching tuned to this exact exchange — what to say or how to approach it"}, {"label": "energy name", "tip": "..."}]}}
+
+On the first turn only (when the user message is "__START__"), prepend a "brief" field:
+{"brief": "1-2 sentences as coach orienting the user — what to expect from this person, where they'll push or soften", "reply": "...", "ended": false, "hint": {...}}
 
 The "hint" steps outside the fiction after your reply. "read" is your honest decode of what you just did as the other person — the real signal or tactic underneath the line. "moves" are 2–3 response options, each with a label from this list: "disarm with warmth", "get curious", "name it lightly", "find the shared question", "push back gently", "stand your ground", "acknowledge their point", "redirect to shared facts" — and a "tip" that is one sentence of specific, actionable coaching for this exact moment (not generic advice).
 
