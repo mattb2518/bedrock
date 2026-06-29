@@ -381,6 +381,12 @@ function InputSection({
 }: InputSectionProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
+  // On mount: record rows={4} height as the minimum so auto-resize only grows.
+  useLayoutEffect(() => {
+    const el = textareaRef.current
+    if (el) el.style.minHeight = `${el.scrollHeight}px`
+  }, [])
+
   // Sync textarea value when parent pushes a new value (mode reset, example load).
   // useLayoutEffect runs before paint to avoid a one-frame flash.
   useLayoutEffect(() => {
