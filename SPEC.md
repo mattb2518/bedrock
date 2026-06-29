@@ -366,7 +366,7 @@ When something in society isn't working well, what's your instinct?
 
 **It depends** → OT: *"What shapes your answer — the stakes, who's affected, the track record of change in that area?"*
 
-**[EE]:** *"In the 1920s the United States amended the Constitution to ban alcohol, then amended it again to unban alcohol thirteen years later. The GI Bill of 1944 paid for the education of 7.8 million veterans and is widely credited with creating the postwar middle class. Two consequential acts of bold change, one generation apart."*
+*No easter egg on A1 — intentional design decision. The first question auto-advances directly to Q2 so the very first interaction demonstrates quiz pace rather than landing on a "Did you know?" intermission.*
 
 *Note: A1 carries four substantive options instead of the usual three. This is deliberate on the foundational dimension — the original three were all change-positive (mild, bold, structural) and missed the strong-stability position.*
 
@@ -1098,7 +1098,7 @@ When an incumbent is running for reelection, how does that affect your thinking?
 
 The candidate from your usual party is mediocre — not corrupt, just unremarkable. The candidate from the other party is genuinely impressive. How do you vote?
 
-**A.** Vote the party — a mediocre member of the right caucus votes with the right majority and advances the right agenda. Individual quality matters less than which team controls the chamber.
+**A.** Vote the party — a mediocre member of your own party still votes with that caucus, helps it control the chamber, and advances its agenda. Individual quality matters less than which team holds the majority.
 *"Congress is a team sport. A brilliant independent-minded member of the minority has less influence than a mediocre member of the majority."*
 
 **B.** Vote the candidate — democracy works better when voters reward quality and punish mediocrity regardless of party.
@@ -1150,7 +1150,7 @@ If you could move the needle on exactly one issue in American public life — on
 
 ## 10. Layer 4 — Dealbreaker Screen — Complete
 
-*32 binary filters presented as a distinct module after Layer 3*
+*Binary filters presented as a distinct module after Layer 3*
 *Not a quiz — a declaration. Different register, different UI, different emotional weight.*
 *Completely optional but strongly encouraged.*
 *Balanced list: paired items on contested issues so neither side feels targeted.*
@@ -1159,79 +1159,49 @@ If you could move the needle on exactly one issue in American public life — on
 
 *"Which of these, if true of a candidate, would make them a non-starter for you — no matter how much you agreed with everything else about them?"*
 
-### The List
+### The List (v1 build — IDs are stable engine keys)
 
 **PROCESS & INSTITUTIONS**
-1. Questioned the legitimacy of a certified election result without credible evidence
-2. Used public office for personal financial gain
-3. Accepted gifts or payments from industries they regulate
-4. Supports removing or threatening judges for their rulings
-5. Has a documented pattern of lying about verifiable facts
+- DB-1: Questioned the legitimacy of a certified election result without credible evidence
+- DB-2: Used public office for personal financial gain
+- DB-5: Has a documented pattern of lying about verifiable facts
 
 **CIVIL LIBERTIES**
-6. Supports deploying federal law enforcement against peaceful protesters
-7. Supports warrantless surveillance of American citizens
-8. Supports making it materially harder for eligible citizens to cast a ballot
-9. Opposes any measure to verify that voters are eligible to vote
-
-**NATIONAL SECURITY**
-10. Supports withdrawing from NATO or other core defense alliances unilaterally
-11. Supports cutting U.S. defense capability below what's needed to deter major adversaries
+- DB-6: Supports deploying federal law enforcement against peaceful protesters
+- DB-8: Supports restricting access to legal voting without evidence of fraud
 
 **POLICY ABSOLUTES — paired by issue**
 
 *Abortion*
-12. Supports a complete abortion ban with no exceptions
-13. Supports unrestricted abortion access at any point in pregnancy with no limitations
+- DB-10: Supports a complete abortion ban with no exceptions
+- DB-11: Supports unrestricted abortion access at any point in pregnancy with no limitations
 
 *Firearms*
-14. Supports confiscating legally owned firearms from legal owners
-15. Opposes all restrictions on firearms including military-style weapons
+- DB-12: Supports confiscating legally owned firearms from legal owners
+- DB-13: Opposes all restrictions on firearms including military-style weapons
 
 *Healthcare*
-16. Supports an immediate single-payer transition that eliminates employer-sponsored insurance
-17. Supports eliminating Medicare, Medicaid, or other public health coverage entirely
+- DB-14: Supports an immediate single-payer transition that eliminates employer-sponsored insurance
+- DB-15: Supports eliminating Medicare, Medicaid, or other public health coverage entirely
 
-*Policing*
-18. Supports significantly reducing police department funding without an alternative public safety plan
-19. Supports eliminating civilian oversight of law enforcement
-
-*Other*
-20. Supports race- or gender-based preferences in hiring, contracting, or admissions
-21. Supports eliminating LGBTQ+ anti-discrimination protections
-22. Denies that human activity contributes to climate change
-23. Rejects taking any meaningful policy action on climate
-24. Supports directing public education funds primarily to religious institutions
-25. Supports federal speech restrictions on "hate speech" or "misinformation" beyond current First Amendment limits
-26. Supports federal regulation of political campaign speech or content beyond current First Amendment limits
-27. Supports banning books or restricting what can be taught in public schools based on political or ideological viewpoint
-28. Supports legalizing all federally controlled substances including hard drugs
+**OTHER**
+- DB-19: Supports eliminating LGBTQ+ anti-discrimination protections
+- DB-20: Denies that human activity contributes to climate change
 
 **CHARACTER**
-29. Credibly accused of sexual misconduct
-30. Has made public statements that explicitly denigrate people based on race, ethnicity, religion, gender identity, or sexual orientation
-31. Has supported policies that materially disadvantage people based on race, ethnicity, religion, gender identity, or sexual orientation
-32. Has been convicted of a felony involving fraud, violence, or abuse of office
+- DB-26: Credibly accused of sexual misconduct
+- DB-29: Has been convicted of a felony involving fraud, violence, or abuse of office
 
 **Open text:** *"Anything else that would disqualify a candidate for you, regardless of their other positions?"*
 
 ### Design Notes
-- Paired items on contested issues (abortion, firearms, healthcare, policing) displayed side by side — makes balance visible immediately
+- Paired items on contested issues (abortion, firearms, healthcare) displayed side by side — makes balance visible immediately
 - Select all that apply — no minimum, no maximum
 - Open text field at bottom captures anything not on the list
 - UI should feel distinct from quiz — checkboxes not radio buttons, no micro-reactions, no Easter eggs
 - Results from this layer applied as hard exclusion filters in recommendation engine — a candidate who crosses a user's line is excluded regardless of dimensional alignment score
 
-### Balance Notes
-- 5 process/institutional items — neutrally framed, but worth naming honestly: in today's environment several of these (election-legitimacy denial, a pattern of lying, certain conduct items) fire more often on candidates associated with one side. We keep them because the underlying principle is non-negotiable regardless of who currently tests it — not because they are symmetric in current application.
-- 4 civil liberties items — paired both directions: item 8 fires on candidates who burden eligible voters, item 9 on candidates who oppose any eligibility verification; items 6–7 are cross-partisan
-- 2 national security items — paired: item 10 fires on unilateral alliance withdrawal, item 11 on gutting deterrence
-- 16 policy-absolute items:
-  - 8 paired items (12/13, 14/15, 16/17, 18/19) — 4 filter left-leaning candidates, 4 filter right-leaning
-  - 9 "Other" items (20–28) — left-firing: 20 race/gender preferences, 25 speech restrictions, 26 campaign-speech regulation, 28 drug legalization; right-firing: 21 LGBTQ protections, 22 climate-cause denial, 23 climate-policy rejection, 24 religious-school funding, 27 viewpoint-based book/curriculum restrictions
-- 4 character items — neutrally framed; the protected-class items (30, 31) lean toward firing on one side in current application, same caveat as the process items
-- Net firing split across all policy and conduct items: roughly even, with the residual asymmetry concentrated in the principled process and character items, which we keep on principle rather than for balance
-- Total: 32 items + open text
+*Note: The ID scheme uses sparse numbering (DB-1, DB-2, DB-5…) reflecting a fuller planned list. IDs are stable engine keys — do not renumber. Additional items to be added in a future design session.*
 
 ---
 
