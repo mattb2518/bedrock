@@ -544,6 +544,47 @@ export default function ConversationsPage() {
   // Keep focus on chat input after each send so spacebar doesn't land on Send button
   const chatInputRef = useRef<HTMLTextAreaElement>(null)
 
+  // Back-button support: handle in-page history entries
+  useEffect(() => {
+    function handlePop(e: PopStateEvent) {
+      const state = e.state as { bedrockStep?: string; mode?: Mode } | null
+      const step = state?.bedrockStep
+      if (step === 'mode') {
+        // Back to mode-select from output or chat
+        setActiveMode(state?.mode ?? null)
+        setOutput(null)
+        setChatStarted(false)
+        setChatMessages([])
+        setChatInput('')
+        setChatLoading(false)
+        setChatEnded(false)
+        setChatEndMessage('')
+        setChatContext('')
+        setError(null)
+      } else if (step === 'output') {
+        // Back between two output states — show the form
+        setOutput(null)
+      } else {
+        // Back to landing (before any mode was selected)
+        setActiveMode(null)
+        setOutput(null)
+        setFreeform('')
+        setChips({})
+        setShowExamples(false)
+        setError(null)
+        setChatStarted(false)
+        setChatMessages([])
+        setChatInput('')
+        setChatLoading(false)
+        setChatEnded(false)
+        setChatEndMessage('')
+        setChatContext('')
+      }
+    }
+    window.addEventListener('popstate', handlePop)
+    return () => window.removeEventListener('popstate', handlePop)
+  }, []) // state setters are stable — empty deps is correct
+
   function toggleChip(rowKey: string, chip: string) {
     setChips(prev => {
       const current = prev[rowKey] ?? []
@@ -568,6 +609,7 @@ export default function ConversationsPage() {
     setChatEnded(false)
     setChatEndMessage('')
     setChatContext('')
+    window.history.pushState({ bedrockStep: 'mode', mode }, '')
   }
 
   function loadExample(text: string) {
@@ -608,6 +650,7 @@ export default function ConversationsPage() {
       }
       const data = await res.json()
       setOutput(data as ConversationOutput)
+      window.history.pushState({ bedrockStep: 'output' }, '')
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Something went wrong — try again')
     } finally {
@@ -652,6 +695,7 @@ export default function ConversationsPage() {
 
       setChatStarted(true)
       setChatMessages([{ role: 'assistant', content: data.reply, hint: data.hint }])
+      window.history.pushState({ bedrockStep: 'chatActive' }, '')
 
       if (data.ended) {
         setChatEnded(true)
