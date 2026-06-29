@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 // "Your Mantle" — the post-quiz payoff page. Leads with the user's major mantle
 // as a large flip card (front: the mantle; back: the historical figure who
@@ -13,8 +13,7 @@ import Constellation from '@/components/ui/Constellation'
 import { MANTLES, mantleFor, type Mantle } from '@/lib/quiz/mantles'
 import { profileToRadar } from '@/lib/quiz/dimensions'
 
-function FlipCard({ mantle, large = false }: { mantle: Mantle; large?: boolean }) {
-  const [flipped, setFlipped] = useState(false)
+function FlipCard({ mantle, large = false, flipped, onFlip }: { mantle: Mantle; large?: boolean; flipped: boolean; onFlip: () => void }) {
   const pad = large ? 'var(--space-8)' : 'var(--space-5)'
   const nameSize = large ? 'var(--text-h2)' : 'var(--text-h4)'
   const height = large ? 260 : 200
@@ -31,7 +30,7 @@ function FlipCard({ mantle, large = false }: { mantle: Mantle; large?: boolean }
     boxSizing: 'border-box',
   }
   return (
-    <div onClick={() => setFlipped((f) => !f)} style={{ cursor: 'pointer', perspective: '1200px', height }} title={flipped ? 'Click to flip back' : 'Click to flip'}>
+    <div onClick={onFlip} style={{ cursor: 'pointer', perspective: '1200px', height }} title={flipped ? 'Click to flip back' : 'Click to flip'}>
       <div style={{ position: 'relative', width: '100%', height: '100%', transformStyle: 'preserve-3d', transition: 'transform 0.5s ease', transform: flipped ? 'rotateY(180deg)' : 'rotateY(0deg)' }}>
         {/* Front — the mantle */}
         <div style={{ ...face, backgroundColor: 'var(--color-bg-surface)' }}>
@@ -61,15 +60,17 @@ export default function YourMantlePage() {
   const major = result ? mantleFor(result.primaryType) : null
   const minors = (result?.secondaryTypes ?? []).slice(0, 2).map(mantleFor)
   const minorTypes = new Set(minors.map((m) => m.type))
+  const [activeFlip, setActiveFlip] = useState<string | null>(null)
+  const toggleFlip = (id: string) => setActiveFlip((cur) => (cur === id ? null : id))
 
   if (!result || !major) {
     return (
       <div style={{ maxWidth: 'var(--max-width-content)', margin: '0 auto', padding: 'var(--space-16) var(--space-6)', textAlign: 'center' }}>
         <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-h1)', color: 'var(--color-text-primary)', marginBottom: 'var(--space-5)' }}>
-          You don’t have a mantle yet.
+          You don't have a mantle yet.
         </h1>
         <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body-lg)', color: 'var(--color-text-secondary)', marginBottom: 'var(--space-8)' }}>
-          Take Layer 1 of the quiz — about twelve minutes — and we’ll map the civic identity that’s already yours.
+          Take Layer 1 of the quiz — about twelve minutes — and we'll map the civic identity that's already yours.
         </p>
         <Link href="/quiz" style={{ backgroundColor: 'var(--color-red)', color: '#fff', fontFamily: 'var(--font-body)', fontWeight: 'var(--weight-semibold)', padding: 'var(--btn-padding-y) var(--btn-padding-x)', borderRadius: 'var(--btn-radius)', textDecoration: 'none' }}>
           Find your mantle →
@@ -88,17 +89,14 @@ export default function YourMantlePage() {
         <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-gold)', letterSpacing: 'var(--tracking-wider)', textTransform: 'uppercase', marginBottom: 'var(--space-4)' }}>
           Your Civic Mantle · {result.completionPercent}% mapped
         </p>
-        <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-h1)', color: 'var(--color-text-primary)', lineHeight: 'var(--leading-tight)', marginBottom: 'var(--space-4)' }}>
-          You are {major.name}.
+        <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-h1)', color: 'var(--color-text-primary)', lineHeight: 'var(--leading-tight)', marginBottom: 'var(--space-6)' }}>
+          You are
         </h1>
-        <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body-lg)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)' }}>
-          Tap a card to flip it and meet the figure who wore the same mantle.
-        </p>
       </div>
 
       {/* Major — large flip card */}
       <div style={{ maxWidth: 520, margin: '0 auto var(--space-8)' }}>
-        <FlipCard mantle={major} large />
+        <FlipCard mantle={major} large flipped={activeFlip === major.type} onFlip={() => toggleFlip(major.type)} />
       </div>
 
       {/* Affinities — smaller flip cards */}
@@ -109,7 +107,7 @@ export default function YourMantlePage() {
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: minors.length > 1 ? '1fr 1fr' : '1fr', gap: 'var(--space-4)' }} className="ym-affinities">
             {minors.map((m) => (
-              <FlipCard key={m.type} mantle={m} />
+              <FlipCard key={m.type} mantle={m} flipped={activeFlip === m.type} onFlip={() => toggleFlip(m.type)} />
             ))}
           </div>
         </div>
