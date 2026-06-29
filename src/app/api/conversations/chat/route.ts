@@ -92,7 +92,13 @@ export async function POST(request: NextRequest) {
     })
 
     const rawText = response.content[0]?.type === 'text' ? response.content[0].text : ''
-    const jsonText = rawText.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '').trim()
+
+    // Extract JSON — handle leading text, markdown fences, or both
+    const start = rawText.indexOf('{')
+    const end = rawText.lastIndexOf('}')
+    const jsonText = start !== -1 && end > start
+      ? rawText.slice(start, end + 1)
+      : rawText.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '').trim()
 
     let parsed
     try {

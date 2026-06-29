@@ -557,10 +557,10 @@ export default function ConversationsPage() {
   // Expanded coaching tip — key is `${msgIndex}-${moveLabel}`
   const [expandedTipKey, setExpandedTipKey] = useState<string | null>(null)
 
-  // Auto-scroll chat to bottom
+  // Scroll new messages into view as they arrive
   const messagesEndRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
   }, [chatMessages, chatLoading])
 
   // Keep focus on chat input after each send so spacebar doesn't land on Send button
@@ -1142,9 +1142,6 @@ export default function ConversationsPage() {
             display: 'flex',
             flexDirection: 'column',
             gap: 'var(--space-1)',
-            minHeight: '200px',
-            maxHeight: '500px',
-            overflowY: 'auto',
             padding: 'var(--space-3) 0',
           }}>
             {chatMessages.map((msg, i) => (
@@ -1301,6 +1298,7 @@ export default function ConversationsPage() {
 
           {/* Chat input or post-session actions */}
           {!chatEnded ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
             <div style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-end' }}>
               <textarea
                 ref={chatInputRef}
@@ -1356,6 +1354,25 @@ export default function ConversationsPage() {
               >
                 Send &rarr;
               </button>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <button
+                onClick={endChat}
+                style={{
+                  fontFamily: 'var(--font-body)',
+                  fontSize: 'var(--text-small)',
+                  fontWeight: 'var(--weight-semibold)',
+                  color: 'var(--color-text-muted)',
+                  backgroundColor: 'transparent',
+                  border: '1px solid var(--color-border)',
+                  borderRadius: 'var(--btn-radius)',
+                  padding: 'var(--space-2) var(--space-3)',
+                  cursor: 'pointer',
+                }}
+              >
+                End practice
+              </button>
+            </div>
             </div>
           ) : (
             <div style={{ display: 'flex', gap: 'var(--space-3)', flexWrap: 'wrap', paddingTop: 'var(--space-4)', borderTop: '1px solid var(--color-border)' }}>
