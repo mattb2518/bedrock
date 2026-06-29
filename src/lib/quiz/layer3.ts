@@ -17,7 +17,7 @@ export const LAYER3_QUESTIONS: QuizQuestion[] = [
     dimensions: [],
     options: [
       { id: 'L3-Q1-a', text: 'It’s disqualifying — character and conduct in office are inseparable, and a person who behaves badly in private will eventually behave badly in public.', microReaction: 'The most reliable predictor of how someone will exercise power is how they’ve exercised it before — in relationships, in business, in private moments when they thought no one was watching.', scores: {} },
-      { id: 'L3-Q1-b', text: 'Policy mostly wins — I’m electing someone to do a job, not be a role model. If the record is strong and the alternative is worse, I can hold my nose.', microReaction: 'FDR had a famously complicated personal life. LBJ was legendarily cruel to his staff. Both transformed the country.', scores: {} },
+      { id: 'L3-Q1-b', text: 'Policy mostly wins — I’m electing someone to do a job, not be a role model. If the record is strong and the alternative is worse, I can hold my nose.', microReaction: 'FDR had a famously complicated personal life. LBJ was legendarily cruel to his staff. Nixon opened China while keeping an enemies list. Personal flaws and consequential records have coexisted in plenty of presidents.', scores: {} },
       { id: 'L3-Q1-c', text: 'Depends on whether the character issue is relevant to the job — financial fraud tells you something about how someone will handle public money. A messy divorce probably doesn’t.', microReaction: 'Not all character flaws are created equal.', scores: {} },
     ],
     dependsFollowUp: { type: 'open_text', prompt: 'What would push you to “disqualifying” — the type of conduct, how recent, the volume of incidents, whether they’ve acknowledged it?' },

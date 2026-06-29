@@ -71,8 +71,9 @@ export const POLITICAL_LINEAGE: DemographicChoiceQuestion = {
   id: 'lineage',
   prompt: 'Which tradition feels most like your political background — even if you’ve moved away from it?',
   options: [
-    'Progressive / liberal Democrat',
-    'Moderate / centrist Democrat',
+    'Progressive / democratic socialist',
+    'Liberal Democrat',
+    'Moderate / New Democrat',
     'Blue Dog / conservative Democrat',
     'Moderate / Rockefeller Republican',
     'Chamber of Commerce / business Republican',

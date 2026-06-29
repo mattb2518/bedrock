@@ -7,6 +7,10 @@ const faqs = [
     a: "Neither. That's the whole point. Bedrock doesn't have a political position — it has a methodology. The eight dimensions were designed so that both poles have defensible, honorable positions. We've run the \"partisan smell test\" on every question: if either side feels obviously right or wrong, we rewrote it. Read the full methodology to see how we checked our work.",
   },
   {
+    q: "How do you make sure the questions aren't biased?",
+    a: "Two ways. First, structurally: answer order is randomized for every user, scoring keys to an option's content rather than its position, and the Layer 4 dealbreakers are paired left and right. Second, by review: before launch, every question, answer option, micro-reaction, and historical aside was checked item by item from two directions at once — what a sharp critic on the left would object to, and what a sharp critic on the right would object to. An item only passed if it survived both, with a real home for every honest position and no \"fun fact\" that quietly takes a side. We don't claim it's perfect — bias-checking is ongoing, there's a feedback button on every question, and when we get one wrong we fix it and say so. The full method is in our Methodology →",
+  },
+  {
     q: "Who built this and why?",
     a: "Matt Blumberg — technology entrepreneur, registered independent, frustrated with the political options available to voters who don't fit neatly in either party. No political backers, no institutional agenda. A person who got frustrated enough to build something. Read the full story on the About page.",
   },

@@ -75,7 +75,7 @@ export const LAYER1_QUESTIONS: QuizQuestion[] = [
         id: 'A2-b',
         text: 'The federal government — national problems need national solutions, and local governments too often protect local interests at the expense of people who need help most.',
         microReaction:
-          "The equity argument. Local control can mean local exclusion — child labor laws and food safety required federal action because states weren't going there on their own.",
+          "The equity argument — some protections, like child labor laws and food safety, needed a national floor because they weren't going to emerge state by state. The tradeoff is real: a national floor can flatten genuine local difference.",
         scores: { local_federal: 85 },
       },
       {
@@ -94,6 +94,8 @@ export const LAYER1_QUESTIONS: QuizQuestion[] = [
         'Whether equal treatment across states matters for this issue',
       ],
     },
+    easterEgg:
+      "The 10th Amendment — 'powers not delegated to the United States are reserved to the States' — is the shortest and most fought-over sentence in the Bill of Rights. Invoked to defend slavery. Invoked to legalize marijuana. Same 28 words.",
   },
   {
     id: 'A3',
@@ -105,14 +107,14 @@ export const LAYER1_QUESTIONS: QuizQuestion[] = [
         id: 'A3-a',
         text: "Prioritize American interests — a government's first obligation is to its own citizens, and influence abroad is only sustainable when we're strong at home.",
         microReaction:
-          "There's a reason we have a State Department and not a World Department.",
+          "There's a reason we have a State Department and not a World Department — every government answers first to the people who can vote it out.",
         scores: { national_global: 15 },
       },
       {
         id: 'A3-b',
         text: "Weigh global interests seriously — in an interconnected world, what's bad for the world tends to become bad for America, and global leadership builds influence money can't buy.",
         microReaction:
-          'The post-WWII alliance system has shaped the global order for 75 years — the longest stretch without great-power war in modern history.',
+          'The post-WWII alliance system has shaped the global order for 75 years — a period that has coincided with the longest absence of great-power war in modern history.',
         scores: { national_global: 85 },
       },
       {
@@ -233,7 +235,7 @@ export const LAYER1_QUESTIONS: QuizQuestion[] = [
         id: 'A6-c',
         text: 'Building the coalition first — the limiting factor is rarely the idea, it’s the political will, and you build will by bringing more people along before you ask for the vote.',
         microReaction:
-          "The community organizer theory of change. Obama called it 'the long game.' So did Madison, in different words.",
+          "The coalition-building theory of change — the limiting factor is rarely the idea, it's the will, and will gets built one person at a time. Madison called it the slow work of assembling majorities.",
         scores: { pragmatism_idealism: 45 },
       },
     ],
@@ -281,6 +283,8 @@ export const LAYER1_QUESTIONS: QuizQuestion[] = [
         'Whether government or community is doing the asking',
       ],
     },
+    easterEgg:
+      "Eighteen states still have laws requiring citizens to help a neighbor in distress. Vermont's is the most famous — you can be fined for walking past someone drowning. One of the few places American law says being a decent neighbor is mandatory.",
   },
   {
     id: 'A8',
@@ -306,7 +310,7 @@ export const LAYER1_QUESTIONS: QuizQuestion[] = [
         id: 'A8-c',
         text: "Calibrate based on the institution's track record on this specific type of question — the CDC gets more benefit of the doubt on epidemiology than on nutrition.",
         microReaction:
-          'Trust by track record — calibrate based on how the institution has done on this kind of question before. The CDC gets more benefit of the doubt on epidemiology than on nutrition.',
+          'Trust by track record — the same institution can be rigorous in one domain and out over its skis in another. Calibrate to the domain, not the logo.',
         scores: { trust_skepticism: 50 },
       },
     ],
@@ -342,9 +346,9 @@ export const LAYER1_QUESTIONS: QuizQuestion[] = [
       },
       {
         id: 'C2-c',
-        text: "Depends on the investment — some infrastructure requires collective action, others are better left to markets, and 'public investment' covers a lot of very different bets.",
+        text: "Fund it like a private investor would — only with clear milestones, hard sunset clauses, and clawbacks if it fails. Public money should face at least the discipline private capital demands before a dollar goes out.",
         microReaction:
-          "The Hoover Dam and Solyndra are both 'government investments.' The details matter enormously.",
+          "The Hoover Dam and Solyndra were both 'government investments.' The difference wasn't the label — it was whether anyone built in a way to fail fast and cut losses.",
         scores: { individual_collective: 50, markets_governance: 50 },
       },
     ],
@@ -502,10 +506,12 @@ export const LAYER1_QUESTIONS: QuizQuestion[] = [
       },
     ],
     dependsFollowUp: {
-      type: 'open_text',
+      type: ‘open_text’,
       prompt:
-        'What would determine how much executive emergency authority you’d support — the nature of the threat, the specific powers, the track record of the president?',
+        ‘What would determine how much executive emergency authority you’d support — the nature of the threat, the specific powers, the track record of the president?’,
     },
+    easterEgg:
+      "The federal income tax was introduced in 1861 as a temporary Civil War measure. Repealed in 1872. Back in 1894. Struck down by the Supreme Court. Back via constitutional amendment in 1913. The United States has been arguing about a tax that was supposed to last four years for over 160 years. ‘Temporary’ is doing a lot of work in American governance.",
   },
   {
     id: 'S4',
@@ -541,7 +547,7 @@ export const LAYER1_QUESTIONS: QuizQuestion[] = [
         'What would have made the response feel more legitimate — different policies, more honest communication, more local control, clearer expiration dates?',
     },
     easterEgg:
-      'During the 1918 influenza pandemic Philadelphia held a Liberty Loan parade despite warnings from its public health director. Cases exploded within days. San Francisco, which closed schools and banned public gatherings, fared significantly better. The Philadelphia health director who was overruled was named Wilmer Krusen. Almost nobody knows his name, which is its own kind of lesson about how we remember these things.',
+      'The 1918 influenza pandemic killed an estimated 675,000 Americans — more than every U.S. war of the twentieth century combined. There was no national policy; every city decided for itself, and the country argued bitterly over masks, closures, and quarantines, just as it would a century later. Within a generation it had largely faded from public memory.',
   },
 ]
 

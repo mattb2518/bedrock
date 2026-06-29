@@ -83,6 +83,27 @@ export default function MethodologyPage() {
         </section>
 
         <section>
+          <h2 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-h3)", color: "var(--color-text-primary)", marginBottom: "var(--space-4)" }}>How we bias-checked every question.</h2>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-body)", color: "var(--color-text-secondary)", lineHeight: "var(--leading-relaxed)", marginBottom: "var(--space-4)" }}>The five tests above are about the model. But a neutral model can still be undermined by a single leading question, a loaded answer option, or a "fun fact" that quietly takes a side. So before launch, every question, every answer option, every micro-reaction, and every historical easter egg went through a separate, item-by-item review.</p>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-body)", color: "var(--color-text-secondary)", lineHeight: "var(--leading-relaxed)", marginBottom: "var(--space-4)" }}>The method is adversarial, and we run it twice. For each item we ask: what would a sharp, good-faith critic <em>from the left</em> say — does any option read as the obviously wrong answer for a progressive, does the framing assume a center-right baseline, does a reaction reward one direction over the other? Then we ask the identical question <em>from the right</em>. An item only passes when it survives both.</p>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-body)", color: "var(--color-text-secondary)", lineHeight: "var(--leading-relaxed)", marginBottom: "var(--space-4)" }}>Three things we specifically check:</p>
+          {[
+            ["Every option has a home.", "On every question, all of the options — not just the middle one — have to be a position a thoughtful person actually holds, stated in its own strongest terms. If one side's real view is missing, or shows up only as a straw man, that's a defect we fix — even when fixing it means adding an option or rewriting one we liked."],
+            ["The easter eggs don't argue.", "The historical asides are there to be interesting, not to make a point. A true fact selected because it flatters one side is still a thumb on the scale, so the eggs are held to history and Americana that illuminate a tension rather than resolve it."],
+            ["Structure does some of the work.", "Answer order is randomized for every user, so no position gets a permanent advantage from sitting first. Internal scoring keys to the position of an option's content, never its letter. And the Layer 4 dealbreakers are deliberately paired left and right so the balance is visible at a glance — including, where the honest answer required it, items that filter candidates on our own founder's positions."],
+          ].map(([title, desc]) => (
+            <div key={title} style={{ display: "flex", gap: "var(--space-4)", marginBottom: "var(--space-4)" }}>
+              <div style={{ width: "4px", backgroundColor: "var(--color-gold)", borderRadius: "var(--radius-full)", flexShrink: 0 }} />
+              <div>
+                <p style={{ fontFamily: "var(--font-body)", fontWeight: "var(--weight-semibold)", color: "var(--color-text-primary)", marginBottom: "var(--space-1)", fontSize: "var(--text-body)" }}>{title}</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-body)", color: "var(--color-text-secondary)", lineHeight: "var(--leading-relaxed)" }}>{desc}</p>
+              </div>
+            </div>
+          ))}
+          <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-body)", color: "var(--color-text-secondary)", lineHeight: "var(--leading-relaxed)" }}>We're not going to claim the result is perfect. Bias-checking is a practice, not a one-time certificate — language drifts, the news cycle re-codes old words, and a sharp critic will always find something we missed. When that happens, the feedback button on every question comes straight to us, and the commitment below holds: if a question is biased, we fix it and say so.</p>
+        </section>
+
+        <section>
           <h2 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-h3)", color: "var(--color-text-primary)", marginBottom: "var(--space-4)" }}>Three accountability commitments.</h2>
           {[
             ["Published methodology", "Open to scrutiny, updated when we learn something. You're reading it now."],
