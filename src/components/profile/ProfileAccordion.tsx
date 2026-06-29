@@ -169,7 +169,7 @@ export default function ProfileAccordion({ email, provider, joinedAt }: { email:
 
   const sections: { id: string; title: string; body: React.ReactNode; badge?: React.ReactNode }[] = [
     { id: 'civic', title: 'Civic profile', body: <CivicProfileBody /> },
-    { id: 'background', title: 'Political background', body: <DemographicsBody />, badge },
+    { id: 'background', title: 'About You and Your Background', body: <DemographicsBody />, badge },
     { id: 'account', title: 'Account', body: <AccountBody email={email} provider={provider} joinedAt={joinedAt} /> },
     { id: 'actions', title: 'Account actions', body: <AccountActionsBody email={email} provider={provider} /> },
   ]
