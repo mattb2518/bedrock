@@ -210,6 +210,8 @@ function ResponseCard({ r }: { r: ConversationResponse }) {
 
 // ─── Main page ────────────────────────────────────────────────────────────────
 
+const SPIN_STYLE = `@keyframes bedrock-spin { to { transform: rotate(360deg); } }`
+
 export default function ConversationsPage() {
   const session = useQuizStore(s => s.session)
   const hasProfile = Boolean(session?.result)
@@ -286,6 +288,7 @@ export default function ConversationsPage() {
 
   return (
     <div style={{ maxWidth: 'var(--max-width-content)', margin: '0 auto', padding: 'var(--space-16) var(--space-6)' }}>
+      <style>{SPIN_STYLE}</style>
 
       {/* Hero */}
       <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-blue-accent)', letterSpacing: 'var(--tracking-wider)', textTransform: 'uppercase', marginBottom: 'var(--space-5)' }}>
@@ -478,8 +481,16 @@ export default function ConversationsPage() {
 
       {/* Loading */}
       {loading && (
-        <div style={{ textAlign: 'center', padding: 'var(--space-12) 0' }}>
-          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-muted)' }}>
+        <div style={{ textAlign: 'center', padding: 'var(--space-12) 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-4)' }}>
+          <div style={{
+            width: '32px',
+            height: '32px',
+            borderRadius: '50%',
+            border: '3px solid var(--color-border)',
+            borderTopColor: 'var(--color-blue-accent)',
+            animation: 'bedrock-spin 0.75s linear infinite',
+          }} />
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-muted)', margin: 0 }}>
             Reading past the surface…
           </p>
         </div>
