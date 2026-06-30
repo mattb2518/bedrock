@@ -17,9 +17,7 @@ const CHECKLIST_ITEMS: Array<{ id: string; label: string }> = [
   { id: 'pew_typology_constants',    label: 'pew-typology.ts constants file built (Pew group attribution on all ten Mantle cards)' },
   { id: 'profile_export',            label: 'Profile export working and tested' },
   { id: 'account_deletion_cascade',  label: 'Account deletion cascade verified (Supabase on delete cascade)' },
-  { id: 'demographics_opt_out',      label: 'Demographics opt-out toggle in account settings' },
   { id: 'anthropic_data_handling',   label: 'Anthropic API data-handling policy confirmed' },
-  { id: 'pricing_model',             label: 'Pricing/donation model confirmed' },
   { id: 'open_source_scoring',       label: 'Open-source scoring code on GitHub, linked from the Methodology page' },
   { id: 'byb_json_populated',        label: 'Beyond Your Ballot static JSON populated before the pillar goes live' },
 ]
