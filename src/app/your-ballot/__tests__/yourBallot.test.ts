@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { matchRace } from '@/lib/engine/match'
 import { buildMatchKey } from '@/lib/engine/buildMatchKey'
-import { parseDistrictInfo } from '@/lib/civic/resolveDistrict'
+import { parseDistrictInfo } from '@/lib/civic/districtUtils'
 import type { CandidateRecord, MatchKey } from '@/lib/engine/match'
 import type { QuizResult, QuizSession } from '@/types/quiz'
 import { ALL_DIMENSIONS } from '@/lib/engine/match'

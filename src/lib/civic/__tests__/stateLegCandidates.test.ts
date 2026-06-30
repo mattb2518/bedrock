@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { parseDistrictInfo } from '../resolveDistrict'
+import { parseDistrictInfo } from '../districtUtils'
 import { matchRace } from '@/lib/engine/match'
 import { buildMatchKey } from '@/lib/engine/buildMatchKey'
 import type { CandidateRecord, MatchKey } from '@/lib/engine/match'

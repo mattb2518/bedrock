@@ -12,6 +12,8 @@
 // We use the Representatives endpoint (NOT the deprecated representativeInfoByDivision).
 // The response includes `divisions` keyed by OCD-ID.
 
+import { parseDistrictInfo } from './districtUtils'
+
 export interface ResolveDistrictResult {
   ocdIds: string[]
   normalizedAddress: string | null
@@ -25,44 +27,10 @@ export interface ResolveDistrictResult {
   stateHouseDistrict: number | null
 }
 
-export interface DistrictInfo {
-  state: string | null
-  congressionalDistrict: number | null
-  stateSenateDistrict: number | null
-  stateHouseDistrict: number | null
-}
-
-/**
- * Parse state abbreviation and district numbers from a list of OCD-IDs.
- * OCD-ID patterns:
- *   ocd-division/country:us/state:va          → state="VA"
- *   ocd-division/country:us/state:va/cd:5     → congressional district 5
- *   ocd-division/country:us/state:va/sldu:22  → state senate district 22
- *   ocd-division/country:us/state:va/sldl:67  → state house district 67
- */
-export function parseDistrictInfo(ocdIds: string[]): DistrictInfo {
-  let state: string | null = null
-  let congressionalDistrict: number | null = null
-  let stateSenateDistrict: number | null = null
-  let stateHouseDistrict: number | null = null
-
-  for (const id of ocdIds) {
-    const stateMatch = id.match(/\/state:([a-z]{2})(?:\/|$)/)
-    if (stateMatch && !state) {
-      state = stateMatch[1].toUpperCase()
-    }
-    const cdMatch = id.match(/\/cd:(\d+)/)
-    if (cdMatch) congressionalDistrict = parseInt(cdMatch[1], 10)
-
-    const slduMatch = id.match(/\/sldu:(\d+)/)
-    if (slduMatch) stateSenateDistrict = parseInt(slduMatch[1], 10)
-
-    const sldlMatch = id.match(/\/sldl:(\d+)/)
-    if (sldlMatch) stateHouseDistrict = parseInt(sldlMatch[1], 10)
-  }
-
-  return { state, congressionalDistrict, stateSenateDistrict, stateHouseDistrict }
-}
+// Re-export so callers that imported these from resolveDistrict keep working.
+// These are NOT server actions — they live in districtUtils.ts (no 'use server').
+export { parseDistrictInfo } from './districtUtils'
+export type { DistrictInfo } from './districtUtils'
 
 export async function resolveDistrict(address: string): Promise<ResolveDistrictResult> {
   const apiKey = process.env.GOOGLE_CIVIC_API_KEY
@@ -73,7 +41,6 @@ export async function resolveDistrict(address: string): Promise<ResolveDistrictR
   const url = new URL('https://civicinfo.googleapis.com/civicinfo/v2/representatives')
   url.searchParams.set('address', address)
   url.searchParams.set('key', apiKey)
-  // Request only the divisions object — we don't need full representative data here
   url.searchParams.set('includeOffices', 'false')
 
   const res = await fetch(url.toString(), { next: { revalidate: 86400 } }) // cache 24h
