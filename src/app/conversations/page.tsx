@@ -892,8 +892,13 @@ export default function ConversationsPage() {
         So this pillar does one thing first, before anything else: it <strong style={{ color: 'var(--color-text-primary)' }}>decodes</strong>. It reads past the surface to the thing underneath &mdash; the worry, the value, the fear actually driving what got said. Then it finds the opening: the place where what you believe and what they believe actually touch. And hands you a few ways in, in your own voice.
       </p>
 
-      <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', marginBottom: 'var(--space-10)' }}>
+      <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', marginBottom: 'var(--space-6)' }}>
         It won&apos;t help you win. That&apos;s the point. No zingers, no gotchas. Firm on what you believe, genuinely open to the person across from you. Curious, not combative. Both at once.
+      </p>
+
+      <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', marginBottom: 'var(--space-10)' }}>
+        Built on the Ladder of Inference (Argyris / Senge).{' '}
+        <a href="/methodology#conversations" style={{ color: 'var(--color-blue-accent)', textDecoration: 'none' }}>How it works →</a>
       </p>
 
       {/* No-profile nudge */}

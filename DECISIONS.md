@@ -48,6 +48,8 @@ just-in-time, when we start building that pillar.
 
 ## Deferred (build later — don't lose these)
 
+- **Profile export shows answer count, not full answer detail (flagged Stage 10, 2026-06-30):** §27.2 calls for L2-L4 answers to be included "if completed." The current export shows a count ("N questions answered") rather than reconstructing each answered question and response, because mapping stored answer IDs back to their originating layer/question reliably was judged higher-risk than valuable for v1 — an incorrect reconstruction would be worse than an honest count. If full answer detail in the export becomes important, this requires building a reliable answerId → layer/question lookup.
+
 - **Re-classify fidelity limitation (flagged Stage 4a, 2026-06-30):** re-classification of candidates currently runs from stored identity/metadata fields only (name, office, district, party, sourced_from) — the original voting-record text, floor-speech excerpts, and campaign-platform content used in the first classification pass are not persisted, so re-classify is not guaranteed identical to a from-scratch run. Accepted as a v1 tradeoff to avoid storing large raw source text indefinitely. If full-fidelity re-classification becomes important, store original classification inputs in `raw_classification` at first-pass time.
 
 - **Retake → "Edit responses" mode.** The returning-user retake screen ships with
