@@ -11,6 +11,7 @@ import Link from 'next/link'
 import { useQuizStore } from '@/store/quizStore'
 import { mantleFor } from '@/lib/quiz/mantles'
 import { LINEAGE_TRIGGERS } from '@/lib/quiz/demographics'
+import { DIMENSIONS } from '@/lib/quiz/dimensions'
 import type { Demographics } from '@/types/quiz'
 import DemographicsBody from '@/components/profile/DemographicsCard'
 import ChangePassword from '@/components/auth/ChangePassword'
@@ -138,6 +139,104 @@ function AccountActionsBody({ email, provider }: { email: string; provider: stri
   )
 }
 
+function DataExportBody() {
+  const session = useQuizStore((s) => s.session)
+
+  function handleExport() {
+    if (!session?.result) return
+
+    const result = session.result
+    const mantle = mantleFor(result.primaryType)
+    const profile = result.profile as unknown as Record<string, number>
+    const now = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+    const lines: string[] = []
+
+    lines.push('BEDROCK CIVIC PROFILE EXPORT')
+    lines.push(`Exported: ${now}`)
+    lines.push('')
+    lines.push('── YOUR CIVIC MANTLE ──────────────────────────────────────────')
+    lines.push(`${mantle.name}`)
+    lines.push(mantle.oneLiner)
+    lines.push(`Completion: ${result.completionPercent}%`)
+    lines.push('')
+
+    lines.push('── YOUR EIGHT DIMENSIONS ──────────────────────────────────────')
+    for (const dim of DIMENSIONS) {
+      const score = profile[dim.key] ?? 50
+      const towards = score > 50 ? dim.poleB : score < 50 ? dim.poleA : 'center'
+      lines.push(`${dim.key}: ${score}/100 (toward ${towards})`)
+      lines.push(`  ${dim.poleA} ←→ ${dim.poleB}`)
+    }
+    lines.push('')
+
+    if (result.secondaryTypes && result.secondaryTypes.length > 0) {
+      lines.push('── SECONDARY TYPES ────────────────────────────────────────────')
+      for (const t of result.secondaryTypes) lines.push(`  ${t}`)
+      lines.push('')
+    }
+
+    if (session.answers && session.answers.length > 0) {
+      lines.push('── YOUR ANSWERS ───────────────────────────────────────────────')
+      lines.push(`${session.answers.length} questions answered`)
+      lines.push('')
+    }
+
+    if (session.dealbreakers && session.dealbreakers.length > 0) {
+      lines.push('── YOUR DEALBREAKERS ──────────────────────────────────────────')
+      for (const d of session.dealbreakers) lines.push(`  • ${d}`)
+      lines.push('')
+    }
+
+    if (session.demographics) {
+      const d = session.demographics
+      lines.push('── ABOUT YOU ──────────────────────────────────────────────────')
+      if (d.partyRelationship) lines.push(`Party relationship: ${d.partyRelationship}`)
+      if (d.currentRegistration) lines.push(`Current registration: ${d.currentRegistration}`)
+      if (d.upbringing) lines.push(`Upbringing: ${d.upbringing}`)
+      if (d.ageRange) lines.push(`Age range: ${d.ageRange}`)
+      if (d.geography) lines.push(`Geography: ${d.geography}`)
+      if (d.region) lines.push(`Region: ${d.region}`)
+      if (d.regionGrewUp) lines.push(`Grew up in: ${d.regionGrewUp}`)
+      lines.push('')
+    }
+
+    lines.push('───────────────────────────────────────────────────────────────')
+    lines.push(`This is your complete Bedrock values profile, exported on ${now}.`)
+    lines.push('Bedrock does not retain a copy of this export.')
+    lines.push('bedrock.guide')
+
+    const blob = new Blob([lines.join('\n')], { type: 'text/plain;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `bedrock-profile-${now.replace(/\s/g, '-').toLowerCase()}.txt`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  if (!session?.result) {
+    return (
+      <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)' }}>
+        Complete the quiz to enable profile export.
+      </p>
+    )
+  }
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+      <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', margin: 0 }}>
+        Download your complete civic profile as a plain-text file. Includes your Mantle, all eight dimension scores, issue positions, dealbreakers, and demographics if you&apos;ve completed them. Does not include conversation history or feedback data.
+      </p>
+      <button
+        onClick={handleExport}
+        style={{ ...ghostBtn, alignSelf: 'flex-start', cursor: 'pointer' }}
+      >
+        Download profile (.txt)
+      </button>
+    </div>
+  )
+}
+
 export default function ProfileAccordion({ email, provider, joinedAt }: { email: string; provider: string; joinedAt: string }) {
   const [open, setOpen] = useState<string | null>(null)
 
@@ -170,6 +269,7 @@ export default function ProfileAccordion({ email, provider, joinedAt }: { email:
   const sections: { id: string; title: string; body: React.ReactNode; badge?: React.ReactNode }[] = [
     { id: 'civic', title: 'Civic profile', body: <CivicProfileBody /> },
     { id: 'background', title: 'About You and Your Background', body: <DemographicsBody />, badge },
+    { id: 'export', title: 'Data export', body: <DataExportBody /> },
     { id: 'account', title: 'Account', body: <AccountBody email={email} provider={provider} joinedAt={joinedAt} /> },
     { id: 'actions', title: 'Account actions', body: <AccountActionsBody email={email} provider={provider} /> },
   ]

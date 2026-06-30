@@ -657,7 +657,8 @@ export default function YourBallotPage() {
             override Claude&apos;s scoring when the evidence warrants it. We also look at thumbs up and
             thumbs down feedback regularly — when users systematically disagree with a recommendation,
             that&apos;s a signal we take seriously and investigate. The AI does the analysis. Humans stay
-            in the loop.
+            in the loop.{' '}
+            <a href="/methodology#ballot" style={{ color: 'var(--color-blue-accent)', textDecoration: 'none' }}>Full methodology →</a>
           </p>
         )}
       </div>

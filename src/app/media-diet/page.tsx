@@ -468,7 +468,8 @@ export default function MediaDietPage() {
               {/* Claude's role disclosure — §25.1 Your Media Diet version */}
               <details style={{ marginTop: 'var(--space-8)' }}>
                 <summary style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', cursor: 'pointer', listStyle: 'none', display: 'flex', alignItems: 'center', gap: 4 }}>
-                  <span>▸</span> How these recommendations are made &amp; Claude&apos;s role
+                  <span>▸</span> How these recommendations are made &amp; Claude&apos;s role —{' '}
+                  <a href="/methodology#media-diet" style={{ color: 'var(--color-blue-accent)', textDecoration: 'none' }}>full methodology →</a>
                 </summary>
                 <div style={{ marginTop: 'var(--space-2)', padding: 'var(--space-4)', backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)' }}>
                   <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)' }}>

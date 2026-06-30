@@ -65,18 +65,40 @@ export default function PrivacyPage() {
 
         <section>
           <h2 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-h3)", color: "var(--color-text-primary)", marginBottom: "var(--space-4)" }}>Exactly two cookies.</h2>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-body)", color: "var(--color-text-secondary)", lineHeight: "var(--leading-relaxed)", marginBottom: "var(--space-4)" }}>We set exactly two cookies. No third-party cookies. No tracking pixels. No fingerprinting.</p>
-          <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-body)", color: "var(--color-text-secondary)", lineHeight: "var(--leading-relaxed)" }}>
+            Bedrock uses two cookies. One is a strictly necessary authentication cookie that keeps you signed in — without it the product doesn&apos;t work. The other is Plausible Analytics, which is cookieless by design and collects no personal data. We don&apos;t use advertising cookies, tracking cookies, or any third-party cookies. If you have questions about our cookie practices, email <a href="mailto:hello@bedrock.guide" style={{ color: "var(--color-blue-accent)" }}>hello@bedrock.guide</a>.
+          </p>
+        </section>
+
+        <section>
+          <h2 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-h3)", color: "var(--color-text-primary)", marginBottom: "var(--space-4)" }}>Your data, exported.</h2>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-body)", color: "var(--color-text-secondary)", lineHeight: "var(--leading-relaxed)", marginBottom: "var(--space-4)" }}>
+            You can download your complete profile as a plain-text <code style={{ fontFamily: "var(--font-mono, monospace)", fontSize: "var(--text-small)", backgroundColor: "var(--color-bg-surface)", padding: "1px 5px", borderRadius: "var(--radius-sm)" }}>.txt</code> file from the My Profile page.
+          </p>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-small)", fontWeight: "var(--weight-semibold)", color: "var(--color-text-subtle)", textTransform: "uppercase", letterSpacing: "var(--tracking-wider)", marginBottom: "var(--space-2)" }}>The export includes</p>
+          <ul style={{ margin: "0 0 var(--space-4)", paddingLeft: "var(--space-5)", display: "flex", flexDirection: "column", gap: "var(--space-1)" }}>
             {[
-              ["Session cookie", "Keeps you logged in. Expires when you close your browser or after 30 days of inactivity. Essential."],
-              ["Quiz progress cookie", "Saves your progress so you can continue where you left off without an account. Expires after 90 days. Functional."],
-            ].map(([name, desc]) => (
-              <div key={name} style={{ backgroundColor: "var(--color-bg-surface)", border: "1px solid var(--color-border)", borderRadius: "var(--radius-md)", padding: "var(--space-4) var(--space-5)" }}>
-                <p style={{ fontFamily: "var(--font-body)", fontWeight: "var(--weight-semibold)", color: "var(--color-text-primary)", marginBottom: "var(--space-1)", fontSize: "var(--text-body)" }}>{name}</p>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-small)", color: "var(--color-text-secondary)" }}>{desc}</p>
-              </div>
+              "Civic Mantle type and one-liner",
+              "All eight dimensional scores with labels and pole descriptions",
+              "Secondary type(s) if any",
+              "Layer 2 issue positions (if completed)",
+              "Layer 3 priority intensity and behavioral modifiers (if completed)",
+              "Layer 4 dealbreaker selections (if completed)",
+              "Demographic module responses (if completed)",
+              "Quiz completion percentage and last updated date",
+            ].map((item) => (
+              <li key={item} style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-body)", color: "var(--color-text-secondary)" }}>{item}</li>
             ))}
-          </div>
+          </ul>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-small)", fontWeight: "var(--weight-semibold)", color: "var(--color-text-subtle)", textTransform: "uppercase", letterSpacing: "var(--tracking-wider)", marginBottom: "var(--space-2)" }}>The export does NOT include</p>
+          <ul style={{ margin: 0, paddingLeft: "var(--space-5)", display: "flex", flexDirection: "column", gap: "var(--space-1)" }}>
+            {[
+              "Conversation history (not stored — each session starts fresh)",
+              "Feedback submitted on candidates or sources (product data, not profile data)",
+            ].map((item) => (
+              <li key={item} style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-body)", color: "var(--color-text-secondary)" }}>{item}</li>
+            ))}
+          </ul>
         </section>
 
         <section>

@@ -439,7 +439,8 @@ export default function BeyondYourBallotPage() {
               override Claude&apos;s scoring when the evidence warrants it. We also look at thumbs up and
               thumbs down feedback regularly — when users systematically disagree with a recommendation,
               that&apos;s a signal we take seriously and investigate. The AI does the analysis. Humans stay
-              in the loop.
+              in the loop.{' '}
+              <a href="/methodology#beyond-ballot" style={{ color: 'var(--color-blue-accent)', textDecoration: 'none' }}>Full methodology →</a>
             </p>
             <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)' }}>
               <strong style={{ color: 'var(--color-text-primary)' }}>Governance filter:</strong> Four
