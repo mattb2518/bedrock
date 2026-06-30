@@ -4,6 +4,8 @@
  * §19 of SPEC.md is the authoritative source for every formula and threshold here.
  */
 
+import { LAYER2_QUESTIONS } from '@/lib/quiz/layer2'
+
 // ─────────────────────────────────────────────────────────────────────────────
 // §19.1  Core types
 // ─────────────────────────────────────────────────────────────────────────────
@@ -289,23 +291,23 @@ function applyL2Boost(
   if (!issuePositions || issuePositions.length === 0) return current
   if (current === 'no_call') return current  // hard floor
 
-  // Count corroborating positions: where the candidate has a placed axis score
-  // that is directionally consistent with the user's profile (within 25 points)
+  // Count corroborating positions using the real issue-to-dimension mapping.
+  // Each L2 question declares which dimension(s) it's evidence for via its
+  // `dimensions` field (filled in during Stage 3). A position corroborates a
+  // candidate when the candidate's score on EVERY declared dimension is within
+  // 25 points of the user's profile score on that dimension.
+  const questionMap = new Map(LAYER2_QUESTIONS.map((q) => [q.id, q]))
   let corroborating = 0
   for (const pos of issuePositions) {
-    // TODO(stage-3): replace this structural proxy with a real issue-to-dimension
-    // map. Each L2 question should declare which Dimension(s) it's evidence for,
-    // and corroboration should check whether the user's specific L2 position aligns
-    // with the candidate's score on those specific axes — not general closeness.
-    // The map belongs in the classification pipeline data; the engine just reads it.
-    //
-    // Current proxy: checks whether the candidate has 3+ axes within 25 pts of
-    // the user profile as a stand-in for per-question issue corroboration.
-    const alignedAxes = ALL_DIMENSIONS.filter((a) => {
-      const p = candidate.axisPlacement[a]
-      return p && Math.abs(key.profile[a] - p.score) <= 25
+    const question = questionMap.get(pos.questionId)
+    if (!question || question.dimensions.length === 0) continue
+
+    const allDimsCorroborate = question.dimensions.every((axis) => {
+      const placement = candidate.axisPlacement[axis as Dimension]
+      if (!placement) return false
+      return Math.abs(key.profile[axis as Dimension] - placement.score) <= 25
     })
-    if (alignedAxes.length >= 3) corroborating++
+    if (allDimsCorroborate) corroborating++
   }
 
   if (current === 'lean' && corroborating >= 2) return 'confident'
