@@ -27,6 +27,22 @@ just-in-time, when we start building that pillar.
 | 2026-06-29 | **Conversations: neutrality guardrails confirmed in system prompt.** | No conspiracy theories, no demonstrably false claims, no personal attacks, character never references the practice session. Guardrails are prompt-level, not UI-level. |
 | 2026-06-12 | **Authoritative data-source reference: [`docs/data-sources-feasibility-june2026.md`](docs/data-sources-feasibility-june2026.md).** | From the Claude Project, web-verified June 2026. Governs all external-data, scoring, and schema work. **Supersedes SPEC.md's Tech Stack** where they conflict. Read it before any data-integration session (whole doc, or targeted: §3 Ballot sources, §6 cross-cutting, §9 schema, §10 build sequence). |
 | 2026-06-12 | **Two APIs in SPEC are dead — do not use.** | Google Civic *Representatives* endpoint sunset Apr 2025 → use `divisionByAddress` + congress.gov/Open States/Ballotpedia. ProPublica Congress API archived Feb 2025 → use congress.gov API. (Feasibility doc §2.) SPEC.md Tech Stack still needs correcting — see §8 of the doc. |
+| 2026-06-29 | **Supabase persistence plan approved.** | Single `quiz_profiles` table, automatic conflict resolution (most complete then newest wins), milestone + debounced write cadence, local-first before sign-up. See `docs/supabase-persistence-plan.md`. |
+| 2026-06-29 | **Cookie banner: no banner required.** | Strictly necessary auth cookies + cookieless Plausible analytics. Exempt under GDPR and CCPA. Founder decision. Documented in §27. |
+| 2026-06-29 | **Rhetoric vs record weighting: 3:1 record over rhetoric.** | When both exist: record 75%, stated position 25%. Challenger with rhetoric only: confidence capped at 0.5 regardless of clarity. See §19. |
+| 2026-06-29 | **Dealbreaker evidence standard.** | Triggers exclusion if: public documented statement OR recorded vote OR credible reporting from two or more independent named journalists at high-reliability outlets. Cannot verify → `unknown` status, flagged to user, caps confidence band. See §22 / §19.4. |
+| 2026-06-29 | **Beyond Your Ballot dealbreakers: flags not exclusions.** | Yellow flag on card with the specific item name. User decides. See §23. |
+| 2026-06-29 | **Media Diet independence definition finalized with examples.** | The Dispatch: in (explored sale but no sale occurred, editorial autonomy intact). Pod Save America: out (Soros Fund investment creates structural partisan incentive). Same bar applied consistently regardless of direction. See §24 and §25. |
+| 2026-06-29 | **Admin tool roles: super_admin / admin / user.** | Privacy wall is structural: NO role including super_admin can see individual user quiz answers, dimensional profiles, or conversation history. See §21. |
+| 2026-06-29 | **Profile export: plain-text `.txt` from My Profile page.** | Contents specified in §27. Does not include conversation history or feedback data. |
+| 2026-06-29 | **Media catalog v1: 60 sources, manually curated.** | Committed as `src/data/media-catalog.csv`. Placeholder for the Ad Fontes API feed (v2). Two flags: `[P]` Partisan Lean, `[R]` Questionable Reliability. |
+| 2026-06-29 | **Ninth Mantle type gap: RESOLVED.** | All 10 Civic Mantle types confirmed in `src/lib/quiz/mantles.ts`. |
+| 2026-06-29 | **Demographic/lineage data: does NOT enter distance computation.** | Calibration context only, not a values signal. Entering it would reintroduce the partisan framing the product exists to avoid. See §22.9. |
+| 2026-06-29 | **Auth methods confirmed: email/password, Google OAuth, magic link.** | All three already built. See `/signup`, `/signin`, `/auth/callback` routes. |
+| 2026-06-29 | **Save your progress email: deferred to v2.** | Anonymous users currently lose progress if the browser is closed before account creation. V2 spec in §16 open items. |
+| 2026-06-29 | **Admin tool competitive scope: deliberate v1 decisions.** | Evaluated against best-in-class admin tools. Cohort analysis and time-series trending deferred to v2. Field-level audit trail, API access to admin functions, bulk operations, and Perplexity verification included in v1. |
+| 2026-06-29 | **Beyond Your Ballot governance filter: description not named orgs.** | Criteria describe what qualifies (cross-partisan organization with members from both parties) with examples (Problem Solvers Caucus, Unite America). No Labels excluded due to political baggage from the 2024 third-party effort. |
+| 2026-06-29 | **Eternal Optimist Mantle: confirmed not left-coded.** | Walt Whitman exemplar. Reagan also fits the type. Closed. |
 
 ---
 
@@ -55,16 +71,22 @@ listed so nothing gets lost.
 ### Pillar 1 — Ballot
 - Do we **exclude non-ideological offices** (judges, clerks, many nonpartisan
   local seats) from values-matching, and offer different guidance instead?
+  — ✅ **resolved 2026-06-29:** yes; judicial/nonpartisan offices show with "values matching doesn't apply here" + endorsements/qualifications. See §22.4.
 - What **evidence standard** triggers a dealbreaker exclusion (e.g. "credibly
   accused," "documented pattern of lying")? Editorial-policy call.
+  — ✅ **resolved 2026-06-29:** documented statement OR recorded vote OR 2+ independent named journalists; otherwise `unknown` (caps confidence, flagged). See Decided row + §22 / §19.4.
 - **Rhetoric vs. record** weighting when placing candidates — has real partisan
   consequences; needs an explicit, defensible rule.
+  — ✅ **resolved 2026-06-29:** 3:1 record over rhetoric (record 75% / stated 25%); challenger-only rhetoric capped at 0.5 confidence. See Decided row + §19.4.
 
 ### Pillar 2 — Media Diet
 - **Which independent creators** make the launch catalog, and how are they
   tiered (confirming / expanding / challenging)? The core editorial judgment.
+  — ✅ **resolved 2026-06-29:** 60-source curated catalog (`src/data/media-catalog.csv`); tiering geometry + per-Mantle editorial seed fallback (min 3/tier/Mantle). See §24.
 - **Launch catalog size** and minimum "challenging" pool per Mantle type.
+  — ✅ **resolved 2026-06-29:** 60 sources at launch; minimum 3 per tier per Mantle via the seed fallback. See §24.7.
 - Do we score **mainstream/institutional outlets** too, or independents only?
+  — ✅ **resolved 2026-06-29:** independents only, per the §24.9 independence definition. Institutional outlets fail the independence bar. See §24.9.
 
 ### Pillar 3 — Conversations
 ✅ **Complete — all open questions resolved in build (2026-06-29). See Decided rows above.**

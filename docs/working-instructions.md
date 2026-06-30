@@ -35,9 +35,9 @@ Unresolved design decisions live in Section 16. Claude Code must flag these and 
 
 ---
 
-### Two sessions flagged for more powerful model
-1. **Recommendation engine logic** — use Opus 4.7 or Deep Thinking mode
-2. **Full bias and competitive landscape check** — run complete quiz through Opus
+### Model-tier sessions
+1. ~~Recommendation engine logic~~ — **done (2026-06-29):** specced in a heavyweight session. See SPEC.md §19.
+2. **Full bias and competitive landscape check** — still to run. Run the complete quiz set — plus methodology copy, media-catalog Partisan Lean flags, and the Beyond Your Ballot governance filter — through Opus ("what would a sophisticated critic from the left say, and from the right?"). Use Opus 4.8 Max / Deep Thinking.
 
 ---
 
@@ -54,24 +54,29 @@ Before we start, read these three documents from GitHub:
 - **DECISIONS.md** — log of all decided questions and deferred items
 - **docs/data-sources-feasibility-june2026.md** — authoritative, web-verified reference for all external data sources; governs all data-integration work
 
-Where we are (June 2026):
+Where we are (June 2026, updated 2026-06-29):
 - Quiz: complete and live
 - Brand and visual identity: locked
-- Pillar 1 — Conversations: **complete**, declared ready for user testing. All three modes shipped (Openers, Responses, Back-and-forth live chat). See SPEC.md §18.6b for the shipped architecture and DECISIONS.md for all resolved questions.
-- Pillar 2 — Ballot: not started
-- Pillar 3 — Media Diet: not started
-- Pillar 4 — Beyond Your Ballot: not started
-- Recommendation engine: not built — design must precede build
+- Auth/accounts: built (email/password, Google OAuth, magic link; signup, password reset, email confirmation)
+- Pillar — Your Conversations: **complete**, in user testing. All three modes shipped (Start one / Respond to one / Back-and-forth live chat). See SPEC.md §18.
+- Recommendation engine: **specced** (SPEC.md §19) — ready to build
+- Classification pipeline: **specced** (SPEC.md §20)
+- Admin tool: **specced** (SPEC.md §21)
+- Your Ballot: **specced** (SPEC.md §22)
+- Beyond Your Ballot: **specced** (SPEC.md §23)
+- Your Media Diet + Article Bias Checker: **specced** (SPEC.md §24/§24b); 60-source catalog committed at `src/data/media-catalog.csv`
+- Methodology / FAQ / Privacy pages: **specced** (SPEC.md §25/§26/§27)
+- Supabase persistence: **approved** (`docs/supabase-persistence-plan.md`) — ready to build
 
 What's next (in order):
-1. **Engine design** — flag for Opus with extended thinking. Read feasibility doc §6 and §9–10 before this session. The matching formula, scoring model, and schema are the main open questions.
-2. **Pillar designs** (Ballot, Media, Beyond Your Ballot) — run these in parallel with or right after engine design so pillar requirements inform the engine before it's built. Open design questions for each pillar are in DECISIONS.md.
+1. **Bias + competitive landscape check** — the one remaining heavyweight session (Opus 4.8 Max). Run the full quiz set + methodology copy + media-catalog flags + governance filter through "what would a sophisticated critic from the left/right say?"
+2. **Long-lead outreach (start now):** Ballotpedia licensing (data@ballotpedia.org), Ad Fontes pricing (info@adfontesmedia.com), AllSides non-commercial eligibility (partnerships@allsides.com). See `docs/api-setup.md`.
+3. **Build** — everything else is specced; hand to Claude Code in the build order in that session's prompt below.
 
 Working conventions:
-- After completing each section, push spec updates to GitHub
+- After completing each section, push spec updates to GitHub (checkpoint commits, not batched)
 - Run a bias check before showing any new question drafts
 - Flag complexity creep — known tendency toward over-engineering
-- Engine design session: use Opus with extended thinking
 - Read feasibility doc before any data-source or scoring work — it supersedes SPEC.md's tech stack notes where they conflict, and names two dead APIs (Google Civic Representatives, ProPublica Congress) with their replacements
 
 Start by reading the three docs above, note anything that needs reconciling, then let's tackle the next item.
@@ -96,23 +101,32 @@ Environment and infrastructure (already settled — do not re-litigate):
 - **Framework:** Next.js 15 App Router, React 19, TypeScript, Tailwind CSS, Zustand
 - **Hosting:** Vercel
 - **Database:** Supabase (dedicated instance)
-- **AI:** Anthropic Claude API (`claude-sonnet-4-6` for Conversations; engine TBD)
+- **AI:** Anthropic Claude API (`claude-sonnet-4-6` for Conversations and classification; the matching engine itself is a pure function, no model)
 - **Analytics:** Plausible only — no Google Analytics, no exceptions
 - **DNS:** Cloudflare (bedrock.guide and bedrock.vote)
 - **Repo:** github.com/mattb2518/bedrock
 
-Where we are (June 2026):
+Where we are (June 2026, updated 2026-06-29):
 - Quiz: complete and live
 - Brand and visual identity: locked
-- Pillar 1 — Conversations: **complete**, ready for user testing. Three modes: Openers, Responses, Back-and-forth (live chat with per-turn coaching, print transcripts, session management). See SPEC.md §18.6b.
-- Recommendation engine: not built — must be designed in Claude Project before building
-- Pillars 2–4 (Ballot, Media, Beyond Your Ballot): not started — design precedes build
+- Auth/accounts: built (email/password, Google OAuth, magic link)
+- Your Conversations: **complete**, in user testing. Three modes; Back-and-forth is a full live chat with per-turn coaching, print transcripts, session management. See SPEC.md §18.
+- Everything else is **specced and ready to build**: recommendation engine (§19), classification pipeline (§20), admin tool (§21), Your Ballot (§22), Beyond Your Ballot (§23), Your Media Diet + Article Bias Checker (§24/§24b), Methodology/FAQ/Privacy (§25/§26/§27).
+- 60-source media catalog committed at `src/data/media-catalog.csv`. API setup steps in `docs/api-setup.md`. Supabase persistence plan approved (`docs/supabase-persistence-plan.md`).
 
-Build sequence going forward:
-1. Engine design in Claude Project (use Opus with extended thinking)
-2. Pillar designs in Claude Project (parallel with engine design)
-3. Build engine in Claude Code once design is settled
-4. Build remaining pillars against the live engine
+Build sequence (in order — confirmed 2026-06-29):
+1. **Supabase persistence** — wire `quiz_profiles` per the approved plan (local-first → account merge). Foundation for everything that reads a saved profile.
+2. **Recommendation engine** — `src/lib/engine/match.ts` (pure function; two-stage pipeline per §19), plus `src/lib/engine/mediaMatch.ts`.
+3. **Classification pipeline** — `src/lib/classification/` (sources, candidates, article). Human-review gates per §20.
+4. **Admin tool** — `/admin` (three roles, structural privacy wall, review queue, feedback dashboard, append-only audit log) per §21.
+5. **Beyond Your Ballot** — runs against the static `src/data/beyond-ballot-candidates.json` per §23.
+6. **Article Bias Checker** — `src/lib/classification/classifyArticle.ts` + the Media Diet right rail per §24b.
+7. **Your Ballot — federal** — congress.gov + FEC; address resolution; candidate cards per §22.
+8. **Your Ballot — state** — Open States v3; statewide + state legislative per §22.
+9. **Your Media Diet** — three-tier recommendations against the 60-source catalog per §24.
+10. **Methodology / FAQ / Privacy pages** — per §25/§26/§27.
+
+Note: two sessions have run with Opus 4.8 Max — the recommendation-engine design and this spec-write session. One Opus session remains before launch: the full bias/competitive check (see the Project-chat prompt above).
 
 Working conventions:
 - Auto-commit and push after every task that modifies files — keep the repo in sync

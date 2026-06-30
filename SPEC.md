@@ -1217,24 +1217,33 @@ If you could move the needle on exactly one issue in American public life — on
 1. ~~Account creation timing~~ — **resolved:** optional/contextual; required only at "Save and continue later"
 2. ~~Importance ratings~~ — **resolved:** single "pick your top 3 dimensions" question at end of Layer 1, before constellation reveal
 3. ~~Open text on every question~~ — **resolved:** subtle "+ add context" link on every question, expands inline on click, no forced visibility
-4. Recommendation engine matching formula — biggest unresolved design question; **run a dedicated session with Opus 4.7 or Deep Thinking mode before speccing this**
-5. Candidate data model — how positions map to dimensions
-6. Media diet MVP scope — how many sources at launch
-7. Outreach emails to Ballotpedia (data@ballotpedia.org) and VoteMate (partnerships@votemateus.org) — drafted in earlier session, pending Matt adding name/background before sending
-8. Cookie banner — **legal review required before launch:** confirm whether strictly-necessary-only cookie policy (exactly two cookies, Plausible analytics which is cookieless) requires a user consent banner under applicable law (GDPR, CCPA). If required, design minimal non-intrusive implementation consistent with privacy-first brand.
-9. Opt-out toggle for anonymized research — **required feature before launch:** users must be able to opt out of having their responses used in anonymized aggregate research. Accessible in account settings. Must be built and tested before Privacy & Data page goes live.
-10. Scoring logic open-source — **required before launch:** full scoring methodology to be documented and published on GitHub. Trust & Methodology page links to it directly.
-11. Anthropic API data handling — **confirm before launch:** verify current Anthropic API policy on data storage and model training. Update Privacy & Data "On Claude" section if policy has changed.
+4. ~~Recommendation engine matching formula~~ — **resolved (2026-06-29):** see §19. Two-stage pipeline (dealbreaker exclusion → weighted dimensional distance), rhetoric/record 3:1, challenger confidence cap 0.5, four confidence bands.
+5. ~~Candidate data model~~ — **resolved (2026-06-29):** see §19 `CandidateRecord` interface (8-axis `axisPlacement`, per-item dealbreaker eval, coverage tier).
+6. ~~Media diet MVP scope~~ — **resolved (2026-06-29):** 60 manually-curated sources at launch (`src/data/media-catalog.csv`). See §24.
+7. Outreach emails to Ballotpedia (data@ballotpedia.org) and VoteMate (partnerships@votemateus.org) — drafted in earlier session, pending Matt adding name/background before sending. (See also the new outreach items below for AllSides / Ad Fontes / Ballotpedia licensing.)
+8. ~~Cookie banner~~ — **resolved (2026-06-29):** no banner required. Strictly-necessary auth cookie + cookieless Plausible; exempt under GDPR/CCPA. Founder decision. Documented in §27.
+9. Opt-out toggle for anonymized research — **required feature before launch:** users must be able to opt out of having their responses used in anonymized aggregate research. Accessible in account settings. Tracked in the §21 pre-launch checklist.
+10. ~~Scoring logic open-source~~ — **resolved (2026-06-29):** scoring methodology published on-site (Methodology page, primary), with the GitHub repo public for code inspection and linked from that page. See §25.
+11. Anthropic API data handling — **confirm before launch:** verify current Anthropic API policy on data storage and model training. Update Privacy "On Claude" section if policy has changed.
 12. Pricing/donation model — confirm before launch. FAQ currently flags this.
-13. Data sources and coverage limitations for ballot recommendations — confirm before launch. FAQ currently flags this.
-14. Media ratings methodology — confirm AllSides and Ad Fontes Media as primary sources before launch. FAQ currently flags this.
-15. Your Conversations — scope and UX to be fully specced. See Section 14.
+13. ~~Data sources and coverage limitations for ballot recommendations~~ — **resolved (2026-06-29):** see §22 (v1 = federal + state; congress.gov + FEC + Google Civic + Open States v3; honest "under construction" copy for local races and ballot measures).
+14. ~~Media ratings methodology~~ — **resolved (2026-06-29):** see §24 and §25. Source-level ratings anchored to Ad Fontes / AllSides (v2); Bedrock 8-axis placement with human review.
+15. ~~Your Conversations — scope and UX~~ — **resolved:** shipped and in user testing 2026-06-29. See §18.
 16. Homepage visual design — civic identity layer needs visual treatment above/around the four pillars. Design decision required before build.
-17. Demographic module interaction with scoring — **confirm before build:** how political lineage data interacts with dimensional scores in candidate matching. See Section 12.
+17. ~~Demographic module interaction with scoring~~ — **resolved (2026-06-29):** demographic/lineage data does NOT enter the distance computation. It is calibration context, not a values signal — entering it would reintroduce the partisan framing the product exists to avoid. See §12 and §22.
 
-**REMINDER FOR MATT — two sessions to run with a more powerful model before build:**
-- **Recommendation engine logic:** Use Opus 4.7 or Deep Thinking mode for the matching formula design — multi-constraint optimization that benefits from deeper reasoning
-- **Full bias and competitive landscape check:** Run the complete quiz question set through Opus asking "what would a sophisticated critic from the left say, and from the right" — fresh eyes on the whole instrument at once
+**New open items (added 2026-06-29):**
+- **AllSides non-commercial eligibility** — confirm in writing before using CC BY-NC 4.0 data. Email drafted, pending send to partnerships@allsides.com.
+- **Ad Fontes Data Platform** — confirm pricing and access before v2 media-catalog automation. Email drafted, pending send to info@adfontesmedia.com.
+- **Ballotpedia licensing** — initiate immediately (long lead time). Email drafted, pending send to data@ballotpedia.org.
+- **Beyond Your Ballot static JSON** (`src/data/beyond-ballot-candidates.json`) — must be populated as an editorial task before the pillar goes live. Not a build task. Tracked in the §21 pre-launch checklist.
+- **Pre-launch bias check** — run on quiz questions AND methodology/FAQ copy AND media-catalog Partisan Lean flag consistency AND the Beyond Your Ballot governance-filter criteria. Tracked in the §21 checklist. **Run with Opus (see reminder below).**
+- **Save-your-progress email** — **deferred to v2.** Anonymous users currently lose quiz progress if the browser is closed before account creation. V2: email a magic link restoring the exact quiz position; requires a temporary session token + server-side partial-state storage.
+- **Weekly admin digest email** — Claude-generated actionable summary (not raw numbers), sent via Resend from admin@bedrock.guide. Decide cron vs. manual trigger before building (§21).
+
+**REMINDER FOR MATT — model-tier sessions:**
+- ~~Recommendation engine logic~~ — **done (2026-06-29):** matching formula specced in a heavyweight session. See §19.
+- **Full bias and competitive landscape check (still to run):** run the complete quiz question set — plus methodology copy, media-catalog Partisan Lean flags, and the governance filter — through Opus asking "what would a sophisticated critic from the left say, and from the right?" Fresh eyes on the whole instrument at once. Use Opus 4.8 Max / Deep Thinking.
 ---
 
 ## 17. Environment Variables
@@ -1256,6 +1265,12 @@ GITHUB_TOKEN=your_token_here
 
 # Anthropic
 ANTHROPIC_API_KEY=your_key_here
+
+# Perplexity — admin verification (current ownership / status / reliability checks)
+PERPLEXITY_API_KEY=your_key_here
+
+# Resend — admin digest email ONLY (auth emails handled by the Supabase–Resend integration, not here)
+RESEND_API_KEY_ADMIN=your_key_here
 
 # Supabase
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
@@ -1296,6 +1311,12 @@ NEXT_PUBLIC_APP_ENV=development
 - *Ballotpedia key will be blank until licensing conversation is complete*
 - *VoteSmart key will be blank until nonprofit application is approved*
 - *During Phase 1 (mocked data), only ANTHROPIC_API_KEY and Supabase keys are needed*
+
+*Notes added 2026-06-29:*
+- *Supabase now uses the new **publishable/secret** key format (`sb_publishable_…` / `sb_secret_…`), not the legacy JWT format (`eyJhbG…`). Both are currently present in `.env.local` — **Claude Code uses the new format only**; ignore the legacy JWT keys.*
+- *The admin digest sends **FROM `admin@bedrock.guide`** (domain verified in Resend). No additional setup needed.*
+- *Auth emails (confirmation, password reset, magic link) are handled by the **Supabase–Resend integration configured in the Supabase dashboard** — NOT via `.env.local`. Do not duplicate them here.*
+- *Google OAuth is configured in the **Supabase Auth dashboard**. No additional env vars are needed beyond the existing Supabase keys.*
 
 ---
 
@@ -2098,6 +2119,8 @@ hello@bedrock.guide (all pages, all contexts)
 *Specced June 2026. This section supersedes the earlier Section 16 "Your Conversations — Feature Spec" stub, which captured early decisions only. Where they conflict, this section governs.*
 *First pillar to build (DECISIONS.md): lowest data risk, needs only the values profile + a Claude system prompt. Sonnet 4.6 + prompt caching, ~$0.011/turn.*
 
+*Status (2026-06-29): all three modes shipped and **in user testing**. Mode 3 (Back-and-forth) shipped as a full live practice chat — see §18.6b. Model confirmed `claude-sonnet-4-6` + prompt caching (§18.12); neutrality guardrails in the system prompt (§18.8, §18.11); clean-slate / no-save for v1 (§18.10). The Conversations methodology paragraph and FAQ live in §25 and §26 (not duplicated here).*
+
 ---
 
 ### 18.1 What It Is — and the Decode Centerpiece
@@ -2371,3 +2394,839 @@ All confirmed this session. Most are now structural (in the system prompt or enf
 - Model: **Claude Sonnet 4.6** + prompt caching (feasibility doc §5).
 - **Deferred to v2:** cross-conversation memory; regenerate/reroll button; the "save history (opt-in)" pattern (superseded by clean-slate v1 + true-memory v2).
 - The system prompt (18.8) is the piece most worth iterating on. Treat its *structure* as locked; expect wording tuning against real example inputs.
+
+
+---
+
+## 19. Recommendation Engine
+
+**Location:** `src/lib/engine/match.ts`
+**Type:** Pure function. No side effects, no external calls, no state. Profile in → ranked results out. Reads from a pre-built catalog.
+
+### 19.1 The match key — everything the engine can know about a user
+
+```typescript
+interface MatchKey {
+  // Tier 0 — required (Layer 1 only, ~40% complete)
+  profile: DimensionalProfile        // 8 axes, 0–100
+  axisWeights: AxisWeights           // from L1 importance picks + L3 intensity
+  axisConfidence: AxisConfidence     // derived from lean strength / "it depends" answers
+
+  // Tier 1 — optional (Layers 2 & 3, ~65–85% complete)
+  issuePositions?: IssuePosition[]   // L2: 8 issue stances
+  behaviorMods?: BehaviorModifiers   // L3: characterWeight, electabilityTolerance,
+                                     //     downballotSalience, crossPartyTolerance
+
+  // Tier 2 — optional (Layer 4, ~100% complete)
+  dealbreakers?: ExclusionPredicate[]
+
+  // Metadata
+  completenessPercent: number        // 40 | 65 | 85 | 100
+  edgeCaseFlag?: 'centered' | 'scattered' | 'near_pure' | null
+}
+
+type DimensionalProfile = Record<Dimension, number>  // 0–100 per axis
+type AxisWeights = Record<Dimension, number>         // 1.0 default; flagged axes higher
+type AxisConfidence = Record<Dimension, number>      // 0–1; near-50 answers → lower
+
+type Dimension =
+  'stability_change' | 'local_federal' | 'national_global' |
+  'rules_outcomes' | 'markets_governance' | 'pragmatism_idealism' |
+  'individual_collective' | 'trust_skepticism'
+```
+
+### 19.2 Candidate data model
+
+```typescript
+interface CandidateRecord {
+  id: string
+  name: string
+  office: string
+  officeType: 'ideological' | 'nonpartisan' | 'judicial'
+  district: string                   // OCD-ID
+  party?: string                     // display only, never used in matching
+  axisPlacement: Partial<Record<Dimension, AxisPlacement>>
+  dealbreakers: Record<number, DealbreakEval>  // key = L4 item number 1–29
+  coverageTier: 'federal' | 'statewide' | 'state_legislative' |
+                'local' | 'school_board'
+  sourcedFrom: string[]
+  lastUpdated: string                // ISO date
+  independentMindedScore?: number    // 0–4; used in Beyond Your Ballot only
+}
+
+interface AxisPlacement {
+  score: number        // 0–100, same polarity as user profile
+  confidence: number   // 0–1
+  rationale: string    // one-line source basis
+  sources: string[]    // citation URLs
+}
+
+type DealbreakEval =
+  | { status: 'clear' }
+  | { status: 'crosses'; evidence: string; source: string }
+  | { status: 'unknown'; note: string }
+```
+
+### 19.3 Media source data model
+
+```typescript
+interface MediaSource {
+  id: string
+  name: string
+  kind: 'journalist' | 'substack' | 'podcast' | 'outlet' | 'newsletter' | 'youtube'
+  formats: ('newsletter' | 'podcast' | 'long-form-writing' |
+            'daily-news' | 'video' | 'social')[]
+  url: string
+  independent: boolean
+  active: 'active' | 'dormant' | 'retired'
+  axisPlacement: Partial<Record<Dimension, AxisPlacement>>
+  coarseLean: 'left' | 'lean-left' | 'center' | 'lean-right' | 'right' | 'heterodox'
+  reliability: number      // 0–100
+  independence: number     // 0–100
+  goodFaith: 'high' | 'mixed' | 'low'
+  transparency: number     // 0–100
+  dimensionCoverage: Partial<Record<Dimension, 'signature' | 'regular' | 'incidental'>>
+  topics: string[]
+  effort: 'light' | 'medium' | 'deep'
+  flags: ('partisan_lean' | 'questionable_reliability')[]
+  biasRatingSource: 'ad_fontes' | 'allsides' | 'mbfc' | 'bedrock_originated'
+  externalRefs: Record<string, string>
+  lastReviewed: string
+  methodologyVersion: string
+  attribution: string
+}
+```
+
+### 19.4 Two-stage matching pipeline
+
+**Stage 1 — Hard excludes (Layer 4 dealbreakers, run first, unconditional):**
+- Any candidate where `dealbreakers[n].status === 'crosses'` is removed from the slate entirely. No partial credit. No discount.
+- `dealbreakers[n].status === 'unknown'` does NOT exclude but caps the confidence band. Surfaced to the user as "we couldn't verify this dealbreaker for this candidate."
+- A dealbreaker triggers exclusion if ANY of:
+  1. A public documented statement by the candidate
+  2. A recorded vote or official action in public office
+  3. Credible reporting from two or more independent named journalists at high-reliability outlets — links surfaced as evidence
+- Cannot verify → `unknown` status, cap confidence, surface to user.
+
+**Stage 2 — Weighted dimensional distance over survivors:**
+
+```
+For candidate c and user u:
+A = axes where axisPlacement[a] exists AND candidate confidence > 0
+
+score(c) = Σ_{a∈A}  w_a · conf_cand_a · (1 − |u_a − c_a| / 100)
+           ─────────────────────────────────────────────────────────
+                       Σ_{a∈A}  w_a · conf_cand_a
+```
+
+Where:
+- `w_a` = `axisWeights[a]` — user importance weight (default 1.0; L1-flagged axes 1.5; L3 intensity can push to 2.0)
+- `conf_cand_a` = candidate confidence on axis `a`
+- Missing axes are **NEVER** imputed to 50 — absence means absent from the computation.
+
+**Rhetoric vs record weighting (decided):**
+- When both exist: voting record 75% weight, stated position 25%.
+- Challenger with rhetoric only: stated position 100% weight, axis confidence automatically capped at 0.5 regardless of the clarity of the statement. Honest acknowledgment that we can't know follow-through.
+
+**Layer 2 issue positions:**
+Bounded confidence boost only, applied after the distance score on races where a position is directly salient. Cannot overturn the dimensional ranking by more than a capped margin. Cannot move a `no_call` to `confident`. Can move `lean` to `confident` when 2+ positions corroborate.
+
+### 19.5 Confidence bands
+
+```typescript
+type ConfidenceBand = 'confident' | 'lean' | 'informational' | 'no_call'
+```
+
+Derived from the minimum of three factors (the weakest factor caps the band):
+1. **Coverage:** how many axes jointly scored, including user priority axes
+2. **Unknown dealbreakers:** each unknown caps confidence further
+3. **Separation:** the score gap between the top two candidates
+
+Presentation:
+- `confident`: "Based on your values, here's who we recommend and why."
+- `lean`: "This leans toward X on what we can see, but it's a lighter call."
+- `informational`: show candidates with data, no pick highlighted.
+- `no_call`: "We don't have enough to say about this race. Here's how to research it yourself." Candidate names + research links.
+
+### 19.6 Output per race
+
+```typescript
+interface RaceResult {
+  raceId: string
+  officeName: string
+  officeType: 'ideological' | 'nonpartisan' | 'judicial'
+  ranked: {
+    candidate: CandidateRecord
+    score: number
+    confidence: ConfidenceBand
+    topAlignedAxes: Dimension[]
+    topDivergentAxes: Dimension[]
+    explanation: string        // Claude-generated from axis rationale
+    unknownDealbreakers: string[]
+  }[]
+  separation: number
+  dataCompleteness: number
+  attributionSources: string[]
+}
+```
+
+### 19.7 Edge case routing
+
+Centered and scattered profiles (`edgeCaseFlag` set) use dimension-weighted matching that leans only on axes scored away from 50. This is the **same code path** as the standard formula — not a special case — because `axisConfidence` is naturally lower near 50.
+
+### 19.8 Media matching function
+
+Lives in `src/lib/engine/mediaMatch.ts`. Simpler than candidate matching — no dealbreakers, no issue positions.
+
+Inputs from the user profile (Layer 1 only):
+- `dimension_scores[8]`
+- `top_dimensions[≤3]` — defines `tension_on_held`
+- `primary_type` + `secondary_types` — drives per-Mantle seed fallback
+- `edge_case_flag`
+- `completeness_pct`
+
+Three computed values per source:
+- `agreement(U,S)`: overall closeness on engaged axes
+- `tension_on_held(U,S)`: distance on the user's top-3 held dimensions
+- `novel_coverage(U,S)`: source `dimension_coverage` on dimensions the user's confirming set covers thinly
+
+Tier assignment:
+- **Confirming:** `agreement >= 0.65`, `tension_on_held <= 0.3`, `reliability >= 60`
+- **Expanding:** `agreement >= 0.4`, `tension_on_held <= 0.4`, `novel_coverage >= 0.5`, `reliability >= 60`, not in confirming
+- **Challenging:** `tension_on_held >= 0.6`, `reliability >= 75`, `good_faith === 'high'`, `independence >= 50`
+
+Diversity pass within each tier: format mix, topic spread, multi-direction in challenging (not all from one direction).
+
+Per-Mantle editorial seed fallback: if geometry produces a thin or lopsided tier for a user, fall back to a hand-picked seed list per Mantle type. Guarantees every user gets a credible diet on day one.
+
+**Dealbreakers NEVER touch the media engine. Hard architectural wall.**
+
+### 19.9 Beyond Your Ballot matching
+
+Identical to the Your Ballot engine with two pre-filters on the candidate set:
+1. **Geographic exclusion:** remove candidates where the district OCD-ID matches any of the user's own district OCD-IDs.
+2. **Independent-minded governance gate:** `independentMindedScore >= 2`.
+
+Dealbreakers run as **FLAGS not exclusions.** Yellow flag on the card with the specific item name. The user decides whether to act.
+
+---
+
+## 20. Classification Pipeline
+
+**Purpose:** populate the candidate and media-source catalogs with 8-axis placements. Runs on ingestion, not on user request. Architecturally separate from the matching engine.
+
+**Locations:**
+- `src/lib/classification/classifySources.ts`
+- `src/lib/classification/classifyCandidates.ts`
+- `src/lib/classification/classifyArticle.ts` (Article Bias Checker)
+
+### 20.1 Source classification — human gates entry
+
+Admin reviews the suggestion queue and marks items `classify` or `reject` **before** Claude classification runs. Rejected items get a logged reason. Only approved items trigger the Claude API call.
+
+Claude classification call for sources: analyzes 5–10 recent pieces fetched via URL. Returns a per-axis score (0–100), confidence per axis, rationale, and evidence citations (specific published pieces). A human reviews the output before anything goes live. A human can override any field.
+
+### 20.2 Candidate classification — automatic ingestion
+
+Every new filing from congress.gov or Open States triggers classification automatically. Human review happens **after** classification, not before ingestion.
+
+Claude classification call for candidates: fetches the public record (voting history, floor speeches, committee positions, campaign platform, town hall transcripts). Applies rhetoric/record weighting (3:1 record over rhetoric when both exist). Returns the same structure as source classification plus dealbreaker evaluations per L4 item.
+
+### 20.3 When Ad Fontes / AllSides APIs are live (v2)
+
+External rating becomes the seed. The Claude prompt changes from "score this source from scratch" to "here are the Ad Fontes scores — map to Bedrock's 8-axis framework and fill the gaps Ad Fontes doesn't cover."
+
+Priority order: external rating anchor → Claude translation/gap-fill → human review → user feedback signal.
+
+Ratings conflict (external vs. existing Bedrock): surfaces automatically in the admin tool as a "ratings conflict — needs human review" flag. Never silently overwrites an existing classification.
+
+### 20.4 Catalog entry schema additions (beyond `MediaSource` / `CandidateRecord`)
+
+- `tagged_by: string`
+- `reviewed_by: string`
+- `source_evidence: string[]`    // links to specific pieces justifying scores
+- `external_refs: Record<string, string>`  // allsides_id, ad_fontes_id, mbfc_id
+- `last_reviewed: string`        // ISO date
+- `methodology_version: string`
+- `attribution: string`          // per-license attribution string for the UI footer
+- `bedrock_originated: boolean`  // true when no external rating exists as an anchor
+
+
+---
+
+## 21. Admin Tool
+
+**Route:** `/admin`
+**Auth:** role flag on the user's Supabase record
+
+### 21.1 Three roles
+
+**Super Admin:**
+- Everything Admin can do
+- Promote any user to Admin, demote Admins to users
+- View user list, search by email or name
+- Delete accounts
+- Override any classification or approval
+- Change system-level settings (reliability thresholds, confidence-band parameters, governance-filter criteria)
+- **CANNOT** see individual user quiz answers, dimensional profiles, or conversation history. The privacy wall is **STRUCTURAL not policy** — admin routes literally do not expose this data. This applies to Super Admin too. No exceptions.
+
+**Admin:**
+- Classify and approve sources and candidates
+- Review and act on user feedback
+- Trigger Perplexity verification (per entry and bulk)
+- Trigger Claude re-analysis
+- View the feedback reporting dashboard
+- Process the suggestion queue (approve or reject user suggestions)
+- **CANNOT** promote users or change system settings
+- **CANNOT** see any user profile data
+
+**User:** standard product access only.
+
+### 21.2 User lookup (Super Admin only)
+
+Search field by email or name. Returns: account creation date, quiz completion percentage (**not** answers, **not** scores, **not** any profile data), current role. Promote-to-Admin button. No further data exposed.
+
+### 21.3 Review queue
+
+- List of pending classifications awaiting approval
+- Per-entry view:
+  - Claude-generated axis scores with confidence levels
+  - Evidence citations (links to specific published pieces)
+  - Rationale per axis
+  - Side-by-side comparison with external ratings where available (AllSides, Ad Fontes, MBFC) — pulled live via their APIs
+  - Approve / Edit / Reject / Re-classify actions
+  - Perplexity verify button: fires an API call (`PERPLEXITY_API_KEY`) asking current ownership, recent changes, reliability incidents, current URL validity. Response displays inline.
+  - Last-verified date with a staleness indicator: yellow at 90 days, red at 180 days
+
+### 21.4 Bulk operations
+
+- **Bulk Perplexity verify:** all entries last verified > 90 days, runs as a queue with a progress indicator
+- **Bulk re-classify:** selected entries, results go to the review queue (not live automatically)
+- **Bulk export:** full catalog or filtered subset as CSV
+- **Bulk approve:** multiple review-queue entries in one action
+
+### 21.5 Disagreement flagging
+
+When the classification pipeline runs twice with different prompts OR when two human raters score the same entry, auto-flag entries where outputs diverge more than 20 points on any axis. These go to a separate **reconciliation** queue, not the standard approval queue.
+
+### 21.6 Audit log
+
+Every approval, override, edit, and rejection is attributed with:
+- The user who performed the action (name + role)
+- Timestamp
+- Field-level before/after values for every changed field
+- Action type
+
+The audit log is **append-only, never editable.**
+
+### 21.7 API access to admin functions
+
+An internal API layer on the admin functions so operations can be triggered programmatically. Example: a cron job that automatically flags stale entries (`last_reviewed > 180 days`) every Sunday night. All API calls require a Super Admin auth token.
+
+### 21.8 Feedback reporting dashboard
+
+- Thumbs-down rate per candidate / per source (sortable, highest first)
+- Thumbs-down rate per race / per tier
+- Free-text responses grouped by entity, full text, searchable
+- Chip-frequency breakdown per entity
+- Disagreement rate by Mantle type (surfaces matching problems per type)
+- Auto-flag when thumbs-down rate exceeds the 30% threshold → appears in the review queue for re-classification
+
+**"Analyze this" button per candidate/source:**
+Fires a Claude API call with: the full feedback dataset for that entry + current axis placement + confidence band + source citations + external ratings. Claude returns:
+- What the feedback pattern suggests
+- Which specific axes are most likely wrong
+- Recommended action (re-classify / lower confidence / flag / no action)
+- A draft updated rationale if re-classification is warranted
+
+A human reviews the analysis and decides whether to act. A re-classify button is available from the same screen.
+
+**Weekly digest email:**
+Sent to Super Admin via Resend (`RESEND_API_KEY_ADMIN`). Sends FROM `admin@bedrock.guide` (domain verified in Resend). Contains a Claude-generated paragraph summarizing:
+- The top 5 most-disagreed-with recommendations from the prior week (both Ballot and Media Diet)
+- Feedback patterns across the full catalog
+- Recommended actions
+
+Not raw numbers — an actionable summary requiring human judgment.
+
+### 21.9 Pre-launch checklist (persistent banner in the admin dashboard)
+
+- [ ] Run a bias check on all quiz questions (both passes: left critic, right critic) — extends to methodology copy, media-catalog Partisan Lean flag consistency, and Beyond Your Ballot governance-filter criteria
+- [ ] Run a Partisan Lean flag consistency check across the media catalog (same threshold applied left and right)
+- [ ] Run a bias check on all methodology and FAQ copy
+- [ ] Run a bias check on the Beyond Your Ballot governance-filter criteria
+- [ ] Confirm AllSides non-commercial eligibility in writing (email drafted, pending send to partnerships@allsides.com)
+- [ ] Confirm Ad Fontes Data Platform pricing and access (email drafted, pending send to info@adfontesmedia.com)
+- [ ] Initiate the Ballotpedia licensing conversation (email drafted, pending send to data@ballotpedia.org)
+- [ ] Cookie banner legal review: **COMPLETE** — founder decision, no banner required (strictly necessary auth + cookieless Plausible). Document in the Privacy page.
+- [ ] Scoring methodology published on the site Methodology page
+- [ ] `pew-typology.ts` constants file built (Pew group attribution on all ten Mantle cards)
+- [ ] Profile export working and tested
+- [ ] Account deletion cascade verified (Supabase `on delete cascade`)
+- [ ] Demographics opt-out toggle in account settings
+- [ ] Anthropic API data-handling policy confirmed
+- [ ] Pricing/donation model confirmed
+- [ ] Open-source scoring code on GitHub, linked from the Methodology page
+- [ ] Beyond Your Ballot static JSON populated before the pillar goes live
+
+---
+
+## 22. Your Ballot
+
+### 22.1 V1 scope
+
+- **Federal:** US Senate, US House — full coverage, all candidates
+- **Statewide:** Governor, statewide executives — full coverage
+- **State legislative:** all 50 states via Open States
+- **OUT of v1:** local races, judicial elections, school board, ballot measures, propositions
+
+**Under construction banner (prominent, top of page):**
+> "Your Ballot covers federal and state races for the fall 2026 general election. Local races and ballot measures are coming — we're working through them now. The reason they're not here yet: data on local candidates is patchy and inconsistent across jurisdictions, and we'd rather show you nothing than show you something incomplete or unreliable. We'll tell you when they're ready."
+
+### 22.2 Address resolution flow
+
+1. User enters address
+2. Google Civic `divisionByAddress` → list of OCD-IDs
+3. For each OCD-ID: congress.gov (federal), FEC openFEC (finance), Open States v3 (state legislative)
+4. Render a unified ballot with per-source attribution
+
+### 22.3 Page states by quiz completion
+
+**No quiz at all:**
+Soft gate — show what Your Ballot does, a prominent quiz CTA, no address field. Not a hard block — the user can navigate away — but there is nothing to show without a profile. Generic ballots are not a feature. **Do NOT show the address field to users with no profile.**
+
+**Layer 1 complete (~40%):**
+Address field appears. Real but hedged recommendations. Completion nudge at the bottom of the results page (Option C). Persistent completion indicator in the page header (40%).
+
+**Layers 2–4 complete:**
+Full recommendations, highest confidence. Completion indicator shows 65%, 85%, or 100% depending on the layers completed.
+
+### 22.4 Ballot display
+
+All races in ballot order, top to bottom. Federal first, then statewide, then state legislative. Nothing hidden or collapsed by default. Confidence bands are **PRESENTATION** states, not **VISIBILITY** states — every race appears regardless of confidence.
+
+**Non-ideological offices (judicial, nonpartisan):**
+Show in the ballot UI with "judicial/nonpartisan race — values matching doesn't apply here." Surface endorsements and qualifications instead of dimensional alignment. `office_type` field on `CandidateRecord`: `ideological | nonpartisan | judicial`.
+
+### 22.5 Candidate card (default visible state)
+
+- Name and party (display only — party **NEVER** used in matching)
+- Office sought
+- Match indicator label: Strong match / Moderate match / Partial match / Insufficient data (**NOT** a number)
+- Top 2–3 axes where the user and candidate align
+- One-sentence Claude-generated match explanation
+- Campaign website link (sourced from FEC)
+- Donate link where available from FEC data
+- Dealbreaker flag if any: yellow flag, specific item name
+- "Learn more — full axis breakdown, campaign finance, sources" link
+
+**Learn more expansion contains:**
+- Full axis-by-axis breakdown with rationale per axis
+- FEC campaign finance summary (total raised, top donors)
+- Source attribution per axis (congress.gov / campaign platform / Vote Smart / etc.)
+- Unknown dealbreaker flags with a "research this yourself" prompt and links
+
+### 22.6 Feedback mechanism
+
+Thumbs up / thumbs down on every card.
+Thumbs down expands a short form:
+- Free-text field ("Tell us why")
+- Chips: "I know this candidate" / "Missing context" / "Wrong on a key issue" / "Data seems off"
+
+Thumbs up logs a positive signal quietly. No UI change beyond the icon. No live profile updates from feedback in v1. All feedback feeds the admin reporting dashboard.
+
+**Feedback data saved per submission:**
+- `user_id`, `candidate_id`, `race_id`
+- `confidence_band` at time of feedback
+- `feedback_type`: `'thumbs_up' | 'thumbs_down'`
+- `free_text` (if provided)
+- `chips_selected: string[]`
+- `user_mantle_type`
+- `user_completion_percent`
+- `timestamp`
+- `app_version`
+- `data_version` (which classification version produced this recommendation)
+
+### 22.7 Printable ballot guide
+
+Full ballot PDF — all races, not recommendations only. Server-side PDF generation. Branded Bedrock document with:
+- User name
+- Civic Mantle type and one-liner
+- Complete ballot ordered top to bottom
+- All four confidence states represented honestly
+- Research links for `no_call` races
+
+Infrastructure shared with Conversations print-to-PDF.
+
+### 22.8 Candidate placement methodology
+
+- Incumbents: voting record 75% weight, stated positions 25% weight.
+- Challengers: stated positions 100% weight, confidence capped at 0.5.
+- Generated by the Claude classification pipeline.
+- Human reviewed before publish. A human can override.
+- Methodology published on the site Methodology page. GitHub repo public for code inspection.
+
+### 22.9 Demographic / lineage data interaction with scoring
+
+Confirmed: does **NOT** enter the distance computation. Reason: demographic data is calibration context, not a values signal. Knowing someone is a "drifted-away moderate Democrat" helps interpret scores but should not change the matching math — that would reintroduce the partisan framing the product exists to avoid.
+
+---
+
+## 23. Beyond Your Ballot
+
+### 23.1 Page intro copy
+
+> "Congress runs on margins. The difference between a legislature that occasionally solves problems and one that never does is often a handful of seats — and right now, the list of members willing to cross the aisle for a pragmatic solution is vanishingly small. Beyond Your Ballot surfaces the races outside your district where that margin is actually at stake. You can't vote in these races. But you can pay attention, and you can help."
+
+### 23.2 Two-part page structure
+
+**Part 1 — On your ballot, worth extra support:**
+In-district candidates who clear BOTH the values match AND the independent-minded governance filter. Block label:
+> "On your ballot and worth your support — these candidates are in your district and meet the same independent-minded governance criteria as the races below. Your vote is the most powerful thing you can give them. Your support beyond that matters too."
+
+**Part 2 — Beyond your ballot:**
+Out-of-district federal candidates clearing both filters, matched to user values, ranked by dimensional distance.
+
+Both parts: campaign site link, donate link where available from FEC. Thumbs up/down with the same feedback data model as Your Ballot (substituting `candidate_id`, adding `beyond_ballot_flag: boolean`).
+
+### 23.3 Engine call
+
+Identical to Your Ballot with two pre-filters applied to the candidate set **BEFORE** the engine runs:
+1. **Geographic exclusion:** remove candidates where the district OCD-ID matches any of the user's own district OCD-IDs.
+2. **Independent-minded governance gate:** `independentMindedScore >= 2`.
+
+### 23.4 Dealbreakers: flags not exclusions
+
+Yellow flag on the card with the specific item name. The user decides whether to act on it. Never excluded from results.
+
+### 23.5 Independent-minded governance filter (4 criteria, must meet >= 2)
+
+1. No party-line voting rate above 85% (incumbents with a record only)
+2. History of co-sponsoring or supporting bipartisan legislation (incumbents with a record only)
+3. Publicly committed to specific structural reforms — gerrymandering, campaign finance, filibuster reform — not vague unity language
+4. Endorsed by a documented cross-partisan organization whose membership includes elected officials from both parties acting in a non-party capacity (for example, the Problem Solvers Caucus or Unite America) OR explicitly contested their own party's position on a major issue with a recorded vote or public statement
+
+For challengers without a voting record: only criteria 3 and 4 apply. This filter is **editorial.** Criteria are published on the Methodology page so users can evaluate the judgment.
+
+### 23.6 V1 data
+
+Federal congressional races only. Static JSON file at `src/data/beyond-ballot-candidates.json`, populated manually from congress.gov and FEC data **before the pillar goes live.** The engine runs against this static set. The file must be populated as a pre-launch editorial task (in the §21 pre-launch checklist).
+
+
+---
+
+## 24. Your Media Diet
+
+### 24.1 Page layout
+
+- **Main column (70–80% width):** three-tier recommendations. Scrolls.
+- **Right rail (20–30% width):** Article Bias Checker. Sticky/persistent as the user scrolls the main column. Visual distinction from the main column (subtle different background, thin border). Always visible, never buried. Not a popup or modal.
+
+### 24.2 Three-tier model
+
+- **Confirming — "deepen what you know":** `agreement >= 0.65`, `tension_on_held <= 0.3`, `reliability >= 60`
+- **Expanding — "expand how you think":** `agreement >= 0.4`, `tension_on_held <= 0.4`, `novel_coverage >= 0.5`, `reliability >= 60`, not already in confirming
+- **Challenging — "challenge you where it counts":** `tension_on_held >= 0.6`, `reliability >= 75`, `good_faith === 'high'`, `independence >= 50`
+
+Each tier displays with:
+- A tier header with a one-line explanation of what this tier does and why
+- Source cards (~3–5 per tier to start)
+- Thumbs up / thumbs down on every card
+
+### 24.3 Source card
+
+- Name and creator/host
+- Format(s) — can be multiple
+- One-line description
+- Lean label (with `[P]` flag if Partisan Lean flagged)
+- Thumbs up / thumbs down
+- Link to source
+
+### 24.4 Feedback data saved per submission
+
+- `user_id`, `source_id`
+- `tier` at time of feedback: `'confirming' | 'expanding' | 'challenging'`
+- `feedback_type`: `'thumbs_up' | 'thumbs_down'`
+- `free_text` (if thumbs down)
+- `chips_selected: string[]` — Chips: "I already read this" / "Not my level" / "Don't trust this source" / "Good suggestion" / "Wrong fit for me"
+- `dimension_coverage_tags` of source at time of feedback
+- `user_mantle_type`
+- `user_completion_percent`
+- `timestamp`, `app_version`, `data_version`
+
+### 24.5 Suggest a source button
+
+Appears at the bottom of recommendations. The user nominates a source not in the catalog. Goes to the classification pipeline ingestion queue — the same flow as any new source addition. A human reviews before anything appears live.
+
+### 24.6 Diversity pass within each tier
+
+Enforce format mix (not all podcasts), topic spread, and in the challenging tier specifically: dissent must come from more than one direction (not all from one partisan direction). If the challenging tier is one-directional, that is a curation bug.
+
+### 24.7 Per-Mantle editorial seed fallback
+
+For each of the ten Mantle types, a hand-picked seed list per tier (minimum 3 per tier per Mantle). If geometry over the catalog produces thin or lopsided tiers, fall back to the seed list. Guarantees every user gets a credible diet on day one even with a small catalog.
+
+### 24.8 Launch catalog
+
+`src/data/media-catalog.csv` — 60 sources, manually curated, committed June 29. This is a v1 placeholder intended to be replaced by the Ad Fontes API feed (primary) once licensing is confirmed. AllSides CSV secondary if PBC non-commercial eligibility is confirmed. The catalog is a living document — add sources, remove on change, respond to suggestions and feedback.
+
+Two catalog flags:
+- `[P]` **Partisan Lean:** a clearly identifiable editorial direction. Does not mean unreliable. Disclosed so users know what they're reading.
+- `[R]` **Questionable Reliability:** documented misinformation or insufficient critical framing. No sources currently carry this flag.
+
+### 24.9 Independence definition (for the Methodology page and catalog decisions)
+
+> "The editorial voice is not controlled by a corporate owner, political party, advertiser network, or institutional funder with a partisan agenda. The person or small team making editorial decisions answers primarily to their audience. Independent journalists still have to earn a living — subscriptions, advertising, private investors, foundation grants are all fine as long as they don't control what gets covered or how."
+
+**Independence evaluation rule:**
+> "We evaluate independence at the time of catalog entry and re-evaluate quarterly. A source that is currently independent but has explored a sale is included with a monitoring flag. A source that has accepted outside investment from a donor or organization with a clear partisan agenda is excluded regardless of current founder ownership, because the funding relationship creates a structural incentive that conflicts with editorial autonomy."
+
+**Two documented examples (include in methodology):**
+- **The Dispatch** explored a potential sale to Axel Springer but no sale occurred and editors make their own editorial decisions — **IN.**
+- **Pod Save America** is majority founder-owned but has accepted investment from Soros Fund Management, which has a documented partisan agenda — **OUT.**
+
+Same bar, applied consistently regardless of direction.
+
+**Quarterly review cadence:**
+- Full review of all `active` sources every quarter.
+- Event-triggered re-review: ownership change, major reliability incident, funding change, editorial direction shift.
+- Every change bumps `last_reviewed` and is attributed in the audit log.
+- The Perplexity verify button in the admin tool is used for current-status checks.
+
+---
+
+## 24b. Article Bias Checker
+
+**Location:** right rail of the Your Media Diet page (20–30% width, sticky). Also powered by `src/lib/classification/classifyArticle.ts`.
+
+**Right rail header:** "Check any article."
+
+### 24b.1 Input accepts
+
+- URL (any publicly accessible page — fetched server-side)
+- Pasted text (any length, no character limit)
+- PDF upload (text extracted server-side; image-only PDFs flagged)
+
+### 24b.2 Output (inline in the rail, three parts)
+
+1. **Dimensional breakdown:** which of the 8 axes this article emphasizes and in which direction
+2. **Profile read:** how it maps to the user's specific values profile — labeled as reinforcing / expanding / challenging FOR THIS USER specifically, not generically
+3. **Reliability signal:** source rating if in the catalog; Claude-generated assessment if not
+
+### 24b.3 Intelligent failure states
+
+- **Paywalled URL:** "We can't access this article — it's behind a paywall. Paste the text instead and we'll analyze it." Input stays open for paste.
+- **URL error or redirect:** "We couldn't reach that URL. Try pasting the text directly."
+- **Image-only PDF:** "This PDF appears to be a scanned image rather than a text document. We can't extract text from it. Try copying and pasting the text manually."
+- **Non-English content:** "This appears to be in [language]. Our analysis works best in English — we'll do our best but results may be less precise." Then proceeds.
+- **Social media post (Twitter/X, Facebook, etc.):** proceed with analysis. Note the brevity caveat inline with results.
+- **Non-civic content:** "This doesn't appear to be political or civic content. The Article Bias Checker works best on journalism, opinion pieces, and policy writing. Want to try a different article?"
+- **Very short text (under ~200 words):** proceed with analysis. Note the precision caveat inline with results.
+
+### 24b.4 Loading state
+
+Substantive, not just a spinner. Show a sequence: "Reading the framing..." → "Mapping to your profile..." Makes the wait feel purposeful.
+
+### 24b.5 Privacy
+
+Article text is **NOT** stored. Analysis runs in the moment only. No logging of what articles users check.
+
+### 24b.6 Cost
+
+~$0.011–0.02 per check on Sonnet 4.6 with prompt caching on the user's values profile.
+
+### 24b.7 Bold intro copy for the rail
+
+> **Check any article.**
+>
+> Paste a link or drop in the text from anything you're reading — a news story, an opinion piece, a social media post. The Article Bias Checker tells you exactly what it's doing to your thinking: which of the eight civic dimensions it's emphasizing, whether it's reinforcing or challenging your specific profile, and where it sits on the reliability spectrum. Not left or right. Not a generic bias label. A specific read on this article for you, based on who you are.
+>
+> It's a different kind of media literacy tool. Most bias checkers tell you what an article is. This one tells you what it's doing to you.
+
+---
+
+## 25. Methodology Page
+
+**Structure:** five accordion sections, one per pillar + quiz.
+1. The Quiz and Your Civic Mantle
+2. Your Ballot
+3. Your Media Diet
+4. Your Conversations
+5. Beyond Your Ballot
+
+Each section covers: how it works, data sources, scoring logic, editorial standards, bias controls, update cadence, Claude's role.
+
+**Cross-links to FAQ:** every methodology section links to the relevant FAQ accordion. Every FAQ entry that touches methodology links back.
+
+Scoring methodology primary documentation lives on this page. The GitHub repo is public for code inspection. The Methodology page links to the GitHub repo.
+
+### 25.1 Claude's role — standard paragraph (calibrate per pillar)
+
+**Your Ballot / Beyond Your Ballot version:**
+> "The analysis behind these recommendations is generated by Claude, Anthropic's AI. Claude reads the public record, scores each candidate on the eight dimensions, and drafts the explanation you see on each card. Humans review placements before they go live and can override Claude's scoring when the evidence warrants it. We also look at thumbs up and thumbs down feedback regularly — when users systematically disagree with a recommendation, that's a signal we take seriously and investigate. The AI does the analysis. Humans stay in the loop."
+
+**Your Media Diet version:**
+Same structure, substituting source scoring for candidate scoring. Add:
+> "We also use Perplexity to verify current ownership and status of sources in the catalog — my knowledge has a cutoff date, and independent media changes ownership. Current-status verification is a systematic part of our quarterly review."
+
+**Your Conversations version:**
+> "Your Conversations is built on a framework developed by Chris Argyris and popularized by Peter Senge in The Fifth Discipline — the Ladder of Inference. Claude runs that method in real time. The system prompt and guardrails are human-designed and regularly reviewed. No human is in the loop per turn, but the framework Claude follows was built by humans and is auditable."
+
+### 25.2 Conversations methodology — full paragraph
+
+> "Your Conversations is built on a framework developed by Chris Argyris and popularized by Peter Senge in The Fifth Discipline — the Ladder of Inference. The idea is simple: most difficult conversations fail not because people disagree on facts but because each person is reasoning from a different set of assumptions they've never made explicit. The Ladder of Inference maps how we move from observable data to conclusions to actions, usually without noticing the steps we skipped. Bedrock uses this framework to help you see the reasoning behind someone else's position — and your own — before you respond. The goal isn't agreement. It's a real conversation instead of a performative one."
+
+### 25.3 Beyond Your Ballot governance filter — methodology paragraph
+
+> "Four criteria, must meet at least two: no party-line voting rate above 85% for incumbents; history of co-sponsoring bipartisan legislation; publicly committed to specific structural reforms (gerrymandering, campaign finance, filibuster reform — not vague unity language); endorsed by a documented cross-partisan organization whose membership includes elected officials from both parties acting in a non-party capacity (for example, the Problem Solvers Caucus or Unite America) or explicitly contested their own party's position with a recorded vote or statement. This filter is editorial. We define it, we apply it, we publish the criteria so you can evaluate our judgment."
+
+
+---
+
+## 26. FAQ Page
+
+**Structure:** five accordion sections mirroring the Methodology page.
+
+### 26.1 Conversations FAQ
+
+**Q: What is Your Conversations?**
+A: A Claude-powered chat interface that uses your values profile as persistent context. You describe a difficult civic conversation you need to have and Claude helps you prepare for it.
+
+**Q: Does it tell me what to say?**
+A: No. It helps you think. The output is clarity about where you stand, genuine curiosity about where the other person stands, and tools for a real conversation — not a script.
+
+**Q: Does it use my values profile?**
+A: Yes. Claude knows your dimensional profile before you say a word. You don't have to explain yourself from scratch every time.
+
+**Q: Is this just a chatbot?**
+A: No. It runs a decades-old method for difficult conversations — the Ladder of Inference, from Chris Argyris and Peter Senge's The Fifth Discipline — that helps you find what you and the other person actually agree on and understand how they got where they got. The AI runs that method. It doesn't improvise.
+
+**Q: Does it save my conversations?**
+A: No. Each session starts fresh. Your conversation history isn't stored. That's a deliberate choice — what you say while preparing for a difficult conversation is yours, not ours.
+
+**Q: What kinds of conversations can it help with?**
+A: Any civic disagreement across political difference. If it's a topic where you and someone else see things differently, Your Conversations can help you approach it more thoughtfully.
+
+### 26.2 Your Ballot FAQ
+
+**Q: How do you match me to candidates?**
+A: Your dimensional profile, importance weights, and dealbreaker filters run against candidate profiles built from public positions, voting records, and stated platforms. Every recommendation includes a plain-English explanation of why each candidate matches or doesn't.
+
+**Q: Who does the analysis?**
+A: Claude, Anthropic's AI, reads the public record, scores each candidate on the eight dimensions, and drafts the explanation on each card. Humans review placements before they go live and can override Claude's scoring. We also look at thumbs up and thumbs down feedback regularly — systematic disagreement is a signal we investigate.
+
+**Q: What's the difference between a confident recommendation and a lean?**
+A: Confidence reflects how much data we have, not how good the match is. Confident means strong data on multiple axes with candidates clearly separated. Lean means the data is thinner or the race is closer. Both are real recommendations — honest about what we know.
+
+**Q: What if a candidate crosses one of my dealbreakers?**
+A: They're excluded from your recommendations entirely, regardless of how well they align on everything else. If we couldn't verify a dealbreaker, we flag it on the card so you can research it yourself.
+
+**Q: What does "we couldn't verify this" mean?**
+A: We found a dealbreaker you flagged but couldn't confirm it to our evidence standard — a public statement, recorded vote, or corroborated reporting from two independent journalists. We don't silently clear it. We tell you.
+
+**Q: Why do some races say "not enough to say"?**
+A: Because we'd rather tell you we don't have enough than guess. For thin races we show what we found and link you to resources for further research.
+
+**Q: Can I print my ballot guide?**
+A: Yes. Once your recommendations are generated you can download a formatted PDF guide to take to the polls. It includes every race — confident recommendations, leaning calls, informational notes, and no-call races with research links.
+
+**Q: Does Bedrock tell me who to vote for?**
+A: No. We show you how candidates align with your values and explain why. The vote is yours. Always.
+
+**Q: What if I disagree with a recommendation?**
+A: Tell us. There's a thumbs down on every card. Your feedback goes into a review queue — we look at it regularly and use it to improve both the data and our methodology.
+
+**Q: Why aren't local races here yet?**
+A: Data on local candidates is patchy and inconsistent across jurisdictions. We'd rather show you nothing than show you something incomplete or unreliable. Local races and ballot measures are coming for the fall general election.
+
+**Q: What about ballot measures and propositions?**
+A: Coming. Not in v1 for the same reason as local races. We'll tell you when they're ready.
+
+### 26.3 Your Media Diet FAQ
+
+**Q: How do you recommend sources?**
+A: We match your eight-dimension values profile against a curated catalog of independent journalists, Substacks, and podcasts. Each source is scored on the same eight axes as your quiz. The match determines which of three tiers a source lands in for you specifically.
+
+**Q: What are the three tiers?**
+A: Confirming sources deepen what you already think. Expanding sources cover ground your current diet misses. Challenging sources make the best honest case against your strongest views. The third tier is the most important one.
+
+**Q: Why three tiers? Why not just sources that match my views?**
+A: Because a media diet that only confirms what you already believe makes you a worse citizen, not a better one. We think that's worth building into the product rather than leaving to chance.
+
+**Q: What does "independent" mean?**
+A: The editorial voice is not controlled by a corporate owner, political party, advertiser network, or institutional funder with a partisan agenda. Independent journalists still have to earn a living — subscriptions, advertising, private investors, foundation grants are all fine as long as they don't control what gets covered or how. A journalist with a Substack and ten thousand paying subscribers answers to those subscribers. A journalist working for a network owned by a Fortune 500 conglomerate answers to a board of directors. That's the difference that matters. CNN is not independent. A journalist who left CNN to run their own Substack is.
+
+**Q: Why isn't [major outlet] in the catalog?**
+A: If it's owned by a large media corporation it doesn't meet our independence definition. We cover independently owned and editorially autonomous sources only.
+
+**Q: Some sources have a Partisan Lean flag. Does that mean they're biased?**
+A: It means their editorial direction is clearly identifiable. Partisan lean doesn't mean unreliable. We flag it so you know what you're reading, not to discourage you from reading it.
+
+**Q: How do you score sources for bias and quality?**
+A: Claude analyzes each source's body of work using a structured rubric tied to the eight civic dimensions. Every placement includes evidence citations — specific published pieces that justify the scores. Human editors review every placement before it goes live and can override Claude's scoring. We cross-reference against AllSides and Ad Fontes Media ratings where available. We also use Perplexity to verify current ownership and status — independent media changes, and we want our catalog to reflect current reality.
+
+**Q: How often is the catalog updated?**
+A: Full review quarterly. Ownership changes, editorial direction shifts, and documented reliability incidents trigger an immediate re-review. Every entry has a last-verified date.
+
+**Q: Is the catalog a living document?**
+A: Yes. We add sources, remove them when things change, and take your suggestions seriously. Thumbs up and thumbs down on any recommendation goes directly into our review process.
+
+**Q: Can I suggest a source?**
+A: Yes — there's a suggestion button in your media recommendations. Suggestions go into a review queue, not the live catalog. Every suggestion goes through the same scoring process before it appears.
+
+**Q: What's the Article Bias Checker?**
+A: Paste any URL or article text and we'll tell you what it's doing to your thinking — not just left or right, but which of the eight dimensions it's emphasizing, and how that maps specifically to your values profile. It accepts URLs, pasted text, and PDFs.
+
+**Q: Does the Article Bias Checker store what I paste?**
+A: No. Article text is analyzed in the moment and not stored.
+
+**Q: Do you use my dealbreakers to filter my media recommendations?**
+A: No. Dealbreakers are ballot exclusion rules. Importing them into your media diet would create an echo chamber — the exact failure mode this pillar exists to fight.
+
+### 26.4 Beyond Your Ballot FAQ
+
+**Q: What is Beyond Your Ballot?**
+A: Federal candidates outside your district whose presence in Congress would shift the balance toward independent-minded governance. You can't vote for them. But you can pay attention and you can help.
+
+**Q: Why should I care about races I can't vote in?**
+A: Because Congress is a team sport. The balance of power isn't decided by your representative alone — it's decided by 435 House members and 100 senators. The list of members willing to cross the aisle for a pragmatic solution is vanishingly small right now. These are the races where that changes.
+
+**Q: How do you decide which candidates appear here?**
+A: Two filters. First, your values match — same engine as Your Ballot. Second, an independent-minded governance filter: candidates must meet at least two of four criteria indicating they'd govern across partisan lines. The criteria are published in our methodology.
+
+**Q: What can I actually do?**
+A: Pay attention to these races. Share them. Donate if you're moved to. Every candidate card includes a link to their campaign site and where available a direct donation link.
+
+**Q: What about dealbreakers?**
+A: They show up as flags, not exclusions. Because you're not voting for these candidates, we don't remove them from your results if they cross one of your lines — we flag it clearly on their card and let you decide.
+
+**Q: Why only federal races?**
+A: Because the independent-minded governance argument is strongest at the federal level, where the margin between a functional and dysfunctional Congress is measured in individual seats.
+
+**Q: How often is this updated?**
+A: The candidate set is updated as federal races develop and filing deadlines pass. We flag significant updates when they happen.
+
+---
+
+## 27. Privacy Page Additions
+
+### 27.1 Cookie section (add to the existing Privacy page)
+
+> "Bedrock uses two cookies. One is a strictly necessary authentication cookie that keeps you signed in — without it the product doesn't work. The other is Plausible Analytics, which is cookieless by design and collects no personal data. We don't use advertising cookies, tracking cookies, or any third-party cookies. If you have questions about our cookie practices, email hello@bedrock.guide."
+
+No consent banner required. Reason: strictly necessary auth cookies are exempt under GDPR and CCPA; Plausible is cookieless and collects no personal data. Founder decision, documented here.
+
+### 27.2 Profile export section (add to the existing Privacy page)
+
+Users can download their complete profile as a plain-text `.txt` file from the My Profile page. The export includes:
+- Civic Mantle type and one-liner
+- All eight dimensional scores with labels and pole descriptions
+- Secondary type(s) if any
+- Layer 2 issue positions (if completed)
+- Layer 3 priority intensity and behavioral modifiers (if completed)
+- Layer 4 dealbreaker selections (if completed)
+- Demographic module responses (if completed)
+- Quiz completion percentage and last updated date
+- Footer: "This is your complete Bedrock values profile, exported on [date]. Bedrock does not retain a copy of this export."
+
+Does **NOT** include: conversation history (not stored), feedback submitted on candidates or sources (product data, not profile data).
