@@ -17,7 +17,7 @@ export default async function ReviewQueuePage({ searchParams }: Props) {
   ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90)
   const cutoff = ninetyDaysAgo.toISOString().slice(0, 10)
 
-  const [candidateRows, sourceRows, staleCandidates, staleSources, reconciliationCount] =
+  const [candidateRows, sourceRows, staleCandidates, staleSources, reconciliationCount, unclassifiedSourcesResult] =
     await Promise.all([
       (() => {
         let q = admin.from('classified_candidates')
@@ -49,6 +49,9 @@ export default async function ReviewQueuePage({ searchParams }: Props) {
             .eq('flagged_for_reconciliation', true)
           return (r1.count ?? 0) + (c2 ?? 0)
         }),
+      admin.from('classified_sources')
+        .select('source_id', { count: 'exact', head: true })
+        .is('axis_placement', null),
     ])
 
   const candidates = candidateRows.data ?? []
@@ -56,7 +59,7 @@ export default async function ReviewQueuePage({ searchParams }: Props) {
   const staleCount = activeType === 'candidate' ? (staleCandidates.count ?? 0) : (staleSources.count ?? 0)
 
   const lowConfidenceCount = candidates.filter((c) => c.attribution === 'auto_classify').length
-  const unclassifiedSourceCount = sources.filter((s) => !s.axis_placement).length
+  const unclassifiedSourceCount = unclassifiedSourcesResult.count ?? 0
 
   const candidateEntries = candidates.map((c) => ({ id: c.candidate_id, primary: `${c.name} — ${c.office}`, attribution: c.attribution as string | null }))
   const sourceEntries = sources.map((s) => ({ id: s.source_id, primary: s.name, attribution: s.attribution as string | null }))

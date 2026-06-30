@@ -90,17 +90,25 @@ describe('computeDisagreementDiff — disagreement detected', () => {
   })
 })
 
-describe('computeDisagreementDiff — missing axes', () => {
-  it('treats a missing axis in old placement as score 50', () => {
-    const oldPlacement = {}
+describe('computeDisagreementDiff — first-time classification (empty old placement)', () => {
+  it('returns flagged=false when old placement is empty — nothing to disagree with', () => {
     const newPlacement = { stability_change: { score: 80, confidence: 0.8, rationale: 'test', sources: [] } }
-    const result = computeDisagreementDiff(oldPlacement, newPlacement)
-    // delta = |50 - 80| = 30 → flagged
-    expect(result.diff['stability_change'].oldScore).toBe(50)
-    expect(result.diff['stability_change'].delta).toBe(30)
-    expect(result.diff['stability_change'].flagged).toBe(true)
+    const result = computeDisagreementDiff({}, newPlacement)
+    expect(result.flagged).toBe(false)
+    expect(result.diff).toEqual({})
   })
 
+  it('returns flagged=false even if new scores would normally exceed threshold', () => {
+    const newPlacement = {
+      stability_change: { score: 0, confidence: 0.8, rationale: 'test', sources: [] },
+      markets_governance: { score: 100, confidence: 0.8, rationale: 'test', sources: [] },
+    }
+    const result = computeDisagreementDiff({}, newPlacement)
+    expect(result.flagged).toBe(false)
+  })
+})
+
+describe('computeDisagreementDiff — missing axes in non-empty old placement', () => {
   it('treats a missing axis in new placement as score 50', () => {
     const result = computeDisagreementDiff(
       { stability_change: { score: 10, confidence: 0.8, rationale: 'test', sources: [] } },

@@ -22,6 +22,9 @@ export function computeDisagreementDiff(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   newPlacement: Record<string, { score: number; [key: string]: any }>
 ): DisagreementResult {
+  // No prior classification — nothing to disagree with
+  if (Object.keys(oldPlacement).length === 0) return { flagged: false, diff: {} }
+
   const diff: Record<string, AxisDelta> = {}
   let anyFlagged = false
 
