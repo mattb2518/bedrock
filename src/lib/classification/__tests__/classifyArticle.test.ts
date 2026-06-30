@@ -6,6 +6,7 @@ import {
   detectPaywall,
   isVeryShortContent,
   fetchArticleText,
+  isoToLanguageName,
 } from '../classifyArticle'
 import type { ArticleInput } from '../classifyArticle'
 import { FLAT_PROFILE } from '../../engine/__tests__/fixtures'
@@ -177,5 +178,33 @@ describe('classifyArticle — no content', () => {
     const result = await classifyArticle(emptyInput, mockClient(CIVIC_RESPONSE))
     expect(result.ok).toBe(false)
     if (!result.ok) expect(result.failure.code).toBe('url_error')
+  })
+})
+
+// ── isoToLanguageName ─────────────────────────────────────────────────────────
+
+describe('isoToLanguageName — non-English caveat display names', () => {
+  it('maps known ISO codes to full language names', () => {
+    expect(isoToLanguageName('es')).toBe('Spanish')
+    expect(isoToLanguageName('fr')).toBe('French')
+    expect(isoToLanguageName('de')).toBe('German')
+    expect(isoToLanguageName('pt')).toBe('Portuguese')
+    expect(isoToLanguageName('it')).toBe('Italian')
+    expect(isoToLanguageName('zh')).toBe('Chinese')
+    expect(isoToLanguageName('ja')).toBe('Japanese')
+    expect(isoToLanguageName('ko')).toBe('Korean')
+    expect(isoToLanguageName('ar')).toBe('Arabic')
+    expect(isoToLanguageName('ru')).toBe('Russian')
+  })
+
+  it('returns "another language" for unknown codes', () => {
+    expect(isoToLanguageName('xx')).toBe('another language')
+    expect(isoToLanguageName('tl')).toBe('another language')
+    expect(isoToLanguageName('')).toBe('another language')
+  })
+
+  it('is case-insensitive', () => {
+    expect(isoToLanguageName('ES')).toBe('Spanish')
+    expect(isoToLanguageName('Fr')).toBe('French')
   })
 })

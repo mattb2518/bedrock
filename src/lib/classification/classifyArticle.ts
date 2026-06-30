@@ -98,6 +98,24 @@ export function isVeryShortContent(text: string): boolean {
 // Social media → caveat, not failure (§24b.3: "proceed with analysis")
 // Very short text → caveat, not failure
 
+// ISO 639-1 → display name for the non-English caveat (§24b.3)
+const ISO_LANGUAGE_NAMES: Record<string, string> = {
+  ar: 'Arabic',
+  de: 'German',
+  es: 'Spanish',
+  fr: 'French',
+  it: 'Italian',
+  ja: 'Japanese',
+  ko: 'Korean',
+  pt: 'Portuguese',
+  ru: 'Russian',
+  zh: 'Chinese',
+}
+
+export function isoToLanguageName(code: string): string {
+  return ISO_LANGUAGE_NAMES[code.toLowerCase()] ?? 'another language'
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // URL fetching — server-side via native fetch
 // ─────────────────────────────────────────────────────────────────────────────
@@ -373,8 +391,9 @@ export async function classifyArticle(
 
   // Non-English caveat (proceed, per §24b.3)
   if (parsed.detected_language && parsed.detected_language !== 'en') {
+    const langName = isoToLanguageName(parsed.detected_language)
     caveats.push(
-      `This appears to be in ${parsed.detected_language}. Our analysis works best in English — we'll do our best but results may be less precise.`
+      `This appears to be in ${langName}. Our analysis works best in English — we'll do our best but results may be less precise.`
     )
   }
 
