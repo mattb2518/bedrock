@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { createAdminClient } from '@/lib/supabase/admin'
 import EntryActions from './EntryActions'
+import VerifyButton from './VerifyButton'
 
 interface Props {
   params: Promise<{ type: string; id: string }>
@@ -81,6 +82,13 @@ export default async function EntryDetailPage({ params }: Props) {
           </Section>
         )}
 
+        {/* Perplexity verification */}
+        <VerifyButton
+          type="candidate"
+          id={id}
+          lastCheck={row.perplexity_last_check as { checkedAt: string; summary: string } | null}
+        />
+
         {/* Actions */}
         <EntryActions
           type="candidate"
@@ -157,6 +165,12 @@ export default async function EntryDetailPage({ params }: Props) {
           </details>
         </Section>
       )}
+
+      <VerifyButton
+        type="source"
+        id={id}
+        lastCheck={row.perplexity_last_check as { checkedAt: string; summary: string } | null}
+      />
 
       <EntryActions
         type="source"

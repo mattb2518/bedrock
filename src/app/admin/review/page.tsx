@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { createAdminClient } from '@/lib/supabase/admin'
+import BulkActions from './BulkActions'
 
 interface Props {
   searchParams: Promise<{ type?: string }>
@@ -10,20 +11,47 @@ export default async function ReviewQueuePage({ searchParams }: Props) {
   const activeType = type === 'source' ? 'source' : 'candidate'
   const admin = createAdminClient()
 
-  const [candidateRows, sourceRows] =
+  const ninetyDaysAgo = new Date()
+  ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90)
+  const cutoff = ninetyDaysAgo.toISOString().slice(0, 10)
+
+  const [candidateRows, sourceRows, staleCandidates, staleSources, reconciliationCount] =
     await Promise.all([
       admin.from('classified_candidates')
         .select('candidate_id, name, office, district, coverage_tier, status, created_at')
         .eq('status', 'pending_review')
+        .eq('flagged_for_reconciliation', false)
         .order('created_at', { ascending: false }),
       admin.from('classified_sources')
         .select('source_id, name, kind, url, status, created_at')
         .eq('status', 'pending_review')
+        .eq('flagged_for_reconciliation', false)
         .order('created_at', { ascending: false }),
+      admin.from('classified_candidates')
+        .select('candidate_id', { count: 'exact', head: true })
+        .eq('status', 'approved')
+        .or(`last_reviewed.is.null,last_reviewed.lt.${cutoff}`),
+      admin.from('classified_sources')
+        .select('source_id', { count: 'exact', head: true })
+        .eq('status', 'approved')
+        .or(`last_reviewed.is.null,last_reviewed.lt.${cutoff}`),
+      admin.from('classified_candidates')
+        .select('candidate_id', { count: 'exact', head: true })
+        .eq('flagged_for_reconciliation', true)
+        .then(async (r1) => {
+          const { count: c2 } = await admin.from('classified_sources')
+            .select('source_id', { count: 'exact', head: true })
+            .eq('flagged_for_reconciliation', true)
+          return (r1.count ?? 0) + (c2 ?? 0)
+        }),
     ])
 
   const candidates = candidateRows.data ?? []
   const sources = sourceRows.data ?? []
+  const staleCount = activeType === 'candidate' ? (staleCandidates.count ?? 0) : (staleSources.count ?? 0)
+
+  const candidateEntries = candidates.map((c) => ({ id: c.candidate_id, primary: `${c.name} — ${c.office}` }))
+  const sourceEntries = sources.map((s) => ({ id: s.source_id, primary: s.name }))
 
   const tabStyle = (active: boolean) => ({
     padding: 'var(--space-2) var(--space-4)',
@@ -38,9 +66,16 @@ export default async function ReviewQueuePage({ searchParams }: Props) {
 
   return (
     <div>
-      <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-h3)', color: 'var(--color-text-primary)', marginBottom: 'var(--space-6)' }}>
-        Review Queue
-      </h1>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 'var(--space-6)' }}>
+        <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-h3)', color: 'var(--color-text-primary)' }}>
+          Review Queue
+        </h1>
+        {(reconciliationCount as number) > 0 && (
+          <Link href="/admin/review/reconciliation" style={{ padding: '6px 14px', borderRadius: 6, background: 'rgba(245,158,11,0.15)', color: '#f59e0b', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', textDecoration: 'none' }}>
+            ⚠ Reconciliation queue ({reconciliationCount})
+          </Link>
+        )}
+      </div>
 
       {/* Type tabs */}
       <div style={{ display: 'flex', gap: 'var(--space-2)', marginBottom: 'var(--space-6)' }}>
@@ -53,80 +88,42 @@ export default async function ReviewQueuePage({ searchParams }: Props) {
       </div>
 
       {activeType === 'candidate' && (
-        <EntryTable
-          rows={candidates.map((c) => ({
-            id: c.candidate_id,
-            type: 'candidate' as const,
-            primary: c.name,
-            secondary: `${c.office} · ${c.district}`,
-            meta: c.coverage_tier,
-            createdAt: c.created_at,
-          }))}
+        <BulkActions
+          type="candidate"
+          entries={candidateEntries}
+          staleCount={staleCount}
         />
       )}
 
       {activeType === 'source' && (
-        <EntryTable
-          rows={sources.map((s) => ({
-            id: s.source_id,
-            type: 'source' as const,
-            primary: s.name,
-            secondary: s.url,
-            meta: s.kind,
-            createdAt: s.created_at,
-          }))}
+        <BulkActions
+          type="source"
+          entries={sourceEntries}
+          staleCount={staleCount}
         />
       )}
-    </div>
-  )
-}
 
-function EntryTable({ rows }: {
-  rows: Array<{ id: string; type: 'candidate' | 'source'; primary: string; secondary: string; meta: string; createdAt: string }>
-}) {
-  if (rows.length === 0) {
-    return (
-      <p style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--text-small)' }}>
-        No pending entries.
-      </p>
-    )
-  }
-
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-      {rows.map((row) => (
-        <Link
-          key={row.id}
-          href={`/admin/review/${row.type}/${row.id}`}
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            padding: 'var(--space-4)',
-            border: '1px solid rgba(255,255,255,0.1)',
-            borderRadius: 8,
-            background: 'rgba(255,255,255,0.02)',
-            textDecoration: 'none',
-          }}
-        >
-          <div>
-            <p style={{ fontSize: 'var(--text-body)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-primary)', marginBottom: 2 }}>
-              {row.primary}
-            </p>
-            <p style={{ fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)' }}>
-              {row.secondary}
-            </p>
-          </div>
-          <div style={{ textAlign: 'right', flexShrink: 0, marginLeft: 'var(--space-4)' }}>
-            <p style={{ fontSize: 11, color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-              {row.meta}
-            </p>
-            <p style={{ fontSize: 11, color: 'var(--color-text-tertiary)', marginTop: 2 }}>
-              {new Date(row.createdAt).toLocaleDateString()}
-            </p>
-          </div>
-        </Link>
-      ))}
+      {/* Deep-link to individual entries */}
+      <div style={{ marginTop: 'var(--space-4)' }}>
+        <p style={{ fontSize: 11, color: 'var(--color-text-tertiary)', marginBottom: 'var(--space-2)' }}>
+          Click an entry above to review individually, or use the checkboxes for bulk actions.
+        </p>
+        {activeType === 'candidate' && candidates.map((c) => (
+          <Link key={c.candidate_id} href={`/admin/review/candidate/${c.candidate_id}`}
+            style={{ display: 'block', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', textDecoration: 'none', padding: '2px 0' }}>
+            → {c.name} ({c.office})
+          </Link>
+        ))}
+        {activeType === 'source' && sources.map((s) => (
+          <Link key={s.source_id} href={`/admin/review/source/${s.source_id}`}
+            style={{ display: 'block', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', textDecoration: 'none', padding: '2px 0' }}>
+            → {s.name}
+          </Link>
+        ))}
+        {((activeType === 'candidate' && candidates.length === 0) || (activeType === 'source' && sources.length === 0)) && (
+          <p style={{ fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)' }}>No pending entries.</p>
+        )}
+      </div>
     </div>
   )
 }

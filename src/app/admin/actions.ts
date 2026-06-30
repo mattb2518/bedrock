@@ -6,6 +6,9 @@ import { createClient } from '@/lib/supabase/server'
 import { requireAdminRole, requireSuperAdminRole } from '@/lib/auth/requireRole'
 import { classifySource } from '@/lib/classification/classifySources'
 import { classifyCandidate } from '@/lib/classification/classifyCandidates'
+import { computeDisagreementDiff } from '@/lib/admin/disagreementFlag'
+import { verifyWithPerplexity } from '@/lib/admin/verifyWithPerplexity'
+import { sendWeeklyDigest } from '@/lib/admin/weeklyDigest'
 import Anthropic from '@anthropic-ai/sdk'
 
 type EntryType = 'candidate' | 'source'
@@ -186,21 +189,29 @@ export async function reclassifyEntry(type: EntryType, id: string) {
       anthropic
     )
 
+    // Disagreement detection — §21.5
+    const disagree = computeDisagreementDiff(row.axis_placement ?? {}, result.axisPlacement)
+
     await admin.from('classified_sources').update({
-      axis_placement: result.axisPlacement,
+      // Only overwrite axis_placement if no significant disagreement; otherwise keep
+      // the old approved scores live and let reconciliation resolve the conflict.
+      ...(disagree.flagged ? {} : { axis_placement: result.axisPlacement }),
       source_evidence: result.sourceEvidence,
-      raw_classification: result.rawClassification,
+      raw_classification: { ...result.rawClassification, new_axis_placement: result.axisPlacement },
       status: 'pending_review',
       methodology_version: result.methodologyVersion,
+      flagged_for_reconciliation: disagree.flagged,
+      reconciliation_diff: disagree.flagged ? disagree.diff : null,
     }).eq('source_id', id)
 
     await writeAuditLog({
       entryType: 'source',
       entryId: id,
-      action: 'reclassified',
+      action: disagree.flagged ? 'flagged' : 'reclassified',
       actorUserId: actorId,
       previousStatus: row.status,
       newStatus: 'pending_review',
+      notes: disagree.flagged ? `Reconciliation needed: ${Object.keys(disagree.diff).filter((a) => disagree.diff[a].flagged).join(', ')}` : undefined,
     })
   } else {
     const { data: row } = await admin
@@ -225,22 +236,30 @@ export async function reclassifyEntry(type: EntryType, id: string) {
       anthropic
     )
 
+    // Disagreement detection — §21.5
+    const disagree = computeDisagreementDiff(row.axis_placement ?? {}, result.candidateData.axisPlacement)
+
     await admin.from('classified_candidates').update({
-      axis_placement: result.candidateData.axisPlacement,
-      dealbreakers: result.candidateData.dealbreakers,
-      rhetorical_only: result.candidateData.rhetoricalOnly ?? false,
-      raw_classification: result.rawClassification,
+      ...(disagree.flagged ? {} : {
+        axis_placement: result.candidateData.axisPlacement,
+        dealbreakers: result.candidateData.dealbreakers,
+        rhetorical_only: result.candidateData.rhetoricalOnly ?? false,
+      }),
+      raw_classification: { ...result.rawClassification, new_axis_placement: result.candidateData.axisPlacement },
       status: 'pending_review',
       methodology_version: result.methodologyVersion,
+      flagged_for_reconciliation: disagree.flagged,
+      reconciliation_diff: disagree.flagged ? disagree.diff : null,
     }).eq('candidate_id', id)
 
     await writeAuditLog({
       entryType: 'candidate',
       entryId: id,
-      action: 'reclassified',
+      action: disagree.flagged ? 'flagged' : 'reclassified',
       actorUserId: actorId,
       previousStatus: row.status,
       newStatus: 'pending_review',
+      notes: disagree.flagged ? `Reconciliation needed: ${Object.keys(disagree.diff).filter((a) => disagree.diff[a].flagged).join(', ')}` : undefined,
     })
   }
 
@@ -284,4 +303,146 @@ export async function demoteToUser(userId: string) {
   })
 
   revalidatePath('/admin/users')
+}
+
+// ── Bulk approve ──────────────────────────────────────────────────────────────
+
+export async function bulkApprove(type: EntryType, ids: string[]) {
+  await requireAdminRole()
+  const actorId = await getActorUserId()
+  const admin = createAdminClient()
+  const table = type === 'candidate' ? 'classified_candidates' : 'classified_sources'
+  const idCol = type === 'candidate' ? 'candidate_id' : 'source_id'
+
+  // Write one audit log row per entry — not one for the whole batch (§21.4)
+  for (const id of ids) {
+    const { data: existing } = await admin.from(table).select('status').eq(idCol, id).single()
+    await admin.from(table).update({
+      status: 'approved',
+      reviewed_by: actorId,
+      last_reviewed: new Date().toISOString().slice(0, 10),
+    }).eq(idCol, id)
+    await writeAuditLog({
+      entryType: type,
+      entryId: id,
+      action: 'approved',
+      actorUserId: actorId,
+      previousStatus: existing?.status ?? null,
+      newStatus: 'approved',
+      notes: 'bulk_approve',
+    })
+  }
+
+  revalidatePath('/admin/review')
+  revalidatePath('/admin')
+}
+
+// ── Bulk re-classify ──────────────────────────────────────────────────────────
+// Runs each entry through Stage 3 classifier sequentially.
+// Returns a progress array — callers can stream this via repeated server actions
+// or simply await the full batch (simpler, fine for small queues).
+
+export async function bulkReclassify(type: EntryType, ids: string[]) {
+  await requireAdminRole()
+  const results: Array<{ id: string; ok: boolean; error?: string }> = []
+  for (const id of ids) {
+    try {
+      await reclassifyEntry(type, id)
+      results.push({ id, ok: true })
+    } catch (e) {
+      results.push({ id, ok: false, error: e instanceof Error ? e.message : 'unknown' })
+    }
+  }
+  return results
+}
+
+// ── Perplexity verify (single entry) ─────────────────────────────────────────
+
+export async function verifyEntry(type: EntryType, id: string) {
+  await requireAdminRole()
+  const admin = createAdminClient()
+  const table = type === 'candidate' ? 'classified_candidates' : 'classified_sources'
+  const idCol = type === 'candidate' ? 'candidate_id' : 'source_id'
+
+  const { data: row } = await admin.from(table).select('*').eq(idCol, id).single()
+  if (!row) throw new Error(`Entry not found: ${id}`)
+
+  const result = await verifyWithPerplexity({
+    type,
+    name: row.name,
+    url: type === 'source' ? row.url : undefined,
+    office: type === 'candidate' ? row.office : undefined,
+    district: type === 'candidate' ? row.district : undefined,
+  })
+
+  await admin.from(table).update({
+    last_reviewed: result.checkedAt,
+    perplexity_last_check: { checkedAt: result.checkedAt, summary: result.summary, rawResponse: result.rawResponse },
+  }).eq(idCol, id)
+
+  revalidatePath(`/admin/review/${type}/${id}`)
+  return result
+}
+
+// ── Bulk Perplexity verify ────────────────────────────────────────────────────
+// Targets entries where last_reviewed is null OR > 90 days old.
+
+export async function bulkVerify(type: EntryType) {
+  await requireAdminRole()
+  const admin = createAdminClient()
+  const table = type === 'candidate' ? 'classified_candidates' : 'classified_sources'
+  const idCol = type === 'candidate' ? 'candidate_id' : 'source_id'
+
+  const ninetyDaysAgo = new Date()
+  ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90)
+  const cutoff = ninetyDaysAgo.toISOString().slice(0, 10)
+
+  const { data: stale } = await admin
+    .from(table)
+    .select(idCol)
+    .or(`last_reviewed.is.null,last_reviewed.lt.${cutoff}`)
+    .eq('status', 'approved')
+    .limit(50)   // cap per run to avoid rate limits
+
+  const ids = (stale ?? []).map((r: Record<string, string>) => r[idCol] as string)
+  const results: Array<{ id: string; ok: boolean; error?: string }> = []
+
+  for (const id of ids) {
+    try {
+      await verifyEntry(type, id)
+      results.push({ id, ok: true })
+    } catch (e) {
+      results.push({ id, ok: false, error: e instanceof Error ? e.message : 'unknown' })
+    }
+  }
+
+  return results
+}
+
+// ── Checklist toggle (Super Admin only) ──────────────────────────────────────
+
+export async function toggleChecklistItem(itemId: string, checked: boolean) {
+  await requireSuperAdminRole()
+  const actorId = await getActorUserId()
+  const admin = createAdminClient()
+
+  await admin.from('admin_checklist').update({
+    checked,
+    checked_by: actorId,
+    checked_at: checked ? new Date().toISOString() : null,
+  }).eq('item_id', itemId)
+
+  revalidatePath('/admin')
+  revalidatePath('/admin/checklist')
+}
+
+// ── Weekly digest (Super Admin only) ─────────────────────────────────────────
+
+export async function triggerWeeklyDigest() {
+  await requireSuperAdminRole()
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user?.email) throw new Error('No email for current user')
+
+  return sendWeeklyDigest(user.email)
 }
