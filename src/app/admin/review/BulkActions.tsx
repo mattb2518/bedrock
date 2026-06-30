@@ -7,7 +7,7 @@ type EntryType = 'candidate' | 'source'
 
 interface Props {
   type: EntryType
-  entries: Array<{ id: string; primary: string }>
+  entries: Array<{ id: string; primary: string; attribution?: string | null }>
   staleCount: number
 }
 
@@ -94,6 +94,16 @@ export default function BulkActions({ type, entries, staleCount }: Props) {
           <label key={entry.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: 'var(--space-3) var(--space-4)', border: `1px solid ${selected.has(entry.id) ? 'rgba(234,179,8,0.4)' : 'rgba(255,255,255,0.08)'}`, borderRadius: 8, background: selected.has(entry.id) ? 'rgba(234,179,8,0.06)' : 'rgba(255,255,255,0.02)', cursor: 'pointer' }}>
             <input type="checkbox" checked={selected.has(entry.id)} onChange={() => toggle(entry.id)} />
             <span style={{ fontSize: 'var(--text-small)', color: 'var(--color-text-primary)' }}>{entry.primary}</span>
+            {entry.attribution === 'auto_ingested' && (
+              <span style={{ fontSize: 10, fontWeight: 600, color: '#60a5fa', background: 'rgba(96,165,250,0.12)', border: '1px solid rgba(96,165,250,0.3)', borderRadius: 4, padding: '1px 6px', whiteSpace: 'nowrap' }}>
+                auto-ingested
+              </span>
+            )}
+            {entry.attribution === 'user_suggestion' && (
+              <span style={{ fontSize: 10, fontWeight: 600, color: '#a78bfa', background: 'rgba(167,139,250,0.12)', border: '1px solid rgba(167,139,250,0.3)', borderRadius: 4, padding: '1px 6px', whiteSpace: 'nowrap' }}>
+                user suggestion
+              </span>
+            )}
             <span style={{ fontSize: 11, color: 'var(--color-text-tertiary)', marginLeft: 'auto' }}>{entry.id}</span>
           </label>
         ))}

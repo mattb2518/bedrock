@@ -13,6 +13,7 @@
  */
 
 import type { CandidateRecord } from '@/lib/engine/match'
+import { queueCandidateForClassification } from './classificationQueue'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types for congress.gov and FEC API responses
@@ -303,6 +304,20 @@ export async function fetchFederalCandidates(
       )
     )
   )
+
+  // Fire-and-forget: queue every fetched candidate for classification if not already present.
+  // Does NOT block the return — ballot page sees no_call immediately; admin can classify later.
+  for (const c of [...senateCandidates, ...houseCandidates]) {
+    void queueCandidateForClassification({
+      id:           c.id,
+      name:         c.name,
+      office:       c.office,
+      district:     c.district,
+      party:        c.party ?? 'Unknown',
+      coverageTier: c.coverageTier,
+      sourcedFrom:  c.sourcedFrom,
+    })
+  }
 
   return { senate: senateCandidates, house: houseCandidates }
 }

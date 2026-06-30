@@ -46,6 +46,7 @@ export default function Nav() {
   const [aboutOpen, setAboutOpen] = useState(false);
   const [actionsOpen, setActionsOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const aboutRef = useRef<HTMLDivElement>(null);
   const actionsRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
@@ -70,15 +71,28 @@ export default function Nav() {
       ? [...topNavLinks, { label: "Your Mantle", href: "/your-mantle" }]
       : topNavLinks;
 
-  // Subscribe to auth state
+  // Subscribe to auth state; also check admin role on sign-in
   useEffect(() => {
     const supabase = createClient();
-    supabase.auth.getUser().then(({ data }) => setUser(data.user));
+
+    async function checkRole(userId: string) {
+      const { data } = await supabase.from("user_roles").select("role").eq("user_id", userId).single();
+      setIsAdmin(data?.role === "admin" || data?.role === "super_admin");
+    }
+
+    supabase.auth.getUser().then(({ data }) => {
+      setUser(data.user);
+      if (data.user) checkRole(data.user.id);
+    });
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user ?? null);
-      // On sign-in, merge local quiz progress into cloud and mark store as cloud-backed
-      if (event === "SIGNED_IN" && session?.user) {
-        attachUser(session.user.id)
+      if (session?.user) {
+        checkRole(session.user.id);
+        // On sign-in, merge local quiz progress into cloud and mark store as cloud-backed
+        if (event === "SIGNED_IN") attachUser(session.user.id);
+      } else {
+        setIsAdmin(false);
       }
     });
     return () => subscription.unsubscribe();
@@ -455,6 +469,36 @@ export default function Nav() {
             )}
           </div>
 
+          {/* Admin link — visible only to admin / super_admin */}
+          {isAdmin && (
+            <Link
+              href="/admin"
+              style={{
+                fontFamily: "var(--font-body)",
+                fontSize: "var(--text-small)",
+                fontWeight: "var(--weight-medium)",
+                color: "var(--color-text-muted)",
+                textDecoration: "none",
+                whiteSpace: "nowrap",
+                border: "1px solid rgba(255,255,255,0.15)",
+                borderRadius: "var(--radius-sm)",
+                padding: "2px 8px",
+                letterSpacing: "0.02em",
+                transition: "var(--transition-fast)",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = "var(--color-text-primary)";
+                e.currentTarget.style.borderColor = "rgba(255,255,255,0.3)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = "var(--color-text-muted)";
+                e.currentTarget.style.borderColor = "rgba(255,255,255,0.15)";
+              }}
+            >
+              Admin
+            </Link>
+          )}
+
           {/* Take the Quiz CTA */}
           <Link
             href="/quiz"
@@ -722,6 +766,25 @@ export default function Nav() {
           >
             Take the Quiz
           </Link>
+
+          {/* Mobile admin link */}
+          {isAdmin && (
+            <div style={{ borderTop: "1px solid var(--color-border)", paddingTop: "var(--space-3)" }}>
+              <Link
+                href="/admin"
+                onClick={() => setMenuOpen(false)}
+                style={{
+                  fontFamily: "var(--font-body)",
+                  fontSize: "var(--text-body)",
+                  fontWeight: "var(--weight-medium)",
+                  color: "var(--color-text-muted)",
+                  textDecoration: "none",
+                }}
+              >
+                Admin panel
+              </Link>
+            </div>
+          )}
 
           {/* Mobile auth */}
           <div style={{ borderTop: "1px solid var(--color-border)", paddingTop: "var(--space-3)" }}>

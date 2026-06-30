@@ -436,6 +436,25 @@ export async function toggleChecklistItem(itemId: string, checked: boolean) {
   revalidatePath('/admin/checklist')
 }
 
+// ── Classify auto-ingested pending candidates ─────────────────────────────────
+// Processes up to 20 auto_ingested pending candidates through the Stage 3
+// classifier. Manual trigger only — no cron. Batch cap prevents runaway cost.
+
+export async function classifyAutoIngested() {
+  await requireAdminRole()
+  const admin = createAdminClient()
+
+  const { data: rows } = await admin
+    .from('classified_candidates')
+    .select('candidate_id')
+    .eq('status', 'pending_review')
+    .eq('attribution', 'auto_ingested')
+    .limit(20)
+
+  const ids = (rows ?? []).map((r) => r.candidate_id as string)
+  return bulkReclassify('candidate', ids)
+}
+
 // ── Weekly digest (Super Admin only) ─────────────────────────────────────────
 
 export async function triggerWeeklyDigest() {

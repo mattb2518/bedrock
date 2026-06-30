@@ -21,6 +21,7 @@
  */
 
 import type { CandidateRecord } from '@/lib/engine/match'
+import { queueCandidateForClassification } from './classificationQueue'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Open States API types
@@ -194,6 +195,19 @@ export async function fetchStateLegCandidates(
   const house = housePeople.map((p) =>
     buildStateLegCandidate(p, state.toUpperCase(), 'lower', stateHouseDistrict!)
   )
+
+  // Fire-and-forget: queue every fetched candidate for classification if not already present.
+  for (const c of [...senate, ...house]) {
+    void queueCandidateForClassification({
+      id:           c.id,
+      name:         c.name,
+      office:       c.office,
+      district:     c.district,
+      party:        c.party ?? 'Unknown',
+      coverageTier: c.coverageTier,
+      sourcedFrom:  c.sourcedFrom,
+    })
+  }
 
   return { senate, house }
 }

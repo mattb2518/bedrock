@@ -1,14 +1,16 @@
 import Link from 'next/link'
 import { createAdminClient } from '@/lib/supabase/admin'
 import BulkActions from './BulkActions'
+import ClassifyAutoIngestedButton from './ClassifyAutoIngestedButton'
 
 interface Props {
-  searchParams: Promise<{ type?: string }>
+  searchParams: Promise<{ type?: string; attribution?: string }>
 }
 
 export default async function ReviewQueuePage({ searchParams }: Props) {
-  const { type = 'candidate' } = await searchParams
+  const { type = 'candidate', attribution } = await searchParams
   const activeType = type === 'source' ? 'source' : 'candidate'
+  const filterAttribution = attribution === 'auto_ingested' ? 'auto_ingested' : null
   const admin = createAdminClient()
 
   const ninetyDaysAgo = new Date()
@@ -17,13 +19,16 @@ export default async function ReviewQueuePage({ searchParams }: Props) {
 
   const [candidateRows, sourceRows, staleCandidates, staleSources, reconciliationCount] =
     await Promise.all([
-      admin.from('classified_candidates')
-        .select('candidate_id, name, office, district, coverage_tier, status, created_at')
-        .eq('status', 'pending_review')
-        .eq('flagged_for_reconciliation', false)
-        .order('created_at', { ascending: false }),
+      (() => {
+        let q = admin.from('classified_candidates')
+          .select('candidate_id, name, office, district, coverage_tier, status, attribution, created_at')
+          .eq('status', 'pending_review')
+          .eq('flagged_for_reconciliation', false)
+        if (filterAttribution) q = q.eq('attribution', filterAttribution)
+        return q.order('created_at', { ascending: false })
+      })(),
       admin.from('classified_sources')
-        .select('source_id, name, kind, url, status, created_at')
+        .select('source_id, name, kind, url, status, attribution, created_at')
         .eq('status', 'pending_review')
         .eq('flagged_for_reconciliation', false)
         .order('created_at', { ascending: false }),
@@ -50,8 +55,10 @@ export default async function ReviewQueuePage({ searchParams }: Props) {
   const sources = sourceRows.data ?? []
   const staleCount = activeType === 'candidate' ? (staleCandidates.count ?? 0) : (staleSources.count ?? 0)
 
-  const candidateEntries = candidates.map((c) => ({ id: c.candidate_id, primary: `${c.name} — ${c.office}` }))
-  const sourceEntries = sources.map((s) => ({ id: s.source_id, primary: s.name }))
+  const autoIngestedCount = candidates.filter((c) => c.attribution === 'auto_ingested').length
+
+  const candidateEntries = candidates.map((c) => ({ id: c.candidate_id, primary: `${c.name} — ${c.office}`, attribution: c.attribution as string | null }))
+  const sourceEntries = sources.map((s) => ({ id: s.source_id, primary: s.name, attribution: s.attribution as string | null }))
 
   const tabStyle = (active: boolean) => ({
     padding: 'var(--space-2) var(--space-4)',
@@ -78,14 +85,37 @@ export default async function ReviewQueuePage({ searchParams }: Props) {
       </div>
 
       {/* Type tabs */}
-      <div style={{ display: 'flex', gap: 'var(--space-2)', marginBottom: 'var(--space-6)' }}>
-        <Link href="/admin/review?type=candidate" style={tabStyle(activeType === 'candidate')}>
+      <div style={{ display: 'flex', gap: 'var(--space-2)', marginBottom: 'var(--space-4)', flexWrap: 'wrap', alignItems: 'center' }}>
+        <Link href="/admin/review?type=candidate" style={tabStyle(activeType === 'candidate' && !filterAttribution)}>
           Candidates ({candidates.length})
         </Link>
         <Link href="/admin/review?type=source" style={tabStyle(activeType === 'source')}>
           Sources ({sources.length})
         </Link>
+        {activeType === 'candidate' && (
+          <Link
+            href={filterAttribution ? '/admin/review?type=candidate' : '/admin/review?type=candidate&attribution=auto_ingested'}
+            style={{
+              ...tabStyle(!!filterAttribution),
+              marginLeft: 'auto',
+              background: filterAttribution ? 'rgba(96,165,250,0.15)' : 'rgba(255,255,255,0.04)',
+              color: filterAttribution ? '#60a5fa' : 'var(--color-text-secondary)',
+            }}
+          >
+            {filterAttribution ? '✕ Clear filter' : `Auto-ingested (${autoIngestedCount})`}
+          </Link>
+        )}
       </div>
+
+      {/* Classify auto-ingested batch trigger */}
+      {activeType === 'candidate' && autoIngestedCount > 0 && (
+        <div style={{ marginBottom: 'var(--space-6)', padding: 'var(--space-4)', background: 'rgba(96,165,250,0.06)', border: '1px solid rgba(96,165,250,0.2)', borderRadius: 8 }}>
+          <p style={{ fontSize: 'var(--text-small)', color: '#60a5fa', marginBottom: 'var(--space-3)' }}>
+            <strong>{autoIngestedCount}</strong> candidate{autoIngestedCount !== 1 ? 's' : ''} queued from live address lookups — not yet classified.
+          </p>
+          <ClassifyAutoIngestedButton count={autoIngestedCount} />
+        </div>
+      )}
 
       {activeType === 'candidate' && (
         <BulkActions
