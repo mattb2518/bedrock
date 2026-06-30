@@ -5,6 +5,7 @@ import { classifyPendingSources } from '@/app/admin/actions'
 
 export default function ClassifyPendingSourcesButton({ count }: { count: number }) {
   const [results, setResults] = useState<Array<{ id: string; ok: boolean; error?: string }> | null>(null)
+  const [error, setError] = useState<string | null>(null)
   const [current, setCurrent] = useState(0)
   const [isPending, startTransition] = useTransition()
 
@@ -13,10 +14,15 @@ export default function ClassifyPendingSourcesButton({ count }: { count: number 
   function run() {
     setCurrent(0)
     setResults(null)
+    setError(null)
     startTransition(async () => {
-      const r = await classifyPendingSources()
-      setCurrent(r.length)
-      setResults(r)
+      try {
+        const r = await classifyPendingSources()
+        setCurrent(r.length)
+        setResults(r)
+      } catch (e) {
+        setError(e instanceof Error ? e.message : 'Classification failed — check server logs.')
+      }
     })
   }
 
@@ -41,6 +47,12 @@ export default function ClassifyPendingSourcesButton({ count }: { count: number 
           ? `Classifying ${current} of ${cap}…`
           : `Classify all with Claude (up to ${cap})`}
       </button>
+
+      {error && (
+        <p style={{ marginTop: 'var(--space-3)', fontSize: 11, color: '#ef4444' }}>
+          Error: {error}
+        </p>
+      )}
 
       {results && (
         <div style={{ marginTop: 'var(--space-3)', padding: 'var(--space-3)', background: 'rgba(0,0,0,0.2)', borderRadius: 6 }}>
