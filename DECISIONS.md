@@ -65,6 +65,16 @@ just-in-time, when we start building that pillar.
 
 ---
 
+## Launch blockers — must resolve before go-live
+
+These are not nice-to-haves. Each one is a hard gate on a shipped pillar.
+
+| Date flagged | Blocker | Detail |
+|---|---|---|
+| 2026-06-30 | **Run classification pipeline against all 60 catalog sources before Media Diet goes live.** | The current fallback (`catalogAdapter.ts` `leanToAxisPlacement`) only populates 2–3 of the 8 dimensions per source based on a coarse left-right lean proxy, leaving axes like `stability_change`, `local_federal`, `national_global`, and `rules_outcomes` at zero confidence for every catalog source. This means Media Diet tier placements currently collapse toward a conventional left-right framing, which undermines the product's core differentiation (8-axis nuance beyond left-right). Real classification must run before this pillar reflects what Bedrock is actually for. Flagged during Stage 9 review. Also tracked in §21.9 pre-launch checklist in SPEC.md. |
+
+---
+
 ## Open questions — need Matt's input (by pillar)
 
 These come from the design memos. Not urgent until we start the relevant pillar;

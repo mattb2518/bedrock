@@ -2768,6 +2768,7 @@ Not raw numbers — an actionable summary requiring human judgment.
 - [ ] Pricing/donation model confirmed
 - [ ] Open-source scoring code on GitHub, linked from the Methodology page
 - [ ] Beyond Your Ballot static JSON populated before the pillar goes live
+- [ ] **HARD BLOCKER — Run classification pipeline against all 60 sources in `src/data/media-catalog.csv` before launch.** The current fallback (`catalogAdapter.ts` `leanToAxisPlacement`) only populates 2–3 of the 8 dimensions per source based on a coarse left-right lean proxy, leaving axes like `stability_change`, `local_federal`, `national_global`, and `rules_outcomes` at zero confidence for every catalog source. This means Media Diet tier placements currently collapse toward a conventional left-right framing, which undermines the product's core differentiation (8-axis nuance beyond left-right). Real classification must run before this pillar reflects what Bedrock is actually for. Flagged Stage 9, 2026-06-30.
 
 ---
 
