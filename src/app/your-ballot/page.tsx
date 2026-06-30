@@ -6,9 +6,11 @@ import { matchRace } from '@/lib/engine/match'
 import { buildMatchKey } from '@/lib/engine/buildMatchKey'
 import { resolveDistrict } from '@/lib/civic/resolveDistrict'
 import { fetchFederalCandidates } from '@/lib/civic/federalCandidates'
+import { fetchStateLegCandidates } from '@/lib/civic/stateLegCandidates'
 import { createClient } from '@/lib/supabase/client'
 import type { RankedCandidate, RaceResult, ConfidenceBand } from '@/lib/engine/match'
 import type { FederalCandidate, FederalBallot } from '@/lib/civic/federalCandidates'
+import type { StateLegBallot } from '@/lib/civic/stateLegCandidates'
 
 // ── Quiz completion → display percent ─────────────────────────────────────────
 
@@ -236,15 +238,20 @@ function CandidateCard({
         </div>
       )}
 
-      {/* Links row */}
+      {/* Links row — FederalCandidate uses campaignSite/donateLink; StateLegCandidate uses websiteUrl */}
       <div style={{ display: 'flex', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
-        {c.campaignSite && (
-          <a href={c.campaignSite} target="_blank" rel="noopener noreferrer" style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-blue-accent)', textDecoration: 'none' }}>
+        {(c as FederalCandidate).campaignSite && (
+          <a href={(c as FederalCandidate).campaignSite!} target="_blank" rel="noopener noreferrer" style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-blue-accent)', textDecoration: 'none' }}>
             Campaign site ↗
           </a>
         )}
-        {c.donateLink && (
-          <a href={c.donateLink} target="_blank" rel="noopener noreferrer" style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-blue-accent)', textDecoration: 'none' }}>
+        {!(c as FederalCandidate).campaignSite && (c as any).websiteUrl && (
+          <a href={(c as any).websiteUrl} target="_blank" rel="noopener noreferrer" style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-blue-accent)', textDecoration: 'none' }}>
+            Official site ↗
+          </a>
+        )}
+        {(c as FederalCandidate).donateLink && (
+          <a href={(c as FederalCandidate).donateLink!} target="_blank" rel="noopener noreferrer" style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-blue-accent)', textDecoration: 'none' }}>
             Donate ↗
           </a>
         )}
@@ -300,8 +307,15 @@ function CandidateCard({
               </p>
             )}
 
-            {/* FEC finance summary */}
-            {c.financeData && (
+            {/* Open States attribution for state legislative candidates */}
+            {(c as any).openStatesId && (
+              <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)' }}>
+                Legislator data sourced from <a href="https://openstates.org" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-blue-accent)', textDecoration: 'none' }}>Open States</a> (Plural Open Data). Campaign finance data for state legislative races is not yet available in this version.
+              </p>
+            )}
+
+            {/* FEC finance summary — federal candidates only */}
+            {(c as FederalCandidate).financeData && (
               <div>
                 <p style={{ margin: '0 0 var(--space-2)', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-primary)' }}>
                   Campaign finance (FEC)
@@ -310,13 +324,13 @@ function CandidateCard({
                   <div>
                     <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)' }}>Total raised</p>
                     <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-primary)' }}>
-                      {formatDollars(c.financeData.totalRaised)}
+                      {formatDollars((c as FederalCandidate).financeData!.totalRaised)}
                     </p>
                   </div>
                   <div>
                     <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)' }}>Cash on hand</p>
                     <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-primary)' }}>
-                      {formatDollars(c.financeData.cashOnHand)}
+                      {formatDollars((c as FederalCandidate).financeData!.cashOnHand)}
                     </p>
                   </div>
                 </div>
@@ -489,6 +503,7 @@ export default function YourBallotPage() {
   const [address, setAddress] = useState('')
   const [resolvedAddress, setResolvedAddress] = useState<string | null>(null)
   const [ballot, setBallot] = useState<FederalBallot | null>(null)
+  const [stateLegBallot, setStateLegBallot] = useState<StateLegBallot | null>(null)
   const [addressError, setAddressError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
 
@@ -500,15 +515,14 @@ export default function YourBallotPage() {
     return buildMatchKey(session.result, session)
   }, [session])
 
-  // Run engine over ballot races
+  // Run engine over all races (federal + state leg) — ballot order: Senate, House, State Senate, State House
   const raceResults = useMemo<RaceResult[]>(() => {
     if (!matchKey || !ballot) return []
 
     const results: RaceResult[] = []
 
-    // Senate race(s) — statewide, Senate first per ballot convention
+    // Federal Senate — statewide; group in case two seats are up simultaneously
     if (ballot.senate.length > 0) {
-      // Group by distinct senate OCD-IDs in case of two seats up
       const byDistrict = new Map<string, typeof ballot.senate>()
       for (const c of ballot.senate) {
         const existing = byDistrict.get(c.district) ?? []
@@ -516,26 +530,46 @@ export default function YourBallotPage() {
       }
       for (const [, senCandidates] of byDistrict) {
         results.push(matchRace({
-          raceId: `senate-${senCandidates[0].district}`,
+          raceId: `fed-senate-${senCandidates[0].district}`,
           candidates: senCandidates,
           key: matchKey,
-          dealbreakersAsFlags: false,   // Hard exclusion — Your Ballot default
+          dealbreakersAsFlags: false,
         }))
       }
     }
 
-    // House race
+    // Federal House
     if (ballot.house.length > 0) {
       results.push(matchRace({
-        raceId: `house-${ballot.house[0].district}`,
+        raceId: `fed-house-${ballot.house[0].district}`,
         candidates: ballot.house,
         key: matchKey,
-        dealbreakersAsFlags: false,   // Hard exclusion — Your Ballot default
+        dealbreakersAsFlags: false,
+      }))
+    }
+
+    // State Senate (upper chamber)
+    if (stateLegBallot && stateLegBallot.senate.length > 0) {
+      results.push(matchRace({
+        raceId: `state-senate-${stateLegBallot.senate[0].district}`,
+        candidates: stateLegBallot.senate,
+        key: matchKey,
+        dealbreakersAsFlags: false,
+      }))
+    }
+
+    // State House (lower chamber)
+    if (stateLegBallot && stateLegBallot.house.length > 0) {
+      results.push(matchRace({
+        raceId: `state-house-${stateLegBallot.house[0].district}`,
+        candidates: stateLegBallot.house,
+        key: matchKey,
+        dealbreakersAsFlags: false,
       }))
     }
 
     return results
-  }, [matchKey, ballot])
+  }, [matchKey, ballot, stateLegBallot])
 
   const userId = session?.userId ?? null
   const mantleType = session?.result?.primaryType ?? null
@@ -548,13 +582,18 @@ export default function YourBallotPage() {
     setAddressError(null)
     startTransition(async () => {
       try {
-        const { normalizedAddress, state, congressionalDistrict } = await resolveDistrict(trimmed)
+        const { normalizedAddress, state, congressionalDistrict, stateSenateDistrict, stateHouseDistrict } = await resolveDistrict(trimmed)
         if (!state) {
           setAddressError('Could not determine your state from that address. Try including your city and state.')
           return
         }
-        const federalBallot = await fetchFederalCandidates(state, congressionalDistrict)
+        // Fetch federal and state legislative in parallel
+        const [federalBallot, stateLeg] = await Promise.all([
+          fetchFederalCandidates(state, congressionalDistrict),
+          fetchStateLegCandidates(state, stateSenateDistrict, stateHouseDistrict).catch(() => null),
+        ])
         setBallot(federalBallot)
+        setStateLegBallot(stateLeg)
         setResolvedAddress(normalizedAddress ?? trimmed)
       } catch {
         setAddressError('Could not look up that address. Try including your city, state, and ZIP code.')
@@ -663,7 +702,7 @@ export default function YourBallotPage() {
                 Showing results for{' '}
                 <strong style={{ color: 'var(--color-text-primary)' }}>{resolvedAddress}</strong>{' '}
                 <button
-                  onClick={() => { setResolvedAddress(null); setBallot(null); setAddress('') }}
+                  onClick={() => { setResolvedAddress(null); setBallot(null); setStateLegBallot(null); setAddress('') }}
                   style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-blue-accent)', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', padding: 0 }}
                 >
                   Change
