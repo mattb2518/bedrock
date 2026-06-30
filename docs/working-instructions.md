@@ -30,6 +30,13 @@ Within a single Claude Project session → commit spec changes to GitHub at each
 
 ---
 
+### Operational notes — reading the repo from a Claude chat
+
+- **Use the raw endpoint, not the GitHub REST API.** When a Claude cloud Project (not Claude Code) fetches repo files, use `https://raw.githubusercontent.com/<owner>/<repo>/<branch>/<path>`. The unauthenticated REST API allows only 60 requests/hour per IP, shared across the whole environment — it throws intermittent 403s that look like connection failures but are really rate limits. The raw endpoint isn't subject to that limit.
+- **Caveat: raw caches aggressively.** A raw 200 can be returned for a branch or path that no longer exists. Use `git ls-remote <repo-url>` as the authority on which branches actually exist — never trust a raw 200 for that.
+
+---
+
 ### Open questions (SPEC.md Section 16)
 Unresolved design decisions live in Section 16. Claude Code must flag these and not resolve them independently. Decisions come back to the Claude Project.
 
