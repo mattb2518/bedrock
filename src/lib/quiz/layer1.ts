@@ -506,9 +506,9 @@ export const LAYER1_QUESTIONS: QuizQuestion[] = [
       },
     ],
     dependsFollowUp: {
-      type: ‘open_text’,
+      type: "open_text",
       prompt:
-        ‘What would determine how much executive emergency authority you’d support — the nature of the threat, the specific powers, the track record of the president?’,
+        "What would determine how much executive emergency authority you’d support — the nature of the threat, the specific powers, the track record of the president?",
     },
     easterEgg:
       "The federal income tax was introduced in 1861 as a temporary Civil War measure. Repealed in 1872. Back in 1894. Struck down by the Supreme Court. Back via constitutional amendment in 1913. The United States has been arguing about a tax that was supposed to last four years for over 160 years. ‘Temporary’ is doing a lot of work in American governance.",
