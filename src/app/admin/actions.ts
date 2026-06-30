@@ -181,10 +181,10 @@ export async function reclassifyEntry(type: EntryType, id: string) {
         sourceId: row.source_id,
         name: row.name,
         url: row.url,
-        contentPieces: (row.source_evidence as string[]).map((e: string) =>
+        contentPieces: ((row.source_evidence ?? []) as string[]).map((e: string) =>
           e.startsWith('http') ? { url: e } : { text: e }
         ),
-        taggedBy: row.tagged_by,
+        taggedBy: row.tagged_by ?? 'admin',
       },
       anthropic
     )
