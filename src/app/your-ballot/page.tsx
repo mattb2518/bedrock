@@ -10,7 +10,8 @@ import { fetchStateLegCandidates } from '@/lib/civic/stateLegCandidates'
 import { createClient } from '@/lib/supabase/client'
 import type { RankedCandidate, RaceResult, ConfidenceBand } from '@/lib/engine/match'
 import type { FederalCandidate, FederalBallot } from '@/lib/civic/federalCandidates'
-import type { StateLegCandidate, StateLegBallot } from '@/lib/civic/stateLegCandidates'
+import type { StateLegBallot } from '@/lib/civic/stateLegCandidates'
+import { isStateLegCandidate, type BallotCandidate } from '@/lib/civic/ballotTypes'
 
 // ── Quiz completion → display percent ─────────────────────────────────────────
 
@@ -94,6 +95,8 @@ function CandidateCard({
 }) {
   const { candidate, confidence, topAlignedAxes, topDivergentAxes, explanation, unknownDealbreakers } = ranked
   const c = candidate as FederalCandidate
+  // bc is the same object narrowed through the BallotCandidate union for type-guarded access
+  const bc = candidate as unknown as BallotCandidate
 
   const [expanded, setExpanded] = useState(false)
   const [thumbState, setThumbState] = useState<'up' | 'down' | null>(null)
@@ -245,8 +248,8 @@ function CandidateCard({
             Campaign site ↗
           </a>
         )}
-        {!(c as FederalCandidate).campaignSite && (c as unknown as StateLegCandidate).websiteUrl && (
-          <a href={(c as unknown as StateLegCandidate).websiteUrl!} target="_blank" rel="noopener noreferrer" style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-blue-accent)', textDecoration: 'none' }}>
+        {isStateLegCandidate(bc) && bc.websiteUrl && (
+          <a href={bc.websiteUrl} target="_blank" rel="noopener noreferrer" style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-blue-accent)', textDecoration: 'none' }}>
             Official site ↗
           </a>
         )}
@@ -308,7 +311,7 @@ function CandidateCard({
             )}
 
             {/* Open States attribution for state legislative candidates */}
-            {(c as unknown as StateLegCandidate).openStatesId && (
+            {isStateLegCandidate(bc) && bc.openStatesId && (
               <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)' }}>
                 Legislator data sourced from <a href="https://openstates.org" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-blue-accent)', textDecoration: 'none' }}>Open States</a> (Plural Open Data). Campaign finance data for state legislative races is not yet available in this version.
               </p>

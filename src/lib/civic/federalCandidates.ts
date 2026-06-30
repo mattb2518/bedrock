@@ -199,7 +199,6 @@ async function buildFederalCandidate(
   coverageTier: CandidateRecord['coverageTier']
 ): Promise<FederalCandidate> {
   let financeData: FECFinanceSummary | null = null
-  let campaignSite: string | null = null
 
   if (fecCandidate) {
     const pc = fecCandidate.principal_committees?.[0]
@@ -217,7 +216,6 @@ async function buildFederalCandidate(
 
   // FEC doesn't expose campaign site URLs; use congress.gov profile as the best available link
   const congressUrl = member.url ?? null
-  campaignSite = congressUrl
 
   return {
     id: member.bioguideId,
