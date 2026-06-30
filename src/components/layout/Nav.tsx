@@ -64,6 +64,7 @@ export default function Nav() {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   const hasResult = useQuizStore((s) => !!s.session?.result);
+  const attachUser = useQuizStore((s) => s.attachUser);
   const navLinks =
     mounted && hasResult
       ? [...topNavLinks, { label: "Your Mantle", href: "/your-mantle" }]
@@ -73,8 +74,12 @@ export default function Nav() {
   useEffect(() => {
     const supabase = createClient();
     supabase.auth.getUser().then(({ data }) => setUser(data.user));
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user ?? null);
+      // On sign-in, merge local quiz progress into cloud and mark store as cloud-backed
+      if (event === "SIGNED_IN" && session?.user) {
+        attachUser(session.user.id)
+      }
     });
     return () => subscription.unsubscribe();
   }, []);

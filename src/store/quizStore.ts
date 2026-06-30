@@ -8,6 +8,7 @@ import type {
   QuizResult,
   QuizSession,
 } from '@/types/quiz'
+import { mergeLocalIntoCloud, saveProfileDebounced } from '@/lib/quiz/sync'
 
 interface QuizStore {
   session: QuizSession | null
@@ -174,8 +175,25 @@ export const useQuizStore = create<QuizStore>()(
 
       attachUser: (userId) =>
         set((state) => {
-          if (!state.session) return state
-          return { session: { ...state.session, userId } }
+          // Merge local progress with cloud, then mark this session as cloud-backed.
+          // mergeLocalIntoCloud is async; we kick it off and let it settle in the
+          // background — the store is already keyed to userId so subsequent writes
+          // will go to Supabase via saveProfileDebounced.
+          mergeLocalIntoCloud(userId, state.session).then((merged) => {
+            if (merged) {
+              // Hydrate the store with the winning session data
+              set((s) => ({
+                session: s.session
+                  ? {
+                      ...s.session,
+                      ...merged,
+                      userId,
+                    }
+                  : null,
+              }))
+            }
+          })
+          return { session: state.session ? { ...state.session, userId } : null }
         }),
     }),
     {

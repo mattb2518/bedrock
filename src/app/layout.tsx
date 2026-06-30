@@ -3,6 +3,7 @@ import { Libre_Baskerville, DM_Sans } from "next/font/google";
 import Script from "next/script";
 import Nav from "@/components/layout/Nav";
 import Footer from "@/components/layout/Footer";
+import SyncProvider from "@/components/providers/SyncProvider";
 import "./globals.css";
 
 const libreBaskerville = Libre_Baskerville({
@@ -68,9 +69,11 @@ export default function RootLayout({
           flexDirection: "column",
         }}
       >
-        <Nav />
-        <main style={{ flex: 1 }}>{children}</main>
-        <Footer />
+        <SyncProvider>
+          <Nav />
+          <main style={{ flex: 1 }}>{children}</main>
+          <Footer />
+        </SyncProvider>
       </body>
     </html>
   );
