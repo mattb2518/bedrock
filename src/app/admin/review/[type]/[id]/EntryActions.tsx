@@ -23,6 +23,10 @@ export default function EntryActions({ type, id, currentStatus, editableFields }
   const [feedback, setFeedback] = useState<{ ok: boolean; msg: string } | null>(null)
   const [isPending, startTransition] = useTransition()
 
+  const isClassified = editableFields.axis_placement != null &&
+    Object.keys(editableFields.axis_placement as object).length > 0
+  const classifyLabel = isClassified ? 'Re-classify' : 'Classify with Claude'
+
   function withFeedback(fn: () => Promise<void>) {
     setFeedback(null)
     startTransition(async () => {
@@ -89,7 +93,7 @@ export default function EntryActions({ type, id, currentStatus, editableFields }
                 onClick={() => withFeedback(() => reclassifyEntry(type, id))}
                 style={{ ...btnBase, background: 'rgba(255,255,255,0.06)', color: 'var(--color-text-secondary)' }}
               >
-                Re-classify
+                {classifyLabel}
               </button>
             </>
           )}
@@ -103,7 +107,7 @@ export default function EntryActions({ type, id, currentStatus, editableFields }
                 onClick={() => withFeedback(() => reclassifyEntry(type, id))}
                 style={{ ...btnBase, background: 'rgba(255,255,255,0.06)', color: 'var(--color-text-secondary)' }}
               >
-                Re-classify
+                {classifyLabel}
               </button>
             </>
           )}

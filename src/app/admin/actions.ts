@@ -358,30 +358,37 @@ export async function bulkReclassify(type: EntryType, ids: string[]) {
 
 // ── Perplexity verify (single entry) ─────────────────────────────────────────
 
-export async function verifyEntry(type: EntryType, id: string) {
+export async function verifyEntry(
+  type: EntryType,
+  id: string
+): Promise<{ ok: true; summary: string; checkedAt: string } | { ok: false; error: string }> {
   await requireAdminRole()
   const admin = createAdminClient()
   const table = type === 'candidate' ? 'classified_candidates' : 'classified_sources'
   const idCol = type === 'candidate' ? 'candidate_id' : 'source_id'
 
-  const { data: row } = await admin.from(table).select('*').eq(idCol, id).single()
-  if (!row) throw new Error(`Entry not found: ${id}`)
+  try {
+    const { data: row } = await admin.from(table).select('*').eq(idCol, id).single()
+    if (!row) return { ok: false, error: `Entry not found: ${id}` }
 
-  const result = await verifyWithPerplexity({
-    type,
-    name: row.name,
-    url: type === 'source' ? row.url : undefined,
-    office: type === 'candidate' ? row.office : undefined,
-    district: type === 'candidate' ? row.district : undefined,
-  })
+    const result = await verifyWithPerplexity({
+      type,
+      name: row.name,
+      url: type === 'source' ? row.url : undefined,
+      office: type === 'candidate' ? row.office : undefined,
+      district: type === 'candidate' ? row.district : undefined,
+    })
 
-  await admin.from(table).update({
-    last_reviewed: result.checkedAt,
-    perplexity_last_check: { checkedAt: result.checkedAt, summary: result.summary, rawResponse: result.rawResponse },
-  }).eq(idCol, id)
+    await admin.from(table).update({
+      last_reviewed: result.checkedAt,
+      perplexity_last_check: { checkedAt: result.checkedAt, summary: result.summary, rawResponse: result.rawResponse },
+    }).eq(idCol, id)
 
-  revalidatePath(`/admin/review/${type}/${id}`)
-  return result
+    revalidatePath(`/admin/review/${type}/${id}`)
+    return { ok: true, summary: result.summary, checkedAt: result.checkedAt }
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : 'Verification failed.' }
+  }
 }
 
 // ── Bulk Perplexity verify ────────────────────────────────────────────────────
@@ -434,6 +441,24 @@ export async function toggleChecklistItem(itemId: string, checked: boolean) {
 
   revalidatePath('/admin')
   revalidatePath('/admin/checklist')
+}
+
+// ── Classify pending sources (catalog_seed, no axis_placement) ───────────────
+// Sequential, capped at 20. Manual trigger only.
+
+export async function classifyPendingSources() {
+  await requireAdminRole()
+  const admin = createAdminClient()
+
+  const { data: rows } = await admin
+    .from('classified_sources')
+    .select('source_id')
+    .eq('status', 'pending_review')
+    .is('axis_placement', null)
+    .limit(20)
+
+  const ids = (rows ?? []).map((r) => r.source_id as string)
+  return bulkReclassify('source', ids)
 }
 
 // ── Classify auto-ingested pending candidates ─────────────────────────────────

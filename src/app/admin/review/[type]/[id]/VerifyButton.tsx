@@ -18,12 +18,12 @@ export default function VerifyButton({ type, id, lastCheck }: Props) {
   function run() {
     setError(null)
     startTransition(async () => {
-      try {
-        const res = await verifyEntry(type, id)
+      const res = await verifyEntry(type, id)
+      if (res.ok) {
         setResult({ summary: res.summary, checkedAt: res.checkedAt })
         setExpanded(true)
-      } catch (e) {
-        setError(e instanceof Error ? e.message : 'Verification failed.')
+      } else {
+        setError(res.error)
       }
     })
   }

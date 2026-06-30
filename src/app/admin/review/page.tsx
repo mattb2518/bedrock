@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { createAdminClient } from '@/lib/supabase/admin'
 import BulkActions from './BulkActions'
 import ClassifyAutoIngestedButton from './ClassifyAutoIngestedButton'
+import ClassifyPendingSourcesButton from './ClassifyPendingSourcesButton'
 
 interface Props {
   searchParams: Promise<{ type?: string; attribution?: string }>
@@ -28,7 +29,7 @@ export default async function ReviewQueuePage({ searchParams }: Props) {
         return q.order('created_at', { ascending: false })
       })(),
       admin.from('classified_sources')
-        .select('source_id, name, kind, url, status, attribution, created_at')
+        .select('source_id, name, kind, url, status, attribution, axis_placement, created_at')
         .eq('status', 'pending_review')
         .eq('flagged_for_reconciliation', false)
         .order('created_at', { ascending: false }),
@@ -56,6 +57,7 @@ export default async function ReviewQueuePage({ searchParams }: Props) {
   const staleCount = activeType === 'candidate' ? (staleCandidates.count ?? 0) : (staleSources.count ?? 0)
 
   const autoIngestedCount = candidates.filter((c) => c.attribution === 'auto_ingested').length
+  const unclassifiedSourceCount = sources.filter((s) => !s.axis_placement).length
 
   const candidateEntries = candidates.map((c) => ({ id: c.candidate_id, primary: `${c.name} — ${c.office}`, attribution: c.attribution as string | null }))
   const sourceEntries = sources.map((s) => ({ id: s.source_id, primary: s.name, attribution: s.attribution as string | null }))
@@ -125,6 +127,15 @@ export default async function ReviewQueuePage({ searchParams }: Props) {
         />
       )}
 
+      {activeType === 'source' && unclassifiedSourceCount > 0 && (
+        <div style={{ marginBottom: 'var(--space-6)', padding: 'var(--space-4)', background: 'rgba(96,165,250,0.06)', border: '1px solid rgba(96,165,250,0.2)', borderRadius: 8 }}>
+          <p style={{ fontSize: 'var(--text-small)', color: '#60a5fa', marginBottom: 'var(--space-3)' }}>
+            <strong>{unclassifiedSourceCount}</strong> source{unclassifiedSourceCount !== 1 ? 's' : ''} pending classification.
+          </p>
+          <ClassifyPendingSourcesButton count={unclassifiedSourceCount} />
+        </div>
+      )}
+
       {activeType === 'source' && (
         <BulkActions
           type="source"
@@ -132,28 +143,6 @@ export default async function ReviewQueuePage({ searchParams }: Props) {
           staleCount={staleCount}
         />
       )}
-
-      {/* Deep-link to individual entries */}
-      <div style={{ marginTop: 'var(--space-4)' }}>
-        <p style={{ fontSize: 11, color: 'var(--color-text-tertiary)', marginBottom: 'var(--space-2)' }}>
-          Click an entry above to review individually, or use the checkboxes for bulk actions.
-        </p>
-        {activeType === 'candidate' && candidates.map((c) => (
-          <Link key={c.candidate_id} href={`/admin/review/candidate/${c.candidate_id}`}
-            style={{ display: 'block', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', textDecoration: 'none', padding: '2px 0' }}>
-            → {c.name} ({c.office})
-          </Link>
-        ))}
-        {activeType === 'source' && sources.map((s) => (
-          <Link key={s.source_id} href={`/admin/review/source/${s.source_id}`}
-            style={{ display: 'block', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', textDecoration: 'none', padding: '2px 0' }}>
-            → {s.name}
-          </Link>
-        ))}
-        {((activeType === 'candidate' && candidates.length === 0) || (activeType === 'source' && sources.length === 0)) && (
-          <p style={{ fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)' }}>No pending entries.</p>
-        )}
-      </div>
     </div>
   )
 }

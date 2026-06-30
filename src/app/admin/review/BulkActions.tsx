@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import Link from 'next/link'
 import { bulkApprove, bulkReclassify, bulkVerify } from '@/app/admin/actions'
 
 type EntryType = 'candidate' | 'source'
@@ -91,9 +92,13 @@ export default function BulkActions({ type, entries, staleCount }: Props) {
           Since App Router means the list is server-rendered, we re-render a client list here. */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', marginBottom: 'var(--space-4)' }}>
         {entries.map((entry) => (
-          <label key={entry.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: 'var(--space-3) var(--space-4)', border: `1px solid ${selected.has(entry.id) ? 'rgba(234,179,8,0.4)' : 'rgba(255,255,255,0.08)'}`, borderRadius: 8, background: selected.has(entry.id) ? 'rgba(234,179,8,0.06)' : 'rgba(255,255,255,0.02)', cursor: 'pointer' }}>
-            <input type="checkbox" checked={selected.has(entry.id)} onChange={() => toggle(entry.id)} />
-            <span style={{ fontSize: 'var(--text-small)', color: 'var(--color-text-primary)' }}>{entry.primary}</span>
+          <div key={entry.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: 'var(--space-3) var(--space-4)', border: `1px solid ${selected.has(entry.id) ? 'rgba(234,179,8,0.4)' : 'rgba(255,255,255,0.08)'}`, borderRadius: 8, background: selected.has(entry.id) ? 'rgba(234,179,8,0.06)' : 'rgba(255,255,255,0.02)' }}>
+            <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} onClick={(e) => e.stopPropagation()}>
+              <input type="checkbox" checked={selected.has(entry.id)} onChange={() => toggle(entry.id)} />
+            </label>
+            <Link href={`/admin/review/${type}/${entry.id}`} style={{ flex: 1, fontSize: 'var(--text-small)', color: 'var(--color-text-primary)', textDecoration: 'none' }}>
+              {entry.primary}
+            </Link>
             {entry.attribution === 'auto_ingested' && (
               <span style={{ fontSize: 10, fontWeight: 600, color: '#60a5fa', background: 'rgba(96,165,250,0.12)', border: '1px solid rgba(96,165,250,0.3)', borderRadius: 4, padding: '1px 6px', whiteSpace: 'nowrap' }}>
                 auto-ingested
@@ -104,8 +109,8 @@ export default function BulkActions({ type, entries, staleCount }: Props) {
                 user suggestion
               </span>
             )}
-            <span style={{ fontSize: 11, color: 'var(--color-text-tertiary)', marginLeft: 'auto' }}>{entry.id}</span>
-          </label>
+            <span style={{ fontSize: 11, color: 'var(--color-text-tertiary)' }}>{entry.id}</span>
+          </div>
         ))}
       </div>
 
