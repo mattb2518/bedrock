@@ -102,6 +102,17 @@ export default function PrivacyPage() {
         </section>
 
         <section>
+          <h2 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-h3)", color: "var(--color-text-primary)", marginBottom: "var(--space-4)" }}>On Claude.</h2>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-body)", color: "var(--color-text-secondary)", lineHeight: "var(--leading-relaxed)", marginBottom: "var(--space-3)" }}>
+            Several features on Bedrock — Your Conversations, the Article Bias Checker, and our candidate and media classification — are powered by Claude, an AI made by Anthropic. When you use these features, your content is sent to Anthropic&apos;s API.
+          </p>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-body)", color: "var(--color-text-secondary)", lineHeight: "var(--leading-relaxed)" }}>
+            Under Anthropic&apos;s current API policy, your inputs and outputs are not used to train Anthropic&apos;s models, and are deleted from their servers within 7 days. Bedrock does not store your Conversations content at all — each session starts fresh. For more detail, see{' '}
+            <a href="https://www.anthropic.com/privacy" target="_blank" rel="noopener noreferrer" style={{ color: "var(--color-blue-accent)" }}>Anthropic&apos;s privacy policy at anthropic.com/privacy</a>.
+          </p>
+        </section>
+
+        <section>
           <h2 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-h3)", color: "var(--color-text-primary)", marginBottom: "var(--space-4)" }}>Your rights.</h2>
           {[
             ["See your data", "Download a complete copy of everything we hold on you at any time, from your profile settings."],

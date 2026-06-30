@@ -455,6 +455,91 @@ export async function classifyAutoIngested() {
   return bulkReclassify('candidate', ids)
 }
 
+// ── Seed media catalog into classified_sources (Super Admin only) ─────────────
+// Reads all 60 rows from src/data/media-catalog.csv and upserts pending_review
+// stubs with attribution='catalog_seed'. Safe to run more than once — ON CONFLICT
+// (url) DO NOTHING means duplicates are silently ignored.
+
+export async function seedCatalogSources(): Promise<{ seeded: number; skipped: number }> {
+  await requireSuperAdminRole()
+  const admin = createAdminClient()
+
+  const { readFileSync } = await import('fs')
+  const { join } = await import('path')
+
+  const csvPath = join(process.cwd(), 'src', 'data', 'media-catalog.csv')
+  const lines = readFileSync(csvPath, 'utf-8').split('\n').filter(Boolean)
+
+  // Skip header row
+  const dataLines = lines.slice(1)
+
+  function mapKind(format: string): string {
+    const f = format.toLowerCase()
+    if (f.includes('newsletter')) return 'newsletter'
+    if (f.includes('podcast'))    return 'podcast'
+    if (f.includes('video'))      return 'video'
+    if (f.includes('blog'))       return 'blog'
+    if (f.includes('magazine'))   return 'magazine'
+    return 'newsletter'
+  }
+
+  function slugify(name: string): string {
+    return 'cat_' + name.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '').slice(0, 60)
+  }
+
+  let seeded = 0
+  let skipped = 0
+
+  for (const line of dataLines) {
+    // CSV columns: name,creators_hosts,format,lean,notable_for,url_or_platform,
+    //              access_model,ownership,independence_risk,policy_depth_score,
+    //              flags,tier_potential,dimension_coverage_notes
+    const cols = line.split(',')
+    const name              = cols[0]?.trim()
+    const format            = cols[2]?.trim() ?? ''
+    const lean              = cols[3]?.trim() ?? ''
+    const url               = cols[5]?.trim()
+    const policy_depth_score = cols[9]?.trim() ?? ''
+    const flags             = cols[10]?.trim() ?? ''
+
+    if (!name || !url) continue
+
+    const sourceId = slugify(name)
+    const seedNotes = [
+      lean ? `Lean: ${lean}` : '',
+      policy_depth_score ? `Policy depth: ${policy_depth_score}/5` : '',
+      flags ? `Flags: ${flags}` : '',
+    ].filter(Boolean).join(' | ')
+
+    const { error } = await admin.from('classified_sources').upsert(
+      {
+        source_id:         sourceId,
+        name,
+        url,
+        kind:              mapKind(format),
+        status:            'pending_review',
+        attribution:       'catalog_seed',
+        bedrock_originated: true,
+        axis_placement:    null,
+        seed_notes:        seedNotes || null,
+        tagged_by:         'catalog_seed',
+      },
+      { onConflict: 'url', ignoreDuplicates: true }
+    )
+
+    if (error) {
+      // Treat unique-constraint skip as "already existed"
+      skipped++
+    } else {
+      seeded++
+    }
+  }
+
+  revalidatePath('/admin')
+  revalidatePath('/admin/review')
+  return { seeded, skipped }
+}
+
 // ── Weekly digest (Super Admin only) ─────────────────────────────────────────
 
 export async function triggerWeeklyDigest() {

@@ -3,6 +3,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { getCurrentUserRole } from '@/lib/auth/getRole'
 import ChecklistUI from './ChecklistUI'
 import DigestButton from './DigestButton'
+import SeedCatalogButton from './SeedCatalogButton'
 
 const CHECKLIST_ITEMS: Array<{ id: string; label: string }> = [
   { id: 'bias_check_quiz',           label: 'Run a bias check on all quiz questions (both passes: left critic, right critic) — extends to methodology copy, media-catalog Partisan Lean flag consistency, and Beyond Your Ballot governance-filter criteria' },
@@ -52,7 +53,10 @@ export default async function AdminOverviewPage() {
         <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-h3)', color: 'var(--color-text-primary)' }}>
           Overview
         </h1>
-        {role === 'super_admin' && <DigestButton />}
+        <div style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'center' }}>
+          {role === 'super_admin' && <SeedCatalogButton />}
+          {role === 'super_admin' && <DigestButton />}
+        </div>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--space-4)', marginBottom: 'var(--space-10)' }}>

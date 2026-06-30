@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import PewTypologyGrid from '@/components/methodology/PewTypologyGrid'
+import { PEW_REPORT_URL } from '@/lib/quiz/pew-typology'
 
 // ── Dimension data for the quiz section ──────────────────────────────────────
 
@@ -68,6 +70,16 @@ const PILLAR_SECTIONS: PillarSection[] = [
         <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)' }}>
           Claude&apos;s role here: none. The quiz engine is deterministic — your answers go in, your scores come out by formula. No AI is involved in computing your profile or assigning your Civic Mantle.
         </p>
+        <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: 'var(--space-5)', marginTop: 'var(--space-2)' }}>
+          <p style={{ margin: '0 0 var(--space-4)', fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)' }}>
+            Independent research confirms what we&apos;re doing here matters.{' '}
+            <a href={PEW_REPORT_URL} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-blue-accent)', textDecoration: 'none' }}>
+              Pew Research Center&apos;s 2026 Political Typology
+            </a>{' '}
+            identifies nine distinct political groups — most of which fall outside comfortable alignment with either major party. Bedrock&apos;s Civic Mantle types cut across multiple Pew groups in both directions. We&apos;re not trying to re-label you with someone else&apos;s categories. We&apos;re trying to help you understand your own.
+          </p>
+          <PewTypologyGrid />
+        </div>
       </>
     ),
   },
