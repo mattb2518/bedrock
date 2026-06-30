@@ -27,11 +27,6 @@ export interface ResolveDistrictResult {
   stateHouseDistrict: number | null
 }
 
-// Re-export so callers that imported these from resolveDistrict keep working.
-// These are NOT server actions — they live in districtUtils.ts (no 'use server').
-export { parseDistrictInfo } from './districtUtils'
-export type { DistrictInfo } from './districtUtils'
-
 export async function resolveDistrict(address: string): Promise<ResolveDistrictResult> {
   const apiKey = process.env.GOOGLE_CIVIC_API_KEY
   if (!apiKey) {
