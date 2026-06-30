@@ -10,7 +10,7 @@ import { fetchStateLegCandidates } from '@/lib/civic/stateLegCandidates'
 import { createClient } from '@/lib/supabase/client'
 import type { RankedCandidate, RaceResult, ConfidenceBand } from '@/lib/engine/match'
 import type { FederalCandidate, FederalBallot } from '@/lib/civic/federalCandidates'
-import type { StateLegBallot } from '@/lib/civic/stateLegCandidates'
+import type { StateLegCandidate, StateLegBallot } from '@/lib/civic/stateLegCandidates'
 
 // ── Quiz completion → display percent ─────────────────────────────────────────
 
@@ -245,8 +245,8 @@ function CandidateCard({
             Campaign site ↗
           </a>
         )}
-        {!(c as FederalCandidate).campaignSite && (c as any).websiteUrl && (
-          <a href={(c as any).websiteUrl} target="_blank" rel="noopener noreferrer" style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-blue-accent)', textDecoration: 'none' }}>
+        {!(c as FederalCandidate).campaignSite && (c as unknown as StateLegCandidate).websiteUrl && (
+          <a href={(c as unknown as StateLegCandidate).websiteUrl!} target="_blank" rel="noopener noreferrer" style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-blue-accent)', textDecoration: 'none' }}>
             Official site ↗
           </a>
         )}
@@ -308,7 +308,7 @@ function CandidateCard({
             )}
 
             {/* Open States attribution for state legislative candidates */}
-            {(c as any).openStatesId && (
+            {(c as unknown as StateLegCandidate).openStatesId && (
               <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)' }}>
                 Legislator data sourced from <a href="https://openstates.org" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-blue-accent)', textDecoration: 'none' }}>Open States</a> (Plural Open Data). Campaign finance data for state legislative races is not yet available in this version.
               </p>

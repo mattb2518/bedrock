@@ -3,16 +3,16 @@ import { parseDistrictInfo } from '../districtUtils'
 import { matchRace } from '@/lib/engine/match'
 import { buildMatchKey } from '@/lib/engine/buildMatchKey'
 import type { CandidateRecord, MatchKey } from '@/lib/engine/match'
-import type { QuizResult, QuizSession } from '@/types/quiz'
+import type { QuizResult, QuizSession, DimensionalProfile } from '@/types/quiz'
 import { ALL_DIMENSIONS } from '@/lib/engine/match'
 
 // ── Fixtures ──────────────────────────────────────────────────────────────────
 
-const FLAT_PROFILE = Object.fromEntries(ALL_DIMENSIONS.map((d) => [d, 50])) as Record<string, number>
+const FLAT_PROFILE = Object.fromEntries(ALL_DIMENSIONS.map((d) => [d, 50])) as DimensionalProfile
 
 const BASE_RESULT: QuizResult = {
   primaryType: 'pragmatic_idealist',
-  profile: FLAT_PROFILE as any,
+  profile: FLAT_PROFILE,
   topDimensions: ['markets_governance'],
   completionPercent: 40,
 }

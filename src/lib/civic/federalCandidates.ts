@@ -215,10 +215,9 @@ async function buildFederalCandidate(
     }
   }
 
-  // congress.gov member URL is the member's congress.gov profile page
-  campaignSite = fecCandidate ? null : null  // FEC doesn't expose campaign site URLs directly
-  // congress.gov has a `url` field pointing to the congress.gov member page — use as reference
+  // FEC doesn't expose campaign site URLs; use congress.gov profile as the best available link
   const congressUrl = member.url ?? null
+  campaignSite = congressUrl
 
   return {
     id: member.bioguideId,

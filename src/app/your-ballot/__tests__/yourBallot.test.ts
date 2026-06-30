@@ -3,16 +3,16 @@ import { matchRace } from '@/lib/engine/match'
 import { buildMatchKey } from '@/lib/engine/buildMatchKey'
 import { parseDistrictInfo } from '@/lib/civic/districtUtils'
 import type { CandidateRecord, MatchKey } from '@/lib/engine/match'
-import type { QuizResult, QuizSession } from '@/types/quiz'
+import type { QuizResult, QuizSession, DimensionalProfile } from '@/types/quiz'
 import { ALL_DIMENSIONS } from '@/lib/engine/match'
 
 // ── Fixtures ──────────────────────────────────────────────────────────────────
 
-const FLAT_PROFILE = Object.fromEntries(ALL_DIMENSIONS.map((d) => [d, 50])) as Record<string, number>
+const FLAT_PROFILE = Object.fromEntries(ALL_DIMENSIONS.map((d) => [d, 50])) as DimensionalProfile
 
 const BASE_RESULT: QuizResult = {
   primaryType: 'pragmatic_idealist',
-  profile: FLAT_PROFILE as any,
+  profile: FLAT_PROFILE,
   topDimensions: ['markets_governance', 'stability_change'],
   completionPercent: 40,
 }
@@ -106,8 +106,8 @@ describe('quiz gating — address field logic', () => {
     // This test documents the rule from §22.3: generic ballots are not a feature.
     // The page renders the CTA block and NOT the address form when session?.result is falsy.
     // We verify the gating condition directly since the page is a client component.
-    const session = null
-    const hasProfile = Boolean((session as any)?.result)
+    const session: { result?: unknown } | null = null
+    const hasProfile = Boolean(session?.result)
     expect(hasProfile).toBe(false)
     // When hasProfile is false the page does NOT render the address field
   })
