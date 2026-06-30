@@ -12,6 +12,7 @@ import { useQuizStore } from '@/store/quizStore'
 import { mantleFor } from '@/lib/quiz/mantles'
 import { LINEAGE_TRIGGERS } from '@/lib/quiz/demographics'
 import { DIMENSIONS } from '@/lib/quiz/dimensions'
+import { DEALBREAKER_TEXT } from '@/lib/quiz/layer4'
 import type { Demographics } from '@/types/quiz'
 import DemographicsBody from '@/components/profile/DemographicsCard'
 import ChangePassword from '@/components/auth/ChangePassword'
@@ -171,7 +172,7 @@ function DataExportBody() {
 
     if (result.secondaryTypes && result.secondaryTypes.length > 0) {
       lines.push('── SECONDARY TYPES ────────────────────────────────────────────')
-      for (const t of result.secondaryTypes) lines.push(`  ${t}`)
+      for (const t of result.secondaryTypes) lines.push(`  ${mantleFor(t).name}`)
       lines.push('')
     }
 
@@ -183,7 +184,7 @@ function DataExportBody() {
 
     if (session.dealbreakers && session.dealbreakers.length > 0) {
       lines.push('── YOUR DEALBREAKERS ──────────────────────────────────────────')
-      for (const d of session.dealbreakers) lines.push(`  • ${d}`)
+      for (const d of session.dealbreakers) lines.push(`  • ${DEALBREAKER_TEXT[d] ?? d}`)
       lines.push('')
     }
 

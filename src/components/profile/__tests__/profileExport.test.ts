@@ -38,6 +38,19 @@ describe('Profile export — inclusion / exclusion (§27.2)', () => {
     })
   })
 
+  describe('Display-name substitution', () => {
+    it('secondary types use mantleFor().name (not raw internal key)', () => {
+      expect(source).toContain('mantleFor(t).name')
+      expect(source).not.toContain('lines.push(`  ${t}`)')
+    })
+
+    it('dealbreakers use DEALBREAKER_TEXT lookup with raw-id fallback', () => {
+      expect(source).toContain('DEALBREAKER_TEXT')
+      expect(source).toContain('DEALBREAKER_TEXT[d] ?? d')
+      expect(source).not.toContain('lines.push(`  • ${d}`)')
+    })
+  })
+
   describe('Excluded content (§27.2 — does NOT include)', () => {
     it('does not export conversation history', () => {
       expect(exportFn).not.toContain('conversationHistory')
