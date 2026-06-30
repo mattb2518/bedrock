@@ -293,11 +293,14 @@ function applyL2Boost(
   // that is directionally consistent with the user's profile (within 25 points)
   let corroborating = 0
   for (const pos of issuePositions) {
-    // L2 options are keyed by questionId; we check for rough profile alignment
-    // on the candidate's strongest axes as a proxy for issue corroboration.
-    // Full issue-to-axis mapping lives in the classification pipeline (Stage 3).
-    // Here we use a structural proxy: if candidate has 3+ axes within 25 pts of
-    // user profile, each matching L2 question is likely corroborated.
+    // TODO(stage-3): replace this structural proxy with a real issue-to-dimension
+    // map. Each L2 question should declare which Dimension(s) it's evidence for,
+    // and corroboration should check whether the user's specific L2 position aligns
+    // with the candidate's score on those specific axes — not general closeness.
+    // The map belongs in the classification pipeline data; the engine just reads it.
+    //
+    // Current proxy: checks whether the candidate has 3+ axes within 25 pts of
+    // the user profile as a stand-in for per-question issue corroboration.
     const alignedAxes = ALL_DIMENSIONS.filter((a) => {
       const p = candidate.axisPlacement[a]
       return p && Math.abs(key.profile[a] - p.score) <= 25

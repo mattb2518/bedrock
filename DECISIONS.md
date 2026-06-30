@@ -68,6 +68,10 @@ just-in-time, when we start building that pillar.
 These come from the design memos. Not urgent until we start the relevant pillar;
 listed so nothing gets lost.
 
+### Engine — implementation gaps to resolve in Stage 3
+
+- **L2 issue-to-axis mapping:** the engine's bounded confidence boost (§19.4) currently uses a structural proxy rather than a real per-question issue-to-dimension map. The proxy checks general axis closeness rather than whether the user's *specific* L2 issue positions corroborate the *specific* axes driving a candidate's alignment. Needs a real issue-to-dimension map built during Stage 3 (classification pipeline) — each L2 question should declare which dimension(s) it's evidence for, and the engine should check corroboration against those specific dimensions rather than general closeness. Tracked 2026-06-30, flagged during Stage 2 review.
+
 ### Pillar 1 — Ballot
 - Do we **exclude non-ideological offices** (judges, clerks, many nonpartisan
   local seats) from values-matching, and offer different guidance instead?
