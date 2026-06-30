@@ -13,7 +13,7 @@
  */
 
 import type { CandidateRecord } from '@/lib/engine/match'
-import { queueCandidateForClassification } from './classificationQueue'
+import { getOrClassifyCandidate } from './classificationQueue'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types for congress.gov and FEC API responses
@@ -57,9 +57,7 @@ export interface FECFinanceSummary {
   campaignSite: string | null
 }
 
-export interface FederalCandidate extends Omit<CandidateRecord, 'axisPlacement' | 'dealbreakers'> {
-  axisPlacement: Record<string, never>    // always empty for live-API candidates
-  dealbreakers: Record<number, never>     // always empty for live-API candidates
+export interface FederalCandidate extends CandidateRecord {
   fecId: string | null
   campaignSite: string | null
   donateLink: string | null
@@ -222,7 +220,7 @@ async function buildFederalCandidate(
     id: member.bioguideId,
     name: member.name,
     office,
-    officeType: 'ideological',
+    officeType: 'ideological' as const,
     district,
     party: partyDisplay(member.party),
     axisPlacement: {},
@@ -232,8 +230,8 @@ async function buildFederalCandidate(
     lastUpdated: new Date().toISOString().slice(0, 10),
     bioguideId: member.bioguideId,
     fecId: fecCandidate?.candidate_id ?? null,
-    campaignSite: congressUrl,  // congress.gov profile is the best publicly-available link
-    donateLink: null,           // FEC does not expose campaign website URLs; editorial task to populate
+    campaignSite: congressUrl,
+    donateLink: null,
     financeData,
   }
 }
@@ -305,19 +303,37 @@ export async function fetchFederalCandidates(
     )
   )
 
-  // Fire-and-forget: queue every fetched candidate for classification if not already present.
-  // Does NOT block the return — ballot page sees no_call immediately; admin can classify later.
-  for (const c of [...senateCandidates, ...houseCandidates]) {
-    void queueCandidateForClassification({
-      id:           c.id,
-      name:         c.name,
-      office:       c.office,
-      district:     c.district,
-      party:        c.party ?? 'Unknown',
-      coverageTier: c.coverageTier,
-      sourcedFrom:  c.sourcedFrom,
-    })
+  // Classify all candidates in parallel — cache hits return instantly; misses call Claude.
+  // Results are merged back so the engine gets real axisPlacement rather than no_call.
+  function withClassification(candidates: FederalCandidate[]) {
+    return Promise.all(
+      candidates.map(async (c) => {
+        const classified = await getOrClassifyCandidate({
+          id:          c.id,
+          name:        c.name,
+          office:      c.office,
+          officeType:  c.officeType,
+          district:    c.district,
+          party:       c.party ?? 'Unknown',
+          coverageTier: c.coverageTier,
+          sourcedFrom: c.sourcedFrom,
+        })
+        if (!classified) return c
+        return {
+          ...c,
+          axisPlacement:  classified.axisPlacement,
+          dealbreakers:   classified.dealbreakers,
+          rhetoricalOnly: classified.rhetoricalOnly,
+          lastUpdated:    classified.lastUpdated,
+        }
+      })
+    )
   }
 
-  return { senate: senateCandidates, house: houseCandidates }
+  const [senate, house] = await Promise.all([
+    withClassification(senateCandidates),
+    withClassification(houseCandidates),
+  ])
+
+  return { senate, house }
 }

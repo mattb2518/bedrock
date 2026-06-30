@@ -27,12 +27,12 @@ export default async function AdminOverviewPage() {
   const admin = createAdminClient()
   const role = await getCurrentUserRole()
 
-  const [{ count: pendingCandidates }, { count: pendingSources }, { count: auditTotal }, { count: autoIngestedPending }, { data: checklistRows }] =
+  const [{ count: pendingCandidates }, { count: pendingSources }, { count: auditTotal }, { count: lowConfidencePending }, { data: checklistRows }] =
     await Promise.all([
       admin.from('classified_candidates').select('*', { count: 'exact', head: true }).eq('status', 'pending_review'),
       admin.from('classified_sources').select('*', { count: 'exact', head: true }).eq('status', 'pending_review'),
       admin.from('classification_audit_log').select('*', { count: 'exact', head: true }),
-      admin.from('classified_candidates').select('*', { count: 'exact', head: true }).eq('status', 'pending_review').eq('attribution', 'auto_ingested'),
+      admin.from('classified_candidates').select('*', { count: 'exact', head: true }).eq('status', 'pending_review').eq('attribution', 'auto_classify'),
       admin.from('admin_checklist').select('item_id, checked'),
     ])
 
@@ -41,10 +41,10 @@ export default async function AdminOverviewPage() {
   const totalCount = CHECKLIST_ITEMS.length
 
   const stats = [
-    { label: 'Candidates pending', value: pendingCandidates ?? 0, href: '/admin/review?type=candidate' },
-    { label: 'Sources pending',    value: pendingSources ?? 0,    href: '/admin/review?type=source' },
-    { label: 'Auto-ingested pending', value: autoIngestedPending ?? 0, href: '/admin/review?type=candidate&attribution=auto_ingested' },
-    { label: 'Audit entries',      value: auditTotal ?? 0,        href: '/admin/audit' },
+    { label: 'Candidates pending',     value: pendingCandidates ?? 0,   href: '/admin/review?type=candidate' },
+    { label: 'Sources pending',        value: pendingSources ?? 0,       href: '/admin/review?type=source' },
+    { label: 'Low-confidence pending', value: lowConfidencePending ?? 0, href: '/admin/review?type=candidate&attribution=auto_classify' },
+    { label: 'Audit entries',          value: auditTotal ?? 0,           href: '/admin/audit' },
   ]
 
   return (

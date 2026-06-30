@@ -1,11 +1,12 @@
 'use client'
 
-import { useState, useTransition, useMemo } from 'react'
+import { useState, useTransition, useMemo, useEffect } from 'react'
 import { useQuizStore } from '@/store/quizStore'
 import { filterBeyondBallotCandidates, matchRace } from '@/lib/engine/match'
 import { buildMatchKey } from '@/lib/engine/buildMatchKey'
 import { resolveDistrict } from '@/lib/civic/resolveDistrict'
 import { createClient } from '@/lib/supabase/client'
+import { triggerBYBClassification } from './actions'
 import candidates from '@/data/beyond-ballot-candidates'
 import type { RankedCandidate } from '@/lib/engine/match'
 import type { BYBCandidateRecord } from '@/data/beyond-ballot-candidates'
@@ -337,6 +338,22 @@ export default function BeyondYourBallotPage() {
   const [isPending, startTransition] = useTransition()
 
   const [showHowItWorks, setShowHowItWorks] = useState(false)
+
+  // Pre-classify any BYB candidates that lack axisPlacement data.
+  // Fire-and-forget: current static data is pre-classified so this is a no-op
+  // today, but ensures real candidates added later get classified on first page load.
+  useEffect(() => {
+    const unclassified = candidates.filter(
+      (c) => !c.axisPlacement || Object.keys(c.axisPlacement).length === 0
+    )
+    if (unclassified.length > 0) {
+      void triggerBYBClassification(unclassified.map((c) => ({
+        id: c.id, name: c.name, office: c.office, officeType: c.officeType,
+        district: c.district, party: c.party ?? 'Unknown',
+        coverageTier: c.coverageTier, sourcedFrom: c.sourcedFrom,
+      })))
+    }
+  }, [])
 
   // Build MatchKey once (stable per session)
   const matchKey = useMemo(() => {

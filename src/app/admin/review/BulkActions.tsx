@@ -109,6 +109,11 @@ export default function BulkActions({ type, entries, staleCount }: Props) {
                 user suggestion
               </span>
             )}
+            {entry.attribution === 'auto_classify' && (
+              <span style={{ fontSize: 10, fontWeight: 600, color: '#f59e0b', background: 'rgba(245,158,11,0.12)', border: '1px solid rgba(245,158,11,0.3)', borderRadius: 4, padding: '1px 6px', whiteSpace: 'nowrap' }}>
+                low confidence
+              </span>
+            )}
             <span style={{ fontSize: 11, color: 'var(--color-text-tertiary)' }}>{entry.id}</span>
           </div>
         ))}

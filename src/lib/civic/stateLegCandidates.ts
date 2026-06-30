@@ -21,7 +21,7 @@
  */
 
 import type { CandidateRecord } from '@/lib/engine/match'
-import { queueCandidateForClassification } from './classificationQueue'
+import { getOrClassifyCandidate } from './classificationQueue'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Open States API types
@@ -57,9 +57,7 @@ interface OpenStatesResponse {
   }
 }
 
-export interface StateLegCandidate extends Omit<CandidateRecord, 'axisPlacement' | 'dealbreakers'> {
-  axisPlacement: Record<string, never>
-  dealbreakers: Record<number, never>
+export interface StateLegCandidate extends CandidateRecord {
   openStatesId: string
   chamber: 'upper' | 'lower' | 'legislature'
   websiteUrl: string | null
@@ -196,18 +194,36 @@ export async function fetchStateLegCandidates(
     buildStateLegCandidate(p, state.toUpperCase(), 'lower', stateHouseDistrict!)
   )
 
-  // Fire-and-forget: queue every fetched candidate for classification if not already present.
-  for (const c of [...senate, ...house]) {
-    void queueCandidateForClassification({
-      id:           c.id,
-      name:         c.name,
-      office:       c.office,
-      district:     c.district,
-      party:        c.party ?? 'Unknown',
-      coverageTier: c.coverageTier,
-      sourcedFrom:  c.sourcedFrom,
-    })
+  // Classify all candidates in parallel — cache hits return instantly; misses call Claude.
+  async function withClassification(candidates: StateLegCandidate[]) {
+    return Promise.all(
+      candidates.map(async (c) => {
+        const classified = await getOrClassifyCandidate({
+          id:          c.id,
+          name:        c.name,
+          office:      c.office,
+          officeType:  c.officeType,
+          district:    c.district,
+          party:       c.party ?? 'Unknown',
+          coverageTier: c.coverageTier,
+          sourcedFrom: c.sourcedFrom,
+        })
+        if (!classified) return c
+        return {
+          ...c,
+          axisPlacement:  classified.axisPlacement,
+          dealbreakers:   classified.dealbreakers,
+          rhetoricalOnly: classified.rhetoricalOnly,
+          lastUpdated:    classified.lastUpdated,
+        }
+      })
+    )
   }
 
-  return { senate, house }
+  const [classifiedSenate, classifiedHouse] = await Promise.all([
+    withClassification(senate),
+    withClassification(house),
+  ])
+
+  return { senate: classifiedSenate, house: classifiedHouse }
 }

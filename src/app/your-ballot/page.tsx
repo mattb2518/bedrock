@@ -752,7 +752,7 @@ export default function YourBallotPage() {
                       opacity: !address.trim() ? 0.5 : 1,
                     }}
                   >
-                    {isPending ? 'Looking up…' : 'Find my ballot'}
+                    {isPending ? 'Building ballot…' : 'Find my ballot'}
                   </button>
                 </div>
                 {addressError && (
@@ -769,9 +769,14 @@ export default function YourBallotPage() {
 
           {/* ── Ballot results ─────────────────────────────────────────────────── */}
           {isPending && (
-            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)' }}>
-              Looking up your races…
-            </p>
+            <div style={{ padding: 'var(--space-6)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-lg)', backgroundColor: 'var(--color-bg-surface)' }}>
+              <p style={{ margin: '0 0 var(--space-2)', fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-primary)' }}>
+                Building your personalized ballot…
+              </p>
+              <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)' }}>
+                Reading candidate records for your district. This takes a few seconds on first lookup — results are cached for everyone in the same district after that.
+              </p>
+            </div>
           )}
 
           {ballot && raceResults.length > 0 && (

@@ -1,7 +1,6 @@
 import Link from 'next/link'
 import { createAdminClient } from '@/lib/supabase/admin'
 import BulkActions from './BulkActions'
-import ClassifyAutoIngestedButton from './ClassifyAutoIngestedButton'
 import ClassifyPendingSourcesButton from './ClassifyPendingSourcesButton'
 
 interface Props {
@@ -56,7 +55,7 @@ export default async function ReviewQueuePage({ searchParams }: Props) {
   const sources = sourceRows.data ?? []
   const staleCount = activeType === 'candidate' ? (staleCandidates.count ?? 0) : (staleSources.count ?? 0)
 
-  const autoIngestedCount = candidates.filter((c) => c.attribution === 'auto_ingested').length
+  const lowConfidenceCount = candidates.filter((c) => c.attribution === 'auto_classify').length
   const unclassifiedSourceCount = sources.filter((s) => !s.axis_placement).length
 
   const candidateEntries = candidates.map((c) => ({ id: c.candidate_id, primary: `${c.name} — ${c.office}`, attribution: c.attribution as string | null }))
@@ -94,28 +93,27 @@ export default async function ReviewQueuePage({ searchParams }: Props) {
         <Link href="/admin/review?type=source" style={tabStyle(activeType === 'source')}>
           Sources ({sources.length})
         </Link>
-        {activeType === 'candidate' && (
+        {activeType === 'candidate' && lowConfidenceCount > 0 && (
           <Link
-            href={filterAttribution ? '/admin/review?type=candidate' : '/admin/review?type=candidate&attribution=auto_ingested'}
+            href={filterAttribution ? '/admin/review?type=candidate' : '/admin/review?type=candidate&attribution=auto_classify'}
             style={{
               ...tabStyle(!!filterAttribution),
               marginLeft: 'auto',
-              background: filterAttribution ? 'rgba(96,165,250,0.15)' : 'rgba(255,255,255,0.04)',
-              color: filterAttribution ? '#60a5fa' : 'var(--color-text-secondary)',
+              background: filterAttribution ? 'rgba(245,158,11,0.15)' : 'rgba(255,255,255,0.04)',
+              color: filterAttribution ? '#f59e0b' : 'var(--color-text-secondary)',
             }}
           >
-            {filterAttribution ? '✕ Clear filter' : `Auto-ingested (${autoIngestedCount})`}
+            {filterAttribution ? '✕ Clear filter' : `Low-confidence (${lowConfidenceCount})`}
           </Link>
         )}
       </div>
 
-      {/* Classify auto-ingested batch trigger */}
-      {activeType === 'candidate' && autoIngestedCount > 0 && (
-        <div style={{ marginBottom: 'var(--space-6)', padding: 'var(--space-4)', background: 'rgba(96,165,250,0.06)', border: '1px solid rgba(96,165,250,0.2)', borderRadius: 8 }}>
-          <p style={{ fontSize: 'var(--text-small)', color: '#60a5fa', marginBottom: 'var(--space-3)' }}>
-            <strong>{autoIngestedCount}</strong> candidate{autoIngestedCount !== 1 ? 's' : ''} queued from live address lookups — not yet classified.
+      {/* Low-confidence classification notice */}
+      {activeType === 'candidate' && lowConfidenceCount > 0 && (
+        <div style={{ marginBottom: 'var(--space-6)', padding: 'var(--space-4)', background: 'rgba(245,158,11,0.06)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: 8 }}>
+          <p style={{ fontSize: 'var(--text-small)', color: '#f59e0b', margin: 0 }}>
+            <strong>{lowConfidenceCount}</strong> candidate{lowConfidenceCount !== 1 ? 's' : ''} auto-classified with low confidence — fewer than 4 axes scored above 0.6. Spot-check before relying on these recommendations.
           </p>
-          <ClassifyAutoIngestedButton count={autoIngestedCount} />
         </div>
       )}
 
