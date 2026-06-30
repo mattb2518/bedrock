@@ -464,14 +464,7 @@ export async function seedCatalogSources(): Promise<{ seeded: number; skipped: n
   await requireSuperAdminRole()
   const admin = createAdminClient()
 
-  const { readFileSync } = await import('fs')
-  const { join } = await import('path')
-
-  const csvPath = join(process.cwd(), 'src', 'data', 'media-catalog.csv')
-  const lines = readFileSync(csvPath, 'utf-8').split('\n').filter(Boolean)
-
-  // Skip header row
-  const dataLines = lines.slice(1)
+  const { CATALOG_SEED_ROWS } = await import('@/data/media-catalog-seed')
 
   function mapKind(format: string): string {
     const f = format.toLowerCase()
@@ -490,45 +483,30 @@ export async function seedCatalogSources(): Promise<{ seeded: number; skipped: n
   let seeded = 0
   let skipped = 0
 
-  for (const line of dataLines) {
-    // CSV columns: name,creators_hosts,format,lean,notable_for,url_or_platform,
-    //              access_model,ownership,independence_risk,policy_depth_score,
-    //              flags,tier_potential,dimension_coverage_notes
-    const cols = line.split(',')
-    const name              = cols[0]?.trim()
-    const format            = cols[2]?.trim() ?? ''
-    const lean              = cols[3]?.trim() ?? ''
-    const url               = cols[5]?.trim()
-    const policy_depth_score = cols[9]?.trim() ?? ''
-    const flags             = cols[10]?.trim() ?? ''
-
-    if (!name || !url) continue
-
-    const sourceId = slugify(name)
+  for (const row of CATALOG_SEED_ROWS) {
     const seedNotes = [
-      lean ? `Lean: ${lean}` : '',
-      policy_depth_score ? `Policy depth: ${policy_depth_score}/5` : '',
-      flags ? `Flags: ${flags}` : '',
+      row.lean              ? `Lean: ${row.lean}`                         : '',
+      row.policyDepthScore  ? `Policy depth: ${row.policyDepthScore}/5`   : '',
+      row.flags             ? `Flags: ${row.flags}`                       : '',
     ].filter(Boolean).join(' | ')
 
     const { error } = await admin.from('classified_sources').upsert(
       {
-        source_id:         sourceId,
-        name,
-        url,
-        kind:              mapKind(format),
-        status:            'pending_review',
-        attribution:       'catalog_seed',
+        source_id:          slugify(row.name),
+        name:               row.name,
+        url:                row.url,
+        kind:               mapKind(row.format),
+        status:             'pending_review',
+        attribution:        'catalog_seed',
         bedrock_originated: true,
-        axis_placement:    null,
-        seed_notes:        seedNotes || null,
-        tagged_by:         'catalog_seed',
+        axis_placement:     null,
+        seed_notes:         seedNotes || null,
+        tagged_by:          'catalog_seed',
       },
       { onConflict: 'url', ignoreDuplicates: true }
     )
 
     if (error) {
-      // Treat unique-constraint skip as "already existed"
       skipped++
     } else {
       seeded++
