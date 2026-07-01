@@ -1,29 +1,31 @@
 'use client'
 
-import { useState, useTransition } from 'react'
-import { classifyPendingSources } from '@/app/admin/actions'
+import { useState } from 'react'
 
 export default function ClassifyPendingSourcesButton({ count }: { count: number }) {
   const [results, setResults] = useState<Array<{ id: string; ok: boolean; error?: string }> | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [current, setCurrent] = useState(0)
-  const [isPending, startTransition] = useTransition()
+  const [isPending, setIsPending] = useState(false)
 
   const cap = Math.min(count, 20)
 
-  function run() {
-    setCurrent(0)
+  async function run() {
+    setIsPending(true)
     setResults(null)
     setError(null)
-    startTransition(async () => {
-      try {
-        const r = await classifyPendingSources()
-        setCurrent(r.length)
-        setResults(r)
-      } catch (e) {
-        setError(e instanceof Error ? e.message : 'Classification failed — check server logs.')
+    try {
+      const res = await fetch('/api/admin/classify-sources', { method: 'POST' })
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}))
+        throw new Error(body.error ?? `Server error ${res.status}`)
       }
-    })
+      const r = await res.json() as Array<{ id: string; ok: boolean; error?: string }>
+      setResults(r)
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Classification failed — check server logs.')
+    } finally {
+      setIsPending(false)
+    }
   }
 
   return (
@@ -44,7 +46,7 @@ export default function ClassifyPendingSourcesButton({ count }: { count: number 
         }}
       >
         {isPending
-          ? `Classifying ${current} of ${cap}…`
+          ? `Classifying up to ${cap}…`
           : `Classify all with Claude (up to ${cap})`}
       </button>
 
