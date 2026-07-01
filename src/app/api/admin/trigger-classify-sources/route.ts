@@ -15,6 +15,10 @@ export async function POST() {
     })
     return Response.json({ ok: true, message: 'Classification job started' })
   } catch (e) {
-    return Response.json({ error: String(e) }, { status: 500 })
+    return Response.json({
+      error: String(e),
+      stack: e instanceof Error ? e.stack : undefined,
+      message: e instanceof Error ? e.message : undefined,
+    }, { status: 500 })
   }
 }
