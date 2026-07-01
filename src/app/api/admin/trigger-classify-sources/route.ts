@@ -1,4 +1,3 @@
-import { inngest } from '@/lib/inngest'
 import { requireAdminRole } from '@/lib/auth/requireRole'
 
 export async function POST() {
@@ -8,11 +7,25 @@ export async function POST() {
     return Response.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
+  const eventKey = process.env.INNGEST_EVENT_KEY
+  if (!eventKey) {
+    return Response.json({ error: 'INNGEST_EVENT_KEY not set' }, { status: 500 })
+  }
+
   try {
-    await inngest.send({ name: 'bedrock/sources.classify', data: {} })
+    const response = await fetch('https://inn.gs/e/' + eventKey, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: 'bedrock/sources.classify', data: {} }),
+    })
+
+    if (!response.ok) {
+      const text = await response.text()
+      return Response.json({ error: `Inngest HTTP error: ${response.status}`, body: text }, { status: 500 })
+    }
+
     return Response.json({ ok: true, message: 'Classification job started' })
   } catch (e) {
-    console.error('inngest.send error:', e)
     return Response.json({ error: String(e) }, { status: 500 })
   }
 }
