@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useQuizStore } from '@/store/quizStore'
 import { loadProfile } from '@/lib/quiz/sync'
+import { createClient } from '@/lib/supabase/client'
 import { matchMedia } from '@/lib/engine/mediaMatch'
 import { buildMediaMatchKey } from '@/lib/engine/buildMediaMatchKey'
 import { BiasCheckerTool } from '@/components/media/BiasCheckerTool'
@@ -358,8 +359,16 @@ export default function MediaDietPage() {
 
   useEffect(() => {
     if (hasProfile) { setAuthChecked(true); return }
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data }) => {
+      console.log('[media-diet] auth user:', data.user)
+    })
     loadProfile().then((profile) => {
-      if (profile) setSessionFromCloud(profile)
+      console.log('[media-diet] loadProfile result:', profile)
+      if (profile) {
+        setSessionFromCloud(profile)
+        console.log('[media-diet] store session after setSessionFromCloud:', useQuizStore.getState().session)
+      }
       setAuthChecked(true)
     })
   }, [])
