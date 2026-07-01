@@ -3315,3 +3315,41 @@ A 6-slide modal carousel shown automatically to first-time visitors. Designed to
 - Slide 2 uses Dimension 5 (Markets vs. Governance) — most accessible of the eight, not partisan, all three options genuinely defensible
 - Quiz card on slide 2 is clearly illustrative — not interactive; styled with muted options, Example question label, cursor:default
 - Tour is informational only — no interactions, no quiz answers captured
+
+---
+
+## 29. Canonical Route Map
+
+**Source of truth for all filesystem routes in `src/app/`.** Claude Code must check this table before creating links, middleware bypass lists, or redirect logic. Never assume a route path from a product name — verify against this table.
+
+| Product Name | Filesystem Path | URL Route | Notes |
+|---|---|---|---|
+| Homepage | `src/app/page.tsx` | `/` | Public |
+| Sign In | `src/app/signin/page.tsx` | `/signin` | Public |
+| Sign Up | `src/app/signup/page.tsx` | `/signup` | Public |
+| Forgot Password | `src/app/forgot-password/page.tsx` | `/forgot-password` | Public |
+| Reset Password | `src/app/reset-password/page.tsx` | `/reset-password` | Public |
+| Auth Callback | `src/app/auth/callback/` | `/auth/callback` | Public |
+| Gate | `src/app/gate/page.tsx` | `/gate` | Pre-launch password wall |
+| Quiz | `src/app/quiz/page.tsx` | `/quiz` | App |
+| Results | `src/app/results/page.tsx` | `/results` | App |
+| Civic Mantle | `src/app/civic-mantle/page.tsx` | `/civic-mantle` | App |
+| Your Mantle | `src/app/your-mantle/page.tsx` | `/your-mantle` | App |
+| Your Media Diet | `src/app/media-diet/page.tsx` | `/media-diet` | App — NOT `/media` |
+| Your Ballot | `src/app/your-ballot/page.tsx` | `/your-ballot` | App — NOT `/ballot` |
+| Beyond Your Ballot | `src/app/beyond-your-ballot/page.tsx` | `/beyond-your-ballot` | App — NOT `/beyond-ballot` |
+| Your Conversations | `src/app/conversations/page.tsx` | `/conversations` | App |
+| Profile | `src/app/profile/page.tsx` | `/profile` | App |
+| Admin | `src/app/admin/` | `/admin` and sub-routes | Admin only |
+| About | `src/app/about/page.tsx` | `/about` | Public |
+| How It Works | `src/app/how-it-works/page.tsx` | `/how-it-works` | Public |
+| Methodology | `src/app/methodology/page.tsx` | `/methodology` | Public |
+| FAQ | `src/app/faq/page.tsx` | `/faq` | Public |
+| Privacy | `src/app/privacy/page.tsx` | `/privacy` | Public |
+
+**⚠️ Known traps (routes confirmed wrong in past builds):**
+- Your Media Diet is `/media-diet` — NOT `/media` (placeholder at `/media` exists but is a stub)
+- Your Ballot is `/your-ballot` — NOT `/ballot`
+- Beyond Your Ballot is `/beyond-your-ballot` — NOT `/beyond-ballot`
+
+**Rule for Claude Code:** Before adding any path to a bypass list, nav link, or redirect, grep `src/app/` for the actual directory name. Product names and route names do not always match.
