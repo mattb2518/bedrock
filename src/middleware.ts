@@ -43,6 +43,15 @@ export async function middleware(request: NextRequest) {
   // For the gate bypass we only need to know a session exists, not verify it.
   const { data: { session } } = await supabase.auth.getSession();
 
+  console.log('[middleware]', {
+    pathname,
+    isGateBypassed,
+    hasSession: !!session,
+    sessionUserId: session?.user?.id ?? null,
+    gateCookie: request.cookies.get(GATE_COOKIE)?.value ?? null,
+    allCookieNames: request.cookies.getAll().map(c => c.name),
+  });
+
   // Still call getUser() for the token refresh side-effect on authed requests.
   if (session) await supabase.auth.getUser();
 
