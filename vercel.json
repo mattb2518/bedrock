@@ -1,3 +1,14 @@
 {
-  "framework": "nextjs"
+  "framework": "nextjs",
+  "functions": {
+    "src/app/admin/actions.ts": {
+      "maxDuration": 300
+    },
+    "src/app/api/conversations/chat/route.ts": {
+      "maxDuration": 60
+    },
+    "src/app/api/bias-checker/route.ts": {
+      "maxDuration": 60
+    }
+  }
 }
