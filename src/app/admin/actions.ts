@@ -181,6 +181,7 @@ export async function reclassifyEntry(type: EntryType, id: string) {
         sourceId: row.source_id,
         name: row.name,
         url: row.url,
+        seedNotes: row.seed_notes ?? undefined,
         contentPieces: ((row.source_evidence ?? []) as string[]).map((e: string) =>
           e.startsWith('http') ? { url: e } : { text: e }
         ),
@@ -196,6 +197,11 @@ export async function reclassifyEntry(type: EntryType, id: string) {
       // Only overwrite axis_placement if no significant disagreement; otherwise keep
       // the old approved scores live and let reconciliation resolve the conflict.
       ...(disagree.flagged ? {} : { axis_placement: result.axisPlacement }),
+      reliability: result.reliability,
+      independence: result.independenceScore,
+      good_faith: result.goodFaith,
+      coarse_lean: result.coarseLean,
+      topics: result.topics,
       source_evidence: result.sourceEvidence,
       raw_classification: { ...result.rawClassification, new_axis_placement: result.axisPlacement },
       status: 'pending_review',

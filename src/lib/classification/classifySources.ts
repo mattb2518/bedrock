@@ -19,6 +19,7 @@ export interface SourceClassificationInput {
   sourceId: string
   name: string
   url: string
+  seedNotes?: string   // admin notes from catalog seed — primary context for podcast URLs
   // 5-10 recent content pieces: each is either a URL or raw text
   contentPieces: Array<{ url?: string; text?: string }>
   // Optional: existing external ratings to anchor the prompt (§20.3)
@@ -40,6 +41,12 @@ export interface AxisClassification {
 export interface SourceClassificationResult {
   sourceId: string
   axisPlacement: Partial<Record<Dimension, AxisPlacement>>
+  // Metadata fields stored directly on classified_sources
+  reliability: number | null       // 0–100
+  independenceScore: number | null // 0–100
+  goodFaith: 'high' | 'mixed' | 'low' | null
+  coarseLean: 'left' | 'lean-left' | 'center' | 'lean-right' | 'right' | 'heterodox' | null
+  topics: string[]
   // §20.4 provenance
   taggedBy: string
   reviewedBy: string | null   // null until admin approves
@@ -61,6 +68,11 @@ interface ClaudeSourceClassification {
     rationale: string
     evidence_urls: string[]
   }>>
+  reliability_score: number
+  independence_score: number
+  good_faith: 'high' | 'mixed' | 'low'
+  coarse_lean: 'left' | 'lean-left' | 'center' | 'lean-right' | 'right' | 'heterodox'
+  topics: string[]
   overall_notes: string
   reliability_assessment: string
   independence_assessment: string
@@ -83,6 +95,8 @@ const AXIS_DESCRIPTIONS: Record<Dimension, string> = {
   trust_skepticism:      'Institutional Trust ↔ Skepticism (0 = high trust in institutions; 100 = high skepticism)',
 }
 
+const PODCAST_URL_PATTERN = /podcasts\.apple\.com|open\.spotify\.com|spotify\.com\/show|anchor\.fm|buzzsprout\.com|podbean\.com|podcasts\.google\.com/i
+
 function buildSourcePrompt(
   input: SourceClassificationInput,
   contentText: string
@@ -95,13 +109,23 @@ function buildSourcePrompt(
     ? `\n\nExternal ratings to use as anchors (map to the 8-axis framework and fill gaps):\n${JSON.stringify(input.externalRatings, null, 2)}`
     : ''
 
+  const isPodcastUrl = PODCAST_URL_PATTERN.test(input.url)
   const hasContent = contentText.trim().length > 0 && !contentText.includes('(URL only — fetch during review)')
 
-  return `You are classifying a media source for Bedrock, a nonpartisan civic identity platform. Your job is to score this source on all 8 civic dimensions. Be precise, nonpartisan, and honest about your confidence — your scores should be defensible to both conservative and liberal critics.
+  const contentSection = isPodcastUrl
+    ? `NOTE: The URL is a podcast platform link (${input.url}) — not a scrapeable content site. ` +
+      `Use the source name and notes below as your primary context, supplemented by general knowledge of this specific show.\n` +
+      (input.seedNotes ? `SOURCE NOTES: ${input.seedNotes}\n` : '')
+    : hasContent
+      ? `RECENT CONTENT TO ANALYZE:\n${contentText}`
+      : `NO LIVE CONTENT AVAILABLE — score from general knowledge of this source's editorial identity, stated mission, ownership, known coverage patterns, and public reputation.` +
+        (input.seedNotes ? `\n\nSEED NOTES (curator context): ${input.seedNotes}` : '')
+
+  return `You are classifying a media source for Bedrock, a nonpartisan civic identity platform. Your job is to score this source on all 8 civic dimensions AND assess its reliability, independence, and good-faith level. Be precise, nonpartisan, and honest about your confidence — your scores should be defensible to both conservative and liberal critics.
 
 SOURCE: ${input.name} (${input.url})${externalAnchor}
 
-${hasContent ? `RECENT CONTENT TO ANALYZE:\n${contentText}` : `NO LIVE CONTENT AVAILABLE — score from general knowledge of this source's editorial identity, stated mission, ownership, known coverage patterns, and public reputation.`}
+${contentSection}
 
 SCORING FRAMEWORK — 8 dimensions, each 0–100:
 ${axisLines}
@@ -110,7 +134,7 @@ IMPORTANT RULES:
 - Score ALL 8 axes. An honest low-confidence score (0.3–0.5) is always more useful than a missing axis.
 - When live content is available, prefer it. When it isn't, score from general knowledge of the source's editorial identity, ownership, stated mission, and public reputation — this is valid and expected.
 - Set confidence to reflect your evidence quality: 0.3–0.4 = general-knowledge only; 0.5–0.6 = partial content or mixed signals; 0.7–0.8 = clear pattern across multiple pieces; 0.9+ = very strong, consistent signal.
-- rationale must be one sentence. If scoring from general knowledge (not specific article content), say so explicitly: e.g. "Based on general knowledge of editorial mission — no live content available."
+- rationale must be one sentence. If scoring from general knowledge (not specific article content), say so explicitly.
 - evidence_urls should list specific article URLs or titles that support the score; leave empty [] when scoring from general knowledge.
 
 Return ONLY a valid JSON object with this exact schema:
@@ -123,9 +147,14 @@ Return ONLY a valid JSON object with this exact schema:
       "evidence_urls": ["<url or title>", ...]
     }
   },
+  "reliability_score": <0-100 — factual accuracy and editorial standards: 0=unreliable/tabloid, 50=mixed, 75+=strong track record, 90+=exemplary>,
+  "independence_score": <0-100 — editorial independence from owners/funders/political parties: 0=captured, 50=mixed, 90+=fully independent>,
+  "good_faith": "<'high' | 'mixed' | 'low'> — high=engages opposing views charitably, corrects errors promptly; mixed=sometimes partisan/sensational; low=bad-faith framing, systematic distortion>",
+  "coarse_lean": "<'left' | 'lean-left' | 'center' | 'lean-right' | 'right' | 'heterodox'> — overall political lean of coverage and framing",
+  "topics": ["<2-6 topic tags from: politics, policy, elections, economy, foreign-policy, culture, media-criticism, science, local, national, international, longform, breaking-news, opinion, data-journalism>"],
   "overall_notes": "<any cross-axis observations or caveats>",
-  "reliability_assessment": "<brief assessment of factual accuracy and editorial standards>",
-  "independence_assessment": "<brief assessment of ownership, funding, editorial independence>"
+  "reliability_assessment": "<one paragraph on factual accuracy and editorial standards>",
+  "independence_assessment": "<one paragraph on ownership, funding, editorial independence>"
 }`
 }
 
@@ -152,7 +181,7 @@ export async function classifySource(
 
   const response = await anthropic.messages.create({
     model: 'claude-sonnet-4-6',
-    max_tokens: 2000,
+    max_tokens: 2500,
     messages: [{ role: 'user', content: prompt }],
   })
 
@@ -193,9 +222,28 @@ export async function classifySource(
     )
   }
 
+  // Validate metadata fields — fall back to null if Claude returns unexpected values
+  const VALID_GOOD_FAITH = ['high', 'mixed', 'low'] as const
+  const VALID_LEAN = ['left', 'lean-left', 'center', 'lean-right', 'right', 'heterodox'] as const
+
+  const reliability = typeof parsed.reliability_score === 'number' && parsed.reliability_score >= 0 && parsed.reliability_score <= 100
+    ? Math.round(parsed.reliability_score) : null
+  const independenceScore = typeof parsed.independence_score === 'number' && parsed.independence_score >= 0 && parsed.independence_score <= 100
+    ? Math.round(parsed.independence_score) : null
+  const goodFaith = VALID_GOOD_FAITH.includes(parsed.good_faith as typeof VALID_GOOD_FAITH[number])
+    ? parsed.good_faith as 'high' | 'mixed' | 'low' : null
+  const coarseLean = VALID_LEAN.includes(parsed.coarse_lean as typeof VALID_LEAN[number])
+    ? parsed.coarse_lean as typeof VALID_LEAN[number] : null
+  const topics = Array.isArray(parsed.topics) ? parsed.topics.filter((t) => typeof t === 'string') : []
+
   return {
     sourceId: input.sourceId,
     axisPlacement,
+    reliability,
+    independenceScore,
+    goodFaith,
+    coarseLean,
+    topics,
     taggedBy: input.taggedBy,
     reviewedBy: null,
     sourceEvidence: Array.from(new Set(sourceEvidence)),
