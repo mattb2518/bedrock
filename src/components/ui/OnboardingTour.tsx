@@ -324,10 +324,12 @@ export default function OnboardingTour() {
                 <>
                   <QuizCard />
                   <p style={{
-                    fontFamily: 'var(--font-body)',
-                    fontSize: 'var(--text-small)',
-                    color: 'var(--color-text-secondary)',
-                    lineHeight: 1.7,
+                    fontFamily: 'var(--font-display)',
+                    fontSize: 'clamp(15px, 3.5vw, 18px)',
+                    fontStyle: 'italic',
+                    color: slide.accent,
+                    textAlign: 'center',
+                    lineHeight: 1.4,
                     margin: 'var(--space-4) 0 var(--space-3)',
                   }}>
                     {slide.body}
@@ -336,9 +338,8 @@ export default function OnboardingTour() {
                     fontFamily: 'var(--font-display)',
                     fontSize: 'clamp(20px, 4vw, 26px)',
                     fontWeight: 400,
-                    color: slide.accent,
+                    color: 'var(--color-text-primary)',
                     lineHeight: 1.25,
-                    fontStyle: 'italic',
                     textAlign: 'center',
                     margin: 'var(--space-3) 0 0',
                   }}>
