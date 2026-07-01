@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { useQuizStore } from "@/store/quizStore";
 
 const slides = [
   {
@@ -36,10 +35,6 @@ const slides = [
 
 export default function HeroSlider() {
   const [current, setCurrent] = useState(0);
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
-  const hasResult = useQuizStore((s) => !!s.session?.result);
-  const isReturning = mounted && hasResult;
 
   const goTo = useCallback((index: number) => setCurrent(index), []);
 
@@ -117,93 +112,47 @@ export default function HeroSlider() {
           ))}
         </div>
 
-        {/* CTAs — vary by returning vs new user */}
+        {/* CTAs — constant across slides */}
         <div style={{ display: "flex", gap: "var(--space-4)", flexWrap: "wrap", marginTop: "var(--space-10)" }}>
-          {isReturning ? (
-            <>
-              <Link
-                href="/your-mantle"
-                style={{
-                  backgroundColor: "var(--color-red)",
-                  color: "#ffffff",
-                  fontFamily: "var(--font-body)",
-                  fontSize: "var(--text-body)",
-                  fontWeight: "var(--weight-semibold)",
-                  padding: "var(--btn-padding-y) var(--btn-padding-x)",
-                  borderRadius: "var(--btn-radius)",
-                  textDecoration: "none",
-                  display: "inline-block",
-                  transition: "var(--transition-fast)",
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "var(--color-red-light)")}
-                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "var(--color-red)")}
-              >
-                View your mantle →
-              </Link>
-              <Link
-                href="/media-diet"
-                style={{
-                  backgroundColor: "transparent",
-                  color: "var(--color-white-warm)",
-                  fontFamily: "var(--font-body)",
-                  fontSize: "var(--text-body)",
-                  fontWeight: "var(--weight-semibold)",
-                  padding: "var(--btn-padding-y) var(--btn-padding-x)",
-                  borderRadius: "var(--btn-radius)",
-                  textDecoration: "none",
-                  display: "inline-block",
-                  border: "2px solid var(--color-border-strong)",
-                  transition: "var(--transition-fast)",
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "rgba(232,228,218,0.08)")}
-                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
-              >
-                Your media diet
-              </Link>
-            </>
-          ) : (
-            <>
-              <Link
-                href="/quiz"
-                style={{
-                  backgroundColor: "var(--color-red)",
-                  color: "#ffffff",
-                  fontFamily: "var(--font-body)",
-                  fontSize: "var(--text-body)",
-                  fontWeight: "var(--weight-semibold)",
-                  padding: "var(--btn-padding-y) var(--btn-padding-x)",
-                  borderRadius: "var(--btn-radius)",
-                  textDecoration: "none",
-                  display: "inline-block",
-                  transition: "var(--transition-fast)",
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "var(--color-red-light)")}
-                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "var(--color-red)")}
-              >
-                Find your bedrock →
-              </Link>
-              <Link
-                href="/how-it-works"
-                style={{
-                  backgroundColor: "transparent",
-                  color: "var(--color-white-warm)",
-                  fontFamily: "var(--font-body)",
-                  fontSize: "var(--text-body)",
-                  fontWeight: "var(--weight-semibold)",
-                  padding: "var(--btn-padding-y) var(--btn-padding-x)",
-                  borderRadius: "var(--btn-radius)",
-                  textDecoration: "none",
-                  display: "inline-block",
-                  border: "2px solid var(--color-border-strong)",
-                  transition: "var(--transition-fast)",
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "rgba(232,228,218,0.08)")}
-                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
-              >
-                How it works
-              </Link>
-            </>
-          )}
+          <Link
+            href="/quiz"
+            style={{
+              backgroundColor: "var(--color-red)",
+              color: "#ffffff",
+              fontFamily: "var(--font-body)",
+              fontSize: "var(--text-body)",
+              fontWeight: "var(--weight-semibold)",
+              padding: "var(--btn-padding-y) var(--btn-padding-x)",
+              borderRadius: "var(--btn-radius)",
+              textDecoration: "none",
+              display: "inline-block",
+              transition: "var(--transition-fast)",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "var(--color-red-light)")}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "var(--color-red)")}
+          >
+            Find your bedrock →
+          </Link>
+          <Link
+            href="/how-it-works"
+            style={{
+              backgroundColor: "transparent",
+              color: "var(--color-white-warm)",
+              fontFamily: "var(--font-body)",
+              fontSize: "var(--text-body)",
+              fontWeight: "var(--weight-semibold)",
+              padding: "var(--btn-padding-y) var(--btn-padding-x)",
+              borderRadius: "var(--btn-radius)",
+              textDecoration: "none",
+              display: "inline-block",
+              border: "2px solid var(--color-border-strong)",
+              transition: "var(--transition-fast)",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "rgba(232,228,218,0.08)")}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
+          >
+            How it works
+          </Link>
         </div>
 
         {/* Dot indicators */}
