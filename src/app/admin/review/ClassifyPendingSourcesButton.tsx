@@ -3,7 +3,7 @@
 import { useState } from 'react'
 
 export default function ClassifyPendingSourcesButton({ count }: { count: number }) {
-  const [results, setResults] = useState<Array<{ id: string; ok: boolean; error?: string }> | null>(null)
+  const [started, setStarted] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isPending, setIsPending] = useState(false)
 
@@ -11,18 +11,21 @@ export default function ClassifyPendingSourcesButton({ count }: { count: number 
 
   async function run() {
     setIsPending(true)
-    setResults(null)
+    setStarted(false)
     setError(null)
     try {
-      const res = await fetch('/api/admin/classify-sources', { method: 'POST' })
+      const res = await fetch('/api/inngest', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify([{ name: 'bedrock/sources.classify', data: {} }]),
+      })
       if (!res.ok) {
         const body = await res.json().catch(() => ({}))
         throw new Error(body.error ?? `Server error ${res.status}`)
       }
-      const r = await res.json() as Array<{ id: string; ok: boolean; error?: string }>
-      setResults(r)
+      setStarted(true)
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Classification failed — check server logs.')
+      setError(e instanceof Error ? e.message : 'Failed to start classification job.')
     } finally {
       setIsPending(false)
     }
@@ -45,9 +48,7 @@ export default function ClassifyPendingSourcesButton({ count }: { count: number 
           opacity: isPending ? 0.6 : 1,
         }}
       >
-        {isPending
-          ? `Classifying up to ${cap}…`
-          : `Classify all with Claude (up to ${cap})`}
+        {isPending ? 'Starting job…' : `Classify all with Claude (up to ${cap})`}
       </button>
 
       {error && (
@@ -56,18 +57,10 @@ export default function ClassifyPendingSourcesButton({ count }: { count: number 
         </p>
       )}
 
-      {results && (
-        <div style={{ marginTop: 'var(--space-3)', padding: 'var(--space-3)', background: 'rgba(0,0,0,0.2)', borderRadius: 6 }}>
-          <p style={{ fontSize: 11, fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-primary)', marginBottom: 4 }}>
-            Results: {results.filter((r) => r.ok).length}/{results.length} succeeded
-          </p>
-          {results.map((r) => (
-            <div key={r.id} style={{ display: 'flex', gap: 8, fontSize: 11, marginBottom: 2 }}>
-              <span style={{ color: r.ok ? '#22c55e' : '#ef4444' }}>{r.ok ? '✓' : '✗'}</span>
-              <span style={{ color: 'var(--color-text-secondary)' }}>{r.id}{r.error ? ` — ${r.error}` : ''}</span>
-            </div>
-          ))}
-        </div>
+      {started && (
+        <p style={{ marginTop: 'var(--space-3)', fontSize: 11, color: '#22c55e' }}>
+          Job started — refresh in a few minutes to see results.
+        </p>
       )}
     </div>
   )

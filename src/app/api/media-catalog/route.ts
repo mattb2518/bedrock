@@ -1,17 +1,18 @@
 /**
  * GET /api/media-catalog
- * Returns the parsed media catalog as MediaSource[] JSON.
- * Static data — cached at the edge for 1 hour.
+ * Returns media sources as MediaSource[] JSON.
+ * Tries approved DB rows first; falls back to static CSV if DB is empty.
+ * Cached at the edge for 1 hour.
  * Client-side pages fetch this and run matchMedia locally (pure function, no secrets).
  */
 
 import { NextResponse } from 'next/server'
 import fs from 'fs'
 import path from 'path'
-import { adaptCatalogRow } from '@/lib/media/catalogAdapter'
+import { adaptCatalogRow, loadApprovedSources } from '@/lib/media/catalogAdapter'
 import type { CatalogRow } from '@/lib/media/catalogAdapter'
 
-export const dynamic = 'force-static'
+export const dynamic = 'force-dynamic'
 export const revalidate = 3600
 
 function parseCsv(csv: string): CatalogRow[] {
@@ -50,6 +51,13 @@ function parseCsv(csv: string): CatalogRow[] {
 }
 
 export async function GET() {
+  // Try approved DB sources first
+  const dbSources = await loadApprovedSources()
+  if (dbSources.length > 0) {
+    return NextResponse.json(dbSources)
+  }
+
+  // Fall back to static CSV
   const csvPath = path.join(process.cwd(), 'src', 'data', 'media-catalog.csv')
   const csv = fs.readFileSync(csvPath, 'utf-8')
   const rows = parseCsv(csv)

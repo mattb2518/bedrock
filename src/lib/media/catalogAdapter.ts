@@ -154,6 +154,61 @@ function urlToId(url: string): string {
   }
 }
 
+// ── DB-sourced catalog ────────────────────────────────────────────────────────
+
+import { createAdminClient } from '@/lib/supabase/admin'
+
+export async function loadApprovedSources(): Promise<MediaSource[]> {
+  try {
+    const admin = createAdminClient()
+    const { data, error } = await admin
+      .from('classified_sources')
+      .select('*')
+      .eq('status', 'approved')
+      .not('axis_placement', 'is', null)
+
+    if (error || !data || data.length === 0) {
+      console.warn('loadApprovedSources: DB returned no rows, falling back to static CSV')
+      return []
+    }
+
+    return data.map((row) => {
+      const axisPlacement = (row.axis_placement ?? {}) as Partial<Record<Dimension, AxisPlacement>>
+      const { kind, formats } = parseFormats(row.format ?? '')
+      const depthScore = row.policy_depth_score ?? 3
+      const effort: MediaSource['effort'] = depthScore >= 4 ? 'deep' : depthScore >= 2 ? 'medium' : 'light'
+
+      return {
+        id: urlToId(row.url),
+        name: row.name,
+        kind,
+        formats,
+        url: row.url,
+        independent: true,
+        active: 'active',
+        axisPlacement,
+        coarseLean: (row.coarse_lean ?? 'center') as MediaSource['coarseLean'],
+        reliability: row.reliability ?? 60,
+        independence: row.independence ?? 70,
+        goodFaith: (row.good_faith ?? 'mixed') as MediaSource['goodFaith'],
+        transparency: 70,
+        dimensionCoverage: {},
+        topics: Array.isArray(row.topics) ? row.topics : [],
+        effort,
+        flags: (row.coarse_lean === 'left' || row.coarse_lean === 'right') ? ['partisan_lean'] : [],
+        biasRatingSource: 'bedrock_originated',
+        externalRefs: row.external_refs ?? {},
+        lastReviewed: row.updated_at ? (row.updated_at as string).split('T')[0] : '2026-06-29',
+        methodologyVersion: row.methodology_version ?? 'v1',
+        attribution: row.attribution ?? row.name,
+      } satisfies MediaSource
+    })
+  } catch (err) {
+    console.warn('loadApprovedSources: exception, falling back to static CSV:', err)
+    return []
+  }
+}
+
 // ── Main adapter ──────────────────────────────────────────────────────────────
 
 export interface CatalogRow {

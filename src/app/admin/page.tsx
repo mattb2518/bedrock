@@ -2,7 +2,6 @@ import Link from 'next/link'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getCurrentUserRole } from '@/lib/auth/getRole'
 import ChecklistUI from './ChecklistUI'
-import DigestButton from './DigestButton'
 import SeedCatalogButton from './SeedCatalogButton'
 
 const CHECKLIST_ITEMS: Array<{ id: string; label: string }> = [
@@ -55,7 +54,6 @@ export default async function AdminOverviewPage() {
         </h1>
         <div style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'center' }}>
           {role === 'super_admin' && <SeedCatalogButton />}
-          {role === 'super_admin' && <DigestButton />}
         </div>
       </div>
 
