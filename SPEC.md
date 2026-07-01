@@ -3277,29 +3277,37 @@ A 6-slide modal carousel shown automatically to first-time visitors. Designed to
   - Option B: Intervene when the stakes are high enough — markets have blind spots
   - Option C: Depends on the domain — I don't apply one rule everywhere
 - Body: 20 questions. About 12 minutes. No wrong answers — only honest ones.
+- Transition line (large font, below card): Then your identity map drives four civic actions.
+- Quiz card styled as clearly illustrative — muted answer options, Example question label, cursor:default enforced visually
 
-**Slide 3 — Your Ballot**
+**Slide 3 — Action 1: Your Ballot**
+- Label: Action 1
 - Headline: Your Ballot
 - Subhead: Every race. Matched to your values.
 - Body: Personalized ballot recommendations from president to school board — including the downballot races that shape your daily life and are hardest to research on your own. Candidate data is actively maintained and growing — coverage expands as we approach each election.
 
-**Slide 4 — Your Media Diet**
-- Headline: Your Media Diet
-- Subhead: Independent journalism, matched to how you think.
-- Body: Not an echo chamber. Not a fire hose. A curated shortlist of journalists, Substacks, and podcasts — in three tiers: what confirms your thinking, what expands it, and what challenges it. Every source bias-checked against our eight-dimension framework.
-
-**Slide 5 — Your Conversations**
-- Headline: Your Conversations
-- Subhead: Talk across difference without losing your mind.
-- Body: A Claude-powered tool for preparing and navigating hard civic conversations — with family, colleagues, anyone. Uses your actual profile as context. Not a debate coach. A thinking partner.
-
-**Slide 6 — Beyond Your Ballot**
+**Slide 4 — Action 2: Beyond Your Ballot**
+- Label: Action 2
 - Headline: Beyond Your Ballot
 - Subhead: Your values, applied beyond your district.
 - Body: Find candidates outside your own district who match your values and are running in races where your support could actually shift the balance of power. Donate. Get involved. Think nationally.
 
+**Slide 5 — Action 3: Your Media Diet**
+- Label: Action 3
+- Headline: Your Media Diet
+- Subhead: Independent journalism, matched to how you think.
+- Body: Not an echo chamber. Not a fire hose. A curated shortlist of journalists, Substacks, and podcasts — in three tiers: what confirms your thinking, what expands it, and what challenges it. Every source bias-checked against our eight-dimension framework. Plus the Article Bias Checker — paste any link or text and see exactly what it is doing to your thinking, mapped to your specific profile.
+
+**Slide 6 — Action 4: Your Conversations**
+- Label: Action 4
+- Headline: Your Conversations
+- Subhead: Talk across difference without losing your mind.
+- Body: A Claude-powered tool for preparing and navigating hard civic conversations — with family, colleagues, anyone. Uses your actual profile as context. Not a debate coach. A thinking partner.
+
 ### 28.5 Design Notes
 
-- Pillar slides (3-6) use parallel structure intentionally — rhythm helps them scan fast on mobile
+- Action slides (3-6) use parallel structure intentionally — rhythm helps them scan fast on mobile
+- Action label (Action 1 through Action 4) appears as eyebrow/pill above each headline — no Pillar language used anywhere
 - Slide 2 uses Dimension 5 (Markets vs. Governance) — most accessible of the eight, not partisan, all three options genuinely defensible
+- Quiz card on slide 2 is clearly illustrative — not interactive; styled with muted options, Example question label, cursor:default
 - Tour is informational only — no interactions, no quiz answers captured
