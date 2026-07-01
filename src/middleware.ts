@@ -5,13 +5,19 @@ const GATE_PASSWORD = "redwhiteblue";
 const GATE_COOKIE = "bedrock_gate";
 
 // Routes that bypass the password gate entirely.
-// App pages (media-diet, ballot, etc.) are bypassed — they handle their own
-// "no profile" state and don't need the gate for protection.
+// Auth + app pages are bypassed — they handle their own no-profile state.
+// Public marketing pages (/, /about, /civic-mantle, etc.) remain gated.
 const GATE_BYPASS = [
+  // Auth flows
   "/gate", "/signin", "/signup", "/forgot-password", "/reset-password",
   "/auth/callback", "/api/inngest",
-  "/media-diet", "/ballot", "/beyond-ballot", "/conversations",
+  // App pages (signed-in users must always reach these)
+  "/quiz", "/results",
   "/your-mantle", "/profile",
+  "/your-ballot", "/beyond-your-ballot",
+  "/media-diet", "/media",
+  "/conversations",
+  "/admin",
 ];
 
 export async function middleware(request: NextRequest) {
