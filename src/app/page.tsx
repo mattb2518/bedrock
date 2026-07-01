@@ -2,10 +2,12 @@ import HeroSlider from "@/components/layout/HeroSlider";
 import MantleConstellation from "@/components/ui/MantleConstellation";
 import { DIMENSION_PAIRS } from "@/components/ui/Constellation";
 import Link from "next/link";
+import OnboardingTour from "@/components/ui/OnboardingTour";
 
 export default function Home() {
   return (
     <>
+      <OnboardingTour />
       {/* ── Hero ─────────────────────────────────────────── */}
       <HeroSlider />
 
