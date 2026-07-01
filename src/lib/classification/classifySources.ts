@@ -95,22 +95,23 @@ function buildSourcePrompt(
     ? `\n\nExternal ratings to use as anchors (map to the 8-axis framework and fill gaps):\n${JSON.stringify(input.externalRatings, null, 2)}`
     : ''
 
-  return `You are classifying a media source for Bedrock, a nonpartisan civic identity platform. Your job is to score this source on 8 civic dimensions based on its recent content. Be precise, evidence-based, and nonpartisan — your scores should be defensible to both conservative and liberal critics.
+  const hasContent = contentText.trim().length > 0 && !contentText.includes('(URL only — fetch during review)')
+
+  return `You are classifying a media source for Bedrock, a nonpartisan civic identity platform. Your job is to score this source on all 8 civic dimensions. Be precise, nonpartisan, and honest about your confidence — your scores should be defensible to both conservative and liberal critics.
 
 SOURCE: ${input.name} (${input.url})${externalAnchor}
 
-RECENT CONTENT TO ANALYZE:
-${contentText}
+${hasContent ? `RECENT CONTENT TO ANALYZE:\n${contentText}` : `NO LIVE CONTENT AVAILABLE — score from general knowledge of this source's editorial identity, stated mission, ownership, known coverage patterns, and public reputation.`}
 
 SCORING FRAMEWORK — 8 dimensions, each 0–100:
 ${axisLines}
 
 IMPORTANT RULES:
-- Only score axes where you have clear evidence from the content. Leave axes unscored if the content doesn't address them.
-- Confidence should reflect how much content you analyzed and how clearly it signals the dimension (0.3 = thin/unclear; 0.7 = moderate; 0.9 = strong/consistent across multiple pieces).
-- rationale must be one sentence citing specific evidence (e.g. "Consistently advocates federal climate mandates across 6 of 8 analyzed pieces").
-- evidence_urls should list the specific pieces (URLs or titles) that most clearly justify the score.
-- Do not infer ideology from the source's name, audience, or stated mission — score only from the content itself.
+- Score ALL 8 axes. An honest low-confidence score (0.3–0.5) is always more useful than a missing axis.
+- When live content is available, prefer it. When it isn't, score from general knowledge of the source's editorial identity, ownership, stated mission, and public reputation — this is valid and expected.
+- Set confidence to reflect your evidence quality: 0.3–0.4 = general-knowledge only; 0.5–0.6 = partial content or mixed signals; 0.7–0.8 = clear pattern across multiple pieces; 0.9+ = very strong, consistent signal.
+- rationale must be one sentence. If scoring from general knowledge (not specific article content), say so explicitly: e.g. "Based on general knowledge of editorial mission — no live content available."
+- evidence_urls should list specific article URLs or titles that support the score; leave empty [] when scoring from general knowledge.
 
 Return ONLY a valid JSON object with this exact schema:
 {
@@ -118,7 +119,7 @@ Return ONLY a valid JSON object with this exact schema:
     "<dimension_name>": {
       "score": <0-100>,
       "confidence": <0.0-1.0>,
-      "rationale": "<one-line evidence-based rationale>",
+      "rationale": "<one-line rationale, noting if from general knowledge vs. specific content>",
       "evidence_urls": ["<url or title>", ...]
     }
   },
@@ -182,6 +183,14 @@ export async function classifySource(
       sources: raw.evidence_urls ?? [],
     }
     sourceEvidence.push(...(raw.evidence_urls ?? []))
+  }
+
+  const axisCount = Object.keys(axisPlacement).length
+  if (axisCount < 3) {
+    throw new Error(
+      `classifySource: only ${axisCount} axes passed validation for source ${input.sourceId} — ` +
+      `raw response: ${JSON.stringify(parsed.axes).slice(0, 300)}`
+    )
   }
 
   return {
