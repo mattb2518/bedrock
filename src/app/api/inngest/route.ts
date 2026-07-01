@@ -9,22 +9,17 @@ const { GET: inngestGET, POST: inngestPOST, PUT: inngestPUT } = serve({
   functions: [classifySourcesJob, weeklyDigestJob, classifyCandidatesJob],
 })
 
-async function withErrorLogging(
-  handler: (req: Request) => Promise<Response>,
-  req: Request
-): Promise<Response> {
+type AnyHandler = (...args: unknown[]) => Promise<Response>
+
+async function withErrorLogging(handler: AnyHandler, ...args: unknown[]): Promise<Response> {
   try {
-    return await handler(req)
+    return await handler(...args)
   } catch (e) {
     console.error('Inngest handler error:', e)
-    return Response.json({
-      error: 'Handler failed',
-      message: String(e),
-      stack: e instanceof Error ? e.stack : undefined,
-    }, { status: 500 })
+    return Response.json({ error: 'Handler failed', message: String(e) }, { status: 500 })
   }
 }
 
-export const GET = (req: Request) => withErrorLogging(inngestGET, req)
-export const POST = (req: Request) => withErrorLogging(inngestPOST, req)
-export const PUT = (req: Request) => withErrorLogging(inngestPUT, req)
+export const GET = (...args: unknown[]) => withErrorLogging(inngestGET as AnyHandler, ...args)
+export const POST = (...args: unknown[]) => withErrorLogging(inngestPOST as AnyHandler, ...args)
+export const PUT = (...args: unknown[]) => withErrorLogging(inngestPUT as AnyHandler, ...args)
