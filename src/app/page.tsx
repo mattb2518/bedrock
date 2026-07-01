@@ -114,7 +114,7 @@ export default function Home() {
               </div>
             </Link>
 
-            <Link href="/media" style={{ textDecoration: "none", display: "block", height: "100%" }}>
+            <Link href="/media-diet" style={{ textDecoration: "none", display: "block", height: "100%" }}>
               <div style={{ backgroundColor: "var(--color-bg-surface)", border: "1px solid var(--color-border)", borderRadius: "var(--radius-lg)", padding: "var(--space-8)", borderTop: "3px solid var(--color-white-warm)", transition: "var(--transition-base)", cursor: "pointer", height: "100%", boxSizing: "border-box" }}>
                 <h3 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-h3)", color: "var(--color-text-primary)", marginBottom: "var(--space-3)" }}>
                   Your Media Diet
