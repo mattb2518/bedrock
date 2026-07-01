@@ -15,7 +15,7 @@ const GATE_BYPASS = [
   "/quiz", "/results",
   "/your-mantle", "/profile",
   "/your-ballot", "/beyond-your-ballot",
-  "/media-diet", "/media",
+  "/media",
   "/conversations",
   "/admin",
 ];
