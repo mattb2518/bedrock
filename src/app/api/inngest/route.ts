@@ -1,28 +1,47 @@
 export async function GET() {
-  const results: Record<string, string> = {}
-
   try {
-    await import('@/lib/jobs/classifySources')
-    results.classifySources = 'OK'
-  } catch (e) {
-    results.classifySources = String(e)
-  }
+    const { Inngest } = await import('inngest')
+    const { serve } = await import('inngest/next')
+    const { classifySourcesJob } = await import('@/lib/jobs/classifySources')
+    const { weeklyDigestJob } = await import('@/lib/jobs/weeklyDigest')
+    const { classifyCandidatesJob } = await import('@/lib/jobs/classifyCandidates')
 
-  try {
-    await import('@/lib/jobs/weeklyDigest')
-    results.weeklyDigest = 'OK'
-  } catch (e) {
-    results.weeklyDigest = String(e)
-  }
+    const inngest = new Inngest({ id: 'bedrock' })
 
-  try {
-    await import('@/lib/jobs/classifyCandidates')
-    results.classifyCandidates = 'OK'
-  } catch (e) {
-    results.classifyCandidates = String(e)
-  }
+    const results: Record<string, string> = {}
 
-  return Response.json(results)
+    try {
+      serve({ client: inngest, functions: [classifySourcesJob] })
+      results.classifySourcesJob = 'OK'
+    } catch (e) {
+      results.classifySourcesJob = String(e)
+    }
+
+    try {
+      serve({ client: inngest, functions: [weeklyDigestJob] })
+      results.weeklyDigestJob = 'OK'
+    } catch (e) {
+      results.weeklyDigestJob = String(e)
+    }
+
+    try {
+      serve({ client: inngest, functions: [classifyCandidatesJob] })
+      results.classifyCandidatesJob = 'OK'
+    } catch (e) {
+      results.classifyCandidatesJob = String(e)
+    }
+
+    try {
+      serve({ client: inngest, functions: [classifySourcesJob, weeklyDigestJob, classifyCandidatesJob] })
+      results.allThree = 'OK'
+    } catch (e) {
+      results.allThree = String(e)
+    }
+
+    return Response.json(results)
+  } catch (e) {
+    return Response.json({ error: String(e) })
+  }
 }
 
 export const PUT = GET
