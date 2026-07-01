@@ -7,4 +7,5 @@ import { classifyCandidatesJob } from '@/lib/jobs/classifyCandidates'
 export const { GET, POST, PUT } = serve({
   client: inngest,
   functions: [classifySourcesJob, weeklyDigestJob, classifyCandidatesJob],
+  serveHost: process.env.NEXT_PUBLIC_APP_URL ?? 'https://bedrock.guide',
 })
