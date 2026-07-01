@@ -1,5 +1,3 @@
-'use server'
-
 /**
  * On-demand candidate classification with caching.
  *
