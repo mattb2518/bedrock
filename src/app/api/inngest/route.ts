@@ -1,13 +1,28 @@
 export async function GET() {
+  const results: Record<string, string> = {}
+
   try {
-    const { Inngest } = await import('inngest')
-    const inngest = new Inngest({ id: 'bedrock-test' })
-    const { serve } = await import('inngest/next')
-    const handler = serve({ client: inngest, functions: [] })
-    return new Response('serve() initialized OK', { status: 200 })
+    await import('@/lib/jobs/classifySources')
+    results.classifySources = 'OK'
   } catch (e) {
-    return new Response(String(e), { status: 500 })
+    results.classifySources = String(e)
   }
+
+  try {
+    await import('@/lib/jobs/weeklyDigest')
+    results.weeklyDigest = 'OK'
+  } catch (e) {
+    results.weeklyDigest = String(e)
+  }
+
+  try {
+    await import('@/lib/jobs/classifyCandidates')
+    results.classifyCandidates = 'OK'
+  } catch (e) {
+    results.classifyCandidates = String(e)
+  }
+
+  return Response.json(results)
 }
 
 export const PUT = GET
