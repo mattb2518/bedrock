@@ -15,16 +15,6 @@ export async function middleware(request: NextRequest) {
     GATE_BYPASS.some((p) => pathname === p || pathname.startsWith(p)) ||
     pathname.startsWith("/api/gate");
 
-  if (!isGateBypassed) {
-    const gateCookie = request.cookies.get(GATE_COOKIE);
-    if (gateCookie?.value !== GATE_PASSWORD) {
-      const url = request.nextUrl.clone();
-      url.pathname = "/gate";
-      url.searchParams.set("from", pathname);
-      return NextResponse.redirect(url);
-    }
-  }
-
   // ── Layer 2: Supabase session refresh ───────────────────────────────────
   // Must refresh the session on every request so tokens don't silently expire.
   let response = NextResponse.next({ request });
@@ -48,8 +38,19 @@ export async function middleware(request: NextRequest) {
     }
   );
 
-  // Calling getUser() triggers token refresh if needed
-  await supabase.auth.getUser();
+  // Calling getUser() triggers token refresh if needed; also used to bypass
+  // the password gate for signed-in users.
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!isGateBypassed && !user) {
+    const gateCookie = request.cookies.get(GATE_COOKIE);
+    if (gateCookie?.value !== GATE_PASSWORD) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/gate";
+      url.searchParams.set("from", pathname);
+      return NextResponse.redirect(url);
+    }
+  }
 
   return response;
 }
