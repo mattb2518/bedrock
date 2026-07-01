@@ -29,23 +29,7 @@ const SLIDES = [
     subhead: "Every race. Matched to your values.",
     body: "Personalized ballot recommendations from president to school board — including the downballot races that shape your daily life and are hardest to research on your own. Candidate data is actively maintained and growing — coverage expands as we approach each election.",
     accent: 'var(--color-red)',
-    pill: 'Pillar 1',
-  },
-  {
-    id: 'media',
-    headline: "Your Media Diet",
-    subhead: "Independent journalism, matched to how you think.",
-    body: "Not an echo chamber. Not a fire hose. A curated shortlist of journalists, Substacks, and podcasts — in three tiers: what confirms your thinking, what expands it, and what challenges it. Every source bias-checked against our eight-dimension framework.",
-    accent: 'var(--color-blue)',
-    pill: 'Pillar 2',
-  },
-  {
-    id: 'conversations',
-    headline: "Your Conversations",
-    subhead: "Talk across difference without losing your mind.",
-    body: "A Claude-powered tool for preparing and navigating hard civic conversations — with family, colleagues, anyone. Uses your actual profile as context. Not a debate coach. A thinking partner.",
-    accent: 'var(--color-gold)',
-    pill: 'Pillar 3',
+    pill: 'Action 1',
   },
   {
     id: 'byb',
@@ -53,7 +37,23 @@ const SLIDES = [
     subhead: "Your values, applied beyond your district.",
     body: "Find candidates outside your own district who match your values and are running in races where your support could actually shift the balance of power. Donate. Get involved. Think nationally.",
     accent: 'var(--color-rose)',
-    pill: 'Pillar 4',
+    pill: 'Action 2',
+  },
+  {
+    id: 'media',
+    headline: "Your Media Diet",
+    subhead: "Independent journalism, matched to how you think.",
+    body: "Not an echo chamber. Not a fire hose. A curated shortlist of journalists, Substacks, and podcasts — in three tiers: what confirms your thinking, what expands it, and what challenges it. Every source bias-checked against our eight-dimension framework. Plus the Article Bias Checker — paste any link or text and see exactly what it's doing to your thinking, mapped to your specific profile.",
+    accent: 'var(--color-blue)',
+    pill: 'Action 3',
+  },
+  {
+    id: 'conversations',
+    headline: "Your Conversations",
+    subhead: "Talk across difference without losing your mind.",
+    body: "A Claude-powered tool for preparing and navigating hard civic conversations — with family, colleagues, anyone. Uses your actual profile as context. Not a debate coach. A thinking partner.",
+    accent: 'var(--color-gold)',
+    pill: 'Action 4',
   },
 ]
 
@@ -66,38 +66,75 @@ function QuizCard() {
     "Depends on the domain — I don't apply one rule everywhere",
   ]
   return (
-    <div style={{
-      background: 'var(--color-bg-input)',
-      border: '1px solid rgba(255,255,255,0.1)',
-      borderRadius: 'var(--radius-lg)',
-      padding: 'var(--space-5)',
-      margin: 'var(--space-4) 0',
-    }}>
+    <div style={{ margin: 'var(--space-4) 0' }}>
       <p style={{
-        fontFamily: 'var(--font-display)',
-        fontSize: 'var(--text-small)',
-        color: 'var(--color-text-primary)',
-        lineHeight: 1.5,
-        marginBottom: 'var(--space-4)',
+        fontFamily: 'var(--font-body)',
+        fontSize: 11,
+        fontWeight: 'var(--weight-semibold)',
+        color: 'var(--color-text-subtle)',
+        letterSpacing: '0.08em',
+        textTransform: 'uppercase',
+        marginBottom: 'var(--space-2)',
       }}>
-        When government and markets point in different directions, your instinct is to:
+        Example question
       </p>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-        {options.map((opt, i) => (
-          <div key={i} style={{
-            padding: 'var(--space-3) var(--space-4)',
-            background: 'var(--color-bg-surface)',
-            border: '1px solid rgba(255,255,255,0.08)',
-            borderRadius: 'var(--radius-md)',
+      <div style={{
+        position: 'relative',
+        background: 'var(--color-bg-input)',
+        border: '1px solid rgba(255,255,255,0.1)',
+        borderRadius: 'var(--radius-lg)',
+        padding: 'var(--space-5)',
+        opacity: 0.75,
+        userSelect: 'none',
+        pointerEvents: 'none',
+      }}>
+        <p style={{
+          fontFamily: 'var(--font-display)',
+          fontSize: 'var(--text-small)',
+          color: 'var(--color-text-primary)',
+          lineHeight: 1.5,
+          marginBottom: 'var(--space-4)',
+        }}>
+          When government and markets point in different directions, your instinct is to:
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+          {options.map((opt, i) => (
+            <div key={i} style={{
+              padding: 'var(--space-3) var(--space-4)',
+              background: 'var(--color-bg-surface)',
+              border: '1px solid rgba(255,255,255,0.08)',
+              borderRadius: 'var(--radius-md)',
+              fontFamily: 'var(--font-body)',
+              fontSize: 'var(--text-small)',
+              color: 'var(--color-text-secondary)',
+              cursor: 'default',
+            }}>
+              {opt}
+            </div>
+          ))}
+        </div>
+        {/* Preview watermark */}
+        <div style={{
+          position: 'absolute',
+          inset: 0,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          pointerEvents: 'none',
+        }}>
+          <span style={{
             fontFamily: 'var(--font-body)',
-            fontSize: 'var(--text-small)',
-            color: 'var(--color-text-secondary)',
-            cursor: 'default',
+            fontSize: '28px',
+            fontWeight: 'var(--weight-bold)',
+            color: 'rgba(255,255,255,0.08)',
+            letterSpacing: '0.25em',
+            textTransform: 'uppercase',
+            transform: 'rotate(-20deg)',
             userSelect: 'none',
           }}>
-            {opt}
-          </div>
-        ))}
+            Preview
+          </span>
+        </div>
       </div>
     </div>
   )
@@ -282,7 +319,22 @@ export default function OnboardingTour() {
                 {slide.subhead}
               </p>
 
-              {slide.hasQuizCard && <QuizCard />}
+              {slide.hasQuizCard && (
+                <>
+                  <QuizCard />
+                  <p style={{
+                    fontFamily: 'var(--font-display)',
+                    fontSize: 'clamp(15px, 3.5vw, 18px)',
+                    color: slide.accent,
+                    textAlign: 'center',
+                    lineHeight: 1.4,
+                    fontStyle: 'italic',
+                    margin: 'var(--space-4) 0 var(--space-3)',
+                  }}>
+                    Then your identity map drives four civic actions.
+                  </p>
+                </>
+              )}
 
               <p style={{
                 fontFamily: 'var(--font-body)',
