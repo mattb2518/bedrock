@@ -12,6 +12,7 @@ import { mergeLocalIntoCloud, saveProfileDebounced } from '@/lib/quiz/sync'
 
 interface QuizStore {
   session: QuizSession | null
+  profileLoading: boolean
 
   // Start a fresh quiz (anonymous)
   startSession: () => void
@@ -67,6 +68,7 @@ export const useQuizStore = create<QuizStore>()(
   persist(
     (set) => ({
       session: null,
+      profileLoading: false,
 
       startSession: () => set({ session: newSession() }),
 
@@ -171,7 +173,7 @@ export const useQuizStore = create<QuizStore>()(
           }
         }),
 
-      resetQuiz: () => set({ session: null }),
+      resetQuiz: () => set({ session: null, profileLoading: false }),
 
       attachUser: (userId) =>
         set((state) => {
@@ -180,20 +182,28 @@ export const useQuizStore = create<QuizStore>()(
           // background — the store is already keyed to userId so subsequent writes
           // will go to Supabase via saveProfileDebounced.
           mergeLocalIntoCloud(userId, state.session).then((merged) => {
-            if (merged) {
-              // Hydrate the store with the winning session data
-              set((s) => ({
-                session: s.session
-                  ? {
-                      ...s.session,
-                      ...merged,
-                      userId,
-                    }
-                  : null,
-              }))
-            }
+            set((s) => {
+              if (merged) {
+                // If a local session exists, merge into it; otherwise build one
+                // from the cloud data so the profile is never silently discarded
+                // when localStorage was empty (new device, cleared cache, etc.)
+                const base = s.session ?? {
+                  id: merged.id ?? crypto.randomUUID(),
+                  currentLayer: 4 as const,
+                  currentQuestionIndex: 0,
+                  answers: [],
+                  topDimensions: [],
+                  dealbreakers: [],
+                  completedLayers: [],
+                  startedAt: merged.startedAt ?? new Date().toISOString(),
+                  updatedAt: merged.updatedAt ?? new Date().toISOString(),
+                }
+                return { session: { ...base, ...merged, userId }, profileLoading: false }
+              }
+              return { profileLoading: false }
+            })
           })
-          return { session: state.session ? { ...state.session, userId } : null }
+          return { session: state.session ? { ...state.session, userId } : null, profileLoading: true }
         }),
     }),
     {

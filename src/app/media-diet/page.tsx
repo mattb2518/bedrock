@@ -348,6 +348,7 @@ function SuggestSourceForm() {
 
 export default function MediaDietPage() {
   const session = useQuizStore((s) => s.session)
+  const profileLoading = useQuizStore((s) => s.profileLoading)
   const hasProfile = Boolean(session?.result)
 
   const userProfile = session?.result ? (session.result.profile as unknown as Record<string, number>) : undefined
@@ -378,6 +379,18 @@ export default function MediaDietPage() {
   useEffect(() => {
     if (hasProfile) loadRecommendations()
   }, [hasProfile, loadRecommendations])
+
+  // ── Loading — profile fetch in flight ────────────────────────────────────
+
+  if (profileLoading && !hasProfile) {
+    return (
+      <main style={{ maxWidth: 1100, margin: '0 auto', padding: 'var(--space-8) var(--space-4)' }}>
+        <div style={{ padding: 'var(--space-6)', textAlign: 'center', color: 'var(--color-text-secondary)', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)' }}>
+          Loading your profile…
+        </div>
+      </main>
+    )
+  }
 
   // ── No profile — soft gate ────────────────────────────────────────────────
 
