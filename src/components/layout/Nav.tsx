@@ -502,31 +502,33 @@ export default function Nav() {
             </Link>
           )}
 
-          {/* Take the Quiz CTA */}
-          <Link
-            href="/quiz"
-            style={{
-              backgroundColor: "var(--color-red)",
-              color: "#ffffff",
-              fontFamily: "var(--font-body)",
-              fontSize: "var(--text-small)",
-              fontWeight: "var(--weight-semibold)",
-              padding: "var(--btn-padding-y-sm) var(--btn-padding-x-sm)",
-              borderRadius: "var(--btn-radius)",
-              textDecoration: "none",
-              transition: "var(--transition-fast)",
-              whiteSpace: "nowrap",
-            }}
-            onMouseEnter={(e) =>
-              (e.currentTarget.style.backgroundColor =
-                "var(--color-red-light)")
-            }
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.backgroundColor = "var(--color-red)")
-            }
-          >
-            Take the Quiz
-          </Link>
+          {/* Take the Quiz CTA — hidden once signed in (app nav state) */}
+          {(!mounted || !user) && (
+            <Link
+              href="/quiz"
+              style={{
+                backgroundColor: "var(--color-red)",
+                color: "#ffffff",
+                fontFamily: "var(--font-body)",
+                fontSize: "var(--text-small)",
+                fontWeight: "var(--weight-semibold)",
+                padding: "var(--btn-padding-y-sm) var(--btn-padding-x-sm)",
+                borderRadius: "var(--btn-radius)",
+                textDecoration: "none",
+                transition: "var(--transition-fast)",
+                whiteSpace: "nowrap",
+              }}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.backgroundColor =
+                  "var(--color-red-light)")
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.backgroundColor = "var(--color-red)")
+              }
+            >
+              Take the Quiz
+            </Link>
+          )}
 
           {/* Auth: signed out → Sign in link; signed in → avatar + sign out */}
           {user === null ? (
@@ -751,24 +753,26 @@ export default function Nav() {
               </Link>
             ))}
           </div>
-          <Link
-            href="/quiz"
-            onClick={() => setMenuOpen(false)}
-            style={{
-              backgroundColor: "var(--color-red)",
-              color: "#ffffff",
-              fontFamily: "var(--font-body)",
-              fontSize: "var(--text-body)",
-              fontWeight: "var(--weight-semibold)",
-              padding: "var(--btn-padding-y-sm) var(--btn-padding-x-sm)",
-              borderRadius: "var(--btn-radius)",
-              textDecoration: "none",
-              textAlign: "center",
-              marginTop: "var(--space-2)",
-            }}
-          >
-            Take the Quiz
-          </Link>
+          {(!mounted || !user) && (
+            <Link
+              href="/quiz"
+              onClick={() => setMenuOpen(false)}
+              style={{
+                backgroundColor: "var(--color-red)",
+                color: "#ffffff",
+                fontFamily: "var(--font-body)",
+                fontSize: "var(--text-body)",
+                fontWeight: "var(--weight-semibold)",
+                padding: "var(--btn-padding-y-sm) var(--btn-padding-x-sm)",
+                borderRadius: "var(--btn-radius)",
+                textDecoration: "none",
+                textAlign: "center",
+                marginTop: "var(--space-2)",
+              }}
+            >
+              Take the Quiz
+            </Link>
+          )}
 
           {/* Mobile admin link */}
           {isAdmin && (

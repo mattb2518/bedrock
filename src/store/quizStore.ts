@@ -47,6 +47,9 @@ interface QuizStore {
 
   // Attach a user ID after account creation
   attachUser: (userId: string) => void
+
+  // Hydrate store from a cloud profile fetch (used by pages that check auth directly)
+  setSessionFromCloud: (partial: Partial<QuizSession>) => void
 }
 
 function newSession(): QuizSession {
@@ -174,6 +177,22 @@ export const useQuizStore = create<QuizStore>()(
         }),
 
       resetQuiz: () => set({ session: null, profileLoading: false }),
+
+      setSessionFromCloud: (partial) =>
+        set((s) => {
+          const base = s.session ?? {
+            id: crypto.randomUUID(),
+            currentLayer: 4 as const,
+            currentQuestionIndex: 0,
+            answers: [],
+            topDimensions: [],
+            dealbreakers: [],
+            completedLayers: [],
+            startedAt: partial.startedAt ?? new Date().toISOString(),
+            updatedAt: partial.updatedAt ?? new Date().toISOString(),
+          }
+          return { session: { ...base, ...partial } }
+        }),
 
       attachUser: (userId) =>
         set((state) => {

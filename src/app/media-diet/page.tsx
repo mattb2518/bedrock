@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useQuizStore } from '@/store/quizStore'
+import { loadProfile } from '@/lib/quiz/sync'
 import { matchMedia } from '@/lib/engine/mediaMatch'
 import { buildMediaMatchKey } from '@/lib/engine/buildMediaMatchKey'
 import { BiasCheckerTool } from '@/components/media/BiasCheckerTool'
@@ -348,8 +349,20 @@ function SuggestSourceForm() {
 
 export default function MediaDietPage() {
   const session = useQuizStore((s) => s.session)
-  const profileLoading = useQuizStore((s) => s.profileLoading)
+  const setSessionFromCloud = useQuizStore((s) => s.setSessionFromCloud)
   const hasProfile = Boolean(session?.result)
+
+  // authChecked starts false so we never flash the gate before we've verified
+  // whether the user has a cloud profile. Flips to true once the check resolves.
+  const [authChecked, setAuthChecked] = useState(false)
+
+  useEffect(() => {
+    if (hasProfile) { setAuthChecked(true); return }
+    loadProfile().then((profile) => {
+      if (profile) setSessionFromCloud(profile)
+      setAuthChecked(true)
+    })
+  }, [])
 
   const userProfile = session?.result ? (session.result.profile as unknown as Record<string, number>) : undefined
   const primaryType  = session?.result?.primaryType ?? null
@@ -380,9 +393,9 @@ export default function MediaDietPage() {
     if (hasProfile) loadRecommendations()
   }, [hasProfile, loadRecommendations])
 
-  // ── Loading — profile fetch in flight ────────────────────────────────────
+  // ── Loading — waiting for Supabase auth check ────────────────────────────
 
-  if (profileLoading && !hasProfile) {
+  if (!authChecked) {
     return (
       <main style={{ maxWidth: 1100, margin: '0 auto', padding: 'var(--space-8) var(--space-4)' }}>
         <div style={{ padding: 'var(--space-6)', textAlign: 'center', color: 'var(--color-text-secondary)', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)' }}>
