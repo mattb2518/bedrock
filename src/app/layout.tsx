@@ -22,7 +22,7 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Bedrock — Know What You Actually Believe",
+  title: "Bedrock — Civic identity for independent-minded voters.",
   description:
     "A civic identity platform for independent-minded voters. Take the quiz. Find your bedrock.",
   metadataBase: new URL("https://bedrock.guide"),

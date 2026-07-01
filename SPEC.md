@@ -1,4 +1,4 @@
-# Bedrock — Master Product Specification
+# Bedrock — Civic identity for independent-minded voters.
 *Version 0.1 — In Progress — Started June 2026*
 *This document is the single source of truth for Claude Code and all build decisions.*
 *Updated incrementally as each section is completed.*

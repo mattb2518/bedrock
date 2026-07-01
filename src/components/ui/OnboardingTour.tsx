@@ -324,26 +324,25 @@ export default function OnboardingTour() {
                 <>
                   <QuizCard />
                   <p style={{
-                    fontFamily: 'var(--font-display)',
-                    fontSize: 'clamp(15px, 3.5vw, 18px)',
-                    color: slide.accent,
-                    textAlign: 'center',
-                    lineHeight: 1.4,
-                    fontStyle: 'italic',
+                    fontFamily: 'var(--font-body)',
+                    fontSize: 'var(--text-small)',
+                    color: 'var(--color-text-secondary)',
+                    lineHeight: 1.7,
                     margin: 'var(--space-4) 0 var(--space-3)',
                   }}>
-                    Then your identity map drives four civic actions.
+                    {slide.body}
                   </p>
                   <p style={{
                     fontFamily: 'var(--font-display)',
                     fontSize: 'clamp(20px, 4vw, 26px)',
                     fontWeight: 400,
-                    color: 'var(--color-text-primary)',
+                    color: slide.accent,
                     lineHeight: 1.25,
+                    fontStyle: 'italic',
                     textAlign: 'center',
                     margin: 'var(--space-3) 0 0',
                   }}>
-                    {slide.body}
+                    Then your identity map drives four civic actions.
                   </p>
                 </>
               )}
