@@ -9,10 +9,20 @@ export async function POST() {
   }
 
   try {
-    await inngest.send({ name: 'bedrock/sources.classify', data: {} })
-    return Response.json({ ok: true, message: 'Classification job started' })
+    console.log('INNGEST_EVENT_KEY exists:', !!process.env.INNGEST_EVENT_KEY)
+    console.log('INNGEST_EVENT_KEY prefix:', process.env.INNGEST_EVENT_KEY?.substring(0, 8))
+    console.log('INNGEST_SIGNING_KEY exists:', !!process.env.INNGEST_SIGNING_KEY)
+
+    const result = await inngest.send({ name: 'bedrock/sources.classify', data: {} })
+
+    console.log('Send result:', result)
+    return Response.json({ ok: true })
   } catch (e) {
-    console.error('inngest.send error:', e)
-    return Response.json({ error: String(e) }, { status: 500 })
+    console.error('Full error:', e)
+    return Response.json({
+      error: String(e),
+      message: (e as Error).message,
+      stack: (e as Error).stack,
+    }, { status: 500 })
   }
 }
