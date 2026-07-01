@@ -3,6 +3,8 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import BulkActions from './BulkActions'
 import ClassifyPendingSourcesButton from './ClassifyPendingSourcesButton'
 
+export const dynamic = 'force-dynamic'
+
 interface Props {
   searchParams: Promise<{ type?: string; attribution?: string }>
 }
