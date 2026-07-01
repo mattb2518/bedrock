@@ -38,11 +38,15 @@ export async function middleware(request: NextRequest) {
     }
   );
 
-  // Calling getUser() triggers token refresh if needed; also used to bypass
-  // the password gate for signed-in users.
-  const { data: { user } } = await supabase.auth.getUser();
+  // getSession() reads the JWT from cookies without a network round-trip —
+  // getUser() makes a server call that can fail silently in middleware.
+  // For the gate bypass we only need to know a session exists, not verify it.
+  const { data: { session } } = await supabase.auth.getSession();
 
-  if (!isGateBypassed && !user) {
+  // Still call getUser() for the token refresh side-effect on authed requests.
+  if (session) await supabase.auth.getUser();
+
+  if (!isGateBypassed && !session) {
     const gateCookie = request.cookies.get(GATE_COOKIE);
     if (gateCookie?.value !== GATE_PASSWORD) {
       const url = request.nextUrl.clone();
