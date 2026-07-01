@@ -14,6 +14,7 @@ const SLIDES = [
     subhead: "You're more complicated than that — and so is your vote.",
     body: "Bedrock is a civic identity platform for independent-minded voters. One values quiz. Four tools to help you understand what you actually believe, vote it, read it, talk about it, and fund it.",
     accent: 'var(--color-blue)',
+    pill: 'Welcome to Bedrock.guide',
   },
   {
     id: 'quiz',
@@ -333,17 +334,30 @@ export default function OnboardingTour() {
                   }}>
                     Then your identity map drives four civic actions.
                   </p>
+                  <p style={{
+                    fontFamily: 'var(--font-display)',
+                    fontSize: 'clamp(20px, 4vw, 26px)',
+                    fontWeight: 400,
+                    color: 'var(--color-text-primary)',
+                    lineHeight: 1.25,
+                    textAlign: 'center',
+                    margin: 'var(--space-3) 0 0',
+                  }}>
+                    {slide.body}
+                  </p>
                 </>
               )}
 
-              <p style={{
-                fontFamily: 'var(--font-body)',
-                fontSize: 'var(--text-small)',
-                color: 'var(--color-text-secondary)',
-                lineHeight: 1.7,
-              }}>
-                {slide.body}
-              </p>
+              {!slide.hasQuizCard && (
+                <p style={{
+                  fontFamily: 'var(--font-body)',
+                  fontSize: 'var(--text-small)',
+                  color: 'var(--color-text-secondary)',
+                  lineHeight: 1.7,
+                }}>
+                  {slide.body}
+                </p>
+              )}
             </motion.div>
           </AnimatePresence>
         </div>
