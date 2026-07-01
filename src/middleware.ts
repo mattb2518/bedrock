@@ -4,8 +4,15 @@ import { createServerClient } from "@supabase/ssr";
 const GATE_PASSWORD = "redwhiteblue";
 const GATE_COOKIE = "bedrock_gate";
 
-// Routes that bypass the password gate entirely
-const GATE_BYPASS = ["/gate", "/signin", "/signup", "/forgot-password", "/reset-password", "/auth/callback", "/api/inngest"];
+// Routes that bypass the password gate entirely.
+// App pages (media-diet, ballot, etc.) are bypassed — they handle their own
+// "no profile" state and don't need the gate for protection.
+const GATE_BYPASS = [
+  "/gate", "/signin", "/signup", "/forgot-password", "/reset-password",
+  "/auth/callback", "/api/inngest",
+  "/media-diet", "/ballot", "/beyond-ballot", "/conversations",
+  "/your-mantle", "/profile",
+];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -14,6 +21,16 @@ export async function middleware(request: NextRequest) {
   const isGateBypassed =
     GATE_BYPASS.some((p) => pathname === p || pathname.startsWith(p)) ||
     pathname.startsWith("/api/gate");
+
+  if (!isGateBypassed) {
+    const gateCookie = request.cookies.get(GATE_COOKIE);
+    if (gateCookie?.value !== GATE_PASSWORD) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/gate";
+      url.searchParams.set("from", pathname);
+      return NextResponse.redirect(url);
+    }
+  }
 
   // ── Layer 2: Supabase session refresh ───────────────────────────────────
   // Must refresh the session on every request so tokens don't silently expire.
@@ -38,32 +55,7 @@ export async function middleware(request: NextRequest) {
     }
   );
 
-  // getSession() reads the JWT from cookies without a network round-trip —
-  // getUser() makes a server call that can fail silently in middleware.
-  // For the gate bypass we only need to know a session exists, not verify it.
-  const { data: { session } } = await supabase.auth.getSession();
-
-  console.log('[middleware]', {
-    pathname,
-    isGateBypassed,
-    hasSession: !!session,
-    sessionUserId: session?.user?.id ?? null,
-    gateCookie: request.cookies.get(GATE_COOKIE)?.value ?? null,
-    allCookieNames: request.cookies.getAll().map(c => c.name),
-  });
-
-  // Still call getUser() for the token refresh side-effect on authed requests.
-  if (session) await supabase.auth.getUser();
-
-  if (!isGateBypassed && !session) {
-    const gateCookie = request.cookies.get(GATE_COOKIE);
-    if (gateCookie?.value !== GATE_PASSWORD) {
-      const url = request.nextUrl.clone();
-      url.pathname = "/gate";
-      url.searchParams.set("from", pathname);
-      return NextResponse.redirect(url);
-    }
-  }
+  await supabase.auth.getUser();
 
   return response;
 }
