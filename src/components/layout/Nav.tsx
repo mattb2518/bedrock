@@ -82,7 +82,10 @@ export default function Nav() {
 
     supabase.auth.getUser().then(({ data }) => {
       setUser(data.user);
-      if (data.user) checkRole(data.user.id);
+      if (data.user) {
+        checkRole(data.user.id);
+        attachUser(data.user.id);
+      }
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
