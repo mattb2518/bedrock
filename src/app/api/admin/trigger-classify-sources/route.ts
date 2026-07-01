@@ -15,7 +15,7 @@ export async function POST() {
   try {
     const response = await fetch('https://inn.gs/e/' + eventKey, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'X-Inngest-Env': 'production' },
       body: JSON.stringify({ name: 'bedrock/sources.classify', data: {} }),
     })
 
