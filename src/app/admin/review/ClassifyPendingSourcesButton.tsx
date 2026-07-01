@@ -14,11 +14,7 @@ export default function ClassifyPendingSourcesButton({ count }: { count: number 
     setStarted(false)
     setError(null)
     try {
-      const res = await fetch('/api/inngest', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify([{ name: 'bedrock/sources.classify', data: {} }]),
-      })
+      const res = await fetch('/api/admin/trigger-classify-sources', { method: 'POST' })
       if (!res.ok) {
         const body = await res.json().catch(() => ({}))
         throw new Error(body.error ?? `Server error ${res.status}`)
