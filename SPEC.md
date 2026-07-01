@@ -3231,3 +3231,75 @@ Users can download their complete profile as a plain-text `.txt` file from the M
 - Footer: "This is your complete Bedrock values profile, exported on [date]. Bedrock does not retain a copy of this export."
 
 Does **NOT** include: conversation history (not stored), feedback submitted on candidates or sources (product data, not profile data).
+
+
+---
+
+## 28. First-Time User Onboarding Tour
+
+A 6-slide modal carousel shown automatically to first-time visitors. Designed to orient new users to the platform before they interact with any feature.
+
+### 28.1 Trigger and Persistence
+
+- **Trigger:** Auto-launches on first visit to the homepage
+- **Detection:** localStorage key `bedrock_tour_seen` — checked on mount; if absent, tour launches; set to `true` on dismiss or completion
+- **Scope:** First-time visitors only; never shown again after dismissal or completion
+
+### 28.2 Navigation and Interaction
+
+- **Desktop:** Left/right arrow buttons + keyboard arrow keys
+- **Mobile:** Swipe left/right (touch gestures); smaller arrows at bottom of card
+- **Dot indicators:** Show current position (e.g. 1 of 6) below navigation arrows
+- **Dismiss:** X always visible top-right on every slide
+- **Outside click:** Does NOT dismiss — too easy to trigger accidentally on mobile
+- **Final slide CTA:** "Lets go" replaces "Next" to signal completion
+
+### 28.3 Visual Design
+
+- Semi-transparent dark backdrop (homepage faintly visible behind)
+- Matches Bedrock dark-mode aesthetic — Libre Baskerville for headings, color tokens from tokens.css
+- Framer Motion for slide transitions
+- Slide 2 question card styled to look like a real (static, non-interactive) quiz card
+
+### 28.4 Slide Content
+
+**Slide 1 — Mission**
+- Headline: You are not red. You are not blue.
+- Subhead: You are more complicated than that — and so is your vote.
+- Body: Bedrock is a civic identity platform for independent-minded voters. One values quiz. Four tools to help you understand what you actually believe, vote it, read it, talk about it, and fund it.
+
+**Slide 2 — The Quiz**
+- Headline: It starts with how you think — not where you stand.
+- Subhead: Most civic tools ask about issues. We ask about values.
+- Illustrative (non-interactive) question card showing Dimension 5 (Markets vs. Governance):
+  - Question: When government and markets point in different directions, your instinct is to:
+  - Option A: Let markets work — intervention usually makes things worse
+  - Option B: Intervene when the stakes are high enough — markets have blind spots
+  - Option C: Depends on the domain — I don't apply one rule everywhere
+- Body: 20 questions. About 12 minutes. No wrong answers — only honest ones.
+
+**Slide 3 — Your Ballot**
+- Headline: Your Ballot
+- Subhead: Every race. Matched to your values.
+- Body: Personalized ballot recommendations from president to school board — including the downballot races that shape your daily life and are hardest to research on your own. Candidate data is actively maintained and growing — coverage expands as we approach each election.
+
+**Slide 4 — Your Media Diet**
+- Headline: Your Media Diet
+- Subhead: Independent journalism, matched to how you think.
+- Body: Not an echo chamber. Not a fire hose. A curated shortlist of journalists, Substacks, and podcasts — in three tiers: what confirms your thinking, what expands it, and what challenges it. Every source bias-checked against our eight-dimension framework.
+
+**Slide 5 — Your Conversations**
+- Headline: Your Conversations
+- Subhead: Talk across difference without losing your mind.
+- Body: A Claude-powered tool for preparing and navigating hard civic conversations — with family, colleagues, anyone. Uses your actual profile as context. Not a debate coach. A thinking partner.
+
+**Slide 6 — Beyond Your Ballot**
+- Headline: Beyond Your Ballot
+- Subhead: Your values, applied beyond your district.
+- Body: Find candidates outside your own district who match your values and are running in races where your support could actually shift the balance of power. Donate. Get involved. Think nationally.
+
+### 28.5 Design Notes
+
+- Pillar slides (3-6) use parallel structure intentionally — rhythm helps them scan fast on mobile
+- Slide 2 uses Dimension 5 (Markets vs. Governance) — most accessible of the eight, not partisan, all three options genuinely defensible
+- Tour is informational only — no interactions, no quiz answers captured
