@@ -3568,9 +3568,10 @@ A 6-slide modal carousel shown automatically to first-time visitors. Designed to
 | Results | `src/app/results/page.tsx` | `/results` | App |
 | Civic Mantle | `src/app/civic-mantle/page.tsx` | `/civic-mantle` | App |
 | Your Mantle | `src/app/your-mantle/page.tsx` | `/your-mantle` | App |
-| Your Media Diet | `src/app/media-diet/page.tsx` | `/media-diet` | App — NOT `/media` |
+| Your Media Diet | `src/app/media-diet/page.tsx` | `/media-diet` | App — canonical. `/media` redirects here. |
 | Your Ballot | `src/app/your-ballot/page.tsx` | `/your-ballot` | App — NOT `/ballot` |
 | Beyond Your Ballot | `src/app/beyond-your-ballot/page.tsx` | `/beyond-your-ballot` | App — NOT `/beyond-ballot` |
+| (redirect) | `src/app/media/page.tsx` | `/media` → `/media-diet` | Next.js `redirect()` — not a real page |
 | Your Conversations | `src/app/conversations/page.tsx` | `/conversations` | App |
 | Profile | `src/app/profile/page.tsx` | `/profile` | App |
 | Admin | `src/app/admin/` | `/admin` and sub-routes | Admin only |
@@ -3581,7 +3582,7 @@ A 6-slide modal carousel shown automatically to first-time visitors. Designed to
 | Privacy | `src/app/privacy/page.tsx` | `/privacy` | Public |
 
 **⚠️ Known traps (routes confirmed wrong in past builds):**
-- Your Media Diet is `/media-diet` — NOT `/media` (placeholder at `/media` exists but is a stub)
+- Your Media Diet is `/media-diet` — NOT `/media` (`/media` is a redirect, not a real page)
 - Your Ballot is `/your-ballot` — NOT `/ballot`
 - Beyond Your Ballot is `/beyond-your-ballot` — NOT `/beyond-ballot`
 
