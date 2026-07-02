@@ -516,6 +516,47 @@ function BeyondYourBallotHoldingState({
         </p>
       </div>
 
+      {/* ZIP code — always shown, top of page before sample cards */}
+      <div style={{ marginBottom: 'var(--space-8)', padding: 'var(--space-4)', backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-lg)' }}>
+        {hasZip && !zipSaved ? (
+          <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)' }}>
+            Personalized for ZIP <strong style={{ color: 'var(--color-text-primary)' }}>{session?.demographics?.zipCode}</strong>.{' '}
+            <button onClick={() => { setZipSaved(false); setZipInput('') }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-blue-accent)', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', padding: 0 }}>Change</button>
+          </p>
+        ) : zipSaved ? (
+          <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)' }}>
+            ZIP {zipInput} saved. ✓
+          </p>
+        ) : (
+          <>
+            <p style={{ margin: '0 0 var(--space-3)', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)' }}>
+              Add your ZIP code so we can personalize your recommendations when they&apos;re ready.
+            </p>
+            <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
+              <input
+                type="text"
+                inputMode="numeric"
+                maxLength={5}
+                placeholder="ZIP code"
+                value={zipInput}
+                onChange={(e) => setZipInput(e.target.value.replace(/\D/g, '').slice(0, 5))}
+                style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', padding: 'var(--space-2) var(--space-3)', backgroundColor: 'var(--color-bg-deep, #0f1f33)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', color: 'var(--color-text-primary)', outline: 'none', width: 120 }}
+              />
+              <button
+                disabled={zipInput.length !== 5}
+                onClick={() => {
+                  setDemographics({ ...session?.demographics, zipCode: zipInput })
+                  setZipSaved(true)
+                }}
+                style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: '#fff', backgroundColor: zipInput.length === 5 ? 'var(--color-blue-accent)' : 'var(--color-border)', border: 'none', borderRadius: 'var(--radius-md)', padding: 'var(--space-2) var(--space-4)', cursor: zipInput.length === 5 ? 'pointer' : 'not-allowed' }}
+              >
+                Save
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+
       {/* Sample cards */}
       <div style={{ marginBottom: 'var(--space-10)' }}>
         <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-muted)', letterSpacing: 'var(--tracking-wider)', textTransform: 'uppercase', marginBottom: 'var(--space-4)' }}>
@@ -545,49 +586,6 @@ function BeyondYourBallotHoldingState({
             Your results are temporary. <a href="/signup" style={{ color: 'var(--color-blue-accent)', textDecoration: 'none', fontWeight: 'var(--weight-semibold)' }}>Create a free account</a> to save them and get notified when Beyond Your Ballot is ready.
           </p>
           <button onClick={() => setBannerDismissed(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', padding: 0, flexShrink: 0 }}>Dismiss</button>
-        </div>
-      )}
-
-      {/* ZIP code — show for any user who has taken the quiz */}
-      {hasProfile && (
-        <div style={{ marginBottom: 'var(--space-6)', padding: 'var(--space-4)', backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-lg)' }}>
-          {hasZip && !zipSaved ? (
-            <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)' }}>
-              Personalized for ZIP <strong style={{ color: 'var(--color-text-primary)' }}>{session?.demographics?.zipCode}</strong>.{' '}
-              <button onClick={() => { setZipSaved(false); setZipInput('') }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-blue-accent)', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', padding: 0 }}>Change</button>
-            </p>
-          ) : zipSaved ? (
-            <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)' }}>
-              ZIP {zipInput} saved. ✓
-            </p>
-          ) : (
-            <>
-              <p style={{ margin: '0 0 var(--space-3)', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)' }}>
-                Add your ZIP code so we can personalize your recommendations when they&apos;re ready.
-              </p>
-              <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  maxLength={5}
-                  placeholder="ZIP code"
-                  value={zipInput}
-                  onChange={(e) => setZipInput(e.target.value.replace(/\D/g, '').slice(0, 5))}
-                  style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', padding: 'var(--space-2) var(--space-3)', backgroundColor: 'var(--color-bg-deep, #0f1f33)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', color: 'var(--color-text-primary)', outline: 'none', width: 120 }}
-                />
-                <button
-                  disabled={zipInput.length !== 5}
-                  onClick={() => {
-                    setDemographics({ ...session?.demographics, zipCode: zipInput })
-                    setZipSaved(true)
-                  }}
-                  style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: '#fff', backgroundColor: zipInput.length === 5 ? 'var(--color-blue-accent)' : 'var(--color-border)', border: 'none', borderRadius: 'var(--radius-md)', padding: 'var(--space-2) var(--space-4)', cursor: zipInput.length === 5 ? 'pointer' : 'not-allowed' }}
-                >
-                  Save
-                </button>
-              </div>
-            </>
-          )}
         </div>
       )}
 
