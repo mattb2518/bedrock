@@ -757,7 +757,7 @@ export default function MediaDietPage() {
           fontStyle: 'italic',
           marginBottom: completionPct < 100 ? 'var(--space-4)' : 0,
         }}>
-          We&apos;re starting with 60 hand-curated sources — chosen for quality, independence, and range. More coming.
+          We&apos;re starting with 62 hand-curated sources — chosen for quality, independence, and range. More coming.
         </p>
 
         {completionPct < 100 && (

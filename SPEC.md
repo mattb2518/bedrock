@@ -1124,7 +1124,7 @@ If you could move the needle on exactly one issue in American public life — on
 3. ~~Open text on every question~~ — **resolved:** subtle "+ add context" link on every question, expands inline on click, no forced visibility
 4. ~~Recommendation engine matching formula~~ — **resolved (2026-06-29):** see §19. Two-stage pipeline (dealbreaker exclusion → weighted dimensional distance), rhetoric/record 3:1, challenger confidence cap 0.5, four confidence bands.
 5. ~~Candidate data model~~ — **resolved (2026-06-29):** see §19 `CandidateRecord` interface (8-axis `axisPlacement`, per-item dealbreaker eval, coverage tier).
-6. ~~Media diet MVP scope~~ — **resolved (2026-06-29):** 60 manually-curated sources at launch (`src/data/media-catalog.csv`). See §24.
+6. ~~Media diet MVP scope~~ — **resolved (2026-06-29):** 62 manually-curated sources at launch (`src/data/media-catalog.csv`). See §24.
 7. Outreach emails to Ballotpedia (data@ballotpedia.org) and VoteMate (partnerships@votemateus.org) — drafted in earlier session, pending Matt adding name/background before sending. (See also the new outreach items below for AllSides / Ad Fontes / Ballotpedia licensing.)
 8. ~~Cookie banner~~ — **resolved (2026-06-29):** no banner required. Strictly-necessary auth cookie + cookieless Plausible; exempt under GDPR/CCPA. Founder decision. Documented in §27.
 9. Opt-out toggle for anonymized research — **required feature before launch:** users must be able to opt out of having their responses used in anonymized aggregate research. Accessible in account settings. Tracked in the §21 pre-launch checklist.
@@ -2675,7 +2675,7 @@ Not raw numbers — an actionable summary requiring human judgment.
 - [ ] Pricing/donation model confirmed
 - [ ] Open-source scoring code on GitHub, linked from the Methodology page
 - [ ] Beyond Your Ballot static JSON populated before the pillar goes live
-- [ ] **HARD BLOCKER — Run classification pipeline against all 60 sources in `src/data/media-catalog.csv` before launch.** The current fallback (`catalogAdapter.ts` `leanToAxisPlacement`) only populates 2–3 of the 8 dimensions per source based on a coarse left-right lean proxy, leaving axes like `stability_change`, `local_federal`, `national_global`, and `rules_outcomes` at zero confidence for every catalog source. This means Media Diet tier placements currently collapse toward a conventional left-right framing, which undermines the product's core differentiation (8-axis nuance beyond left-right). Real classification must run before this pillar reflects what Bedrock is actually for. Flagged Stage 9, 2026-06-30.
+- [ ] **HARD BLOCKER — Run classification pipeline against all 62 sources in `src/data/media-catalog.csv` before launch.** The current fallback (`catalogAdapter.ts` `leanToAxisPlacement`) only populates 2–3 of the 8 dimensions per source based on a coarse left-right lean proxy, leaving axes like `stability_change`, `local_federal`, `national_global`, and `rules_outcomes` at zero confidence for every catalog source. This means Media Diet tier placements currently collapse toward a conventional left-right framing, which undermines the product's core differentiation (8-axis nuance beyond left-right). Real classification must run before this pillar reflects what Bedrock is actually for. Flagged Stage 9, 2026-06-30.
 
 ### 21.10 Admin Preview Mode
 
@@ -3010,7 +3010,7 @@ Not an algorithm designed to rage bait you. Not a political party's talking poin
 Your recommendations are built on your eight-dimension values profile — matched against a curated catalog of independent journalists, Substacks, and podcasts. Three tiers, by design: sources that reinforce your foundation, sources that broaden your view, and sources that push back where it matters.
 
 **Caveat line** (DM Sans, italic, muted, below intro paragraph):
-*We're starting with 60 hand-curated sources — chosen for quality, independence, and range. More coming.*
+*We're starting with 62 hand-curated sources — chosen for quality, independence, and range. More coming.*
 
 ### 24.2 Three-tier model
 
@@ -3102,7 +3102,9 @@ For each of the ten Mantle types, a hand-picked seed list per tier (minimum 3 pe
 
 ### 24.8 Launch catalog
 
-`src/data/media-catalog.csv` — 60 sources, manually curated, committed June 29. This is a v1 placeholder intended to be replaced by the Ad Fontes API feed (primary) once licensing is confirmed. AllSides CSV secondary if PBC non-commercial eligibility is confirmed. The catalog is a living document — add sources, remove on change, respond to suggestions and feedback.
+`src/data/media-catalog.csv` — 62 sources, manually curated (60 committed June 29; National Review and The Ben Shapiro Show added 2026-07-02). This is a v1 placeholder intended to be replaced by the Ad Fontes API feed (primary) once licensing is confirmed. AllSides CSV secondary if PBC non-commercial eligibility is confirmed. The catalog is a living document — add sources, remove on change, respond to suggestions and feedback.
+
+Catalog additions (2026-07-02): National Review (Right / traditional conservative; independence Low; policy_depth 4) and The Ben Shapiro Show (Right / populist conservative; independence Medium; policy_depth 3), added to strengthen conservative and populist-right representation per the July 2026 bias audit. Reliability in the current engine is derived from policy_depth_score; a dedicated reliability signal fed by external ratings, with color-coded display, is a separate planned item and is not part of this change.
 
 Two catalog flags:
 - `[P]` **Partisan Lean:** a clearly identifiable editorial direction. Does not mean unreliable. Disclosed so users know what they're reading.
