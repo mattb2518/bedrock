@@ -68,13 +68,14 @@ const QUESTIONS_BY_LAYER: Record<number, QuizQuestion[]> = {
 // handle the traversal so the step index stays stable.
 interface DemoStepDef {
   key: keyof Demographics
-  type: 'choice' | 'pills' | 'text'
+  type: 'choice' | 'pills' | 'text' | 'zip'
   prompt: string
   options?: string[]
   condition?: (d: Demographics) => boolean
 }
 
 const DEMO_STEPS: DemoStepDef[] = [
+  { key: 'zipCode', type: 'zip', prompt: 'What\'s your ZIP code?' },
   { key: 'partyRelationship', type: 'choice', prompt: PARTY_RELATIONSHIP.prompt, options: PARTY_RELATIONSHIP.options },
   { key: 'lineage', type: 'choice', prompt: POLITICAL_LINEAGE.prompt, options: POLITICAL_LINEAGE.options, condition: (d) => !!d.partyRelationship && LINEAGE_TRIGGERS.includes(d.partyRelationship) },
   { key: 'currentRegistration', type: 'choice', prompt: CURRENT_REGISTRATION.prompt, options: CURRENT_REGISTRATION.options },
@@ -900,6 +901,38 @@ export default function QuizFlow() {
             <button onClick={() => advanceDemoStep(demo)} style={mutedLinkBtn}>
               Skip this question →
             </button>
+          </>
+        )}
+
+        {/* ZIP: numeric text input, skippable */}
+        {stepDef.type === 'zip' && (
+          <>
+            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', marginBottom: 'var(--space-4)', lineHeight: 'var(--leading-relaxed)' }}>
+              For U.S. voters — lets us match you to the races on your actual ballot. Optional.
+            </p>
+            <input
+              type="text"
+              inputMode="numeric"
+              maxLength={5}
+              placeholder="e.g. 10001"
+              value={demo.zipCode ?? ''}
+              onChange={(e) => {
+                const val = e.target.value.replace(/\D/g, '').slice(0, 5)
+                setDemo((d) => ({ ...d, zipCode: val || undefined }))
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault()
+                  advanceDemoStep({ ...demo })
+                }
+              }}
+              autoFocus
+              style={{ width: 160, backgroundColor: 'var(--color-bg-input, var(--color-bg-surface))', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md, 8px)', padding: 'var(--space-3) var(--space-4)', fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-primary)', marginBottom: 'var(--space-6)', display: 'block' }}
+            />
+            <div style={{ display: 'flex', gap: 'var(--space-4)', flexWrap: 'wrap' }}>
+              <button style={primaryBtn} onClick={() => advanceDemoStep({ ...demo })}>Continue →</button>
+              <button style={ghostBtn} onClick={() => advanceDemoStep({ ...demo, zipCode: undefined })}>Skip</button>
+            </div>
           </>
         )}
 
