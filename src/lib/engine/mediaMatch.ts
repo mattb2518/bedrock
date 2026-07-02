@@ -150,14 +150,29 @@ function computeNovelCoverage(key: MediaMatchKey, source: MediaSource): number {
 // Tier assignment thresholds  (§19.8 — exact values from spec)
 // ─────────────────────────────────────────────────────────────────────────────
 
+// ── v1 below-threshold exception (TEMPORARY — remove when the v2 reliability signal ships) ──
+// Independently-owned, widely-read sources allowed into Confirming for same-lean users despite
+// missing the reliability floor. Surfaced with a disclosure footnote on the card. Matched by host.
+const CONFIRMING_EXCEPTION_HOSTS = new Set<string>(['dailywire.com'])
+
+export function isBelowThresholdException(source: MediaSource): boolean {
+  try {
+    const host = new URL(source.url.startsWith('http') ? source.url : `https://${source.url}`)
+      .hostname.replace(/^www\./, '').toLowerCase()
+    return CONFIRMING_EXCEPTION_HOSTS.has(host)
+  } catch {
+    return false
+  }
+}
+
 function assignTier(
   scores: { agreement: number; tensionOnHeld: number; novelCoverage: number },
   source: MediaSource
 ): MediaTier | null {
   const { agreement, tensionOnHeld, novelCoverage } = scores
 
-  // Confirming: agreement >= 0.65, tension <= 0.30, reliability >= 60
-  if (agreement >= 0.65 && tensionOnHeld <= 0.30 && source.reliability >= 60) {
+  // reliability floor OR a v1 below-threshold exception (remove exception for v2)
+  if (agreement >= 0.65 && tensionOnHeld <= 0.30 && (source.reliability >= 60 || isBelowThresholdException(source))) {
     return 'confirming'
   }
 

@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useQuizStore } from '@/store/quizStore'
 import { loadProfile } from '@/lib/quiz/sync'
-import { matchMedia } from '@/lib/engine/mediaMatch'
+import { matchMedia, isBelowThresholdException } from '@/lib/engine/mediaMatch'
 import { buildMediaMatchKey } from '@/lib/engine/buildMediaMatchKey'
 import { mantleFor } from '@/lib/quiz/mantles'
 import { DIMENSIONS, poleLabel } from '@/lib/quiz/dimensions'
@@ -181,6 +181,12 @@ function SourceCard({
       <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: '1.5' }}>
         {source.attribution}
       </p>
+      {/* v1 below-threshold disclosure — remove with the v2 reliability signal */}
+      {isBelowThresholdException(source) && (
+        <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: '11px', fontStyle: 'italic', color: 'var(--color-text-muted)', lineHeight: '1.5' }}>
+          This source sits below our usual bar for reliability, but it&apos;s independently owned and a widely-read voice — so we&apos;ve included it while we expand the catalog in this part of the spectrum. Tell us if you disagree: hello@bedrock.guide.
+        </p>
+      )}
       {/* Claude one-liner */}
       {oneLiner && (
         <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', lineHeight: '1.5', fontStyle: 'italic' }}>

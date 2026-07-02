@@ -3113,6 +3113,8 @@ For each of the ten Mantle types, a hand-picked seed list per tier (minimum 3 pe
 
 Catalog additions (2026-07-02): National Review (Right / traditional conservative; independence Low; policy_depth 4) and The Ben Shapiro Show (Right / populist conservative; independence Medium; policy_depth 3), added to strengthen conservative and populist-right representation per the July 2026 bias audit. Reliability in the current engine is derived from policy_depth_score; a dedicated reliability signal fed by external ratings, with color-coded display, is a separate planned item and is not part of this change.
 
+Below-threshold exception (v1, temporary): a host allowlist (`isBelowThresholdException` in `mediaMatch.ts`) admits independently-owned, widely-read sources into the Confirming tier for same-lean users despite missing the reliability floor. Currently The Ben Shapiro Show (dailywire.com, reliability 42). It surfaces only in Confirming — it fails the Challenging reliability/independence gates on its own — always with a disclosure footnote on the card. National Review needs no exception; the loosened Challenging gate already admits it. Remove this exception when the v2 reliability signal ships.
+
 Two catalog flags:
 - `[P]` **Partisan Lean:** a clearly identifiable editorial direction. Does not mean unreliable. Disclosed so users know what they're reading.
 - `[R]` **Questionable Reliability:** documented misinformation or insufficient critical framing. No sources currently carry this flag.
