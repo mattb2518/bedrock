@@ -160,52 +160,33 @@ function SourceCard({
   const { source } = scored
 
   return (
-    <div style={{
-      padding: 'var(--space-4)',
-      border: '1px solid var(--color-border)',
-      borderRadius: 'var(--radius-lg)',
-      backgroundColor: 'var(--color-bg-base)',
-      display: 'flex',
-      flexDirection: 'column',
-      gap: 'var(--space-2)',
-    }}>
-      {/* Name + link + formats */}
-      <div>
+    <div style={{ padding: 'var(--space-4)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-lg)', backgroundColor: 'var(--color-bg-base)', display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+      {/* Top row */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
         <a href={source.url} target="_blank" rel="noopener noreferrer"
           style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-body)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-primary)', textDecoration: 'none' }}>
           {source.name} ↗
         </a>
-        <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', marginLeft: 'var(--space-2)' }}>
+        <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)' }}>
           {source.formats.join(' · ')}
         </span>
+        <span style={{ fontFamily: 'var(--font-body)', fontSize: '12px', padding: '1px 8px', borderRadius: 99, backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border)', color: 'var(--color-text-secondary)' }}>
+          {formatLean(source.coarseLean)}
+        </span>
+        <div style={{ marginLeft: 'auto' }}>
+          <FeedbackButtons source={source} tier={tier} userMantleType={userMantleType} userCompletionPercent={userCompletionPercent} />
+        </div>
       </div>
-
       {/* Description */}
       <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: '1.5' }}>
         {source.attribution}
       </p>
-
       {/* Claude one-liner */}
       {oneLiner && (
         <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', lineHeight: '1.5', fontStyle: 'italic' }}>
           {oneLiner}
         </p>
       )}
-
-      {/* Lean label */}
-      <div>
-        <span style={{ fontFamily: 'var(--font-body)', fontSize: '12px', padding: '1px 8px', borderRadius: 99, backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border)', color: 'var(--color-text-secondary)' }}>
-          {formatLean(source.coarseLean)}
-        </span>
-      </div>
-
-      {/* Feedback */}
-      <FeedbackButtons
-        source={source}
-        tier={tier}
-        userMantleType={userMantleType}
-        userCompletionPercent={userCompletionPercent}
-      />
     </div>
   )
 }
