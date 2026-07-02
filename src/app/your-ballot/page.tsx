@@ -717,14 +717,20 @@ function YourBallotHoldingState({
         </div>
       )}
 
-      {/* CTA */}
-      {isRegistered ? (
-        <div>
-          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-primary)', lineHeight: 'var(--leading-relaxed)', marginBottom: 'var(--space-3)' }}>
-            We&apos;ll email you at <strong>{userEmail ?? 'your address on file'}</strong> when your ballot is ready. No action needed — you&apos;re on the list.
-          </p>
-          {!hasZip && !zipSaved && (
-            <div style={{ marginTop: 'var(--space-4)', padding: 'var(--space-4)', backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-lg)' }}>
+      {/* ZIP code — show for any user who has taken the quiz */}
+      {hasProfile && (
+        <div style={{ marginBottom: 'var(--space-6)', padding: 'var(--space-4)', backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-lg)' }}>
+          {hasZip && !zipSaved ? (
+            <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)' }}>
+              Personalized for ZIP <strong style={{ color: 'var(--color-text-primary)' }}>{session?.demographics?.zipCode}</strong>.{' '}
+              <button onClick={() => { setZipSaved(false); setZipInput('') }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-blue-accent)', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', padding: 0 }}>Change</button>
+            </p>
+          ) : zipSaved ? (
+            <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)' }}>
+              ZIP {zipInput} saved. ✓
+            </p>
+          ) : (
+            <>
               <p style={{ margin: '0 0 var(--space-3)', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)' }}>
                 Add your ZIP code so we can personalize your ballot when it&apos;s ready.
               </p>
@@ -736,7 +742,7 @@ function YourBallotHoldingState({
                   placeholder="ZIP code"
                   value={zipInput}
                   onChange={(e) => setZipInput(e.target.value.replace(/\D/g, '').slice(0, 5))}
-                  style={{ flex: 1, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', padding: 'var(--space-2) var(--space-3)', backgroundColor: 'var(--color-bg-deep, #0f1f33)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', color: 'var(--color-text-primary)', outline: 'none', maxWidth: 140 }}
+                  style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', padding: 'var(--space-2) var(--space-3)', backgroundColor: 'var(--color-bg-deep, #0f1f33)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', color: 'var(--color-text-primary)', outline: 'none', width: 120 }}
                 />
                 <button
                   disabled={zipInput.length !== 5}
@@ -749,15 +755,19 @@ function YourBallotHoldingState({
                   Save
                 </button>
               </div>
-            </div>
+            </>
           )}
-          {zipSaved && (
-            <p style={{ marginTop: 'var(--space-3)', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)' }}>
-              ZIP {zipInput} saved. ✓
-            </p>
-          )}
+        </div>
+      )}
+
+      {/* CTA */}
+      {isRegistered ? (
+        <div>
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-primary)', lineHeight: 'var(--leading-relaxed)', marginBottom: 'var(--space-3)' }}>
+            We&apos;ll email you at <strong>{userEmail ?? 'your address on file'}</strong> when your ballot is ready. No action needed — you&apos;re on the list.
+          </p>
           {completionPercent < 100 && (
-            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', marginTop: 'var(--space-4)' }}>
+            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', marginTop: 'var(--space-3)' }}>
               <a href="/quiz" style={{ color: 'var(--color-blue-accent)', textDecoration: 'none' }}>Complete your quiz to sharpen your recommendations →</a>
             </p>
           )}
