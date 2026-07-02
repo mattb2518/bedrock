@@ -2920,12 +2920,12 @@ Federal congressional races only. Static JSON file at `src/data/beyond-ballot-ca
 
 ### 24.1 Page layout
 
-- **Main column (70–80% width):** three-tier recommendations. Scrolls.
-- **Right rail (20–30% width):** Article Bias Checker. Sticky/persistent as the user scrolls the main column. Visual distinction from the main column (subtle different background, thin border). Always visible, never buried. Not a popup or modal.
+- **Full width:** three-tier recommendations. Scrolls.
+- **No right rail.** The Article Bias Checker has been deferred (see §24b). The recommendations are full-width.
 
 ### 24.1a Page header copy (locked)
 
-The page opens with a header block above the two-column layout. Matches the visual treatment of the Conversations page header.
+The page opens with a header block above the recommendations. Matches the visual treatment of the Conversations page header.
 
 **Eyebrow** (small caps, muted, DM Sans):
 YOUR MEDIA DIET
@@ -2937,8 +2937,6 @@ Journalism that deepens, expands, and challenges — based on what you actually 
 Not your algorithm. Not your party's talking points. Not a feed that quietly confirms everything you already think.
 
 Your recommendations are built on your eight-dimension values profile — matched against a curated catalog of independent journalists, Substacks, and podcasts. Three tiers, by design: sources that reinforce your foundation, sources that broaden your view, and sources that push back where it matters.
-
-And if you want to check anything you're already reading — paste a URL into the Article Bias Checker and we'll tell you exactly what it's doing to your thinking.
 
 ### 24.2 Three-tier model
 
@@ -3015,7 +3013,19 @@ Same bar, applied consistently regardless of direction.
 
 ## 24b. Article Bias Checker
 
-**Location:** right rail of the Your Media Diet page (20–30% width, sticky). Also powered by `src/lib/classification/classifyArticle.ts`.
+**STATUS: DEFERRED — not shipping at launch.**
+
+The Article Bias Checker was built as a right-rail feature on the Media Diet page but has been pulled pre-launch for the following reasons:
+- The current implementation is a *fit* checker (how an article relates to your values profile), not a true bias checker — the distinction isn't clear to users
+- The right-rail layout is too narrow and creates a poor UX
+- Author-level bias and op-ed vs. reporting distinctions are not handled
+- The concept needs a proper redesign before it ships
+
+**When revisiting:** consider making this a standalone page or dedicated tool with a proper full-width layout, unified input (URL, pasted text, or file — no mode picker), and a clearer output model that distinguishes source reliability from author bias from article framing. The classification infrastructure (`classifyArticle.ts`) can stay; the UX and concept need rethinking.
+
+**Do not remove the underlying code** — `classifyArticle.ts` may be reused. Just do not surface the UI.
+
+
 
 **Right rail header:** "Check any article."
 
