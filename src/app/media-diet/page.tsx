@@ -212,6 +212,140 @@ function SourceCard({
   )
 }
 
+// ── Tier nav (sticky scroll-spy) ─────────────────────────────────────────────
+
+const TIERS: MediaTier[] = ['confirming', 'expanding', 'challenging']
+
+function TierNav() {
+  const [active, setActive] = useState<MediaTier>('confirming')
+
+  useEffect(() => {
+    const observers: IntersectionObserver[] = []
+    TIERS.forEach((tier) => {
+      const el = document.getElementById(`tier-${tier}`)
+      if (!el) return
+      const obs = new IntersectionObserver(
+        ([entry]) => { if (entry.isIntersecting) setActive(tier) },
+        { rootMargin: '-30% 0px -60% 0px', threshold: 0 }
+      )
+      obs.observe(el)
+      observers.push(obs)
+    })
+    return () => observers.forEach((o) => o.disconnect())
+  }, [])
+
+  function scrollTo(tier: MediaTier) {
+    document.getElementById(`tier-${tier}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
+  return (
+    <div style={{
+      position: 'sticky',
+      top: 'var(--nav-height)',
+      zIndex: 10,
+      backgroundColor: 'var(--color-bg-page)',
+      borderBottom: '1px solid var(--color-border)',
+      marginBottom: 'var(--space-8)',
+      marginLeft: 'calc(-1 * var(--space-4))',
+      marginRight: 'calc(-1 * var(--space-4))',
+      paddingLeft: 'var(--space-4)',
+      paddingRight: 'var(--space-4)',
+    }}>
+      <div style={{ display: 'flex', gap: 'var(--space-1)', padding: 'var(--space-2) 0' }}>
+        {TIERS.map((tier) => {
+          const isActive = active === tier
+          const color = TIER_META[tier].color
+          return (
+            <button
+              key={tier}
+              onClick={() => scrollTo(tier)}
+              style={{
+                fontFamily: 'var(--font-body)',
+                fontSize: 'var(--text-small)',
+                fontWeight: isActive ? 'var(--weight-semibold)' : 'var(--weight-medium)',
+                color: isActive ? color : 'var(--color-text-secondary)',
+                background: 'none',
+                border: 'none',
+                borderBottom: isActive ? `2px solid ${color}` : '2px solid transparent',
+                padding: 'var(--space-2) var(--space-3)',
+                cursor: 'pointer',
+                transition: 'color 0.15s ease, border-color 0.15s ease',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {TIER_META[tier].label}
+            </button>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+// ── Source card legend ────────────────────────────────────────────────────────
+
+function CardLegend() {
+  const [open, setOpen] = useState(false)
+
+  return (
+    <div style={{ marginBottom: 'var(--space-6)' }}>
+      <button
+        onClick={() => setOpen((v) => !v)}
+        style={{
+          fontFamily: 'var(--font-body)',
+          fontSize: 'var(--text-small)',
+          color: 'var(--color-text-secondary)',
+          background: 'none',
+          border: 'none',
+          cursor: 'pointer',
+          padding: 0,
+          textDecoration: 'underline',
+          textUnderlineOffset: '3px',
+        }}
+      >
+        {open ? 'Got it ↑' : 'What do these labels mean? ↓'}
+      </button>
+
+      <div style={{
+        display: 'grid',
+        gridTemplateRows: open ? '1fr' : '0fr',
+        transition: 'grid-template-rows 0.2s ease',
+        overflow: 'hidden',
+      }}>
+        <div style={{ overflow: 'hidden' }}>
+          <div style={{
+            marginTop: 'var(--space-3)',
+            padding: 'var(--space-4)',
+            backgroundColor: 'var(--color-bg-surface)',
+            border: '1px solid var(--color-border)',
+            borderRadius: 'var(--radius-sm)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 'var(--space-3)',
+          }}>
+            {[
+              { label: '↗', text: 'Opens the source in a new tab.' },
+              { label: '👍 👎', text: 'Tell us if this fits. We use your feedback to improve future recommendations.' },
+              { label: 'Lean Left / Lean Right / Center', text: "The source's overall editorial perspective." },
+              { label: '[P]', text: 'Partisan Lean flagged: this source scores above our threshold for partisan framing. Included because it meets reliability standards — labeled so you can decide what to do with that.' },
+              { label: 'Format pills (Newsletter, Podcast, etc.)', text: 'The format(s) this source publishes in.' },
+            ].map(({ label, text }) => (
+              <div key={label} style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start' }}>
+                <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-primary)', whiteSpace: 'nowrap', minWidth: 80 }}>
+                  {label}
+                </span>
+                <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: '1.5' }}>
+                  {text}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ── Tier section ──────────────────────────────────────────────────────────────
 
 function TierSection({
@@ -230,7 +364,7 @@ function TierSection({
   const isEmpty = sources.length === 0
 
   return (
-    <div style={{ marginBottom: 'var(--space-8)' }}>
+    <div id={`tier-${tier}`} style={{ marginBottom: 'var(--space-8)' }}>
       {/* Tier header */}
       <div style={{ marginBottom: 'var(--space-4)', borderLeft: `3px solid ${meta.color}`, paddingLeft: 'var(--space-3)' }}>
         <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-heading)', fontWeight: 'var(--weight-bold)', color: meta.color, margin: '0 0 var(--space-1)' }}>
@@ -481,6 +615,8 @@ export default function MediaDietPage() {
 
           {matchResult && (
             <>
+              <TierNav />
+              <CardLegend />
               <TierSection tier="confirming"  sources={confirming}  userMantleType={mantleType} userCompletionPercent={completionPct} />
               <TierSection tier="expanding"   sources={expanding}   userMantleType={mantleType} userCompletionPercent={completionPct} />
               <TierSection tier="challenging" sources={challenging} userMantleType={mantleType} userCompletionPercent={completionPct} />
