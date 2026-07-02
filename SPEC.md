@@ -148,6 +148,10 @@ The output of the quiz. Each user gets:
 - Edge case: genuinely centered profile gets special treatment
 - Edge case: scattered profile — strong dimensional leans but no clean clustering into a type — surfaces as scattered rather than forced into a misfit primary
 
+### Partisan note (on /civic-mantle page)
+A callout paragraph displayed on the /civic-mantle page, styled as a bordered aside in muted text:
+"Bedrock is built for the independent-minded middle. If you're a committed partisan, your results will reflect your closest Mantle — but the platform is designed for voters who don't start from a party label."
+
 ### Civic Mantle Directory
 
 | Label | Working Name | Dimension Profile (dominant poles) | One-liner |
@@ -226,8 +230,10 @@ Communicated via progress bar design, not explicit question numbering. Gives loc
   2. **Your positions** (Layer 2 answers, only if completed)
   3. **What drives your vote** (Layer 3 answers, only if completed)
   4. **Your dealbreakers** (Layer 4 selections, only if completed)
+- Immediately below the mantle reveal: if the user is anonymous (no account), a dismissible "Save your results" banner with a "Sign Up Free" link and a "Skip for now" button.
+- A "Put it to work ↓" smooth-scroll anchor link appears below the mantle reveal / account prompt, before the dimensional accordions, linking to the "Now put it to work" section.
 - Below the accordions: small underlined text links — "Edit answers" (only when quiz incomplete) and "Retake quiz" (always). Not buttons, not prominent CTAs.
-- Below that: "Now put it to work" section — the four pillar cards linking to each pillar page.
+- Below that: "Now put it to work" section (id="put-it-to-work") — the four pillar cards linking to each pillar page.
 - No "Explore your mantle" button anywhere on this page — the /your-mantle page is reachable via the nav "Your Mantle" dropdown.
 
 **Note:** The dimensional breakdown no longer appears inside the mantle reveal component when rendered on /results (it's suppressed via `hideDimBreakdown` prop and shown instead in the unified accordion block below). On the in-quiz reveal it still appears inside the reveal.
@@ -252,7 +258,7 @@ Most civic tools ask where you stand on the issues. We're asking something diffe
 
 We want to know how you think. Not which party you agree with, not which policies you support — but the underlying values that drive those positions. The stuff that's been true about you for twenty years.
 
-Twenty questions. About twelve minutes. No wrong answers — only honest ones.
+Fourteen questions. About eight minutes. No wrong answers — only honest ones.
 
 One thing: every question has an "It depends" option. It's not a cop-out — it's often the most accurate answer. If you pick it, we'll ask one quick follow-up. Your nuance is the point.
 
@@ -1344,7 +1350,7 @@ And I couldn't find a single civic tool built for people who think that way. So 
 **There's got to be a better way.**
 I'm frustrated — and I suspect you are too. Frustrated that real problems with real solutions sit unsolved year after year. Frustrated that the tools built for voters assume you have a party and flatten everything else. Frustrated that even engaged, thoughtful citizens walk into voting booths uninformed about most of what's on their ballot.
 
-But frustration without action is just noise. So instead of waiting for someone else to fix it, I built something.
+But frustration without action is just noise. So instead of waiting for someone else to fix it, I decided to celebrate our nation's 250th birthday by building something.
 
 Our political system has become so polarized that real problems stop getting solved. Not because solutions don't exist. Because solving them would require leaders to put country over party. Over self. Over their next fundraising email.
 
@@ -1355,7 +1361,7 @@ Parties have nationalized every local race. The media ecosystem rewards the loud
 **The people this hurts most.**
 The fastest-growing voter segment in America — people who don't fully belong to either party — has no real civic infrastructure built for it.
 
-Every existing tool assumes a party as a starting point. The media ecosystem sorts you into a tribe whether you want one or not. The political conversation treats you as a swing voter to be captured rather than a citizen to be served.
+Every existing tool assumes a party as a starting point. The media ecosystem sorts you into a tribe whether you want one or not. Social media rewards rage with clickbait and algorithms designed to divide us and provoke outrage. The political conversation treats you as a swing voter to be captured rather than a citizen to be served.
 
 That's not an accident. It's a structural failure.
 
@@ -1449,10 +1455,10 @@ Read the full methodology →
 The quiz builds in four stages — each one going deeper than the last.
 
 *Layer 1 — Your values foundation.*
-Twenty questions about what you believe at the level of principle. Closes with one question: of the eight dimensions, which feel most central to who you are as a voter? Then — before you move on — your constellation appears for the first time. A radar chart unique to you across all eight dimensions. The shape is yours. No one else's will look exactly like it.
+Fourteen questions about what you believe at the level of principle. Closes with one question: of the eight dimensions, which feel most central to who you are as a voter? Then — before you move on — your constellation appears for the first time. A radar chart unique to you across all eight dimensions. The shape is yours. No one else's will look exactly like it.
 
 *Layer 2 — Your real-world positions.*
-Eight questions on actual policy debates and real events — chosen specifically because they produce cross-partisan discomfort. This is where stated values meet actual positions. Sometimes they align. Sometimes they don't. Both are useful.
+Nine questions on actual policy debates and real events — chosen specifically because they produce cross-partisan discomfort. This is where stated values meet actual positions. Sometimes they align. Sometimes they don't. Both are useful.
 
 *Layer 3 — What drives your vote.*
 Eight questions about voting behavior, priority intensity, and the factors that have actually shaped how you've voted in the past. This layer sharpens how the recommendation engine weighs your profile.
@@ -1619,7 +1625,7 @@ We're not going to claim the result is perfect. Bias-checking is a practice, not
 **How the quiz is structured.**
 Four layers, each going deeper than the last. Full description in How It Works →
 
-*Layer 1 — Values foundation:* Twenty questions across three tiers — eight anchor questions establishing your baseline on each dimension, eight crossover questions loading on two dimensions simultaneously, and four synthesis questions loading on three or more at once. Closes with a dimension importance rating, then your first constellation reveal.
+*Layer 1 — Values foundation:* Fourteen questions across three tiers — eight anchor questions establishing your baseline on each dimension, four crossover questions loading on two dimensions simultaneously, and two synthesis questions loading on three or more at once. Closes with a dimension importance rating, then your first constellation reveal.
 
 *Layer 2 — Reality check:* Nine questions — real policy debates and actual events chosen specifically because they produce cross-partisan discomfort.
 
@@ -2938,15 +2944,30 @@ A brief section below the sample cards:
 "Here's how we classify candidates →" — links to /methodology
 One sentence: "Every placement is based on voting records, stated positions, and campaign platforms — never party affiliation. Human editors review every classification before it goes live."
 
-**CTA — two states:**
+**ZIP code prompt (top of page, before sample cards — all users):**
+A compact card under the headlines prompts the user to enter their ZIP code. Three states:
+- Has ZIP stored: "Personalized for ZIP [XXXXX]. Change." — tappable Change link to re-enter.
+- No ZIP, no session (new visitor): prompt text "Add your ZIP code to personalize your ballot. Then create an account so we can email you when your races go live." ZIP is saved to `localStorage` key `bedrock_pending_zip`. After saving, show a follow-up message with links to /signup and /quiz.
+- No ZIP, has session: prompt text "Add your ZIP code so we can personalize your ballot when it's ready." Saves directly to session demographics.
+When a session is created (quiz start or sign-in), `bedrock_pending_zip` is consumed and written into session demographics automatically.
+
+**CTA — three states:**
 
 Registered user (has account):
 "We'll email you at [user's email] when your ballot is ready. No action needed — you're on the list."
-Secondary: "In the meantime, complete your quiz to sharpen your recommendations →" (only if completion < 100%)
+Secondary: "Complete your quiz to sharpen your recommendations →" (only if completion < 100%)
 
-Not registered / not signed in:
-Primary CTA button: "Take the quiz and get notified when your ballot is ready →"
+Quiz complete, no account:
+Primary CTA button: "Create an account to get notified →" (links to /signup). No quiz link — they've already taken it.
+
+No quiz / no account (pre-quiz user):
+Primary CTA button: "Take the quiz / Create an account →"
 Below button: "Already have an account? Sign in →"
+
+**Account banner (quiz-complete, no account):**
+A dismissible inline banner above the CTA: "Your results are temporary. Create a free account to save them and get notified when your ballot is ready." with a /signup link and Dismiss button.
+
+**Pre-quiz users see the holding state too:** The holding state is shown for ALL users when the holding state flag is active — not just those with a profile. Pre-quiz users see the same layout with the quiz/account CTA instead of the email confirmation.
 
 **Transition:** When general election data is ready and classifications are complete, remove the holding state and show real recommendations. The holding state is a page-level flag in the codebase, not a middleware gate.
 
@@ -3412,12 +3433,6 @@ A: Yes. We add sources, remove them when things change, and take your suggestion
 **Q: Can I suggest a source?**
 A: Yes — there's a suggestion button in your media recommendations. Suggestions go into a review queue, not the live catalog. Every suggestion goes through the same scoring process before it appears.
 
-**Q: What's the Article Bias Checker?**
-A: Paste any URL or article text and we'll tell you what it's doing to your thinking — not just left or right, but which of the eight dimensions it's emphasizing, and how that maps specifically to your values profile. It accepts URLs, pasted text, and PDFs.
-
-**Q: Does the Article Bias Checker store what I paste?**
-A: No. Article text is analyzed in the moment and not stored.
-
 **Q: Do you use my dealbreakers to filter my media recommendations?**
 A: No. Dealbreakers are ballot exclusion rules. Importing them into your media diet would create an echo chamber — the exact failure mode this pillar exists to fight.
 
@@ -3533,7 +3548,7 @@ A 6-slide modal carousel shown automatically to first-time visitors. Designed to
 - Label: Action 3
 - Headline: Your Media Diet
 - Subhead: Independent journalism, matched to how you think.
-- Body: Not an echo chamber. Not a fire hose. A curated shortlist of journalists, Substacks, and podcasts — in three tiers: what confirms your thinking, what expands it, and what challenges it. Every source bias-checked against our eight-dimension framework. Plus the Article Bias Checker — paste any link or text and see exactly what it is doing to your thinking, mapped to your specific profile.
+- Body: Not an echo chamber. Not a fire hose. A curated shortlist of journalists, Substacks, and podcasts — in three tiers: what confirms your thinking, what expands it, and what challenges it. Every source matched against your eight-dimension civic profile.
 
 **Slide 6 — Action 4: Your Conversations**
 - Label: Action 4
