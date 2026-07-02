@@ -5,15 +5,17 @@ import { useQuizStore } from '@/store/quizStore'
 import { loadProfile } from '@/lib/quiz/sync'
 import { matchMedia } from '@/lib/engine/mediaMatch'
 import { buildMediaMatchKey } from '@/lib/engine/buildMediaMatchKey'
+import { mantleFor } from '@/lib/quiz/mantles'
+import { DIMENSIONS, poleLabel } from '@/lib/quiz/dimensions'
 import type { MediaMatchResult, ScoredMediaSource, MediaTier } from '@/lib/engine/mediaMatch'
 import type { MediaSource } from '@/lib/engine/mediaMatch'
+import type { BlurbsResult, BlurbsRequest } from '@/app/api/media-blurbs/route'
+import type { Dimension, DimensionalProfile } from '@/types/quiz'
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
-// Minimum sources before showing "thinner than usual" notice (§24.7)
 const THIN_TIER_MIN = 2
 
-// Feedback chips per §24.4
 const FEEDBACK_CHIPS = [
   'I already read this',
   'Not my level',
@@ -22,23 +24,21 @@ const FEEDBACK_CHIPS = [
   'Wrong fit for me',
 ]
 
-// Tier headers — one-line explanation pulled from §26.3 FAQ "What are the three tiers?"
+const TIERS: MediaTier[] = ['confirming', 'expanding', 'challenging']
+
 const TIER_META: Record<MediaTier, { label: string; description: string; color: string }> = {
-  confirming:  { label: 'Confirming',  color: 'var(--color-blue-accent)',  description: 'Deepen what you know. Sources that align with how you see the world and cover it rigorously.' },
-  expanding:   { label: 'Expanding',   color: '#16a34a',                   description: 'Expand how you think. Sources that cover ground your current diet misses.' },
-  challenging: { label: 'Challenging', color: '#d97706',                   description: 'Challenge you where it counts. The best honest case against your strongest views. The most important tier.' },
+  confirming:  { label: 'Confirming',  color: 'var(--color-blue-accent)', description: 'Deepen what you know. Sources that align with how you see the world and cover it rigorously.' },
+  expanding:   { label: 'Expanding',   color: '#16a34a',                  description: 'Expand how you think. Sources that cover ground your current diet misses.' },
+  challenging: { label: 'Challenging', color: '#d97706',                  description: 'Challenge you where it counts. The best honest case against your strongest views. The most important tier.' },
 }
 
-// Lean display
-function leanLabel(source: MediaSource): string {
-  const lean = source.coarseLean.replace(/-/g, ' ')
-  const hasPartisan = source.flags.includes('partisan_lean')
-  return hasPartisan ? `${lean} [P]` : lean
-}
+// ── Lean label (no [P]) ───────────────────────────────────────────────────────
 
-// Format display
-function formatLabel(source: MediaSource): string {
-  return source.formats.join(' · ')
+function formatLean(coarseLean: string): string {
+  return coarseLean
+    .split('-')
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ')
 }
 
 // ── Feedback component ────────────────────────────────────────────────────────
@@ -104,19 +104,12 @@ function FeedbackButtons({
   return (
     <div>
       <div style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'center' }}>
-        <button
-          onClick={handleThumbsUp}
-          aria-label="Thumbs up"
-          style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 16, opacity: thumbsState === 'down' ? 0.4 : 1 }}
-        >👍</button>
-        <button
-          onClick={handleThumbsDown}
-          aria-label="Thumbs down"
-          style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 16, opacity: thumbsState === 'up' ? 0.4 : 1 }}
-        >👎</button>
+        <button onClick={handleThumbsUp} aria-label="Thumbs up"
+          style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 16, opacity: thumbsState === 'down' ? 0.4 : 1 }}>👍</button>
+        <button onClick={handleThumbsDown} aria-label="Thumbs down"
+          style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 16, opacity: thumbsState === 'up' ? 0.4 : 1 }}>👎</button>
       </div>
 
-      {/* Thumbs-down expansion */}
       {expanded && !submitted && (
         <div style={{ marginTop: 'var(--space-2)', padding: 'var(--space-3)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--color-bg-surface)' }}>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-1)', marginBottom: 'var(--space-2)' }}>
@@ -156,11 +149,13 @@ function SourceCard({
   tier,
   userMantleType,
   userCompletionPercent,
+  oneLiner,
 }: {
   scored: ScoredMediaSource
   tier: MediaTier
   userMantleType: string | null
   userCompletionPercent: number
+  oneLiner?: string
 }) {
   const { source } = scored
 
@@ -174,29 +169,33 @@ function SourceCard({
       flexDirection: 'column',
       gap: 'var(--space-2)',
     }}>
-      {/* Name + creator */}
+      {/* Name + link + formats */}
       <div>
         <a href={source.url} target="_blank" rel="noopener noreferrer"
           style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-body)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-primary)', textDecoration: 'none' }}>
           {source.name} ↗
         </a>
         <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', marginLeft: 'var(--space-2)' }}>
-          {formatLabel(source)}
+          {source.formats.join(' · ')}
         </span>
       </div>
 
-      {/* One-line description */}
+      {/* Description */}
       <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: '1.5' }}>
         {source.attribution}
       </p>
 
+      {/* Claude one-liner */}
+      {oneLiner && (
+        <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', lineHeight: '1.5', fontStyle: 'italic' }}>
+          {oneLiner}
+        </p>
+      )}
+
       {/* Lean label */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
+      <div>
         <span style={{ fontFamily: 'var(--font-body)', fontSize: '12px', padding: '1px 8px', borderRadius: 99, backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border)', color: 'var(--color-text-secondary)' }}>
-          {leanLabel(source)}
-        </span>
-        <span style={{ fontFamily: 'var(--font-body)', fontSize: '12px', color: 'var(--color-text-secondary)' }}>
-          {source.effort} read
+          {formatLean(source.coarseLean)}
         </span>
       </div>
 
@@ -211,32 +210,15 @@ function SourceCard({
   )
 }
 
-// ── Tier nav (sticky scroll-spy) ─────────────────────────────────────────────
+// ── Tab nav (switches view, no scroll-spy) ────────────────────────────────────
 
-const TIERS: MediaTier[] = ['confirming', 'expanding', 'challenging']
-
-function TierNav() {
-  const [active, setActive] = useState<MediaTier>('confirming')
-
-  useEffect(() => {
-    const observers: IntersectionObserver[] = []
-    TIERS.forEach((tier) => {
-      const el = document.getElementById(`tier-${tier}`)
-      if (!el) return
-      const obs = new IntersectionObserver(
-        ([entry]) => { if (entry.isIntersecting) setActive(tier) },
-        { rootMargin: '-30% 0px -60% 0px', threshold: 0 }
-      )
-      obs.observe(el)
-      observers.push(obs)
-    })
-    return () => observers.forEach((o) => o.disconnect())
-  }, [])
-
-  function scrollTo(tier: MediaTier) {
-    document.getElementById(`tier-${tier}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  }
-
+function TierTabNav({
+  active,
+  onChange,
+}: {
+  active: MediaTier
+  onChange: (tier: MediaTier) => void
+}) {
   return (
     <div style={{
       position: 'sticky',
@@ -244,7 +226,7 @@ function TierNav() {
       zIndex: 10,
       backgroundColor: 'var(--color-bg-page)',
       borderBottom: '1px solid var(--color-border)',
-      marginBottom: 'var(--space-8)',
+      marginBottom: 'var(--space-6)',
       marginLeft: 'calc(-1 * var(--space-4))',
       marginRight: 'calc(-1 * var(--space-4))',
       paddingLeft: 'var(--space-4)',
@@ -257,7 +239,7 @@ function TierNav() {
           return (
             <button
               key={tier}
-              onClick={() => scrollTo(tier)}
+              onClick={() => onChange(tier)}
               style={{
                 fontFamily: 'var(--font-body)',
                 fontSize: 'var(--text-small)',
@@ -281,13 +263,16 @@ function TierNav() {
   )
 }
 
-// ── Source card legend ────────────────────────────────────────────────────────
+// ── Disclosures ───────────────────────────────────────────────────────────────
 
-function CardLegend() {
+function Disclosure({ toggleClosed, toggleOpen, children }: {
+  toggleClosed: string
+  toggleOpen: string
+  children: React.ReactNode
+}) {
   const [open, setOpen] = useState(false)
-
   return (
-    <div style={{ marginBottom: 'var(--space-6)' }}>
+    <div style={{ marginBottom: 'var(--space-4)' }}>
       <button
         onClick={() => setOpen((v) => !v)}
         style={{
@@ -302,7 +287,7 @@ function CardLegend() {
           textUnderlineOffset: '3px',
         }}
       >
-        {open ? 'Got it ↑' : 'What do these labels mean? ↓'}
+        {open ? toggleOpen : toggleClosed}
       </button>
 
       <div style={{
@@ -318,26 +303,8 @@ function CardLegend() {
             backgroundColor: 'var(--color-bg-surface)',
             border: '1px solid var(--color-border)',
             borderRadius: 'var(--radius-sm)',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 'var(--space-3)',
           }}>
-            {[
-              { label: '↗', text: 'Opens the source in a new tab.' },
-              { label: '👍 👎', text: 'Tell us if this fits. We use your feedback to improve future recommendations.' },
-              { label: 'Lean Left / Lean Right / Center', text: "The source's overall editorial perspective." },
-              { label: '[P]', text: 'Partisan Lean flagged: this source scores above our threshold for partisan framing. Included because it meets reliability standards — labeled so you can decide what to do with that.' },
-              { label: 'Format pills (Newsletter, Podcast, etc.)', text: 'The format(s) this source publishes in.' },
-            ].map(({ label, text }) => (
-              <div key={label} style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start' }}>
-                <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-primary)', whiteSpace: 'nowrap', minWidth: 80 }}>
-                  {label}
-                </span>
-                <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: '1.5' }}>
-                  {text}
-                </span>
-              </div>
-            ))}
+            {children}
           </div>
         </div>
       </div>
@@ -345,50 +312,127 @@ function CardLegend() {
   )
 }
 
-// ── Tier section ──────────────────────────────────────────────────────────────
+function LabelLegend() {
+  return (
+    <Disclosure toggleClosed="What do these labels mean? ↓" toggleOpen="Got it ↑">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+        {[
+          {
+            label: '↗',
+            text: 'Opens the source in a new tab so you can peruse and subscribe.',
+          },
+          {
+            label: '👍 👎',
+            text: 'Tell us if this fits. We use your feedback to improve your future recommendations.',
+          },
+          {
+            label: 'Editorial Perspective',
+            text: (
+              <>
+                Our assessment of the source&apos;s overall editorial viewpoint, based on topic selection, framing, and sourcing patterns. Possible values:
+                <ul style={{ margin: 'var(--space-2) 0 0 var(--space-4)', padding: 0, lineHeight: '1.8' }}>
+                  {['Left — consistent liberal/progressive framing',
+                    'Lean Left — generally center-left, with some partisan framing',
+                    'Center — balanced or deliberately nonpartisan',
+                    'Lean Right — generally center-right, with some partisan framing',
+                    'Right — consistent conservative framing',
+                    'Heterodox — doesn\'t fit the left-right spectrum; contrarian, cross-cutting, or ideologically independent',
+                  ].map((item) => (
+                    <li key={item} style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)' }}>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </>
+            ),
+          },
+        ].map(({ label, text }) => (
+          <div key={label} style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start' }}>
+            <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-primary)', whiteSpace: 'nowrap', minWidth: 100 }}>
+              {label}
+            </span>
+            <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: '1.5' }}>
+              {text}
+            </span>
+          </div>
+        ))}
+      </div>
+    </Disclosure>
+  )
+}
 
-function TierSection({
+function IndependenceDisclosure() {
+  return (
+    <Disclosure toggleClosed="What do we mean by independent? ↓" toggleOpen="Got it ↑">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+        <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: '1.6' }}>
+          The editorial voice is not controlled by a corporate owner, political party, advertiser network, or institutional funder with a partisan agenda. Independent journalists still have to earn a living — subscriptions, advertising, private investors, foundation grants are all fine as long as they don&apos;t control what gets covered or how.
+        </p>
+        <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: '1.6' }}>
+          A journalist with a Substack and ten thousand paying subscribers answers to those subscribers. A journalist working for a network owned by a Fortune 500 conglomerate answers to a board of directors. That&apos;s the difference that matters. CNN is not independent. A journalist who left CNN to run their own Substack is.
+        </p>
+      </div>
+    </Disclosure>
+  )
+}
+
+// ── Tier content panel ────────────────────────────────────────────────────────
+
+function TierPanel({
   tier,
   sources,
   userMantleType,
   userCompletionPercent,
+  blurb,
+  blurbsLoading,
+  cardOneLiners,
 }: {
   tier: MediaTier
   sources: ScoredMediaSource[]
   userMantleType: string | null
   userCompletionPercent: number
+  blurb: string | null
+  blurbsLoading: boolean
+  cardOneLiners: Record<string, string>
 }) {
   const meta = TIER_META[tier]
   const isThin = sources.length > 0 && sources.length < THIN_TIER_MIN
   const isEmpty = sources.length === 0
 
   return (
-    <div id={`tier-${tier}`} style={{ marginBottom: 'var(--space-8)' }}>
+    <div>
       {/* Tier header */}
       <div style={{ marginBottom: 'var(--space-4)', borderLeft: `3px solid ${meta.color}`, paddingLeft: 'var(--space-3)' }}>
         <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-heading)', fontWeight: 'var(--weight-bold)', color: meta.color, margin: '0 0 var(--space-1)' }}>
           {meta.label}
         </h2>
-        <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)' }}>
-          {meta.description}
-        </p>
+        {blurbsLoading ? (
+          <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', fontStyle: 'italic' }}>
+            Personalizing your recommendations…
+          </p>
+        ) : blurb ? (
+          <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: '1.6' }}>
+            {blurb}
+          </p>
+        ) : (
+          <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)' }}>
+            {meta.description}
+          </p>
+        )}
       </div>
 
-      {/* Thin-tier notice — §24.7 fallback mechanism */}
+      {/* Thin-tier notice */}
       {(isThin || isEmpty) && (
         <div style={{ padding: 'var(--space-3)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--color-bg-surface)', marginBottom: 'var(--space-4)' }}>
           <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: '1.5' }}>
             {isEmpty
               ? `Fewer recommendations than usual in this tier. As we grow the catalog and classify more sources, this section will fill in.`
               : `Fewer recommendations than usual in this tier — we're showing what we have. The catalog is growing.`}
-            {/* PRE-LAUNCH EDITORIAL TASK: replace with per-Mantle seed lists once written.
-                The seed list mechanism is wired: if seeds were available, they'd be passed here
-                and the isEmpty branch above would not show. See §24.7. */}
           </p>
         </div>
       )}
 
-      {/* Source cards — up to 5 per tier per spec */}
+      {/* Source cards */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
         {sources.slice(0, 5).map((s) => (
           <SourceCard
@@ -397,6 +441,7 @@ function TierSection({
             tier={tier}
             userMantleType={userMantleType}
             userCompletionPercent={userCompletionPercent}
+            oneLiner={cardOneLiners[s.source.name]}
           />
         ))}
       </div>
@@ -478,6 +523,55 @@ function SuggestSourceForm() {
   )
 }
 
+// ── Blurb request builder ─────────────────────────────────────────────────────
+
+function buildBlurbsRequest(
+  matchResult: MediaMatchResult,
+  result: { primaryType: string; topDimensions: Dimension[]; profile: DimensionalProfile },
+  oneLiner: string,
+): BlurbsRequest {
+  const profile = result.profile as unknown as Record<string, number>
+
+  // top dimensions → plain English
+  const topDims = result.topDimensions.slice(0, 3).map((dim) =>
+    poleLabel(dim as Dimension, profile[dim] ?? 50)
+  )
+
+  // bottom 2 = dimensions closest to 50 (most uncertain)
+  const bottomDims = DIMENSIONS
+    .map((d) => ({ key: d.key, certainty: Math.abs((profile[d.key] ?? 50) - 50) }))
+    .sort((a, b) => a.certainty - b.certainty)
+    .slice(0, 2)
+    .map((d) => poleLabel(d.key, profile[d.key] ?? 50))
+
+  function summarize(sources: ScoredMediaSource[]) {
+    return sources.slice(0, 5).map((s) => {
+      const sigAxes = Object.entries(s.source.dimensionCoverage)
+        .filter(([, v]) => v === 'signature')
+        .slice(0, 2)
+        .map(([k]) => {
+          const dim = DIMENSIONS.find((d) => d.key === k)
+          return dim ? `${dim.poleA}/${dim.poleB}` : k
+        })
+      return {
+        name: s.source.name,
+        lean: formatLean(s.source.coarseLean),
+        signatureAxes: sigAxes,
+      }
+    })
+  }
+
+  return {
+    mantleType: result.primaryType,
+    oneLiner,
+    topDimensions: topDims,
+    bottomDimensions: bottomDims,
+    confirming:  summarize(matchResult.confirming),
+    expanding:   summarize(matchResult.expanding),
+    challenging: summarize(matchResult.challenging),
+  }
+}
+
 // ── Main page ─────────────────────────────────────────────────────────────────
 
 export default function MediaDietPage() {
@@ -485,8 +579,6 @@ export default function MediaDietPage() {
   const setSessionFromCloud = useQuizStore((s) => s.setSessionFromCloud)
   const hasProfile = Boolean(session?.result)
 
-  // authChecked starts false so we never flash the gate before we've verified
-  // whether the user has a cloud profile. Flips to true once the check resolves.
   const [authChecked, setAuthChecked] = useState(false)
 
   useEffect(() => {
@@ -497,25 +589,25 @@ export default function MediaDietPage() {
     })
   }, [])
 
-  const userProfile = session?.result ? (session.result.profile as unknown as Record<string, number>) : undefined
-  const primaryType  = session?.result?.primaryType ?? null
-  const mantleType   = session?.result?.primaryType ?? null
-  const completionPct = session?.result?.completionPercent ?? 0
+  const result       = session?.result
+  const mantleType   = result?.primaryType ?? null
+  const completionPct = result?.completionPercent ?? 0
+  const mantleInfo   = mantleType ? mantleFor(mantleType) : null
 
+  const [activeTier, setActiveTier] = useState<MediaTier>('confirming')
   const [matchResult, setMatchResult] = useState<MediaMatchResult | null>(null)
   const [catalogError, setCatalogError] = useState<string | null>(null)
+  const [blurbs, setBlurbs] = useState<BlurbsResult | null>(null)
+  const [blurbsLoading, setBlurbsLoading] = useState(false)
 
-  // Load catalog + run matching — no dealbreakers in this call (§26.3 architectural wall)
   const loadRecommendations = useCallback(async () => {
     if (!session?.result) return
     try {
       const res = await fetch('/api/media-catalog')
-      const catalog: MediaSource[] = await res.json()
-      // buildMediaMatchKey returns MediaMatchKey — structurally has no dealbreakers field.
-      // Even though session.dealbreakers may exist, they are never forwarded here.
+      const catalog = await res.json()
       const key = buildMediaMatchKey(session.result)
-      const result = matchMedia(key, catalog)
-      setMatchResult(result)
+      const mr = matchMedia(key, catalog)
+      setMatchResult(mr)
     } catch (err) {
       setCatalogError('Could not load recommendations. Please refresh.')
       console.error('media catalog error:', err)
@@ -526,7 +618,26 @@ export default function MediaDietPage() {
     if (hasProfile) loadRecommendations()
   }, [hasProfile, loadRecommendations])
 
-  // ── Loading — waiting for Supabase auth check ────────────────────────────
+  // Fetch Claude blurbs once match result is ready
+  useEffect(() => {
+    if (!matchResult || !result || !mantleInfo) return
+    setBlurbsLoading(true)
+    const body = buildBlurbsRequest(
+      matchResult,
+      { primaryType: result.primaryType, topDimensions: result.topDimensions as Dimension[], profile: result.profile as unknown as DimensionalProfile },
+      mantleInfo.oneLiner,
+    )
+    fetch('/api/media-blurbs', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    })
+      .then((r) => r.json())
+      .then((data: BlurbsResult) => { setBlurbs(data); setBlurbsLoading(false) })
+      .catch(() => { setBlurbsLoading(false) })
+  }, [matchResult])
+
+  // ── Loading — auth check ──────────────────────────────────────────────────
 
   if (!authChecked) {
     return (
@@ -543,46 +654,95 @@ export default function MediaDietPage() {
   if (!hasProfile) {
     return (
       <main style={{ maxWidth: 1100, margin: '0 auto', padding: 'var(--space-8) var(--space-4)' }}>
-            <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-display)', fontWeight: 'var(--weight-bold)', color: 'var(--color-text-primary)', marginBottom: 'var(--space-4)' }}>
-              Your Media Diet
-            </h1>
-            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', marginBottom: 'var(--space-4)' }}>
-              Independent journalism matched to how you actually think — in three tiers: sources that deepen what you know, sources that expand how you think, and sources that challenge you where it counts.
-            </p>
-            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', marginBottom: 'var(--space-6)' }}>
-              Take the quiz to get your personalized recommendations. We match your eight-dimension values profile against a curated catalog of independent journalists, Substacks, and podcasts.
-            </p>
-            <a href="/quiz"
-              style={{ display: 'inline-block', fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', fontWeight: 'var(--weight-semibold)', padding: 'var(--space-3) var(--space-5)', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--color-blue-accent)', color: '#fff', textDecoration: 'none' }}>
-              Take the quiz →
-            </a>
+        <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-display)', fontWeight: 'var(--weight-bold)', color: 'var(--color-text-primary)', marginBottom: 'var(--space-4)' }}>
+          Your Media Diet
+        </h1>
+        <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', marginBottom: 'var(--space-4)' }}>
+          Independent journalism matched to how you actually think — in three tiers: sources that deepen what you know, sources that expand how you think, and sources that challenge you where it counts.
+        </p>
+        <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', marginBottom: 'var(--space-6)' }}>
+          Take the quiz to get your personalized recommendations. We match your eight-dimension values profile against a curated catalog of independent journalists, Substacks, and podcasts.
+        </p>
+        <a href="/quiz"
+          style={{ display: 'inline-block', fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', fontWeight: 'var(--weight-semibold)', padding: 'var(--space-3) var(--space-5)', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--color-blue-accent)', color: '#fff', textDecoration: 'none' }}>
+          Take the quiz →
+        </a>
       </main>
     )
   }
 
   // ── Has profile — recommendations ─────────────────────────────────────────
 
-  const confirming  = matchResult?.confirming  ?? []
-  const expanding   = matchResult?.expanding   ?? []
-  const challenging = matchResult?.challenging ?? []
+  const tierSources: Record<MediaTier, ScoredMediaSource[]> = {
+    confirming:  matchResult?.confirming  ?? [],
+    expanding:   matchResult?.expanding   ?? [],
+    challenging: matchResult?.challenging ?? [],
+  }
+
+  const tierBlurbs: Record<MediaTier, string | null> = {
+    confirming:  blurbs?.confirming_blurb  ?? null,
+    expanding:   blurbs?.expanding_blurb   ?? null,
+    challenging: blurbs?.challenging_blurb ?? null,
+  }
 
   return (
     <main style={{ maxWidth: 1100, margin: '0 auto', padding: 'var(--space-8) var(--space-4)' }}>
 
-      {/* Page header */}
-      <div style={{ marginBottom: 'var(--space-12)' }}>
-        <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-muted)', letterSpacing: 'var(--tracking-wider)', textTransform: 'uppercase', marginBottom: 'var(--space-5)' }}>
+      {/* ── Page header ──────────────────────────────────────────────────── */}
+      <div style={{ marginBottom: 'var(--space-10)' }}>
+        <p style={{
+          fontFamily: 'var(--font-body)',
+          fontSize: 'var(--text-small)',
+          fontWeight: 'var(--weight-semibold)',
+          color: 'var(--color-text-muted)',
+          letterSpacing: 'var(--tracking-wider)',
+          textTransform: 'uppercase',
+          marginBottom: 'var(--space-5)',
+        }}>
           Your Media Diet
         </p>
-        <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-h1)', color: 'var(--color-text-primary)', marginBottom: 'var(--space-6)', lineHeight: 'var(--leading-tight)' }}>
+
+        <h1 style={{
+          fontFamily: 'var(--font-display)',
+          fontSize: 'var(--text-h1)',
+          color: 'var(--color-text-primary)',
+          marginBottom: 'var(--space-5)',
+          lineHeight: 'var(--leading-tight)',
+        }}>
           Journalism that deepens, expands, and challenges — based on what you actually believe.
         </h1>
-        <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body-lg)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', marginBottom: 'var(--space-4)' }}>
-          Not your algorithm. Not your party&apos;s talking points. Not a feed that quietly confirms everything you already think.
+
+        <p style={{
+          fontFamily: 'var(--font-body)',
+          fontSize: 'var(--text-body-lg)',
+          color: 'var(--color-text-primary)',
+          lineHeight: 'var(--leading-relaxed)',
+          marginBottom: 'var(--space-4)',
+        }}>
+          Not an algorithm designed to rage bait you. Not a political party&apos;s talking points. Not an echo chamber.
         </p>
-        <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body-lg)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', marginBottom: 'var(--space-4)' }}>
+
+        <p style={{
+          fontFamily: 'var(--font-body)',
+          fontSize: 'var(--text-body-lg)',
+          color: 'var(--color-text-secondary)',
+          lineHeight: 'var(--leading-relaxed)',
+          marginBottom: 'var(--space-4)',
+        }}>
           Your recommendations are built on your eight-dimension values profile — matched against a curated catalog of independent journalists, Substacks, and podcasts. Three tiers, by design: sources that reinforce your foundation, sources that broaden your view, and sources that push back where it matters.
         </p>
+
+        <p style={{
+          fontFamily: 'var(--font-body)',
+          fontSize: 'var(--text-body)',
+          color: 'var(--color-text-muted)',
+          lineHeight: 'var(--leading-relaxed)',
+          fontStyle: 'italic',
+          marginBottom: completionPct < 100 ? 'var(--space-4)' : 0,
+        }}>
+          We&apos;re starting with 60 hand-curated sources — chosen for quality, independence, and range. More coming.
+        </p>
+
         {completionPct < 100 && (
           <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', margin: 0 }}>
             <a href="/quiz" style={{ color: 'var(--color-blue-accent)', textDecoration: 'none' }}>Complete your profile</a> to refine these recommendations.
@@ -590,52 +750,67 @@ export default function MediaDietPage() {
         )}
       </div>
 
-      <div>
+      {/* ── Catalog error ────────────────────────────────────────────────── */}
+      {catalogError && (
+        <div style={{ padding: 'var(--space-4)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', color: 'var(--color-text-secondary)', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', marginBottom: 'var(--space-6)' }}>
+          {catalogError}
+        </div>
+      )}
 
-          {catalogError && (
-            <div style={{ padding: 'var(--space-4)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', color: 'var(--color-text-secondary)', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', marginBottom: 'var(--space-6)' }}>
-              {catalogError}
+      {/* ── Loading recommendations ───────────────────────────────────────── */}
+      {!matchResult && !catalogError && (
+        <div style={{ padding: 'var(--space-6)', textAlign: 'center', color: 'var(--color-text-secondary)', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)' }}>
+          Loading recommendations…
+        </div>
+      )}
+
+      {/* ── Tab view ─────────────────────────────────────────────────────── */}
+      {matchResult && (
+        <>
+          <TierTabNav active={activeTier} onChange={setActiveTier} />
+
+          {/* Disclosures — sit between tab bar and cards */}
+          <div style={{ marginBottom: 'var(--space-6)' }}>
+            <LabelLegend />
+            <IndependenceDisclosure />
+          </div>
+
+          {/* Active tier content */}
+          <TierPanel
+            tier={activeTier}
+            sources={tierSources[activeTier]}
+            userMantleType={mantleType}
+            userCompletionPercent={completionPct}
+            blurb={tierBlurbs[activeTier]}
+            blurbsLoading={blurbsLoading}
+            cardOneLiners={blurbs?.card_oneliners ?? {}}
+          />
+
+          {/* Suggest a source */}
+          <div style={{ marginTop: 'var(--space-10)' }}>
+            <SuggestSourceForm />
+          </div>
+
+          {/* Claude's role disclosure */}
+          <details style={{ marginTop: 'var(--space-8)' }}>
+            <summary style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', cursor: 'pointer', listStyle: 'none', display: 'flex', alignItems: 'center', gap: 4 }}>
+              <span>▸</span> How these recommendations are made &amp; Claude&apos;s role —{' '}
+              <a href="/methodology#media-diet" style={{ color: 'var(--color-blue-accent)', textDecoration: 'none' }}>full methodology →</a>
+            </summary>
+            <div style={{ marginTop: 'var(--space-2)', padding: 'var(--space-4)', backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)' }}>
+              <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)' }}>
+                The analysis behind these recommendations is generated by Claude, Anthropic&apos;s AI.
+                Claude reads each source&apos;s body of work, scores it on the eight civic dimensions, and drafts the explanation you see on each card.
+                Humans review placements before they go live and can override Claude&apos;s scoring when the evidence warrants it.
+                We also look at thumbs up and thumbs down feedback regularly — when users systematically disagree with a recommendation, that&apos;s a signal we take seriously and investigate.
+                We also use Perplexity to verify current ownership and status of sources — independent media changes, and we want our catalog to reflect current reality.
+                Current-status verification is a systematic part of our quarterly review.
+              </p>
             </div>
-          )}
+          </details>
+        </>
+      )}
 
-          {!matchResult && !catalogError && (
-            <div style={{ padding: 'var(--space-6)', textAlign: 'center', color: 'var(--color-text-secondary)', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)' }}>
-              Loading recommendations…
-            </div>
-          )}
-
-          {matchResult && (
-            <>
-              <TierNav />
-              <CardLegend />
-              <TierSection tier="confirming"  sources={confirming}  userMantleType={mantleType} userCompletionPercent={completionPct} />
-              <TierSection tier="expanding"   sources={expanding}   userMantleType={mantleType} userCompletionPercent={completionPct} />
-              <TierSection tier="challenging" sources={challenging} userMantleType={mantleType} userCompletionPercent={completionPct} />
-
-              {/* Suggest a source — §24.5 */}
-              <SuggestSourceForm />
-
-              {/* Claude's role disclosure — §25.1 Your Media Diet version */}
-              <details style={{ marginTop: 'var(--space-8)' }}>
-                <summary style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', cursor: 'pointer', listStyle: 'none', display: 'flex', alignItems: 'center', gap: 4 }}>
-                  <span>▸</span> How these recommendations are made &amp; Claude&apos;s role —{' '}
-                  <a href="/methodology#media-diet" style={{ color: 'var(--color-blue-accent)', textDecoration: 'none' }}>full methodology →</a>
-                </summary>
-                <div style={{ marginTop: 'var(--space-2)', padding: 'var(--space-4)', backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)' }}>
-                  <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)' }}>
-                    The analysis behind these recommendations is generated by Claude, Anthropic&apos;s AI.
-                    Claude reads each source&apos;s body of work, scores it on the eight civic dimensions, and drafts the explanation you see on each card.
-                    Humans review placements before they go live and can override Claude&apos;s scoring when the evidence warrants it.
-                    We also look at thumbs up and thumbs down feedback regularly — when users systematically disagree with a recommendation, that&apos;s a signal we take seriously and investigate.
-                    We also use Perplexity to verify current ownership and status of sources — independent media changes, and we want our catalog to reflect current reality.
-                    Current-status verification is a systematic part of our quarterly review.
-                  </p>
-                </div>
-              </details>
-            </>
-          )}
-
-      </div>
     </main>
   )
 }
