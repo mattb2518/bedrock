@@ -33,7 +33,7 @@ const slides = [
   },
 ];
 
-export default function HeroSlider() {
+export default function HeroSlider({ compact = false }: { compact?: boolean }) {
   const [current, setCurrent] = useState(0);
 
   const goTo = useCallback((index: number) => setCurrent(index), []);
@@ -49,8 +49,8 @@ export default function HeroSlider() {
     <section
       style={{
         backgroundColor: "var(--color-bg-page)",
-        padding: "var(--space-24) var(--space-6) var(--space-20)",
-        minHeight: "520px",
+        padding: compact ? "var(--space-10) var(--space-6) var(--space-8)" : "var(--space-24) var(--space-6) var(--space-20)",
+        minHeight: compact ? undefined : "520px",
         display: "flex",
         alignItems: "center",
       }}
@@ -112,8 +112,8 @@ export default function HeroSlider() {
           ))}
         </div>
 
-        {/* CTAs — constant across slides */}
-        <div style={{ display: "flex", gap: "var(--space-4)", flexWrap: "wrap", marginTop: "var(--space-10)" }}>
+        {/* CTAs — hidden for returning users */}
+        {!compact && <div style={{ display: "flex", gap: "var(--space-4)", flexWrap: "wrap", marginTop: "var(--space-10)" }}>
           <Link
             href="/quiz"
             style={{
@@ -153,7 +153,7 @@ export default function HeroSlider() {
           >
             How it works
           </Link>
-        </div>
+        </div>}
 
         {/* Dot indicators */}
         <div style={{ display: "flex", gap: "var(--space-2)", marginTop: "var(--space-10)" }}>
