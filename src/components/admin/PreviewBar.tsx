@@ -1,0 +1,211 @@
+"use client"
+
+import { useEffect, useState } from 'react'
+import { createClient } from '@/lib/supabase/client'
+import { useQuizStore } from '@/store/quizStore'
+import { usePreviewStore } from '@/store/previewStore'
+import { MANTLES, classifyProfile } from '@/lib/quiz/mantles'
+import type { CivicType, QuizResult } from '@/types/quiz'
+
+// ── Synthetic QuizResult builder ──────────────────────────────────────────────
+
+function syntheticResult(type: CivicType): QuizResult {
+  const mantle = MANTLES.find((m) => m.type === type)!
+  const ranked = classifyProfile(mantle.profile)
+  return {
+    primaryType: type,
+    secondaryTypes: ranked.secondary.slice(0, 3),
+    profile: mantle.profile,
+    topDimensions: [],
+    completedLayers: [1, 2, 3, 4],
+    completionPercent: 100,
+  }
+}
+
+// ── Bar ───────────────────────────────────────────────────────────────────────
+
+const BAR_HEIGHT = 38
+
+export default function PreviewBar() {
+  const [isAdmin, setIsAdmin] = useState(false)
+  const [checked, setChecked] = useState(false)
+
+  const session = useQuizStore((s) => s.session)
+  const resetQuiz = useQuizStore((s) => s.resetQuiz)
+  const setResult = useQuizStore((s) => s.setResult)
+  const setSessionFromCloud = useQuizStore((s) => s.setSessionFromCloud)
+
+  const { mode, mantleType, savedSession, activate, exit } = usePreviewStore()
+
+  // Check role once on mount
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(async ({ data }) => {
+      if (!data.user) { setChecked(true); return }
+      const { data: roleRow } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', data.user.id)
+        .single()
+      setIsAdmin(roleRow?.role === 'admin' || roleRow?.role === 'super_admin')
+      setChecked(true)
+    })
+  }, [])
+
+  if (!checked || !isAdmin) return null
+
+  // ── Handlers ────────────────────────────────────────────────────────────────
+
+  function handleNewUser() {
+    activate('new_user', undefined, session)
+    resetQuiz()
+  }
+
+  function handleMantle(type: CivicType) {
+    activate('mantle', type, mode === 'myself' ? session : savedSession)
+    // Ensure a session shell exists, then inject the synthetic result
+    if (!useQuizStore.getState().session) {
+      setSessionFromCloud({
+        id: `preview-${type}`,
+        currentLayer: 4,
+        currentQuestionIndex: 0,
+        answers: [],
+        topDimensions: [],
+        dealbreakers: [],
+        completedLayers: [1, 2, 3, 4],
+        startedAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      })
+    }
+    setResult(syntheticResult(type))
+  }
+
+  function handleExit() {
+    exit()
+    if (savedSession) {
+      setSessionFromCloud(savedSession)
+    } else {
+      // No saved session — re-fetch from Supabase
+      resetQuiz()
+      const supabase = createClient()
+      supabase.auth.getUser().then(({ data }) => {
+        if (data.user) useQuizStore.getState().attachUser(data.user.id)
+      })
+    }
+  }
+
+  // ── Styles ───────────────────────────────────────────────────────────────────
+
+  const isPreview = mode !== 'myself'
+  const accentColor = '#E8A030'
+
+  const barLabel =
+    mode === 'myself'    ? 'Previewing as: Myself'
+    : mode === 'new_user' ? 'PREVIEW MODE: New User'
+    : `PREVIEW MODE: ${MANTLES.find((m) => m.type === mantleType)?.name ?? mantleType}`
+
+  return (
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      height: BAR_HEIGHT,
+      backgroundColor: '#132238',
+      borderLeft: isPreview ? `3px solid ${accentColor}` : 'none',
+      zIndex: 9999,
+      display: 'flex',
+      alignItems: 'center',
+      gap: 'var(--space-4)',
+      padding: '0 var(--space-5)',
+      fontFamily: 'var(--font-body)',
+      fontSize: '12px',
+    }}>
+      {/* Mode label */}
+      <span style={{
+        color: isPreview ? accentColor : 'rgba(255,255,255,0.35)',
+        fontWeight: isPreview ? 'var(--weight-semibold)' : 'var(--weight-medium)',
+        letterSpacing: isPreview ? 'var(--tracking-wider)' : undefined,
+        textTransform: isPreview ? 'uppercase' : undefined,
+        whiteSpace: 'nowrap',
+      }}>
+        {barLabel}
+      </span>
+
+      {/* Divider */}
+      <span style={{ color: 'rgba(255,255,255,0.15)', fontSize: 16, lineHeight: 1 }}>|</span>
+
+      {/* Myself button */}
+      <button
+        onClick={() => { if (mode !== 'myself') handleExit() }}
+        style={{
+          background: 'none', border: 'none', cursor: 'pointer',
+          fontFamily: 'var(--font-body)', fontSize: '12px',
+          color: mode === 'myself' ? '#fff' : 'rgba(255,255,255,0.45)',
+          fontWeight: mode === 'myself' ? 'var(--weight-semibold)' : 'var(--weight-medium)',
+          padding: '2px 6px', borderRadius: 4,
+          backgroundColor: mode === 'myself' ? 'rgba(255,255,255,0.1)' : 'transparent',
+        }}
+      >
+        Myself
+      </button>
+
+      <button
+        onClick={handleNewUser}
+        style={{
+          background: 'none', border: 'none', cursor: 'pointer',
+          fontFamily: 'var(--font-body)', fontSize: '12px',
+          color: mode === 'new_user' ? accentColor : 'rgba(255,255,255,0.45)',
+          fontWeight: mode === 'new_user' ? 'var(--weight-semibold)' : 'var(--weight-medium)',
+          padding: '2px 6px', borderRadius: 4,
+          backgroundColor: mode === 'new_user' ? 'rgba(232,160,48,0.12)' : 'transparent',
+        }}
+      >
+        New User
+      </button>
+
+      {/* Mantle type dropdown */}
+      <select
+        value={mode === 'mantle' && mantleType ? mantleType : ''}
+        onChange={(e) => e.target.value && handleMantle(e.target.value as CivicType)}
+        style={{
+          background: mode === 'mantle' ? 'rgba(232,160,48,0.12)' : 'rgba(255,255,255,0.06)',
+          border: `1px solid ${mode === 'mantle' ? accentColor : 'rgba(255,255,255,0.15)'}`,
+          borderRadius: 4,
+          color: mode === 'mantle' ? accentColor : 'rgba(255,255,255,0.45)',
+          fontFamily: 'var(--font-body)',
+          fontSize: '12px',
+          padding: '2px 6px',
+          cursor: 'pointer',
+        }}
+      >
+        <option value="">Mantle type…</option>
+        {MANTLES.map((m) => (
+          <option key={m.type} value={m.type}>{m.name}</option>
+        ))}
+      </select>
+
+      {/* Exit button — right-aligned, only in preview modes */}
+      {isPreview && (
+        <button
+          onClick={handleExit}
+          style={{
+            marginLeft: 'auto',
+            background: 'none',
+            border: `1px solid ${accentColor}`,
+            borderRadius: 4,
+            cursor: 'pointer',
+            fontFamily: 'var(--font-body)',
+            fontSize: '12px',
+            color: accentColor,
+            padding: '2px 10px',
+          }}
+        >
+          Exit preview
+        </button>
+      )}
+    </div>
+  )
+}
+
+export { BAR_HEIGHT }

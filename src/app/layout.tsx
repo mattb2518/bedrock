@@ -4,6 +4,7 @@ import Script from "next/script";
 import Nav from "@/components/layout/Nav";
 import Footer from "@/components/layout/Footer";
 import SyncProvider from "@/components/providers/SyncProvider";
+import PreviewBar from "@/components/admin/PreviewBar";
 import "./globals.css";
 
 const libreBaskerville = Libre_Baskerville({
@@ -70,6 +71,7 @@ export default function RootLayout({
         }}
       >
         <SyncProvider>
+          <PreviewBar />
           <Nav />
           <main style={{ flex: 1 }}>{children}</main>
           <Footer />
