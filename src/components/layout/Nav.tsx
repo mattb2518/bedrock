@@ -45,10 +45,12 @@ export default function Nav() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
   const [actionsOpen, setActionsOpen] = useState(false);
+  const [mantleOpen, setMantleOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const aboutRef = useRef<HTMLDivElement>(null);
   const actionsRef = useRef<HTMLDivElement>(null);
+  const mantleRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
   const router = useRouter();
 
@@ -66,10 +68,8 @@ export default function Nav() {
   useEffect(() => setMounted(true), []);
   const hasResult = useQuizStore((s) => !!s.session?.result);
   const attachUser = useQuizStore((s) => s.attachUser);
-  const navLinks =
-    mounted && hasResult
-      ? [...topNavLinks, { label: "Your Mantle", href: "/your-mantle" }]
-      : topNavLinks;
+  const navLinks = topNavLinks;
+  const isMantleActive = pathname === "/your-mantle" || pathname === "/results";
 
   // Subscribe to auth state; also check admin role on sign-in
   useEffect(() => {
@@ -119,6 +119,9 @@ export default function Nav() {
       }
       if (actionsRef.current && !actionsRef.current.contains(e.target as Node)) {
         setActionsOpen(false);
+      }
+      if (mantleRef.current && !mantleRef.current.contains(e.target as Node)) {
+        setMantleOpen(false);
       }
     }
     document.addEventListener("mousedown", handleClick);
@@ -233,6 +236,61 @@ export default function Nav() {
               </Link>
             );
           })}
+
+          {/* Your Mantle dropdown — only when the user has a result */}
+          {mounted && hasResult && (
+            <div ref={mantleRef} style={{ position: "relative" }}>
+              <button
+                onClick={() => setMantleOpen((o) => !o)}
+                style={{
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  fontFamily: "var(--font-body)",
+                  fontSize: "var(--text-small)",
+                  fontWeight: isMantleActive ? "var(--weight-semibold)" : "var(--weight-medium)",
+                  color: isMantleActive ? "var(--color-text-primary)" : "var(--color-text-secondary)",
+                  borderBottom: isMantleActive ? "2px solid var(--color-gold)" : "2px solid transparent",
+                  paddingBottom: "2px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "4px",
+                  whiteSpace: "nowrap",
+                  transition: "var(--transition-fast)",
+                }}
+                onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.color = "var(--color-text-primary)")}
+                onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.color = isMantleActive ? "var(--color-text-primary)" : "var(--color-text-secondary)")}
+              >
+                Your Mantle
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ transform: mantleOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.15s ease" }}>
+                  <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+
+              {mantleOpen && (
+                <div style={{ position: "absolute", top: "calc(100% + 12px)", right: 0, backgroundColor: "var(--color-bg-surface)", border: "1px solid var(--color-border)", borderRadius: "var(--radius-lg)", padding: "var(--space-2)", minWidth: "160px", boxShadow: "0 8px 24px rgba(0,0,0,0.3)", zIndex: 100 }}>
+                  {[
+                    { label: "Overview", href: "/your-mantle" },
+                    { label: "In-Depth Results", href: "/results" },
+                  ].map((link) => {
+                    const active = pathname === link.href;
+                    return (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        onClick={() => setMantleOpen(false)}
+                        style={{ display: "block", fontFamily: "var(--font-body)", fontSize: "var(--text-small)", fontWeight: active ? "var(--weight-semibold)" : "var(--weight-medium)", color: active ? "var(--color-text-primary)" : "var(--color-text-secondary)", textDecoration: "none", padding: "var(--space-3) var(--space-4)", borderRadius: "var(--radius-md)", backgroundColor: active ? "var(--color-bg-deep, #0f1f33)" : "transparent", transition: "var(--transition-fast)" }}
+                        onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = "var(--color-bg-deep, #0f1f33)"; (e.currentTarget as HTMLElement).style.color = "var(--color-text-primary)"; }}
+                        onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = active ? "var(--color-bg-deep, #0f1f33)" : "transparent"; (e.currentTarget as HTMLElement).style.color = active ? "var(--color-text-primary)" : "var(--color-text-secondary)"; }}
+                      >
+                        {link.label}
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Your Actions dropdown */}
           <div ref={actionsRef} style={{ position: "relative" }}>
@@ -672,6 +730,23 @@ export default function Nav() {
               {link.label}
             </Link>
           ))}
+          {/* Your Mantle group in mobile — only when user has a result */}
+          {mounted && hasResult && (
+            <div style={{ borderTop: "1px solid var(--color-border)", paddingTop: "var(--space-3)", display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
+              <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-micro)", fontWeight: "var(--weight-semibold)", color: "var(--color-text-muted)", textTransform: "uppercase", letterSpacing: "var(--tracking-wider)" }}>
+                Your Mantle
+              </span>
+              {[
+                { label: "Overview", href: "/your-mantle" },
+                { label: "In-Depth Results", href: "/results" },
+              ].map((link) => (
+                <Link key={link.href} href={link.href} onClick={() => setMenuOpen(false)} style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-body)", fontWeight: "var(--weight-medium)", color: "var(--color-text-secondary)", textDecoration: "none", paddingLeft: "var(--space-3)" }}>
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+          )}
+
           {/* Your Actions group in mobile */}
           <div
             style={{

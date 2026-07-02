@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useQuizStore } from '@/store/quizStore'
 import MantleReveal from '@/components/quiz/MantleReveal'
 import ProfileDetails from '@/components/quiz/ProfileDetails'
@@ -40,15 +41,38 @@ export default function ResultsPage() {
 // Prominent next-step CTAs right under the reveal — so "Explore your mantle" and
 // the way back into the quiz aren't buried at the bottom of a long page.
 function ResultsTopCta({ quizComplete }: { quizComplete: boolean }) {
+  const resetQuiz = useQuizStore((s) => s.resetQuiz)
+  const router = useRouter()
+
+  function handleRetake() {
+    resetQuiz()
+    router.push('/quiz')
+  }
+
   return (
     <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap', maxWidth: 'var(--max-width-content)', margin: '0 auto', padding: '0 var(--space-6) var(--space-12)' }}>
       <Link href="/your-mantle" style={{ backgroundColor: 'var(--color-red)', color: '#fff', fontFamily: 'var(--font-body)', fontWeight: 'var(--weight-semibold)', padding: 'var(--btn-padding-y) var(--btn-padding-x)', borderRadius: 'var(--btn-radius)', textDecoration: 'none' }}>
         Explore your mantle →
       </Link>
-      {!quizComplete && (
-        <Link href="/quiz" style={{ backgroundColor: 'transparent', color: 'var(--color-text-secondary)', fontFamily: 'var(--font-body)', fontWeight: 'var(--weight-medium)', padding: 'var(--btn-padding-y) var(--btn-padding-x)', borderRadius: 'var(--btn-radius)', textDecoration: 'none', border: '1px solid var(--color-border)' }}>
-          Continue the quiz →
-        </Link>
+      {quizComplete ? (
+        <button
+          onClick={handleRetake}
+          style={{ backgroundColor: 'transparent', color: 'var(--color-text-secondary)', fontFamily: 'var(--font-body)', fontWeight: 'var(--weight-medium)', padding: 'var(--btn-padding-y) var(--btn-padding-x)', borderRadius: 'var(--btn-radius)', border: '1px solid var(--color-border)', cursor: 'pointer' }}
+        >
+          Retake quiz
+        </button>
+      ) : (
+        <>
+          <Link href="/quiz" style={{ backgroundColor: 'transparent', color: 'var(--color-text-secondary)', fontFamily: 'var(--font-body)', fontWeight: 'var(--weight-medium)', padding: 'var(--btn-padding-y) var(--btn-padding-x)', borderRadius: 'var(--btn-radius)', textDecoration: 'none', border: '1px solid var(--color-border)' }}>
+            Edit answers →
+          </Link>
+          <button
+            onClick={handleRetake}
+            style={{ backgroundColor: 'transparent', color: 'var(--color-text-secondary)', fontFamily: 'var(--font-body)', fontWeight: 'var(--weight-medium)', padding: 'var(--btn-padding-y) var(--btn-padding-x)', borderRadius: 'var(--btn-radius)', border: '1px solid var(--color-border)', cursor: 'pointer' }}
+          >
+            Retake quiz
+          </button>
+        </>
       )}
     </div>
   )
