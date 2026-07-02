@@ -172,7 +172,16 @@ export async function loadApprovedSources(): Promise<MediaSource[]> {
       return []
     }
 
-    return data.map((row) => {
+    // Filter out seed/placeholder rows that snuck into the DB
+    const realRows = data.filter(
+      (row) => row.name && row.name !== 'catalog_seed' && row.url && row.url.includes('.')
+    )
+    if (realRows.length === 0) {
+      console.warn('loadApprovedSources: all DB rows look like placeholders, falling back to CSV')
+      return []
+    }
+
+    return realRows.map((row) => {
       const axisPlacement = (row.axis_placement ?? {}) as Partial<Record<Dimension, AxisPlacement>>
       const { kind, formats } = parseFormats(row.format ?? '')
       const depthScore = row.policy_depth_score ?? 3

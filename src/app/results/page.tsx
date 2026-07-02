@@ -79,10 +79,10 @@ function ResultsTopCta({ quizComplete }: { quizComplete: boolean }) {
 }
 
 const PILLARS = [
-  { href: '/ballot', title: 'Your Ballot', blurb: 'Every race matched to your values — president to school board.', accent: 'var(--color-red)' },
-  { href: '/media', title: 'Your Media Diet', blurb: 'Independent journalism matched to how you actually think.', accent: 'var(--color-white-warm)' },
-  { href: '/conversations', title: 'Your Conversations', blurb: 'Claude-powered prep for hard conversations across difference.', accent: 'var(--color-blue-accent)' },
-  { href: '/beyond-ballot', title: 'Beyond Your Ballot', blurb: 'Candidates you can’t vote for, but who’d shape the country.', accent: 'var(--color-rose)' },
+  { href: ‘/your-ballot’, title: ‘Your Ballot’, blurb: ‘Every race matched to your values — president to school board.’, accent: ‘var(--color-red)’ },
+  { href: ‘/media-diet’, title: ‘Your Media Diet’, blurb: ‘Independent journalism matched to how you actually think.’, accent: ‘var(--color-white-warm)’ },
+  { href: ‘/conversations’, title: ‘Your Conversations’, blurb: ‘Claude-powered prep for hard conversations across difference.’, accent: ‘var(--color-blue-accent)’ },
+  { href: ‘/beyond-your-ballot’, title: ‘Beyond Your Ballot’, blurb: ‘Candidates you can’t vote for, but who’d shape the country.’, accent: ‘var(--color-rose)’ },
 ]
 
 function ResultsNext({ quizComplete }: { quizComplete: boolean }) {

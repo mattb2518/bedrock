@@ -13,8 +13,8 @@ const topNavLinks = [
 ];
 
 const actionsLinks = [
-  { label: "Your Ballot", href: "/ballot" },
-  { label: "Beyond Your Ballot", href: "/beyond-ballot" },
+  { label: "Your Ballot", href: "/your-ballot" },
+  { label: "Beyond Your Ballot", href: "/beyond-your-ballot" },
   { label: "Your Media Diet", href: "/media-diet" },
   { label: "Your Conversations", href: "/conversations" },
 ];

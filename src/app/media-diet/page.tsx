@@ -769,8 +769,8 @@ export default function MediaDietPage() {
         <>
           <TierTabNav active={activeTier} onChange={setActiveTier} />
 
-          {/* Disclosures — sit between tab bar and cards */}
-          <div style={{ marginBottom: 'var(--space-6)' }}>
+          {/* Disclosures — sit between tab bar and cards, inline */}
+          <div style={{ marginBottom: 'var(--space-6)', display: 'flex', gap: 'var(--space-6)', flexWrap: 'wrap' }}>
             <LabelLegend />
             <IndependenceDisclosure />
           </div>
