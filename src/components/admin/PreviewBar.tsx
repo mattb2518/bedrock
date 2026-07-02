@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { useQuizStore } from '@/store/quizStore'
 import { usePreviewStore } from '@/store/previewStore'
 import { MANTLES, classifyProfile } from '@/lib/quiz/mantles'
 import type { CivicType, QuizResult } from '@/types/quiz'
@@ -45,8 +44,6 @@ export default function PreviewBar() {
   const [isAdmin, setIsAdmin] = useState(false)
   const [checked, setChecked] = useState(false)
 
-  const resetQuiz = useQuizStore((s) => s.resetQuiz)
-
   const { mode, mantleType, activate, exit } = usePreviewStore()
 
   // Check role once on mount
@@ -77,7 +74,6 @@ export default function PreviewBar() {
 
   function handleNewUser() {
     activate('new_user', undefined, null)
-    resetQuiz()
   }
 
   function handleMantle(type: CivicType) {

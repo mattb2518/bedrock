@@ -9,6 +9,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useQuizStore } from '@/store/quizStore'
+import { usePreviewStore } from '@/store/previewStore'
 import Constellation from '@/components/ui/Constellation'
 import { MANTLES, mantleFor, type Mantle } from '@/lib/quiz/mantles'
 import { profileToRadar } from '@/lib/quiz/dimensions'
@@ -55,7 +56,8 @@ function FlipCard({ mantle, large = false, flipped, onFlip }: { mantle: Mantle; 
 
 export default function YourMantlePage() {
   const session = useQuizStore((s) => s.session)
-  const result = session?.result
+  const { mode, previewResult } = usePreviewStore()
+  const result = mode !== 'myself' ? previewResult : (session?.result ?? null)
 
   const major = result ? mantleFor(result.primaryType) : null
   const minors = (result?.secondaryTypes ?? []).slice(0, 2).map(mantleFor)

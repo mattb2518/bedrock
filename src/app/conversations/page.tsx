@@ -61,22 +61,15 @@ const WORRIED = ["I'll get too heated", "I'll cave", "I'll freeze", "I'll say it
 
 const CHIP_ROWS: Record<Mode, ChipRow[]> = {
   openers: [
-    { key: 'who', label: 'Who are you talking to?', chips: WHO },
-    { key: 'topic', label: 'Topic', chips: TOPIC },
     { key: 'posture', label: 'Or is it more of a posture?', chips: POSTURE },
     { key: 'wrong', label: 'What usually goes wrong?', chips: WRONG },
   ],
   responses: [
-    { key: 'who', label: 'Who said it?', chips: WHO },
-    { key: 'saidTo', label: 'Said to whom?', chips: SAID_TO },
     { key: 'vibe', label: "What's the vibe?", chips: VIBE },
-    { key: 'topic', label: 'Topic', chips: TOPIC },
     { key: 'posture', label: 'Or is it more of a posture?', chips: POSTURE },
   ],
   chat: [
-    { key: 'who', label: 'Who are you practicing with?', chips: WHO },
     { key: 'worried', label: 'What are you worried about?', chips: WORRIED },
-    { key: 'topic', label: 'Topic', chips: TOPIC },
     { key: 'posture', label: 'Or is it more of a posture?', chips: POSTURE },
   ],
 }

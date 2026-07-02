@@ -2077,25 +2077,20 @@ Each mode = one freeform box (carries the irreducible, unpredictable part) + opt
 
 **MODE 1 — Start one**
 Freeform box: *"What do you want to talk about — and what's making it hard?"*
-- **Who are you talking to?** → spouse/partner · parent · in-law · sibling · adult child · friend · neighbor · coworker · someone online · other
-- **Topic** → immigration · climate · guns · abortion · economy · elections · race · foreign policy · healthcare · something local · other
-- **Or is it more of a posture?** *(optional, pick if it fits better than a topic)* → they've checked out entirely · they think it's all rigged · they only trust their own side's media · they think people like me are the problem · they just want to fight · they've stopped listening · other
+- **Or is it more of a posture?** → they've checked out entirely · they think it's all rigged · they only trust their own side's media · they think people like me are the problem · they just want to fight · they've stopped listening · other
 - **What usually goes wrong?** → we talk past each other · it gets heated fast · I freeze up · they shut down · we've never actually tried · other
 
 **MODE 2 — Respond to one**
 Freeform box: *"What did they say? Paste it, or describe it."*
-- **Who said it?** → (same "who" list as Mode 1)
-- **Said to whom?** → me · someone I care about *(third-party fork — one tap)*
 - **What's the vibe?** → genuinely curious · goading · angry · testing me · venting · trying to connect · other
-- **Topic** → (same topic list)
 - **Or is it more of a posture?** → (same posture list)
 
 **MODE 3 — Back-and-forth**
 Freeform box: *"What's the conversation about — and who are you practicing with?"*
-- **Who are you rehearsing for?** → (same "who" list)
 - **What are you worried about?** → I'll get too heated · I'll cave · I'll freeze · I'll say it wrong · it'll blow up the relationship · other
-- **Topic** → (same topic list)
 - **Or is it more of a posture?** → (same posture list)
+
+*(who / said-to / topic chips removed 2026-07-02 — they duplicated the freeform box and caused mismatch conflicts; kept only the additive chips that frame approach and emotional weather)*
 
 **Chip logic notes for Code:**
 - **Topic and posture are NOT mutually exclusive.** A user can tap "immigration" AND "they think people like me are the problem" — that combination is high-value (subject + emotional weather). Never force either/or. The "or is it more of a posture?" framing is user-facing guidance, not a logic constraint.
@@ -2694,6 +2689,7 @@ A persistent preview bar visible only to admins (Super Admin and Admin roles) on
 
 **Toggle behavior:**
 - Switching modes is instant, no page reload
+- **New User** sets `previewResult: null` in the memory-only preview store — does NOT call `resetQuiz` and does NOT touch the persisted session. Switching back to "Myself" restores instantly because the real store was never touched.
 - Switching back to "Myself" restores the real profile from the store (re-fetches from Supabase if needed)
 - A page refresh always clears preview mode and returns to "Myself"
 - A persistent "Exit preview" button always visible when in any non-Myself mode
@@ -2702,7 +2698,7 @@ A persistent preview bar visible only to admins (Super Admin and Admin roles) on
 Each of the ten types needs a representative synthetic Layer 1 profile (8-axis scores) that reflects that type's values signature. These are used only for preview — never shown to real users, never stored. Claude Code should generate reasonable synthetic scores for each type based on the type descriptions in the spec. Super Admin can override individual axis scores for testing edge cases.
 
 **Scope of preview:**
-- Affects: homepage returning-user state, Media Diet recommendations, Ballot matching, Conversations profile injection, Beyond Your Ballot matching
+- Affects: homepage returning-user state, Your Mantle page, Media Diet recommendations, Ballot matching, Conversations profile injection, Beyond Your Ballot matching
 - Does NOT affect: admin tool itself, audit log, review queue, feedback dashboard
 - External API calls (Ballot candidates, etc.) still use real data — just matched against the synthetic profile
 
