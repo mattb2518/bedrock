@@ -311,6 +311,28 @@ export async function demoteToUser(userId: string) {
   revalidatePath('/admin/users')
 }
 
+// ── Delete user (Super Admin only) ───────────────────────────────────────────
+// Manually nulls TEXT-typed tagged_by before calling auth.admin.deleteUser
+// (FK-cascaded tables handle themselves: quiz_profiles, user_roles deleted;
+// source_feedback, candidate_feedback, classification_audit_log, admin_checklist
+// nulled automatically).
+
+export async function deleteUser(userId: string) {
+  await requireSuperAdminRole()
+  const admin = createAdminClient()
+
+  // tagged_by is TEXT (not a FK), so no cascade — must null manually
+  await admin
+    .from('classified_sources')
+    .update({ tagged_by: null })
+    .eq('tagged_by', userId)
+
+  const { error } = await admin.auth.admin.deleteUser(userId)
+  if (error) throw new Error(error.message)
+
+  revalidatePath('/admin/users')
+}
+
 // ── Bulk approve ──────────────────────────────────────────────────────────────
 
 export async function bulkApprove(type: EntryType, ids: string[]) {
