@@ -143,10 +143,8 @@ function riskToScores(risk: string): { goodFaith: MediaSource['goodFaith']; inde
 // ── flags column → MediaSource.flags ─────────────────────────────────────────
 
 function parseFlags(flagStr: string): MediaSource['flags'] {
-  const flags: MediaSource['flags'] = []
-  if (flagStr.includes('[P]')) flags.push('partisan_lean')
-  if (flagStr.includes('[R]')) flags.push('questionable_reliability')
-  return flags
+  if (flagStr.includes('[R]')) return ['questionable_reliability']
+  return []
 }
 
 // ── Derive stable id from URL ─────────────────────────────────────────────────
@@ -258,6 +256,7 @@ export function adaptCatalogRow(row: CatalogRow): MediaSource {
   const reliability = Math.min(100, Math.max(0, (policyDepth / 5) * 80 + 20))
   // Effort: depth 4–5 = deep; 2–3 = medium; 1 = light
   const effort: MediaSource['effort'] = policyDepth >= 4 ? 'deep' : policyDepth >= 2 ? 'medium' : 'light'
+  const coarseLean = normalizeCoarseLean(row.lean)
 
   return {
     id: urlToId(row.url),
@@ -268,7 +267,7 @@ export function adaptCatalogRow(row: CatalogRow): MediaSource {
     independent: true,   // all catalog entries meet the independence definition
     active: 'active',
     axisPlacement: leanToAxisPlacement(row.lean),
-    coarseLean: normalizeCoarseLean(row.lean),
+    coarseLean,
     reliability,
     independence: independenceScore,
     goodFaith,
@@ -276,7 +275,10 @@ export function adaptCatalogRow(row: CatalogRow): MediaSource {
     dimensionCoverage: parseDimensionCoverage(row.dimension_coverage_notes),
     topics: row.notable_for.split(/[,.;]/).map((s) => s.trim()).filter(Boolean).slice(0, 5),
     effort,
-    flags: parseFlags(row.flags),
+    flags: [
+      ...(coarseLeanIsPartisan(coarseLean) ? ['partisan_lean' as const] : []),
+      ...parseFlags(row.flags),
+    ],
     biasRatingSource: 'bedrock_originated',
     externalRefs: {},
     lastReviewed: '2026-06-29',
