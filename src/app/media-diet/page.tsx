@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useQuizStore } from '@/store/quizStore'
+import { usePreviewStore } from '@/store/previewStore'
 import { loadProfile } from '@/lib/quiz/sync'
 import { matchMedia, isBelowThresholdException } from '@/lib/engine/mediaMatch'
 import { buildMediaMatchKey } from '@/lib/engine/buildMediaMatchKey'
@@ -567,23 +568,26 @@ function buildBlurbsRequest(
 export default function MediaDietPage() {
   const session = useQuizStore((s) => s.session)
   const setSessionFromCloud = useQuizStore((s) => s.setSessionFromCloud)
-  const hasProfile = Boolean(session?.result)
-  const isAnonymous = hasProfile && !session?.userId
-  const [mediaBannerDismissed, setMediaBannerDismissed] = useState(false)
+  const { mode, previewResult } = usePreviewStore()
 
   const [authChecked, setAuthChecked] = useState(false)
+  const [mediaBannerDismissed, setMediaBannerDismissed] = useState(false)
 
   useEffect(() => {
-    if (hasProfile) { setAuthChecked(true); return }
+    if (session?.result) { setAuthChecked(true); return }
     loadProfile().then((profile) => {
       if (profile) setSessionFromCloud(profile)
       setAuthChecked(true)
     })
   }, [])
 
-  const result       = session?.result
-  const mantleType   = result?.primaryType ?? null
-  const completionPct = result?.completionPercent ?? 0
+  // In preview modes the synthetic result overrides the real session result.
+  const effectiveResult = mode !== 'myself' ? previewResult : (session?.result ?? null)
+
+  const hasProfile = Boolean(effectiveResult)
+  const isAnonymous = hasProfile && !session?.userId && mode === 'myself'
+  const mantleType   = effectiveResult?.primaryType ?? null
+  const completionPct = effectiveResult?.completionPercent ?? 0
   const mantleInfo   = mantleType ? mantleFor(mantleType) : null
 
   const [activeTier, setActiveTier] = useState<MediaTier>('confirming')
@@ -591,37 +595,44 @@ export default function MediaDietPage() {
   const [catalogError, setCatalogError] = useState<string | null>(null)
   const [blurbs, setBlurbs] = useState<BlurbsResult | null>(null)
   const [blurbsLoading, setBlurbsLoading] = useState(false)
-  const loadedRef = useRef(false)
 
   const loadRecommendations = useCallback(async () => {
-    if (!session?.result) return
+    if (!effectiveResult) return
     try {
       const res = await fetch('/api/media-catalog')
       const catalog = await res.json()
-      const key = buildMediaMatchKey(session.result)
+      const key = buildMediaMatchKey(effectiveResult)
       const mr = matchMedia(key, catalog)
       setMatchResult(mr)
     } catch (err) {
       setCatalogError('Could not load recommendations. Please refresh.')
       console.error('media catalog error:', err)
     }
-  }, [session?.result])
+  }, [effectiveResult])
+
+  // Stable key — re-runs when the Mantle switches or the real profile changes,
+  // but not on incidental re-renders.
+  const profileKey = effectiveResult
+    ? `${effectiveResult.primaryType}:${JSON.stringify(effectiveResult.profile)}`
+    : null
 
   useEffect(() => {
-    if (hasProfile && !loadedRef.current) {
-      loadedRef.current = true
+    if (effectiveResult) {
+      setMatchResult(null)
+      setBlurbs(null)
       loadRecommendations()
     }
-  }, [hasProfile, loadRecommendations])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profileKey])
 
   // Fetch Claude blurbs once match result is ready
   useEffect(() => {
-    if (!matchResult || !result || !mantleInfo) return
+    if (!matchResult || !effectiveResult || !mantleInfo) return
     let cancelled = false
     setBlurbsLoading(true)
     const body = buildBlurbsRequest(
       matchResult,
-      { primaryType: result.primaryType, topDimensions: result.topDimensions as Dimension[], profile: result.profile as unknown as DimensionalProfile },
+      { primaryType: effectiveResult.primaryType, topDimensions: effectiveResult.topDimensions as Dimension[], profile: effectiveResult.profile as unknown as DimensionalProfile },
       mantleInfo.oneLiner,
     )
     fetch('/api/media-blurbs', {

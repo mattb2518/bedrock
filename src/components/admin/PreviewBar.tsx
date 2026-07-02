@@ -45,12 +45,9 @@ export default function PreviewBar() {
   const [isAdmin, setIsAdmin] = useState(false)
   const [checked, setChecked] = useState(false)
 
-  const session = useQuizStore((s) => s.session)
   const resetQuiz = useQuizStore((s) => s.resetQuiz)
-  const setResult = useQuizStore((s) => s.setResult)
-  const setSessionFromCloud = useQuizStore((s) => s.setSessionFromCloud)
 
-  const { mode, mantleType, savedSession, activate, exit } = usePreviewStore()
+  const { mode, mantleType, activate, exit } = usePreviewStore()
 
   // Check role once on mount
   useEffect(() => {
@@ -79,41 +76,16 @@ export default function PreviewBar() {
   // ── Handlers ────────────────────────────────────────────────────────────────
 
   function handleNewUser() {
-    activate('new_user', undefined, session)
+    activate('new_user', undefined, null)
     resetQuiz()
   }
 
   function handleMantle(type: CivicType) {
-    activate('mantle', type, mode === 'myself' ? session : savedSession)
-    // Ensure a session shell exists, then inject the synthetic result
-    if (!useQuizStore.getState().session) {
-      setSessionFromCloud({
-        id: `preview-${type}`,
-        currentLayer: 4,
-        currentQuestionIndex: 0,
-        answers: [],
-        topDimensions: [],
-        dealbreakers: [],
-        completedLayers: [1, 2, 3, 4],
-        startedAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      })
-    }
-    setResult(syntheticResult(type))
+    activate('mantle', type, syntheticResult(type))
   }
 
   function handleExit() {
     exit()
-    if (savedSession) {
-      setSessionFromCloud(savedSession)
-    } else {
-      // No saved session — re-fetch from Supabase
-      resetQuiz()
-      const supabase = createClient()
-      supabase.auth.getUser().then(({ data }) => {
-        if (data.user) useQuizStore.getState().attachUser(data.user.id)
-      })
-    }
   }
 
   // ── Styles ───────────────────────────────────────────────────────────────────

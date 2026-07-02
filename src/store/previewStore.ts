@@ -5,33 +5,28 @@
 // real Supabase data or the persisted quiz store.
 
 import { create } from 'zustand'
-import type { CivicType, QuizSession } from '@/types/quiz'
+import type { CivicType, QuizResult } from '@/types/quiz'
 
 export type PreviewMode = 'myself' | 'new_user' | 'mantle'
 
 interface PreviewStore {
   mode: PreviewMode
   mantleType: CivicType | null
-  // Snapshot of the real session taken before preview activates, so we can restore it.
-  savedSession: QuizSession | null
+  // Synthetic result for the active preview; null in 'myself' and 'new_user' modes.
+  previewResult: QuizResult | null
 
-  activate: (mode: PreviewMode, mantleType?: CivicType, currentSession?: QuizSession | null) => void
+  activate: (mode: PreviewMode, mantleType?: CivicType, previewResult?: QuizResult | null) => void
   exit: () => void
 }
 
 export const usePreviewStore = create<PreviewStore>()((set) => ({
   mode: 'myself',
   mantleType: null,
-  savedSession: null,
+  previewResult: null,
 
-  activate: (mode, mantleType = undefined, currentSession = null) =>
-    set((s) => ({
-      mode,
-      mantleType: mantleType ?? null,
-      // Only save the real session the first time we leave 'myself' mode
-      savedSession: s.mode === 'myself' ? currentSession : s.savedSession,
-    })),
+  activate: (mode, mantleType = undefined, previewResult = null) =>
+    set({ mode, mantleType: mantleType ?? null, previewResult: previewResult ?? null }),
 
   exit: () =>
-    set({ mode: 'myself', mantleType: null }),
+    set({ mode: 'myself', mantleType: null, previewResult: null }),
 }))
