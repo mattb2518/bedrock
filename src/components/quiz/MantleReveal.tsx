@@ -58,7 +58,7 @@ function isCentered(profile: DimensionalProfile): boolean {
   return DIMENSIONS.filter((d) => Math.abs(profile[d.key] - 50) <= 15).length >= 6
 }
 
-export default function MantleReveal({ result, headerCta }: { result: QuizResult; headerCta?: React.ReactNode }) {
+export default function MantleReveal({ result, headerCta, hideDimBreakdown = false }: { result: QuizResult; headerCta?: React.ReactNode; hideDimBreakdown?: boolean }) {
   const mantle = mantleFor(result.primaryType)
   const radar = profileToRadar(result.profile)
   const centered = isCentered(result.profile)
@@ -130,8 +130,9 @@ export default function MantleReveal({ result, headerCta }: { result: QuizResult
         </div>
       )}
 
-      {/* Dimensional breakdown — collapsed by default */}
-      <DimAccordion result={result} shown={shown} rise={rise} />
+      {/* Dimensional breakdown — collapsed by default; hidden on /results where it
+          appears alongside the other profile sections below the reveal */}
+      {!hideDimBreakdown && <DimAccordion result={result} shown={shown} rise={rise} />}
     </div>
   )
 }
