@@ -218,6 +218,14 @@ export async function loadApprovedSources(): Promise<MediaSource[]> {
   }
 }
 
+// ── Word-boundary trim ────────────────────────────────────────────────────────
+
+function wordTrim(s: string, max: number): string {
+  if (s.length <= max) return s
+  const cut = s.lastIndexOf(' ', max)
+  return cut > 0 ? s.slice(0, cut) : s.slice(0, max)
+}
+
 // ── Main adapter ──────────────────────────────────────────────────────────────
 
 export interface CatalogRow {
@@ -267,6 +275,6 @@ export function adaptCatalogRow(row: CatalogRow): MediaSource {
     externalRefs: {},
     lastReviewed: '2026-06-29',
     methodologyVersion: 'v1',
-    attribution: `${row.creators_hosts} — ${row.notable_for.slice(0, 80)}`,
+    attribution: `${row.creators_hosts} — ${wordTrim(row.notable_for, 80)}`,
   }
 }
