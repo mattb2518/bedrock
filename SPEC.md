@@ -346,9 +346,9 @@ Select as many or as few as apply. Add your own at the bottom if something isn't
 
 ## 7. Layer 1 Questions — Complete
 
-*20 questions: 8 anchor + 8 crossover + 4 synthesis*
+*14 questions: 8 anchor + 4 crossover + 2 synthesis*
 *Pure values. Abstract, timeless. No policy references.*
-*Bias-checked and cleared.*
+*Bias-reviewed (June 2026); audit pass in progress (July 2026).*
 
 ### Format Key
 - **[DIM]** = Primary dimension
@@ -530,28 +530,10 @@ When a major American expert institution — a federal regulatory agency, a scie
 
 ---
 
-### CROSSOVER QUESTIONS (8)
+### CROSSOVER QUESTIONS (4)
 
 ---
 
-**C1 — Stability↔Change × Rules↔Outcomes**
-
-The Constitution has been amended 27 times in 235 years. Some think that's about right. Others think it's too few. Your view:
-
-**A.** About right — the amendment process is deliberately hard because fundamental law should reflect deep consensus, not momentary majorities.
-*"Madison designed it this way on purpose — and 235 years later the document is still standing."*
-
-**B.** Too few — structural problems in American democracy can't be fixed through ordinary legislation, and the difficulty of amendment has let them calcify.
-*"Jefferson thought the whole thing should be rewritten every generation. Probably too aggressive, but the impulse wasn't crazy."*
-
-**C.** The number isn't the point — what matters is whether the amendment process is accessible to citizens or captured by whoever has the most resources.
-*"A constitution that can only be amended by well-funded organized interests isn't really a people's document."*
-
-**It depends** → OT: *"What would make you more or less comfortable with the amendment process being used more frequently?"*
-
-**[EE]:** *"The 27th Amendment — preventing Congress from giving itself an immediate pay raise — was proposed in 1789 and not ratified until 1992. A University of Texas student named Gregory Watson rediscovered it in 1982, wrote a paper arguing it was still open for ratification, got a C, and spent the next decade getting state legislatures to ratify it anyway. He got his grade changed to an A in 2017."*
-
----
 
 **C2 — Individual↔Collective × Markets↔Governance**
 
@@ -574,24 +556,6 @@ The federal government is considering a large public investment — infrastructu
 
 ---
 
-**C3 — Trust↔Skepticism × Local↔Federal**
-
-When your local and federal government disagree about what's best for your community — on zoning, environmental standards, school curriculum — who do you trust more?
-
-**A.** Local government — they know the community, they're accountable to the people affected, and the further away a decision is made the less it reflects local reality.
-*"Your city council member shops at the same grocery store you do. Your senator probably doesn't know your zip code."*
-
-**B.** Federal government — local majorities have a long history of making decisions that work for the powerful and against the vulnerable.
-*"Closeness to power isn't the same as accountability to everyone. Local governments can be captured by local interests just as thoroughly as federal ones."*
-
-**C.** Whichever has less to gain from the outcome — the more an institution benefits from a decision, the less I trust its judgment, regardless of level.
-*"A local government that owns the land in question is not a neutral arbiter. Neither is a federal agency whose budget depends on the program it's evaluating."*
-
-**It depends** → OT: *"What would make you trust one level over the other on a specific issue?"*
-
-**[EE]:** *"The United States has approximately 90,000 units of local government — more than any other country on earth. Americans have always been serious about keeping power close to home. Whether that's working as intended is a separate question."*
-
----
 
 **C4 — Local↔Federal × Individual↔Collective**
 
@@ -655,52 +619,9 @@ A candidate you broadly agree with has a real chance of winning — but only if 
 
 ---
 
-**C7 — Stability↔Change × Individual↔Collective**
 
-Major economic transitions — manufacturing decline, the shift to clean energy, automation — tend to concentrate costs on specific communities while spreading benefits broadly. Who should bear responsibility?
 
-**A.** Primarily the individuals affected — economies change, skills need to update, and while transition support is appropriate, personal responsibility for adapting is part of the social contract.
-*"The communities that rebuilt fastest after economic disruption were the ones treated as capable of adapting, not as permanent victims."*
-
-**B.** Primarily society as a whole — when a community bears concentrated costs so the rest of the country benefits, the beneficiaries have a real obligation to those left behind.
-*"Some communities bore the cost of cheaper goods, cleaner energy, higher productivity. The people who benefited most owe something real to the people who paid most."*
-
-**C.** The industries and investors who captured the gains — if a company automates away ten thousand jobs and books record profits, the moral case for that company funding the transition is stronger than the case for taxpayers.
-*"You captured the upside, you fund the downside. It's how environmental liability works."*
-
-**It depends** → MC (select all that apply): *"What shapes your answer?"*
-- Whether the transition was driven by policy or market forces
-- How concentrated the costs are
-- Whether affected workers had meaningful warning
-- Whether the companies involved are still profitable
-
-**[EE]:** *"When the Erie Canal opened in 1825 it destroyed the economies of every town along the older trade routes overnight. The towns that adapted survived. The ones that didn't are still there, smaller, wondering what happened."*
-
----
-
-**C8 — Markets↔Governance × Rules↔Outcomes**
-
-A major industry — pharmaceuticals, social media, financial services — has produced serious harm at scale. Investigations confirm it was foreseeable and the industry knew. What should happen?
-
-**A.** Enforce existing laws and let markets correct — companies that harm people should face legal consequences, but new regulation tends to protect the bad actor from the competitor who might replace them.
-*"Regulation written for yesterday's bad actor tends to entrench it — airline routes and fares were frozen by regulation for forty years until deregulation cut prices roughly in half. Courts and competition have teeth too, without the capture problem."*
-
-**B.** Write new rules with real teeth — courts are too slow, competition takes too long, and the people harmed in the meantime are real.
-*"After 2008, 'let the market correct' meant millions lost their homes while the institutions that caused it got bailouts."*
-
-**C.** Make the executives personally liable — a fine paid by shareholders for decisions made by executives isn't accountability, it's a tax on people who mostly didn't make the decision.
-*"The Sarbanes-Oxley Act tried this after Enron. The question is whether it went far enough."*
-
-**It depends** → MC (select all that apply): *"What shapes your answer?"*
-- Whether existing laws were broken or just inadequate
-- Whether the industry is genuinely competitive
-- Whether the harm is ongoing
-
-**[EE]:** *"The Sherman Antitrust Act of 1890 was passed by Republicans, signed by a Republican president, and used most aggressively in its first thirty years against Republican-allied corporations like Standard Oil. The political coalition around antitrust has changed two or three times since."*
-
----
-
-### SYNTHESIS QUESTIONS (4)
+### SYNTHESIS QUESTIONS (2)
 
 ---
 
@@ -723,43 +644,7 @@ After a series of domestic attacks, a president declares a national emergency an
 
 ---
 
-**S2 — National × Global × Individual × Collective**
 
-A large wave of people is arriving at the southern border — some fleeing violence, some seeking economic opportunity, some with unclear circumstances. The immigration system is overwhelmed. What should the United States do?
-
-**A.** The core problem is enforcement — the United States has laws and isn't applying them consistently, which is unfair to legal immigrants and an invitation to more of the same.
-*"A law that isn't enforced isn't a law — it's a suggestion."*
-
-**B.** The core problem is capacity — the asylum system is so backlogged it functionally doesn't work, and people who would qualify legally have no realistic path to use it.
-*"The average wait for a green card from certain countries exceeds 50 years. That's not a backlog — that's a closed door with a waiting room."*
-
-**C.** The core problem is the conditions people are fleeing — as long as extreme violence and poverty persist in sending countries, no level of enforcement or processing capacity will resolve the underlying pressure.
-*"Border policy alone has never stopped a refugee crisis — sending-country conditions are doing the driving."*
-
-**It depends** → OT: *"What factors matter most — the distinction between asylum seekers and economic migrants, security screening, fairness to people immigrating legally?"*
-
-**[EE]:** *"America has swung between openness and restriction for two centuries. The 1924 Johnson-Reed Act slammed the door nearly shut, with national-origin quotas that lasted four decades. The 1965 Hart-Celler Act reopened it and remade the country. Every generation has reopened the same question — and answered it differently."*
-
----
-
-**S3 — Rules × Markets × Trust × Skepticism**
-
-American political campaigns are enormously expensive and funded largely by wealthy individuals, corporations, and opaque outside groups. The Supreme Court has ruled much of this is protected free speech. What's the right response?
-
-**A.** Accept the current system and focus on transparency — money in politics is inevitable, the First Amendment constraints are real, and full disclosure lets voters draw their own conclusions.
-*"You may not be able to stop the money but you can shine a light on it."*
-
-**B.** Push for public financing and strict limits — the First Amendment argument for unlimited campaign spending conflates money with speech in a way that drowns out everyone else.
-*"One person one vote means something different in a system where the price of entry into political influence is measured in millions."*
-
-**C.** Focus on the revolving door rather than campaign finance — the more corrupting influence isn't what goes into campaigns but what officials do after leaving office.
-*"Campaign finance reform has been the focus of reformers for fifty years with limited success. The more direct transaction — public service followed by private enrichment — operates almost completely in the open."*
-
-**It depends** → OT: *"What feels like the most corrupting influence — where the money comes from, what donors expect, what happens after officials leave office?"*
-
-**[EE]:** *"In 1799 Aaron Burr got a water company chartered to address a genuine public health crisis, inserted a clause allowing surplus capital to be used for 'any monied transactions,' never really built the water system, and turned the surplus into the Bank of Manhattan — which eventually became JPMorgan Chase. The gap between public purpose and private enrichment has been a feature of American civic life since almost the beginning."*
-
----
 
 **S4 — Stability × Individual × Collective × Federal × Trust**
 

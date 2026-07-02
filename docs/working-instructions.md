@@ -15,6 +15,9 @@ SPEC.md is the document both Claude Project and Claude Code work from. Always pu
 
 ---
 
+### Spec-sync rule
+Any change to shipped content or counts in code (quiz questions, dealbreaker items, catalog logic, page copy) must update the corresponding SPEC.md section in the same session. Spec and code must not diverge across sessions.
+
 ### Sync rule
 Before switching from Claude Project to Claude Code → push latest spec to GitHub.
 Before switching back to Claude Project → note any implementation decisions worth capturing in the spec.

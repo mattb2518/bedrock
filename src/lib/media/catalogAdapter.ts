@@ -67,6 +67,12 @@ function leanToAxisPlacement(lean: string): Partial<Record<Dimension, AxisPlacem
   return {}
 }
 
+// ── Partisan-lean flag helper ─────────────────────────────────────────────────
+
+function coarseLeanIsPartisan(cl: MediaSource['coarseLean']): boolean {
+  return cl !== 'center' && cl !== 'heterodox'
+}
+
 // ── Lean string → MediaSource.coarseLean ─────────────────────────────────────
 
 type CoarseLean = MediaSource['coarseLean']
@@ -204,7 +210,7 @@ export async function loadApprovedSources(): Promise<MediaSource[]> {
         dimensionCoverage: {},
         topics: Array.isArray(row.topics) ? row.topics : [],
         effort,
-        flags: (row.coarse_lean === 'left' || row.coarse_lean === 'right') ? ['partisan_lean'] : [],
+        flags: coarseLeanIsPartisan((row.coarse_lean ?? 'center') as MediaSource['coarseLean']) ? ['partisan_lean'] : [],
         biasRatingSource: 'bedrock_originated',
         externalRefs: row.external_refs ?? {},
         lastReviewed: row.updated_at ? (row.updated_at as string).split('T')[0] : '2026-06-29',
