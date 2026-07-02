@@ -161,11 +161,12 @@ function assignTier(
     return 'confirming'
   }
 
-  // Challenging: tension >= 0.60, reliability >= 75, goodFaith === 'high', independence >= 50
+  // Challenging: v1 loosening (was tension>=0.60, reliability>=75, goodFaith==='high', independence>=50).
+  // Relaxed to fill the flagship tier; revisit under the v2 reliability-signal rework.
   if (
-    tensionOnHeld >= 0.60 &&
-    source.reliability >= 75 &&
-    source.goodFaith === 'high' &&
+    tensionOnHeld >= 0.55 &&
+    source.reliability >= 65 &&
+    source.goodFaith !== 'low' &&
     source.independence >= 50
   ) {
     return 'challenging'
@@ -249,17 +250,17 @@ function diversitySort(
 function applyMantleSeedFallback(
   tier: ScoredMediaSource[],
   allSources: ScoredMediaSource[],
-  tierName: MediaTier
+  tierName: MediaTier,
+  placed: Set<string>
 ): { sources: ScoredMediaSource[]; usedFallback: boolean } {
   if (tier.length > 0) return { sources: tier, usedFallback: false }
 
-  // Seed fallback: pull highest-reliability active sources not already placed
-  const existing = new Set(tier.map((s) => s.source.id))
   const fallback = allSources
-    .filter((s) => !existing.has(s.source.id) && s.source.active === 'active')
+    .filter((s) => !placed.has(s.source.id) && s.source.active === 'active')
     .sort((a, b) => b.source.reliability - a.source.reliability)
     .slice(0, 3)
     .map((s) => ({ ...s, tier: tierName }))
+  for (const s of fallback) placed.add(s.source.id)
 
   return { sources: fallback, usedFallback: fallback.length > 0 }
 }
@@ -300,10 +301,15 @@ export function matchMedia(
   const sortedExpanding   = diversitySort(expanding,   'expanding')
   const sortedChallenging = diversitySort(challenging, 'challenging')
 
-  // Per-mantle seed fallback for any empty tier
-  const { sources: finalConfirming }  = applyMantleSeedFallback(sortedConfirming,  all, 'confirming')
-  const { sources: finalExpanding }   = applyMantleSeedFallback(sortedExpanding,   all, 'expanding')
-  const { sources: finalChallenging } = applyMantleSeedFallback(sortedChallenging, all, 'challenging')
+  // Per-mantle seed fallback for any empty tier — shared placed-set prevents cloning across tiers
+  const placed = new Set<string>([
+    ...sortedConfirming.map((s) => s.source.id),
+    ...sortedExpanding.map((s) => s.source.id),
+    ...sortedChallenging.map((s) => s.source.id),
+  ])
+  const { sources: finalConfirming }  = applyMantleSeedFallback(sortedConfirming,  all, 'confirming',  placed)
+  const { sources: finalExpanding }   = applyMantleSeedFallback(sortedExpanding,   all, 'expanding',   placed)
+  const { sources: finalChallenging } = applyMantleSeedFallback(sortedChallenging, all, 'challenging', placed)
 
   return {
     confirming:  finalConfirming,

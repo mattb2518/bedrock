@@ -151,8 +151,9 @@ function parseFlags(flagStr: string): MediaSource['flags'] {
 
 function urlToId(url: string): string {
   try {
-    const hostname = new URL(url.startsWith('http') ? url : `https://${url}`).hostname
-    return hostname.replace(/^www\./, '').replace(/\./g, '_').replace(/[^a-z0-9_]/g, '')
+    const u = new URL(url.startsWith('http') ? url : `https://${url}`)
+    const raw = u.hostname.replace(/^www\./, '') + u.pathname.replace(/\/+$/, '')
+    return raw.replace(/[^a-z0-9]+/gi, '_').replace(/^_+|_+$/g, '').toLowerCase()
   } catch {
     return url.replace(/[^a-z0-9]/gi, '_').toLowerCase().slice(0, 40)
   }
