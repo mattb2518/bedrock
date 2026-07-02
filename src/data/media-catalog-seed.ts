@@ -75,4 +75,6 @@ export const CATALOG_SEED_ROWS: CatalogSeedRow[] = [
   { name: 'City Journal',                    url: 'https://www.city-journal.org',                        format: 'Magazine + podcast',              lean: 'Right / policy-focused',         policyDepthScore: '4', flags: '[P]' },
   { name: 'The Ricochet Podcast',            url: 'https://ricochet.com/podcast/ricochet-podcast/',      format: 'Podcast',                         lean: 'Right',                          policyDepthScore: '3', flags: '[P]' },
   { name: 'Antiwar.com',                     url: 'https://www.antiwar.com',                             format: 'Newsletter',                      lean: 'Right-libertarian / anti-interventionist', policyDepthScore: '4', flags: '[P]' },
+  { name: 'National Review',                 url: 'https://www.nationalreview.com',                      format: 'Magazine + website + podcasts',   lean: 'Right / traditional conservative',          policyDepthScore: '4', flags: '[P]' },
+  { name: 'The Ben Shapiro Show',            url: 'https://www.dailywire.com/show/the-ben-shapiro-show', format: 'Podcast + video',                 lean: 'Right / populist conservative',             policyDepthScore: '3', flags: '[P]' },
 ]

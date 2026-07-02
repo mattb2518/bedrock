@@ -20,7 +20,7 @@ const SLIDES = [
     id: 'quiz',
     headline: "It starts with how you think — not where you stand.",
     subhead: "Most civic tools ask about issues. We ask about values.",
-    body: "20 questions. About 12 minutes. No wrong answers — only honest ones.",
+    body: "14 questions. About 12 minutes. No wrong answers — only honest ones.",
     accent: 'var(--color-gold)',
     hasQuizCard: true,
   },

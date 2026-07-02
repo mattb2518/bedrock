@@ -785,8 +785,11 @@ export default function BeyondYourBallotPage() {
             <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)' }}>
               <strong style={{ color: 'var(--color-text-primary)' }}>Governance filter:</strong> Four
               criteria, must meet at least two: no party-line voting rate above 85% for incumbents;
-              history of co-sponsoring bipartisan legislation; publicly committed to specific structural
-              reforms (gerrymandering, campaign finance, filibuster reform — not vague unity language);
+              history of co-sponsoring bipartisan legislation; publicly committed to a specific structural
+              or institutional reform — redistricting, campaign finance and disclosure, congressional term
+              limits, age or tenure limits including Supreme Court term limits, debt-ceiling or
+              budget-process reform, or executive and emergency-power limits, not vague unity language,
+              and regardless of partisan direction;
               endorsed by a documented cross-partisan organization whose membership includes elected
               officials from both parties acting in a non-party capacity (for example, the Problem
               Solvers Caucus or Unite America) or explicitly contested their own party&apos;s position with

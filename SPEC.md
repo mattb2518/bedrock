@@ -1633,7 +1633,7 @@ We use exactly two cookies — one to keep you logged in, one to remember your p
 
 For analytics we use Plausible — a privacy-first tool that doesn't track individual users and doesn't require cookies. We chose it specifically because it doesn't compromise your privacy to tell us how the product is performing.
 
-[FLAG: Legal review required before launch — confirm whether strictly-necessary-only cookie policy requires a user consent banner under GDPR, CCPA, or other applicable law. If required, implement minimal non-intrusive banner consistent with privacy-first brand.]
+[RESOLVED 2026-06-29: Legal review complete — no consent banner required. Strictly-necessary auth cookie is exempt under GDPR/CCPA; Plausible is cookieless. Founder decision, documented in §27.1.]
 
 **On Claude.**
 The quiz conversation and Your Conversations are powered by Claude — Anthropic's AI. Your responses are processed by Claude in real time. Anthropic does not store your individual responses or use them for model training. For Anthropic's full privacy practices, see anthropic.com/privacy.
@@ -2668,7 +2668,7 @@ Not raw numbers — an actionable summary requiring human judgment.
 - [ ] Confirm AllSides non-commercial eligibility in writing (email drafted, pending send to partnerships@allsides.com)
 - [ ] Confirm Ad Fontes Data Platform pricing and access (email drafted, pending send to info@adfontesmedia.com)
 - [ ] Initiate the Ballotpedia licensing conversation (email drafted, pending send to data@ballotpedia.org)
-- [ ] Cookie banner legal review: **COMPLETE** — founder decision, no banner required (strictly necessary auth + cookieless Plausible). Document in the Privacy page.
+- [x] Cookie banner legal review: **COMPLETE** — founder decision, no banner required (strictly necessary auth + cookieless Plausible). Document in the Privacy page.
 - [ ] Scoring methodology published on the site Methodology page
 - [ ] `pew-typology.ts` constants file built (Pew group attribution on all ten Mantle cards)
 - [ ] Profile export working and tested
@@ -2678,7 +2678,7 @@ Not raw numbers — an actionable summary requiring human judgment.
 - [ ] Pricing/donation model confirmed
 - [ ] Open-source scoring code on GitHub, linked from the Methodology page
 - [ ] Beyond Your Ballot static JSON populated before the pillar goes live
-- [ ] **HARD BLOCKER — Run classification pipeline against all 62 sources in `src/data/media-catalog.csv` before launch.** The current fallback (`catalogAdapter.ts` `leanToAxisPlacement`) only populates 2–3 of the 8 dimensions per source based on a coarse left-right lean proxy, leaving axes like `stability_change`, `local_federal`, `national_global`, and `rules_outcomes` at zero confidence for every catalog source. This means Media Diet tier placements currently collapse toward a conventional left-right framing, which undermines the product's core differentiation (8-axis nuance beyond left-right). Real classification must run before this pillar reflects what Bedrock is actually for. Flagged Stage 9, 2026-06-30.
+- [ ] **Classification pipeline — 60/62 done.** The 60 seeded catalog sources are classified and approved in `classified_sources` with real 8-axis placements; `loadApprovedSources` serves those, so Media Diet reflects the full 8-axis model — the `catalogAdapter.ts` `leanToAxisPlacement` proxy is now only the empty-DB fallback, not the live path. **Remaining before this box is checked:** classify + approve the two 2026-07-02 additions (National Review, The Ben Shapiro Show), which are enqueued in the admin queue awaiting the classify decision. (Flagged a hard blocker 2026-06-30; resolved for the seeded catalog 2026-07.)
 
 ### 21.10 Admin Preview Mode
 
@@ -3424,7 +3424,7 @@ A 6-slide modal carousel shown automatically to first-time visitors. Designed to
   - Option A: Let markets work — intervention usually makes things worse
   - Option B: Intervene when the stakes are high enough — markets have blind spots
   - Option C: Depends on the domain — I don't apply one rule everywhere
-- Body: 20 questions. About 12 minutes. No wrong answers — only honest ones.
+- Body: 14 questions. About 12 minutes. No wrong answers — only honest ones.
 - Transition line (large font, below card): Then your identity map drives four civic actions.
 - Quiz card styled as clearly illustrative — muted answer options, Example question label, cursor:default enforced visually
 
