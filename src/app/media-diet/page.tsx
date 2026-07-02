@@ -6,7 +6,6 @@ import { loadProfile } from '@/lib/quiz/sync'
 import { createClient } from '@/lib/supabase/client'
 import { matchMedia } from '@/lib/engine/mediaMatch'
 import { buildMediaMatchKey } from '@/lib/engine/buildMediaMatchKey'
-import { BiasCheckerTool } from '@/components/media/BiasCheckerTool'
 import type { MediaMatchResult, ScoredMediaSource, MediaTier } from '@/lib/engine/mediaMatch'
 import type { MediaSource } from '@/lib/engine/mediaMatch'
 
@@ -419,10 +418,6 @@ export default function MediaDietPage() {
   if (!hasProfile) {
     return (
       <main style={{ maxWidth: 1100, margin: '0 auto', padding: 'var(--space-8) var(--space-4)' }}>
-        <div style={{ display: 'flex', gap: 'var(--space-8)', alignItems: 'flex-start', flexWrap: 'wrap' }}>
-
-          {/* Main column */}
-          <div style={{ flex: '1 1 60%', minWidth: 300 }}>
             <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-display)', fontWeight: 'var(--weight-bold)', color: 'var(--color-text-primary)', marginBottom: 'var(--space-4)' }}>
               Your Media Diet
             </h1>
@@ -436,18 +431,6 @@ export default function MediaDietPage() {
               style={{ display: 'inline-block', fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', fontWeight: 'var(--weight-semibold)', padding: 'var(--space-3) var(--space-5)', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--color-blue-accent)', color: '#fff', textDecoration: 'none' }}>
               Take the quiz →
             </a>
-          </div>
-
-          {/* Right rail — bias checker always available */}
-          <div style={{ flex: '0 0 300px', minWidth: 260, padding: 'var(--space-4)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-lg)', backgroundColor: 'var(--color-bg-surface)' }}>
-            <BiasCheckerTool
-              userProfile={userProfile}
-              primaryType={primaryType ?? undefined}
-              hasProfile={false}
-              compact
-            />
-          </div>
-        </div>
       </main>
     )
   }
@@ -475,9 +458,6 @@ export default function MediaDietPage() {
         <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body-lg)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', marginBottom: 'var(--space-4)' }}>
           Your recommendations are built on your eight-dimension values profile — matched against a curated catalog of independent journalists, Substacks, and podcasts. Three tiers, by design: sources that reinforce your foundation, sources that broaden your view, and sources that push back where it matters.
         </p>
-        <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body-lg)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', marginBottom: 'var(--space-4)' }}>
-          And if you want to check anything you&apos;re already reading — paste a URL into the Article Bias Checker and we&apos;ll tell you exactly what it&apos;s doing to your thinking.
-        </p>
         {completionPct < 100 && (
           <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', margin: 0 }}>
             <a href="/quiz" style={{ color: 'var(--color-blue-accent)', textDecoration: 'none' }}>Complete your profile</a> to refine these recommendations.
@@ -485,10 +465,7 @@ export default function MediaDietPage() {
         )}
       </div>
 
-      <div style={{ display: 'flex', gap: 'var(--space-8)', alignItems: 'flex-start' }}>
-
-        {/* Main column — three tiers */}
-        <div style={{ flex: '1 1 68%', minWidth: 300 }}>
+      <div>
 
           {catalogError && (
             <div style={{ padding: 'var(--space-4)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', color: 'var(--color-text-secondary)', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', marginBottom: 'var(--space-6)' }}>
@@ -530,29 +507,6 @@ export default function MediaDietPage() {
               </details>
             </>
           )}
-        </div>
-
-        {/* Right rail — Article Bias Checker, sticky (§24.1) */}
-        <div style={{
-          flex: '0 0 290px',
-          minWidth: 240,
-          position: 'sticky',
-          top: 'var(--space-6)',
-          alignSelf: 'flex-start',
-          padding: 'var(--space-4)',
-          border: '1px solid var(--color-border)',
-          borderRadius: 'var(--radius-lg)',
-          backgroundColor: 'var(--color-bg-surface)',
-          maxHeight: 'calc(100vh - 80px)',
-          overflowY: 'auto',
-        }}>
-          <BiasCheckerTool
-            userProfile={userProfile}
-            primaryType={primaryType ?? undefined}
-            hasProfile={hasProfile}
-            compact
-          />
-        </div>
 
       </div>
     </main>
