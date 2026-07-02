@@ -79,7 +79,9 @@ Return ONLY valid JSON, no markdown, no preamble:
     })
 
     const raw = message.content[0].type === 'text' ? message.content[0].text : ''
-    const parsed: BlurbsResult = JSON.parse(raw)
+    const cleaned = raw.replace(/```json\s*|\s*```/g, '').trim()
+    const jsonText = cleaned.startsWith('{') ? cleaned : cleaned.slice(cleaned.indexOf('{'), cleaned.lastIndexOf('}') + 1)
+    const parsed: BlurbsResult = JSON.parse(jsonText)
 
     return NextResponse.json(parsed)
   } catch (err) {

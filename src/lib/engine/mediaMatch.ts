@@ -138,9 +138,10 @@ function computeNovelCoverage(key: MediaMatchKey, source: MediaSource): number {
 
   let score = 0
   for (const axis of nonHeld) {
-    const level = source.dimensionCoverage[axis]
-    if (level === 'signature') score += 1.0
-    else if (level === 'regular') score += 0.5
+    // dimensionCoverage is empty on DB sources; use classifier confidence as the coverage signal
+    const conf = source.axisPlacement[axis]?.confidence ?? 0
+    if (conf >= 0.7) score += 1.0
+    else if (conf >= 0.4) score += 0.5
   }
 
   return score / nonHeld.length
