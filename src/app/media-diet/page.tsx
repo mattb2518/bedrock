@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useQuizStore } from '@/store/quizStore'
 import { loadProfile } from '@/lib/quiz/sync'
 import { matchMedia } from '@/lib/engine/mediaMatch'
@@ -329,7 +329,7 @@ function LabelLegend() {
           },
         ].map(({ label, text }) => (
           <div key={label} style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start' }}>
-            <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-primary)', whiteSpace: 'nowrap', minWidth: 100 }}>
+            <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-primary)', width: 132, flexShrink: 0 }}>
               {label}
             </span>
             <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: '1.5' }}>
@@ -390,18 +390,9 @@ function TierPanel({
         <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-heading)', fontWeight: 'var(--weight-bold)', color: meta.color, margin: '0 0 var(--space-1)' }}>
           {meta.label}
         </h2>
-        {blurbsLoading ? (
-          <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', fontStyle: 'italic' }}>
-            Personalizing your recommendations…
-          </p>
-        ) : blurb ? (
-          <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: '1.6' }}>
-            {blurb}
-          </p>
-        ) : (
-          <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)' }}>
-            {meta.description}
-          </p>
+        <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: '1.5' }}>{meta.description}</p>
+        {blurb && (
+          <p style={{ margin: 'var(--space-1) 0 0', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', lineHeight: '1.6' }}>{blurb}</p>
         )}
       </div>
 
@@ -587,6 +578,7 @@ export default function MediaDietPage() {
   const [catalogError, setCatalogError] = useState<string | null>(null)
   const [blurbs, setBlurbs] = useState<BlurbsResult | null>(null)
   const [blurbsLoading, setBlurbsLoading] = useState(false)
+  const loadedRef = useRef(false)
 
   const loadRecommendations = useCallback(async () => {
     if (!session?.result) return
@@ -603,12 +595,16 @@ export default function MediaDietPage() {
   }, [session?.result])
 
   useEffect(() => {
-    if (hasProfile) loadRecommendations()
+    if (hasProfile && !loadedRef.current) {
+      loadedRef.current = true
+      loadRecommendations()
+    }
   }, [hasProfile, loadRecommendations])
 
   // Fetch Claude blurbs once match result is ready
   useEffect(() => {
     if (!matchResult || !result || !mantleInfo) return
+    let cancelled = false
     setBlurbsLoading(true)
     const body = buildBlurbsRequest(
       matchResult,
@@ -621,8 +617,9 @@ export default function MediaDietPage() {
       body: JSON.stringify(body),
     })
       .then((r) => r.json())
-      .then((data: BlurbsResult) => { setBlurbs(data); setBlurbsLoading(false) })
-      .catch(() => { setBlurbsLoading(false) })
+      .then((data: BlurbsResult) => { if (!cancelled) { setBlurbs(data); setBlurbsLoading(false) } })
+      .catch(() => { if (!cancelled) setBlurbsLoading(false) })
+    return () => { cancelled = true }
   }, [matchResult])
 
   // ── Loading — auth check ──────────────────────────────────────────────────
