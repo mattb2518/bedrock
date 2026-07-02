@@ -93,7 +93,7 @@ function CivicProfileBody() {
     return (
       <div>
         <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', marginBottom: 'var(--space-4)' }}>
-          Your civic type and constellation will appear here once you complete the quiz.
+          Your Civic Mantle and constellation will appear here once you complete the quiz.
         </p>
         <Link href="/quiz" style={primaryBtn}>Take the quiz →</Link>
       </div>

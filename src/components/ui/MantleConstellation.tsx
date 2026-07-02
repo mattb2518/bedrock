@@ -6,7 +6,6 @@
 // Scores are in axis order: Stability, Federal, National, Rules, Markets,
 // Pragmatism, Individual, Trust (high pole = high value, low pole = low value).
 
-import Link from "next/link";
 import Constellation from "@/components/ui/Constellation";
 
 const MANTLES = [
@@ -26,10 +25,10 @@ export default function MantleConstellation() {
   return (
     <div className="mantle-fingerprints">
       {MANTLES.map(m => (
-        <Link key={m.label} href="/civic-mantle" className="mantle-fp">
+        <div key={m.label} className="mantle-fp">
           <Constellation scores={m.scores} size={150} showLabels={false} showGrid={false} viewBox="70 70 260 260" />
           <span className="mantle-fp__label">{m.label}</span>
-        </Link>
+        </div>
       ))}
 
       <style>{`

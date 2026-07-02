@@ -209,7 +209,7 @@ export async function loadApprovedSources(): Promise<MediaSource[]> {
         externalRefs: row.external_refs ?? {},
         lastReviewed: row.updated_at ? (row.updated_at as string).split('T')[0] : '2026-06-29',
         methodologyVersion: row.methodology_version ?? 'v1',
-        attribution: row.attribution ?? row.name,
+        attribution: (row.attribution && row.attribution !== 'catalog_seed') ? row.attribution : row.name,
       } satisfies MediaSource
     })
   } catch (err) {

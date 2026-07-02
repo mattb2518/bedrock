@@ -640,11 +640,18 @@ const SAMPLE_BALLOT_CANDIDATES: SampleBallotCandidate[] = [
 function YourBallotHoldingState({
   completionPercent,
   userId,
+  hasProfile,
 }: {
   completionPercent: number
   userId: string | null
+  hasProfile: boolean
 }) {
+  const session = useQuizStore((s) => s.session)
+  const setDemographics = useQuizStore((s) => s.setDemographics)
   const [userEmail, setUserEmail] = useState<string | null>(null)
+  const [bannerDismissed, setBannerDismissed] = useState(false)
+  const [zipInput, setZipInput] = useState('')
+  const [zipSaved, setZipSaved] = useState(false)
 
   useEffect(() => {
     if (!userId) return
@@ -654,6 +661,7 @@ function YourBallotHoldingState({
   }, [userId])
 
   const isRegistered = Boolean(userId)
+  const hasZip = Boolean(session?.demographics?.zipCode)
 
   return (
     <main style={{ maxWidth: 860, margin: '0 auto', padding: 'var(--space-8) var(--space-4)' }}>
@@ -699,22 +707,72 @@ function YourBallotHoldingState({
         </p>
       </div>
 
+      {/* Account banner for quiz-complete/no-account users (13b) */}
+      {hasProfile && !isRegistered && !bannerDismissed && (
+        <div style={{ backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border)', borderLeft: '3px solid var(--color-gold)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-4)', marginBottom: 'var(--space-6)', display: 'flex', alignItems: 'center', gap: 'var(--space-4)', flexWrap: 'wrap' }}>
+          <p style={{ flex: 1, margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)' }}>
+            Your results are temporary. <a href="/signup" style={{ color: 'var(--color-blue-accent)', textDecoration: 'none', fontWeight: 'var(--weight-semibold)' }}>Create a free account</a> to save them and get notified when your ballot is ready.
+          </p>
+          <button onClick={() => setBannerDismissed(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', padding: 0, flexShrink: 0 }}>Dismiss</button>
+        </div>
+      )}
+
       {/* CTA */}
       {isRegistered ? (
         <div>
           <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-primary)', lineHeight: 'var(--leading-relaxed)', marginBottom: 'var(--space-3)' }}>
             We&apos;ll email you at <strong>{userEmail ?? 'your address on file'}</strong> when your ballot is ready. No action needed — you&apos;re on the list.
           </p>
+          {!hasZip && !zipSaved && (
+            <div style={{ marginTop: 'var(--space-4)', padding: 'var(--space-4)', backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-lg)' }}>
+              <p style={{ margin: '0 0 var(--space-3)', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)' }}>
+                Add your ZIP code so we can personalize your ballot when it&apos;s ready.
+              </p>
+              <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={5}
+                  placeholder="ZIP code"
+                  value={zipInput}
+                  onChange={(e) => setZipInput(e.target.value.replace(/\D/g, '').slice(0, 5))}
+                  style={{ flex: 1, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', padding: 'var(--space-2) var(--space-3)', backgroundColor: 'var(--color-bg-deep, #0f1f33)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', color: 'var(--color-text-primary)', outline: 'none', maxWidth: 140 }}
+                />
+                <button
+                  disabled={zipInput.length !== 5}
+                  onClick={() => {
+                    setDemographics({ ...session?.demographics, zipCode: zipInput })
+                    setZipSaved(true)
+                  }}
+                  style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: '#fff', backgroundColor: zipInput.length === 5 ? 'var(--color-blue-accent)' : 'var(--color-border)', border: 'none', borderRadius: 'var(--radius-md)', padding: 'var(--space-2) var(--space-4)', cursor: zipInput.length === 5 ? 'pointer' : 'not-allowed' }}
+                >
+                  Save
+                </button>
+              </div>
+            </div>
+          )}
+          {zipSaved && (
+            <p style={{ marginTop: 'var(--space-3)', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)' }}>
+              ZIP {zipInput} saved. ✓
+            </p>
+          )}
           {completionPercent < 100 && (
-            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)' }}>
+            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', marginTop: 'var(--space-4)' }}>
               <a href="/quiz" style={{ color: 'var(--color-blue-accent)', textDecoration: 'none' }}>Complete your quiz to sharpen your recommendations →</a>
             </p>
           )}
         </div>
+      ) : hasProfile ? (
+        // Quiz done, no account — suppress quiz CTA, just prompt signup
+        <div>
+          <a href="/signup" style={{ display: 'block', width: '100%', boxSizing: 'border-box', textAlign: 'center', fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', fontWeight: 'var(--weight-semibold)', color: '#fff', backgroundColor: 'var(--color-red)', textDecoration: 'none', padding: 'var(--space-4) var(--space-6)', borderRadius: 'var(--btn-radius)', marginBottom: 'var(--space-3)' }}>
+            Create an account to get notified →
+          </a>
+        </div>
       ) : (
         <div>
           <a href="/quiz" style={{ display: 'block', width: '100%', boxSizing: 'border-box', textAlign: 'center', fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', fontWeight: 'var(--weight-semibold)', color: '#fff', backgroundColor: 'var(--color-red)', textDecoration: 'none', padding: 'var(--space-4) var(--space-6)', borderRadius: 'var(--btn-radius)', marginBottom: 'var(--space-3)' }}>
-            Take the quiz and get notified when your ballot is ready →
+            Take the quiz / Create an account →
           </a>
           <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', textAlign: 'center' }}>
             Already have an account?{' '}
@@ -836,33 +894,20 @@ export default function YourBallotPage() {
   }
 
   // ── Holding state (§22.10) — all hooks above have run unconditionally ────
-  if (HOLDING_STATE && hasProfile) {
-    return <YourBallotHoldingState completionPercent={completionPercent} userId={userId} />
+  if (HOLDING_STATE) {
+    return <YourBallotHoldingState completionPercent={completionPercent} userId={userId} hasProfile={hasProfile} />
   }
 
   return (
     <main style={{ maxWidth: 720, margin: '0 auto', padding: 'var(--space-8) var(--space-4)' }}>
 
-      {/* Under construction banner — verbatim from §22.1 */}
-      <div style={{
-        backgroundColor: 'var(--color-bg-surface)',
-        border: '1px solid var(--color-border)',
-        borderRadius: 'var(--radius-lg)',
-        padding: 'var(--space-4)',
-        marginBottom: 'var(--space-6)',
-      }}>
-        <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)' }}>
-          Your Ballot covers federal and state races for the fall 2026 general election. Local races and
-          ballot measures are coming — we&apos;re working through them now. The reason they&apos;re not here yet:
-          data on local candidates is patchy and inconsistent across jurisdictions, and we&apos;d rather show
-          you nothing than show you something incomplete or unreliable. We&apos;ll tell you when they&apos;re ready.
-        </p>
-      </div>
-
-      {/* Page title + completion indicator */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-4)', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
-        <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-display)', fontWeight: 'var(--weight-bold)', color: 'var(--color-text-primary)', margin: 0 }}>
-          Your Ballot
+      {/* Eyebrow + headline */}
+      <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-red)', letterSpacing: 'var(--tracking-wider)', textTransform: 'uppercase', marginBottom: 'var(--space-4)' }}>
+        Your Ballot
+      </p>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 'var(--space-4)', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+        <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-h1)', color: 'var(--color-text-primary)', lineHeight: 'var(--leading-tight)', margin: 0 }}>
+          Every race, matched to your values.
         </h1>
         {hasProfile && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
@@ -875,6 +920,11 @@ export default function YourBallotPage() {
           </div>
         )}
       </div>
+
+      {/* Coverage note */}
+      <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', marginBottom: 'var(--space-6)' }}>
+        Covers federal and state races for the fall 2026 general election. Local races and ballot measures are coming — we&apos;d rather show you nothing than something incomplete or unreliable.
+      </p>
 
       {/* How this works — Claude's role disclosure (§25.1) */}
       <div style={{ marginBottom: 'var(--space-6)', borderTop: '1px solid var(--color-border)', paddingTop: 'var(--space-4)' }}>

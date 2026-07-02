@@ -529,11 +529,57 @@ function InputSection({
   )
 }
 
+// ─── How it Works accordion (hash-openable) ───────────────────────────────────
+
+function HowItWorksAccordion() {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    if (window.location.hash === '#how-it-works') {
+      setOpen(true)
+      setTimeout(() => ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100)
+    }
+  }, [])
+
+  return (
+    <div id="how-it-works" ref={ref} style={{ marginTop: 'var(--space-16)', borderTop: '1px solid var(--color-border)', paddingTop: 'var(--space-6)' }}>
+      <button
+        onClick={() => setOpen(v => !v)}
+        aria-expanded={open}
+        style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 'var(--space-4)', background: 'none', border: 'none', cursor: 'pointer', padding: 'var(--space-2) 0', fontFamily: 'var(--font-display)', fontSize: 'var(--text-h4)', color: 'var(--color-text-primary)', textAlign: 'left' }}
+      >
+        How it Works
+        <span aria-hidden="true" style={{ display: 'inline-block', color: 'var(--color-text-muted)', fontSize: '20px', lineHeight: 1, transform: open ? 'rotate(90deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease', flexShrink: 0 }}>›</span>
+      </button>
+      {open && (
+        <div style={{ paddingTop: 'var(--space-5)', display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', margin: 0 }}>
+            Your Conversations is built on a framework developed by Chris Argyris and popularized by Peter Senge in <em>The Fifth Discipline</em> — the Ladder of Inference. The idea is simple: most difficult conversations fail not because people disagree on facts but because each person is reasoning from a different set of assumptions they&apos;ve never made explicit.
+          </p>
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', margin: 0 }}>
+            The Ladder of Inference maps how we move from observable data to conclusions to actions, usually without noticing the steps we skipped. Bedrock uses this framework to help you see the reasoning behind someone else&apos;s position — and your own — before you respond. The goal isn&apos;t agreement. It&apos;s a real conversation instead of a performative one.
+          </p>
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', margin: 0 }}>
+            Conversation history is not stored. Each session starts fresh. What you explore while preparing for a difficult conversation is yours, not ours.
+          </p>
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', margin: 0 }}>
+            <a href="/methodology#conversations" style={{ color: 'var(--color-blue-accent)', textDecoration: 'none' }}>Full methodology →</a>
+          </p>
+        </div>
+      )}
+    </div>
+  )
+}
+
 // ─── Main page ────────────────────────────────────────────────────────────────
 
 export default function ConversationsPage() {
   const session = useQuizStore(s => s.session)
   const hasProfile = Boolean(session?.result)
+  const isAnonymous = hasProfile && !session?.userId
+  const [convBannerDismissed, setConvBannerDismissed] = useState(false)
 
   // Openers / Responses state
   const [activeMode, setActiveMode] = useState<Mode | null>(null)
@@ -875,6 +921,16 @@ export default function ConversationsPage() {
       <style>{ANIMATIONS}</style>
       {showGuardrails && <GuardrailsModal onClose={() => setShowGuardrails(false)} />}
 
+      {/* Account banner for quiz-complete/no-account (13b) */}
+      {isAnonymous && !convBannerDismissed && (
+        <div style={{ backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border)', borderLeft: '3px solid var(--color-gold)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-4)', marginBottom: 'var(--space-6)', display: 'flex', alignItems: 'center', gap: 'var(--space-4)', flexWrap: 'wrap' }}>
+          <p style={{ flex: 1, margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)' }}>
+            Your results are temporary. <a href="/signup" style={{ color: 'var(--color-blue-accent)', textDecoration: 'none', fontWeight: 'var(--weight-semibold)' }}>Create a free account</a> to save them.
+          </p>
+          <button onClick={() => setConvBannerDismissed(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', padding: 0, flexShrink: 0 }}>Dismiss</button>
+        </div>
+      )}
+
       {/* Hero */}
       <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-blue-accent)', letterSpacing: 'var(--tracking-wider)', textTransform: 'uppercase', marginBottom: 'var(--space-5)' }}>
         Your Conversations
@@ -898,7 +954,7 @@ export default function ConversationsPage() {
 
       <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', marginBottom: 'var(--space-10)' }}>
         Built on the Ladder of Inference (Argyris / Senge).{' '}
-        <a href="/methodology#conversations" style={{ color: 'var(--color-blue-accent)', textDecoration: 'none' }}>How it works →</a>
+        <a href="#how-it-works" style={{ color: 'var(--color-blue-accent)', textDecoration: 'none' }}>How it works →</a>
       </p>
 
       {/* No-profile nudge */}
@@ -1660,6 +1716,9 @@ export default function ConversationsPage() {
           One thing this doesn&apos;t do yet: remember. Each conversation starts fresh &mdash; it won&apos;t recall that you talked to your brother-in-law last week and ask how it went. That&apos;s coming.
         </p>
       )}
+
+      {/* How it Works accordion */}
+      <HowItWorksAccordion />
     </div>
 
     {/* Print layout — portal into body, hidden on screen, shown @media print */}

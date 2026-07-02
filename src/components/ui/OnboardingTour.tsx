@@ -44,7 +44,7 @@ const SLIDES = [
     id: 'media',
     headline: "Your Media Diet",
     subhead: "Independent journalism, matched to how you think.",
-    body: "Not an echo chamber. Not a fire hose. A curated shortlist of journalists, Substacks, and podcasts — in three tiers: what confirms your thinking, what expands it, and what challenges it. Every source bias-checked against our eight-dimension framework. Plus the Article Bias Checker — paste any link or text and see exactly what it's doing to your thinking, mapped to your specific profile.",
+    body: "Not an echo chamber. Not a fire hose. A curated shortlist of journalists, Substacks, and podcasts — in three tiers: what confirms your thinking, what expands it, and what challenges it. Every source matched against your eight-dimension civic profile.",
     accent: 'var(--color-blue)',
     pill: 'Action 3',
   },

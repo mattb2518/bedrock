@@ -196,8 +196,11 @@ export default function CivicMantlePage() {
         <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-body-lg)", color: "var(--color-text-secondary)", lineHeight: "var(--leading-relaxed)", marginBottom: "var(--space-4)" }}>
           A Civic Mantle isn't a label someone assigns you. It's something you claim — the civic identity that emerges from what you actually believe, not what party you belong to.
         </p>
-        <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-body-lg)", color: "var(--color-text-secondary)", lineHeight: "var(--leading-relaxed)" }}>
+        <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-body-lg)", color: "var(--color-text-secondary)", lineHeight: "var(--leading-relaxed)", marginBottom: "var(--space-4)" }}>
           The Bedrock quiz maps your values across eight dimensions. The result: one primary Civic Mantle and up to three secondary affinities.
+        </p>
+        <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-small)", color: "var(--color-text-muted)", lineHeight: "var(--leading-relaxed)", borderLeft: "3px solid var(--color-border)", paddingLeft: "var(--space-4)" }}>
+          Bedrock is built for the independent-minded middle. If you&apos;re a committed partisan, your results will reflect your closest Mantle — but the platform is designed for voters who don&apos;t start from a party label.
         </p>
       </div>
 

@@ -12,7 +12,7 @@
 export const PEW_REPORT_TITLE = "Beyond Red vs. Blue: The 2026 Political Typology"
 
 export const PEW_REPORT_URL =
-  "https://www.pewresearch.org/politics/2026/06/19/beyond-red-vs-blue-the-political-typology-2026/"
+  "https://www.pewresearch.org/politics/2026/06/10/beyond-red-vs-blue-the-political-typology/"
 
 export const PEW_ATTRIBUTION = "Pew Research Center, June 2026"
 

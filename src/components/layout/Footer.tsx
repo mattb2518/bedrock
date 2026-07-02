@@ -107,7 +107,6 @@ export default function Footer() {
           <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-micro)", color: "var(--color-text-muted)" }}>
             © {year} Bedrock. Independent. Nonpartisan. Yours.
           </p>
-          <Link href="/privacy" style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-micro)", color: "var(--color-text-muted)", textDecoration: "none" }}>Privacy & Data</Link>
         </div>
       </div>
 

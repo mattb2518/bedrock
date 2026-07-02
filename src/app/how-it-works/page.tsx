@@ -13,8 +13,8 @@ export default function HowItWorksPage() {
   ];
 
   const layers = [
-    { num: "1", label: "Your values foundation.", desc: "Twenty questions about what you believe at the level of principle. Closes with your constellation appearing for the first time — a radar chart unique to you across all eight dimensions." },
-    { num: "2", label: "Your real-world positions.", desc: "Eight questions on actual policy debates and real events — chosen specifically because they produce cross-partisan discomfort. This is where stated values meet actual positions." },
+    { num: "1", label: "Your values foundation.", desc: "Fourteen questions about what you believe at the level of principle. Closes with your constellation appearing for the first time — a radar chart unique to you across all eight dimensions." },
+    { num: "2", label: "Your real-world positions.", desc: "Nine questions on actual policy debates and real events — chosen specifically because they produce cross-partisan discomfort. This is where stated values meet actual positions." },
     { num: "3", label: "What drives your vote.", desc: "Eight questions about voting behavior, priority intensity, and the factors that have actually shaped how you've voted in the past." },
     { num: "4", label: "Where you draw the line.", desc: "The dealbreakers. The issues where a single position overrides everything else. Most civic tools never ask these questions. They're often the most predictive of all." },
   ];

@@ -558,7 +558,7 @@ export default function QuizFlow() {
       <Shell>
         <Kicker>Layer 1 · {LAYER_LABELS[1]}</Kicker>
         <LayerSubtitle>{LAYER_SUBTITLES[1]}</LayerSubtitle>
-        <H1>Find your bedrock.</H1>
+        <H1>Define your bedrock. Find your civic mantle.</H1>
         <Body>
           Most civic tools ask where you stand on the issues. We’re asking something different — and harder. We want to know how you <em>think</em>: the underlying values that drive your positions.
         </Body>

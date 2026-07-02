@@ -508,7 +508,9 @@ function SuggestSourceForm() {
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
           <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Source name" required
             style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', padding: 'var(--space-2) var(--space-3)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--color-bg-base)', color: 'var(--color-text-primary)', width: '100%', boxSizing: 'border-box' }} />
-          <input type="url" value={url} onChange={(e) => setUrl(e.target.value)} placeholder="URL" required
+          <input type="text" value={url} onChange={(e) => setUrl(e.target.value)} placeholder="URL (e.g. example.com)" required
+            pattern="[^\s]+\.[a-zA-Z]{2,}"
+            title="Enter a web address (e.g. example.com or https://example.com)"
             style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', padding: 'var(--space-2) var(--space-3)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--color-bg-base)', color: 'var(--color-text-primary)', width: '100%', boxSizing: 'border-box' }} />
           <textarea value={note} onChange={(e) => setNote(e.target.value)}
             placeholder="Why should this be in the catalog? (optional)" rows={2}
@@ -578,6 +580,8 @@ export default function MediaDietPage() {
   const session = useQuizStore((s) => s.session)
   const setSessionFromCloud = useQuizStore((s) => s.setSessionFromCloud)
   const hasProfile = Boolean(session?.result)
+  const isAnonymous = hasProfile && !session?.userId
+  const [mediaBannerDismissed, setMediaBannerDismissed] = useState(false)
 
   const [authChecked, setAuthChecked] = useState(false)
 
@@ -654,8 +658,11 @@ export default function MediaDietPage() {
   if (!hasProfile) {
     return (
       <main style={{ maxWidth: 1100, margin: '0 auto', padding: 'var(--space-8) var(--space-4)' }}>
-        <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-display)', fontWeight: 'var(--weight-bold)', color: 'var(--color-text-primary)', marginBottom: 'var(--space-4)' }}>
+        <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-muted)', letterSpacing: 'var(--tracking-wider)', textTransform: 'uppercase', marginBottom: 'var(--space-5)' }}>
           Your Media Diet
+        </p>
+        <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-h1)', color: 'var(--color-text-primary)', marginBottom: 'var(--space-5)', lineHeight: 'var(--leading-tight)' }}>
+          Independent journalism, matched to how you think.
         </h1>
         <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', marginBottom: 'var(--space-4)' }}>
           Independent journalism matched to how you actually think — in three tiers: sources that deepen what you know, sources that expand how you think, and sources that challenge you where it counts.
@@ -665,7 +672,7 @@ export default function MediaDietPage() {
         </p>
         <a href="/quiz"
           style={{ display: 'inline-block', fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', fontWeight: 'var(--weight-semibold)', padding: 'var(--space-3) var(--space-5)', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--color-blue-accent)', color: '#fff', textDecoration: 'none' }}>
-          Take the quiz →
+          Take the quiz / Create an account →
         </a>
       </main>
     )
@@ -687,6 +694,16 @@ export default function MediaDietPage() {
 
   return (
     <main style={{ maxWidth: 1100, margin: '0 auto', padding: 'var(--space-8) var(--space-4)' }}>
+
+      {/* Account banner for quiz-complete/no-account (13b) */}
+      {isAnonymous && !mediaBannerDismissed && (
+        <div style={{ backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border)', borderLeft: '3px solid var(--color-gold)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-4)', marginBottom: 'var(--space-6)', display: 'flex', alignItems: 'center', gap: 'var(--space-4)', flexWrap: 'wrap' }}>
+          <p style={{ flex: 1, margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)' }}>
+            Your results are temporary. <a href="/signup" style={{ color: 'var(--color-blue-accent)', textDecoration: 'none', fontWeight: 'var(--weight-semibold)' }}>Create a free account</a> to save them.
+          </p>
+          <button onClick={() => setMediaBannerDismissed(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', padding: 0, flexShrink: 0 }}>Dismiss</button>
+        </div>
+      )}
 
       {/* ── Page header ──────────────────────────────────────────────────── */}
       <div style={{ marginBottom: 'var(--space-10)' }}>
@@ -769,10 +786,10 @@ export default function MediaDietPage() {
         <>
           <TierTabNav active={activeTier} onChange={setActiveTier} />
 
-          {/* Disclosures — sit between tab bar and cards, inline */}
-          <div style={{ marginBottom: 'var(--space-6)', display: 'flex', gap: 'var(--space-6)', flexWrap: 'wrap' }}>
-            <LabelLegend />
-            <IndependenceDisclosure />
+          {/* Disclosures — sit between tab bar and cards, side-by-side */}
+          <div style={{ marginBottom: 'var(--space-6)', display: 'flex', gap: 'var(--space-6)', alignItems: 'flex-start' }}>
+            <div style={{ flex: '1 1 0', minWidth: 0 }}><LabelLegend /></div>
+            <div style={{ flex: '1 1 0', minWidth: 0 }}><IndependenceDisclosure /></div>
           </div>
 
           {/* Active tier content */}

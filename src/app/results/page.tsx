@@ -5,10 +5,38 @@ import { useRouter } from 'next/navigation'
 import { useQuizStore } from '@/store/quizStore'
 import MantleReveal from '@/components/quiz/MantleReveal'
 import ProfileDetails from '@/components/quiz/ProfileDetails'
-import { useCallback } from 'react'
+import { useCallback, useState } from 'react'
+
+function AccountPrompt() {
+  const [dismissed, setDismissed] = useState(false)
+  if (dismissed) return null
+  return (
+    <div style={{ maxWidth: 700, margin: '0 auto', padding: '0 var(--space-6) var(--space-6)' }}>
+      <div style={{ backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-5)', display: 'flex', gap: 'var(--space-4)', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+        <div style={{ flex: 1, minWidth: 200 }}>
+          <p style={{ margin: '0 0 var(--space-2)', fontFamily: 'var(--font-body)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-primary)', fontSize: 'var(--text-body)' }}>
+            Save your results
+          </p>
+          <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)' }}>
+            Create a free account to save your Civic Mantle and get personalized recommendations across all four pillars.
+          </p>
+        </div>
+        <div style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'center', flexShrink: 0 }}>
+          <Link href="/signup" style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--weight-semibold)', fontSize: 'var(--text-small)', backgroundColor: 'var(--color-red)', color: '#fff', textDecoration: 'none', padding: 'var(--space-2) var(--space-4)', borderRadius: 'var(--btn-radius)' }}>
+            Sign Up Free
+          </Link>
+          <button onClick={() => setDismissed(true)} style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+            Skip for now
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 export default function ResultsPage() {
   const session = useQuizStore((s) => s.session)
+  const isAnonymous = !session?.userId
 
   if (!session?.result) {
     return (
@@ -17,7 +45,7 @@ export default function ResultsPage() {
           No results yet.
         </h1>
         <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body-lg)', color: 'var(--color-text-secondary)', marginBottom: 'var(--space-8)' }}>
-          Complete Layer 1 of the quiz to see your civic type, your constellation, and your eight-dimensional breakdown.
+          Complete Layer 1 of the quiz to see your Civic Mantle, your constellation, and your eight-dimensional breakdown.
         </p>
         <Link href="/quiz" style={{ backgroundColor: 'var(--color-red)', color: '#fff', fontFamily: 'var(--font-body)', fontWeight: 'var(--weight-semibold)', padding: 'var(--btn-padding-y) var(--btn-padding-x)', borderRadius: 'var(--btn-radius)', textDecoration: 'none' }}>
           Take the quiz →
@@ -32,6 +60,12 @@ export default function ResultsPage() {
   return (
     <>
       <MantleReveal result={session.result} hideDimBreakdown />
+      {isAnonymous && <AccountPrompt />}
+      <div style={{ maxWidth: 700, margin: '0 auto', padding: '0 var(--space-6) var(--space-4)', textAlign: 'center' }}>
+        <a href="#put-it-to-work" style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', textDecoration: 'none' }}>
+          Put it to work ↓
+        </a>
+      </div>
       <ProfileDetails session={session} />
       <QuizLinks quizComplete={quizComplete} />
       <ResultsNext quizComplete={quizComplete} />
@@ -74,7 +108,7 @@ const PILLARS = [
 
 function ResultsNext({ quizComplete }: { quizComplete: boolean }) {
   return (
-    <div style={{ maxWidth: 'var(--max-width-wide)', margin: '0 auto', padding: 'var(--space-8) var(--space-6) var(--space-20)' }}>
+    <div id="put-it-to-work" style={{ maxWidth: 'var(--max-width-wide)', margin: '0 auto', padding: 'var(--space-8) var(--space-6) var(--space-20)', scrollMarginTop: 'var(--nav-height)' }}>
       <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: 'var(--space-12)' }}>
         <div style={{ textAlign: 'center', maxWidth: 600, margin: '0 auto var(--space-10)' }}>
           <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-gold)', letterSpacing: 'var(--tracking-wider)', textTransform: 'uppercase', marginBottom: 'var(--space-4)' }}>

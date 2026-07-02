@@ -16,7 +16,7 @@ export default function PrivacyPage() {
 
         <section>
           <h2 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-h3)", color: "var(--color-text-primary)", marginBottom: "var(--space-4)" }}>What we collect.</h2>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-body)", color: "var(--color-text-secondary)", lineHeight: "var(--leading-relaxed)", marginBottom: "var(--space-3)" }}>Your quiz answers, your profile (civic type + dimensional scores), your account information (email, password), and your activity on the platform (searches, ballot guides saved, conversations). That's it.</p>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-body)", color: "var(--color-text-secondary)", lineHeight: "var(--leading-relaxed)", marginBottom: "var(--space-3)" }}>Your quiz answers, your profile (Civic Mantle + dimensional scores), your account information (email, password), and your activity on the platform (searches, ballot guides saved, conversations). That's it.</p>
           <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-body)", color: "var(--color-text-secondary)", lineHeight: "var(--leading-relaxed)" }}>We do not collect browsing history outside Bedrock. We do not collect your location. We do not track you across other sites.</p>
         </section>
 

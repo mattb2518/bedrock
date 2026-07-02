@@ -1,10 +1,13 @@
+import { Suspense } from 'react'
 import HomeContent from "@/components/home/HomeContent";
 import OnboardingTour from "@/components/ui/OnboardingTour";
+import AuthErrorBanner from "@/components/ui/AuthErrorBanner";
 
 export default function Home() {
   return (
     <>
       <OnboardingTour />
+      <Suspense><AuthErrorBanner /></Suspense>
       <HomeContent />
       {/* ── Tagline band ──────────────────────────────────── */}
       <section style={{ backgroundColor: "var(--color-bg-page)", borderTop: "1px solid var(--color-border)", padding: "var(--space-12) var(--space-6)", textAlign: "center" }}>
