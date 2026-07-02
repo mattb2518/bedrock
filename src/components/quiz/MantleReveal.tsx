@@ -90,8 +90,11 @@ export default function MantleReveal({ result, headerCta, hideDimBreakdown = fal
           <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-h1)', color: 'var(--color-text-primary)', textAlign: 'center', lineHeight: 'var(--leading-tight)', marginBottom: 'var(--space-5)' }}>
             An unusually centered profile.
           </h1>
-          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body-lg)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', maxWidth: 620, margin: '0 auto var(--space-8)', textAlign: 'center' }}>
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body-lg)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', maxWidth: 620, margin: '0 auto var(--space-6)', textAlign: 'center' }}>
             Across most of the eight dimensions, you sit close to the middle — you can see the case for both poles and don't reflexively favor either one. That's rarer than it sounds. We'll build your recommendations from the dimensions where you do lean.
+          </p>
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', textAlign: 'center', maxWidth: 620, margin: '0 auto var(--space-8)' }}>
+            If we had to place you, you sit closest to <strong style={{ color: 'var(--color-text-primary)' }}>{mantle.name}</strong> — but you wear it lightly.
           </p>
         </div>
       ) : (
