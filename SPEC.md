@@ -2969,17 +2969,27 @@ A sticky nav bar sits just below the page header and above the first tier. It sh
 
 ### 24.1c Source card legend
 
-A **"How this works"** disclosure sits between the tier-nav bar and the first tier. Collapsed by default. Clicking expands an inline panel (not a modal) with brief explanations of each UI element on the source cards.
+A **"What do these labels mean?"** disclosure sits between the tier-nav bar and the first tier. Always visible — not collapsed. Left-justified definitions, consistent text size throughout.
 
-**Legend content (exact copy):**
+**Legend content (exact copy, locked):**
 
-- **↗** — Opens the source in a new tab
-- **👍 👎** — Tell us if this fits. We use your feedback to improve future recommendations.
-- **Lean Left / Lean Right / Center** — The source's overall editorial perspective
-- **[P]** — Partisan Lean flagged: this source scores above our threshold for partisan framing. Included because it meets reliability standards — labeled so you can decide what to do with that.
-- **Format pills** (Newsletter, Podcast, etc.) — The format(s) this source publishes in
+- **↗** — Opens the source in a new tab so you can peruse and subscribe
 
-Disclosure link copy: *"What do these labels mean? ↓"* / *"Got it ↑"* (toggle)
+- **👍 👎** — Tell us if this fits. We use your feedback to improve your future recommendations.
+
+- **Editorial Perspective** — Our assessment of the source's overall editorial viewpoint, based on topic selection, framing, and sourcing patterns. Possible values:
+  - Left — consistent liberal/progressive framing
+  - Lean Left — generally center-left, with some partisan framing
+  - Center — balanced or deliberately nonpartisan
+  - Lean Right — generally center-right, with some partisan framing
+  - Right — consistent conservative framing
+  - Heterodox — doesn't fit the left-right spectrum; contrarian, cross-cutting, or ideologically independent
+
+**Notes for implementation:**
+- No [P] flag — removed. Lean label alone is sufficient.
+- No Format pills entry in the legend — format labels are self-explanatory.
+- No "Medium read" / "Deep read" labels on cards — remove these entirely, they are not spec'd and have no defined data source.
+- All definition text left-justified, same font size throughout.
 
 ### 24.1a Page header copy (locked)
 
@@ -3003,18 +3013,62 @@ Your recommendations are built on your eight-dimension values profile — matche
 - **Challenging — "challenge you where it counts":** `tension_on_held >= 0.6`, `reliability >= 75`, `good_faith === 'high'`, `independence >= 50`
 
 Each tier displays with:
-- A tier header with a one-line explanation of what this tier does and why
-- Source cards (~3–5 per tier to start)
+- A dynamic personalized blurb (see §24.2a)
+- Source cards (~3–5 per tier to start), each with a card-level one-liner (see §24.3)
 - Thumbs up / thumbs down on every card
+
+### 24.2a Dynamic tier blurbs (Claude-generated)
+
+After the recommendation engine selects sources for each tier, a single Claude API call generates three personalized blurbs — one per tier — explaining why these sources landed where they did for this specific user.
+
+**Trigger:** After sources are selected, before the page renders. Show a loading state while blurbs generate.
+
+**Input to Claude (per call — all three tiers in one prompt):**
+- User's Mantle type name and one-liner
+- User's top 3 dimensions (highest-scoring Layer 1 axes) with plain-language labels
+- User's bottom 2 dimensions (lowest-scoring axes)
+- For each tier: list of source names, their lean labels, and their top 2 axis scores
+- The tier placement criteria (what made each source land where it did)
+
+**Output:** Three blurbs, one per tier, in JSON:
+```json
+{
+  "confirming": "string",
+  "expanding": "string", 
+  "challenging": "string"
+}
+```
+
+**Blurb requirements:**
+- 2-3 sentences each
+- Opens by naming the user's Mantle type: "As a [Mantle Type]..."
+- Names 1-2 specific sources from the tier by name
+- References the specific axes that drove placement (in plain language, not axis codes)
+- Explains the *why* — not just "these match you" but "these match you because..."
+- Tone: warm, confident, nonpartisan. Same voice as the quiz.
+- Never says "algorithm" or "score" — say "your values profile" or "how you think about X"
+
+**Example (Confirming, The Honest Broker):**
+"As an Honest Broker, you prize rigor and balance over tribal comfort — and that shows in this tier. Sources like Axios and The Texas Tribune score high on the same institutional-integrity and pragmatic-outcomes axes that define your civic mantle. These aren't just sources that agree with you; they're sources that approach civic questions the way you do."
+
+**Example (Challenging, The Honest Broker):**
+"As an Honest Broker, your instinct is to weigh all sides — but these sources will push back on your tendency toward institutional trust. The Free Press and Persuasion both score high on the stability/change axis in directions that differ from yours, and they make the case for structural disruption in ways that deserve a serious read, even when you disagree."
+
+**Caching:** Cache blurbs per user per session. Regenerate only if the user's profile changes or sources are re-selected.
+
+**Fallback:** If the Claude call fails, show a static fallback: the existing one-line tier description. Never show an empty blurb or an error state.
+
+**Model:** `claude-sonnet-4-6` with prompt caching on the system prompt. Estimated cost: ~$0.003 per page load.
 
 ### 24.3 Source card
 
 - Name and creator/host
 - Format(s) — can be multiple
-- One-line description
-- Lean label (with `[P]` flag if Partisan Lean flagged)
+- Longer description (2-3 sentences — enough to understand what the source covers and why it's worth reading)
+- **Card-level one-liner** — one sentence explaining why this specific source landed in this tier for this user. Generated in the same Claude call as the tier blurbs. Example: "In your Challenging tier because it scores high on the stability/change axis, where you lean toward gradual reform."
+- Lean label — one of: Left · Lean Left · Center · Lean Right · Right · Heterodox. No [P] flag.
+- ↗ link (opens in new tab)
 - Thumbs up / thumbs down
-- Link to source
 
 ### 24.4 Feedback data saved per submission
 
