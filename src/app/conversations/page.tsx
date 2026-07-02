@@ -61,16 +61,16 @@ const WORRIED = ["I'll get too heated", "I'll cave", "I'll freeze", "I'll say it
 
 const CHIP_ROWS: Record<Mode, ChipRow[]> = {
   openers: [
-    { key: 'posture', label: 'Or is it more of a posture?', chips: POSTURE },
+    { key: 'posture', label: "What's their posture?", chips: POSTURE },
     { key: 'wrong', label: 'What usually goes wrong?', chips: WRONG },
   ],
   responses: [
     { key: 'vibe', label: "What's the vibe?", chips: VIBE },
-    { key: 'posture', label: 'Or is it more of a posture?', chips: POSTURE },
+    { key: 'posture', label: "What's their posture?", chips: POSTURE },
   ],
   chat: [
     { key: 'worried', label: 'What are you worried about?', chips: WORRIED },
-    { key: 'posture', label: 'Or is it more of a posture?', chips: POSTURE },
+    { key: 'posture', label: "What's their posture?", chips: POSTURE },
   ],
 }
 

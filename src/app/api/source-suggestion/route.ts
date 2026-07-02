@@ -87,7 +87,7 @@ export async function POST(req: Request) {
           from: 'Bedrock <admin@bedrock.guide>',
           to: ['hello@bedrock.guide'],
           subject: `New source suggestion: ${name.trim()}`,
-          text: `Someone suggested a source for the catalog.\n\nName: ${name.trim()}\nURL: ${url.trim()}\nNote: ${note?.trim() || '(none)'}\nSuggested by (user id): ${user?.id ?? 'anonymous'}\n\nIt's in the admin review queue as pending_review.`,
+          text: `Someone suggested a source for the catalog.\n\nName: ${name.trim()}\nURL: ${url.trim()}\nNote: ${note?.trim() || '(none)'}\nSuggested by: ${user?.email ?? 'anonymous — no reply address'}\nUser id: ${user?.id ?? '(none)'}\n\nIt's in the admin review queue as pending_review.`,
         }),
       })
     } else {

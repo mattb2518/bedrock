@@ -2081,18 +2081,18 @@ Each mode = one freeform box (carries the irreducible, unpredictable part) + opt
 
 **MODE 1 — Start one**
 Freeform box: *"What do you want to talk about — and what's making it hard?"*
-- **Or is it more of a posture?** → they've checked out entirely · they think it's all rigged · they only trust their own side's media · they think people like me are the problem · they just want to fight · they've stopped listening · other
+- **What's their posture?** → they've checked out entirely · they think it's all rigged · they only trust their own side's media · they think people like me are the problem · they just want to fight · they've stopped listening · other
 - **What usually goes wrong?** → we talk past each other · it gets heated fast · I freeze up · they shut down · we've never actually tried · other
 
 **MODE 2 — Respond to one**
 Freeform box: *"What did they say? Paste it, or describe it."*
 - **What's the vibe?** → genuinely curious · goading · angry · testing me · venting · trying to connect · other
-- **Or is it more of a posture?** → (same posture list)
+- **What's their posture?** → (same posture list)
 
 **MODE 3 — Back-and-forth**
 Freeform box: *"What's the conversation about — and who are you practicing with?"*
 - **What are you worried about?** → I'll get too heated · I'll cave · I'll freeze · I'll say it wrong · it'll blow up the relationship · other
-- **Or is it more of a posture?** → (same posture list)
+- **What's their posture?** → (same posture list)
 
 *(who / said-to / topic chips removed 2026-07-02 — they duplicated the freeform box and caused mismatch conflicts; kept only the additive chips that frame approach and emotional weather)*
 
