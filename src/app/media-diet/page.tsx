@@ -363,13 +363,16 @@ function LabelLegend() {
 
 function IndependenceDisclosure() {
   return (
-    <Disclosure toggleClosed="What do we mean by independent? ↓" toggleOpen="Got it ↑">
+    <Disclosure toggleClosed="What do we mean by independent and reliable? ↓" toggleOpen="Got it ↑">
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
         <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: '1.6' }}>
           The editorial voice is not controlled by a corporate owner, political party, advertiser network, or institutional funder with a partisan agenda. Independent journalists still have to earn a living — subscriptions, advertising, private investors, foundation grants are all fine as long as they don&apos;t control what gets covered or how.
         </p>
         <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: '1.6' }}>
           A journalist with a Substack and ten thousand paying subscribers answers to those subscribers. A journalist working for a network owned by a Fortune 500 conglomerate answers to a board of directors. That&apos;s the difference that matters. CNN is not independent. A journalist who left CNN to run their own Substack is.
+        </p>
+        <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: '1.6' }}>
+          Reliable means the source gets its facts right, corrects its mistakes, and argues in good faith instead of misleading you to win a point. Reliability is separate from viewpoint — a source can hold a strong, clearly-stated position and still be scrupulous with the facts, and another can sound perfectly neutral while playing loose with them. We score every source for reliability and weigh it in what we recommend; a documented accuracy problem triggers a re-check. A clear lean is fine. Getting the facts wrong is not.
         </p>
       </div>
     </Disclosure>
@@ -757,7 +760,7 @@ export default function MediaDietPage() {
           fontStyle: 'italic',
           marginBottom: completionPct < 100 ? 'var(--space-4)' : 0,
         }}>
-          We&apos;re starting with 62 hand-curated sources — chosen for quality, independence, and range. More coming.
+          We&apos;re starting with 62 hand-curated sources — chosen for quality, independence, reliability, and range. More coming.
         </p>
 
         {completionPct < 100 && (

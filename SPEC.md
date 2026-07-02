@@ -2984,17 +2984,19 @@ A **"What do these labels mean?"** disclosure sits between the tier-nav bar and 
 - No "Medium read" / "Deep read" labels on cards — remove these entirely, they are not spec'd and have no defined data source.
 - All definition text left-justified, same font size throughout.
 
-### 24.1d "What do we mean by independent?" disclosure
+### 24.1d "What do we mean by independent and reliable?" disclosure
 
 A second collapsible disclosure, parallel to the legend (§24.1c), sitting immediately below it. Same visual treatment — same toggle style, same font, same layout.
 
-**Toggle copy:** *"What do we mean by independent? ↓"* / *"Got it ↑"*
+**Toggle copy:** *"What do we mean by independent and reliable? ↓"* / *"Got it ↑"*
 
 **Expanded content (exact copy, locked):**
 
 The editorial voice is not controlled by a corporate owner, political party, advertiser network, or institutional funder with a partisan agenda. Independent journalists still have to earn a living — subscriptions, advertising, private investors, foundation grants are all fine as long as they don't control what gets covered or how.
 
 A journalist with a Substack and ten thousand paying subscribers answers to those subscribers. A journalist working for a network owned by a Fortune 500 conglomerate answers to a board of directors. That's the difference that matters. CNN is not independent. A journalist who left CNN to run their own Substack is.
+
+Reliable means the source gets its facts right, corrects its mistakes, and argues in good faith instead of misleading you to win a point. Reliability is separate from viewpoint — a source can hold a strong, clearly-stated position and still be scrupulous with the facts, and another can sound perfectly neutral while playing loose with them. We score every source for reliability and weigh it in what we recommend; a documented accuracy problem triggers a re-check. A clear lean is fine. Getting the facts wrong is not.
 
 ### 24.1a Page header copy (locked)
 
@@ -3013,7 +3015,7 @@ Not an algorithm designed to rage bait you. Not a political party's talking poin
 Your recommendations are built on your eight-dimension values profile — matched against a curated catalog of independent journalists, Substacks, and podcasts. Three tiers, by design: sources that reinforce your foundation, sources that broaden your view, and sources that push back where it matters.
 
 **Caveat line** (DM Sans, italic, muted, below intro paragraph):
-*We're starting with 62 hand-curated sources — chosen for quality, independence, and range. More coming.*
+*We're starting with 62 hand-curated sources — chosen for quality, independence, reliability, and range. More coming.*
 
 ### 24.2 Three-tier model
 
