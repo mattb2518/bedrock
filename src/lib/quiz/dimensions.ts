@@ -52,3 +52,8 @@ export function poleLabel(key: Dimension, value: number): string {
   const dim = DIMENSIONS.find((d) => d.key === key)!
   return value >= 50 ? dim.poleB : dim.poleA
 }
+
+// True when the profile is unusually centered: ≥6 of 8 dimensions within 15 pts of the midpoint.
+export function isCentered(profile: DimensionalProfile): boolean {
+  return DIMENSIONS.filter((d) => Math.abs(profile[d.key] - 50) <= 15).length >= 6
+}

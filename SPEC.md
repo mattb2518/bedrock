@@ -185,9 +185,13 @@ Three edge cases the recommendation engine must detect and handle with dedicated
 
 **1. Near-pure primary.** Single type clears a wide gap from all others (similarity score to top type significantly higher than to any secondary). Acknowledge in reveal copy: *"You're one of the purest [Type]s we've seen — your profile lines up with this identity more cleanly than most users'."*
 
-**2. Genuinely centered profile.** Six or more of the eight dimensions score within a narrow band around the midpoint (rough threshold: ±15% of center). Surface as a centered profile rather than forcing a primary. Reveal copy:
+**2. Genuinely centered profile.** Six or more of the eight dimensions score within a narrow band around the midpoint (threshold: ±15 pts of 50). The assigned Mantle is still shown as the headline on both the in-quiz reveal (MantleReveal) and /your-mantle — centered is the caveat, not the identity. Reveal copy (single paragraph, after the Mantle h1):
 
-*"Your profile is unusually centered. Across most of the eight dimensions, you sit close to the middle — you can see the case for both poles and don't reflexively favor either one. That's rarer than it sounds. It usually means one of two things: you genuinely hold the tension between competing values rather than resolving it by team, or you're still working out where you actually stand. Either way, we'll build your ballot from the dimensions where you do lean — and your recommendations may surprise you more than most users'."*
+*"An unusually centered profile — across most of the eight dimensions you sit close to the middle, so you wear this one lightly. We build your recommendations from the dimensions where you do lean."*
+
+/your-mantle adds a briefer inline note below the "You are" headline: *"You're unusually centered — you sit near the middle on most dimensions, so you wear this lightly."*
+
+**Cross-page links:** /results QuizLinks row includes "See results overview" → /your-mantle. /your-mantle primary CTA reads "See in-depth results →" → /results. These links are always present (not centered-only), creating a clear overview ⇆ in-depth navigation pattern.
 
 **3. Scattered profile.** Strong dimensional leans, but the leans don't cluster into a recognizable type. Detection: top-type similarity score below threshold (rough: <65%) AND top three types within a tight band of each other (rough: <10% gap between primary and tertiary). Surface as scattered rather than forced. Reveal copy:
 
@@ -232,7 +236,7 @@ Communicated via progress bar design, not explicit question numbering. Gives loc
   4. **Your dealbreakers** (Layer 4 selections, only if completed)
 - Immediately below the mantle reveal: if the user is anonymous (no account), a dismissible "Save your results" banner with a "Sign Up Free" link and a "Skip for now" button.
 - A "Put it to work ↓" smooth-scroll anchor link appears below the mantle reveal / account prompt, before the dimensional accordions, linking to the "Now put it to work" section.
-- Below the accordions: small underlined text links — "Edit answers" (only when quiz incomplete) and "Retake quiz" (always). Not buttons, not prominent CTAs.
+- Below the accordions: small underlined text links — "Edit answers" (only when quiz incomplete), "Retake quiz" (always), and "See results overview" → /your-mantle (always). Not buttons, not prominent CTAs.
 - Below that: "Now put it to work" section (id="put-it-to-work") — the four pillar cards linking to each pillar page.
 - No "Explore your mantle" button anywhere on this page — the /your-mantle page is reachable via the nav "Your Mantle" dropdown.
 

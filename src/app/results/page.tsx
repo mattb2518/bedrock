@@ -95,6 +95,9 @@ function QuizLinks({ quizComplete }: { quizComplete: boolean }) {
       >
         Retake quiz
       </button>
+      <Link href="/your-mantle" style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', textDecoration: 'underline', textUnderlineOffset: '3px' }}>
+        See results overview
+      </Link>
     </div>
   )
 }

@@ -12,7 +12,7 @@ import { useQuizStore } from '@/store/quizStore'
 import { usePreviewStore } from '@/store/previewStore'
 import Constellation from '@/components/ui/Constellation'
 import { MANTLES, mantleFor, type Mantle } from '@/lib/quiz/mantles'
-import { profileToRadar } from '@/lib/quiz/dimensions'
+import { profileToRadar, isCentered } from '@/lib/quiz/dimensions'
 
 function FlipCard({ mantle, large = false, flipped, onFlip }: { mantle: Mantle; large?: boolean; flipped: boolean; onFlip: () => void }) {
   const pad = large ? 'var(--space-8)' : 'var(--space-5)'
@@ -94,6 +94,11 @@ export default function YourMantlePage() {
         <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-h1)', color: 'var(--color-text-primary)', lineHeight: 'var(--leading-tight)', marginBottom: 'var(--space-6)' }}>
           You are
         </h1>
+        {isCentered(result.profile) && (
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', textAlign: 'center', maxWidth: 620, margin: '0 auto var(--space-6)' }}>
+            You're unusually centered — you sit near the middle on most dimensions, so you wear this lightly.
+          </p>
+        )}
       </div>
 
       {/* Major — large flip card */}
@@ -135,7 +140,7 @@ export default function YourMantlePage() {
       {/* Onward buttons */}
       <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap', marginTop: 'var(--space-12)', marginBottom: 'var(--space-16)' }}>
         <Link href="/results" style={{ backgroundColor: 'var(--color-red)', color: '#fff', fontFamily: 'var(--font-body)', fontWeight: 'var(--weight-semibold)', padding: 'var(--btn-padding-y) var(--btn-padding-x)', borderRadius: 'var(--btn-radius)', textDecoration: 'none' }}>
-          See your full results →
+          See in-depth results →
         </Link>
         <Link href="/civic-mantle" style={{ backgroundColor: 'transparent', color: 'var(--color-text-secondary)', fontFamily: 'var(--font-body)', fontWeight: 'var(--weight-medium)', padding: 'var(--btn-padding-y) var(--btn-padding-x)', borderRadius: 'var(--btn-radius)', textDecoration: 'none', border: '1px solid var(--color-border)' }}>
           Explore all ten

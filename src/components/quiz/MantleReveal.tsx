@@ -9,7 +9,7 @@
 
 import { useEffect, useState } from 'react'
 import Constellation from '@/components/ui/Constellation'
-import { DIMENSIONS, profileToRadar } from '@/lib/quiz/dimensions'
+import { DIMENSIONS, profileToRadar, isCentered } from '@/lib/quiz/dimensions'
 import { mantleFor, type Mantle } from '@/lib/quiz/mantles'
 import type { DimensionalProfile, QuizResult } from '@/types/quiz'
 
@@ -54,9 +54,6 @@ function FlipCard({ mantle, large = false, flipped, onFlip }: { mantle: Mantle; 
 // Centered-profile detection (SPEC §4 edge case 2): 6+ of 8 dims within ±15 of
 // the midpoint. Provisional; near-pure/scattered detection comes with the real
 // engine.
-function isCentered(profile: DimensionalProfile): boolean {
-  return DIMENSIONS.filter((d) => Math.abs(profile[d.key] - 50) <= 15).length >= 6
-}
 
 export default function MantleReveal({ result, headerCta, hideDimBreakdown = false }: { result: QuizResult; headerCta?: React.ReactNode; hideDimBreakdown?: boolean }) {
   const mantle = mantleFor(result.primaryType)
@@ -88,13 +85,10 @@ export default function MantleReveal({ result, headerCta, hideDimBreakdown = fal
       {centered ? (
         <div style={rise(0.1)}>
           <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-h1)', color: 'var(--color-text-primary)', textAlign: 'center', lineHeight: 'var(--leading-tight)', marginBottom: 'var(--space-5)' }}>
-            An unusually centered profile.
+            {mantle.name}
           </h1>
-          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body-lg)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', maxWidth: 620, margin: '0 auto var(--space-6)', textAlign: 'center' }}>
-            Across most of the eight dimensions, you sit close to the middle — you can see the case for both poles and don't reflexively favor either one. That's rarer than it sounds. We'll build your recommendations from the dimensions where you do lean.
-          </p>
-          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', textAlign: 'center', maxWidth: 620, margin: '0 auto var(--space-8)' }}>
-            If we had to place you, you sit closest to <strong style={{ color: 'var(--color-text-primary)' }}>{mantle.name}</strong> — but you wear it lightly.
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body-lg)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', maxWidth: 620, margin: '0 auto var(--space-8)', textAlign: 'center' }}>
+            An unusually centered profile — across most of the eight dimensions you sit close to the middle, so you wear this one lightly. We build your recommendations from the dimensions where you do lean.
           </p>
         </div>
       ) : (
