@@ -217,12 +217,20 @@ Communicated via progress bar design, not explicit question numbering. Gives loc
 - Curiosity-driven, not guilt-driven
 
 ### Results Reveal
-- Feels like Myers-Briggs or DISC — a moment, not just a bar chart
-- Named type as headline
-- Constellation as hero visual
-- "Here's what makes you genuinely unusual"
-- "Here's where you sit relative to other Bedrock users"
-- Shareable — people screenshot and share their constellation
+
+**Page: `/results`**
+
+- Mantle reveal at top: named type (flip card with historical figure on back), constellation, secondary affinities
+- Below the reveal: four parallel collapsed accordion sections in this order:
+  1. **Your eight dimensions** — scored slider for each of the 8 axes; "most central" tag on top dimensions
+  2. **Your positions** (Layer 2 answers, only if completed)
+  3. **What drives your vote** (Layer 3 answers, only if completed)
+  4. **Your dealbreakers** (Layer 4 selections, only if completed)
+- Below the accordions: small underlined text links — "Edit answers" (only when quiz incomplete) and "Retake quiz" (always). Not buttons, not prominent CTAs.
+- Below that: "Now put it to work" section — the four pillar cards linking to each pillar page.
+- No "Explore your mantle" button anywhere on this page — the /your-mantle page is reachable via the nav "Your Mantle" dropdown.
+
+**Note:** The dimensional breakdown no longer appears inside the mantle reveal component when rendered on /results (it's suppressed via `hideDimBreakdown` prop and shown instead in the unified accordion block below). On the in-quiz reveal it still appears inside the reveal.
 
 ### Option Order Randomization
 Display order of A/B/C (and D where it applies on A1) is randomized per question per user session at render time. Position bias is real — left-most or first-listed options pick up a few points of preference independent of content — and randomization keeps it from compounding any framing tilt. Internal scoring keys to position-independent option IDs, not letters. The "It depends" path stays in its fixed last slot.
@@ -2010,7 +2018,9 @@ Attribution: "From the *Country Over Self* podcast." (*Country Over Self* italic
 Mark + wordmark · Civic Mantle · How It Works · About · Take the Quiz (primary CTA button)
 
 **App nav (post-login):**
-Mark + wordmark · Quiz · Your Ballot · Your Media · Your Conversations · Beyond Your Ballot · My Profile · [account avatar]
+Mark + wordmark · Civic Mantle · Your Mantle ▾ (dropdown: Overview → /your-mantle, In-Depth Results → /results; only shown once user has a quiz result) · Your Actions ▾ (dropdown: Your Ballot, Beyond Your Ballot, Your Media Diet, Your Conversations) · About ▾ · [avatar + sign out]
+
+URLs: Your Ballot → `/your-ballot`, Beyond Your Ballot → `/beyond-your-ballot`, Your Media Diet → `/media-diet`.
 
 **Quiz nav item — three states:**
 - Not started → label "Take the Quiz" → begins quiz
