@@ -3097,6 +3097,8 @@ After the recommendation engine selects sources for each tier, a single Claude A
 
 Appears at the bottom of recommendations. The user nominates a source not in the catalog. Goes to the classification pipeline ingestion queue — the same flow as any new source addition. A human reviews before anything appears live.
 
+On submission: if the suggested URL's domain matches an existing approved source (matched by host, tolerant of any path after the host), the user is told we already cover it and it is not re-queued. Otherwise it is written to `classified_sources` (status `pending_review`) via the service-role client so RLS doesn't block the write, and a best-effort notification email is sent to hello@bedrock.guide via Resend (from admin@bedrock.guide, key `RESEND_API_KEY_ADMIN`); email failure is non-fatal.
+
 ### 24.6 Diversity pass within each tier
 
 Enforce format mix (not all podcasts), topic spread, and in the challenging tier specifically: dissent must come from more than one direction (not all from one partisan direction). If the challenging tier is one-directional, that is a curation bug.

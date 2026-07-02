@@ -433,17 +433,22 @@ function SuggestSourceForm() {
   const [note, setNote] = useState('')
   const [submitted, setSubmitted] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [alreadyHave, setAlreadyHave] = useState(false)
+  const [existingName, setExistingName] = useState('')
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!name.trim() || !url.trim()) return
     setLoading(true)
     try {
-      await fetch('/api/source-suggestion', {
+      const res = await fetch('/api/source-suggestion', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: name.trim(), url: url.trim(), note: note.trim() }),
       })
+      const data = await res.json().catch(() => ({}))
+      setAlreadyHave(Boolean(data?.alreadyHave))
+      setExistingName(typeof data?.existingName === 'string' ? data.existingName : '')
       setSubmitted(true)
     } finally {
       setLoading(false)
@@ -454,7 +459,9 @@ function SuggestSourceForm() {
     return (
       <div style={{ padding: 'var(--space-4)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-lg)', backgroundColor: 'var(--color-bg-surface)', textAlign: 'center' }}>
         <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-primary)' }}>
-          Thanks — your suggestion goes into our review queue. Every suggestion goes through the same scoring process before anything appears.
+          {alreadyHave
+            ? `Good news — we already cover ${existingName || 'this one'}. If it's not showing in your recommendations, it's because it didn't match your values profile closely enough to land in one of your three tiers.`
+            : `Thanks — we've got your suggestion. We'll evaluate it and follow up. Every source goes through the same review before anything appears.`}
         </p>
       </div>
     )
