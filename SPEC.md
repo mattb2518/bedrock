@@ -1065,15 +1065,21 @@ If you could move the needle on exactly one issue in American public life — on
 - DB-2: Used public office for personal financial gain
 - DB-5: Has a documented pattern of lying about verifiable facts
 
-**CIVIL LIBERTIES**
+**CIVIL LIBERTIES — paired by issue**
+
+*Voting*
+- DB-30: Supports removing safeguards that verify voter eligibility or identity
+- DB-8: Supports restricting ballot access for eligible citizens without evidence of fraud
+
+*Speech*
+- DB-31: Supports giving government the power to ban or criminalize lawful speech based on its content or viewpoint
 - DB-6: Supports deploying federal law enforcement against peaceful protesters
-- DB-8: Supports restricting access to legal voting without evidence of fraud
 
 **POLICY ABSOLUTES — paired by issue**
 
 *Abortion*
-- DB-10: Supports a complete abortion ban with no exceptions
 - DB-11: Supports unrestricted abortion access at any point in pregnancy with no limitations
+- DB-10: Supports a complete abortion ban with no exceptions
 
 *Firearms*
 - DB-12: Supports confiscating legally owned firearms from legal owners
@@ -1084,8 +1090,8 @@ If you could move the needle on exactly one issue in American public life — on
 - DB-15: Supports eliminating Medicare, Medicaid, or other public health coverage entirely
 
 **OTHER**
-- DB-19: Supports eliminating LGBTQ+ anti-discrimination protections
-- DB-20: Denies that human activity contributes to climate change
+- DB-19: Supports stripping anti-discrimination protections from any group based on identity
+- DB-20: Rejects the scientific consensus that routine childhood vaccines are safe and effective — for instance, promoting the discredited claim that vaccines cause autism
 
 **CHARACTER**
 - DB-26: Credibly accused of sexual misconduct
@@ -1094,7 +1100,7 @@ If you could move the needle on exactly one issue in American public life — on
 **Open text:** *"Anything else that would disqualify a candidate for you, regardless of their other positions?"*
 
 ### Design Notes
-- Paired items on contested issues (abortion, firearms, healthcare) displayed side by side — makes balance visible immediately
+- Paired items on contested issues (voting, speech, abortion, firearms, healthcare) displayed side by side — five left/right pairs plus seven universal items, so balance is visible immediately
 - Select all that apply — no minimum, no maximum
 - Open text field at bottom captures anything not on the list
 - UI should feel distinct from quiz — checkboxes not radio buttons, no micro-reactions, no Easter eggs

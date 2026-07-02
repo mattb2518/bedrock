@@ -1,5 +1,5 @@
 // Layer 4 — the dealbreaker screen, verbatim from SPEC §10.
-// Not a quiz: 29 binary filters + open text. Contested issues are PAIRED so
+// Not a quiz: 17 binary filters + open text. Contested issues are PAIRED so
 // neither side feels targeted (displayed side by side). Selected ids become hard
 // exclusion filters in the recommendation engine.
 
@@ -34,9 +34,17 @@ export const LAYER4_SECTIONS: DealbreakerSection[] = [
   },
   {
     title: 'Civil Liberties',
-    items: [
-      { id: 'DB-6', text: 'Supports deploying federal law enforcement against peaceful protesters' },
-      { id: 'DB-8', text: 'Supports restricting access to legal voting without evidence of fraud' },
+    pairs: [
+      {
+        issue: 'Voting',
+        left: { id: 'DB-30', text: 'Supports removing safeguards that verify voter eligibility or identity' },
+        right: { id: 'DB-8', text: 'Supports restricting ballot access for eligible citizens without evidence of fraud' },
+      },
+      {
+        issue: 'Speech',
+        left: { id: 'DB-31', text: 'Supports giving government the power to ban or criminalize lawful speech based on its content or viewpoint' },
+        right: { id: 'DB-6', text: 'Supports deploying federal law enforcement against peaceful protesters' },
+      },
     ],
   },
   {
@@ -44,8 +52,8 @@ export const LAYER4_SECTIONS: DealbreakerSection[] = [
     pairs: [
       {
         issue: 'Abortion',
-        left: { id: 'DB-10', text: 'Supports a complete abortion ban with no exceptions' },
-        right: { id: 'DB-11', text: 'Supports unrestricted abortion access at any point in pregnancy with no limitations' },
+        left: { id: 'DB-11', text: 'Supports unrestricted abortion access at any point in pregnancy with no limitations' },
+        right: { id: 'DB-10', text: 'Supports a complete abortion ban with no exceptions' },
       },
       {
         issue: 'Firearms',
@@ -62,8 +70,8 @@ export const LAYER4_SECTIONS: DealbreakerSection[] = [
   {
     title: 'Other',
     items: [
-      { id: 'DB-19', text: 'Supports eliminating LGBTQ+ anti-discrimination protections' },
-      { id: 'DB-20', text: 'Denies that human activity contributes to climate change' },
+      { id: 'DB-19', text: 'Supports stripping anti-discrimination protections from any group based on identity' },
+      { id: 'DB-20', text: 'Rejects the scientific consensus that routine childhood vaccines are safe and effective — for instance, promoting the discredited claim that vaccines cause autism' },
     ],
   },
   {
