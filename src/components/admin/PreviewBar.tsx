@@ -22,6 +22,21 @@ function syntheticResult(type: CivicType): QuizResult {
   }
 }
 
+// ── Mantle options (hardcoded — not fetched) ──────────────────────────────────
+
+const MANTLE_OPTIONS: { type: CivicType; label: string }[] = [
+  { type: 'honest_broker',   label: 'The Honest Broker' },
+  { type: 'system_fixer',    label: 'The System Fixer' },
+  { type: 'long_gamer',      label: 'The Long Gamer' },
+  { type: 'good_neighbor',   label: 'The Good Neighbor' },
+  { type: 'missourian',      label: 'The Missourian' },
+  { type: 'eternal_optimist',label: 'The Eternal Optimist' },
+  { type: 'steward',         label: 'The Steward' },
+  { type: 'free_agent',      label: 'The Free Agent' },
+  { type: 'standard_bearer', label: 'The Standard Bearer' },
+  { type: 'pioneer',         label: 'The Pioneer' },
+]
+
 // ── Bar ───────────────────────────────────────────────────────────────────────
 
 const BAR_HEIGHT = 38
@@ -51,6 +66,13 @@ export default function PreviewBar() {
       setChecked(true)
     })
   }, [])
+
+  // Push the entire page down by bar height so the fixed bar doesn't overlap the nav
+  useEffect(() => {
+    if (!isAdmin) return
+    document.body.style.paddingTop = `${BAR_HEIGHT}px`
+    return () => { document.body.style.paddingTop = '' }
+  }, [isAdmin])
 
   if (!checked || !isAdmin) return null
 
@@ -102,7 +124,7 @@ export default function PreviewBar() {
   const barLabel =
     mode === 'myself'    ? 'Previewing as: Myself'
     : mode === 'new_user' ? 'PREVIEW MODE: New User'
-    : `PREVIEW MODE: ${MANTLES.find((m) => m.type === mantleType)?.name ?? mantleType}`
+    : `PREVIEW MODE: ${MANTLE_OPTIONS.find((m) => m.type === mantleType)?.label ?? mantleType}`
 
   return (
     <div style={{
@@ -180,8 +202,8 @@ export default function PreviewBar() {
         }}
       >
         <option value="">Mantle type…</option>
-        {MANTLES.map((m) => (
-          <option key={m.type} value={m.type}>{m.name}</option>
+        {MANTLE_OPTIONS.map((m) => (
+          <option key={m.type} value={m.type}>{m.label}</option>
         ))}
       </select>
 
