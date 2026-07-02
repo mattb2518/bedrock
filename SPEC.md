@@ -2004,6 +2004,37 @@ Four pillars in order, each with tri-color accent bar:
 *"Not red, not blue — red, white, and blue."* (gold italic Libre Baskerville 22px)
 Attribution: "From the *Country Over Self* podcast." (*Country Over Self* italicized)
 
+---
+
+### Returning-User Homepage (signed in + quiz complete)
+
+When a signed-in user with a completed quiz profile lands on the homepage, the layout differs from the public homepage. Use the same `mounted && hasResult` pattern as the nav to detect returning users client-side.
+
+**1. Nav** — app nav (already implemented)
+
+**2. Hero** — same three rotating slides, same copy. Two changes:
+- Shrink the hero background color block (reduce vertical padding/height — feels less like a sales pitch, more like a greeting)
+- Remove the two CTA buttons underneath the slides entirely ("Find your bedrock →" and "How it works")
+
+**3. Civic Mantle section** — removed entirely for returning users
+
+**4. Your Actions section** (replaces the public Civic Mantle + Four Pillars section)
+- Eyebrow: YOUR ACTIONS
+- Headline: "Everything built on your civic mantle."
+- Four pillar cards exactly as they appear today — no changes to the cards themselves
+- Your Media Diet pillar copy updated in both public and returning-user views: *"Curated journalism that deepens, expands, and challenges."* (replaces old one-liner)
+
+**5. Your Mantle section** (new — returning user only, sits below Your Actions)
+A slimmed-down version of the Your Mantle page. Shows:
+- Mantle name + type (e.g. "The Honest Broker")
+- Constellation (radar chart)
+- Two or three top trait descriptors
+- Link: "Go to your mantle →" (links to /your-mantle)
+
+No retake link here — the Your Mantle page already has links to retake individual layers.
+
+**6. Tagline band** — unchanged
+
 ### Nav Links — Two States
 
 **Public nav (pre-login):**
