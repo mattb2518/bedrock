@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useLayoutEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { useQuizStore } from '@/store/quizStore'
+import { mantleFor } from '@/lib/quiz/mantles'
 import type { QuizSession } from '@/types/quiz'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -579,6 +580,7 @@ export default function ConversationsPage() {
   const session = useQuizStore(s => s.session)
   const hasProfile = Boolean(session?.result)
   const isAnonymous = hasProfile && !session?.userId
+  const mantleName = session?.result?.primaryType ? mantleFor(session.result.primaryType).name : null
   const [convBannerDismissed, setConvBannerDismissed] = useState(false)
 
   // Openers / Responses state
@@ -1065,6 +1067,9 @@ export default function ConversationsPage() {
           <div>
             <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-gold)', letterSpacing: 'var(--tracking-wider)', textTransform: 'uppercase', marginBottom: 'var(--space-4)' }}>
               The decode
+              {hasProfile && mantleName && (
+                <span style={{ fontSize: '10px', fontStyle: 'italic', color: 'var(--color-text-muted)', marginLeft: '10px' }}>Read through the lens of {mantleName}</span>
+              )}
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
               {([
@@ -1769,7 +1774,12 @@ export default function ConversationsPage() {
               </p>
 
               {/* The decode */}
-              <p style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#b8922a', marginBottom: '16px' }}>The decode</p>
+              <p style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#b8922a', marginBottom: '16px' }}>
+                The decode
+                {hasProfile && mantleName && (
+                  <span style={{ fontSize: '10px', fontStyle: 'italic', color: '#888', marginLeft: '10px' }}>Read through the lens of {mantleName}</span>
+                )}
+              </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '28px', paddingBottom: '24px', borderBottom: '0.5px solid #ddd' }}>
                 {([
                   { label: 'The surface', text: output.surface },
