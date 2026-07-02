@@ -3028,55 +3028,29 @@ Each tier displays with:
 - Source cards (~3–5 per tier to start), each with a card-level one-liner (see §24.3)
 - Thumbs up / thumbs down on every card
 
-### 24.2a Dynamic tier blurbs (Claude-generated)
+### 24.2a Tier blurbs (pre-generated, static)
 
-After the recommendation engine selects sources for each tier, a single Claude API call generates three personalized blurbs — one per tier — explaining why these sources landed where they did for this specific user.
+Tier blurbs are pre-generated via Anthropic API (offline script `scripts/generate-media-blurbs.ts`) and committed as static data in `src/data/media-blurbs.ts`. The live `/api/media-blurbs` route has been retired.
 
-**Trigger:** After sources are selected, before the page renders. Show a loading state while blurbs generate.
+**Data structure:** `MANTLE_TIER_BLURBS: Record<CivicType, { confirming: string; expanding: string; challenging: string }>` — 30 blurbs total (10 Mantles × 3 tiers).
 
-**Input to Claude (per call — all three tiers in one prompt):**
-- User's Mantle type name and one-liner
-- User's top 3 dimensions (highest-scoring Layer 1 axes) with plain-language labels
-- User's bottom 2 dimensions (lowest-scoring axes)
-- For each tier: list of source names, their lean labels, and their top 2 axis scores
-- The tier placement criteria (what made each source land where it did)
+**At render time**, the tier blurb for the user's Mantle is read from the static map and the first 5 matched source names are appended as a sentence: `"You'll find that in [Source A, Source B, and Source C]."` This gives each user a personalized-feeling blurb without a live API call.
 
-**Output:** Three blurbs, one per tier, in JSON:
-```json
-{
-  "confirming": "string",
-  "expanding": "string", 
-  "challenging": "string"
-}
-```
+**Fallback:** If the user's Mantle type is not found in the map (shouldn't happen), fall back to the tier's static one-line description.
 
-**Blurb requirements:**
-- 2-3 sentences each
-- Opens by naming the user's Mantle type: "As a [Mantle Type]..."
-- Names 1-2 specific sources from the tier by name
-- References the specific axes that drove placement (in plain language, not axis codes)
-- Explains the *why* — not just "these match you" but "these match you because..."
-- Tone: warm, confident, nonpartisan. Same voice as the quiz.
+**Blurb requirements (for regeneration):**
+- Exactly 2 sentences per blurb
+- Opens: "As [Mantle name]…"
+- Warm, confident, nonpartisan; references the Mantle's values in plain language
+- Never names specific outlets (source names are injected at render time)
 - Never says "algorithm" or "score" — say "your values profile" or "how you think about X"
-
-**Example (Confirming, The Honest Broker):**
-"As an Honest Broker, you prize rigor and balance over tribal comfort — and that shows in this tier. Sources like Axios and The Texas Tribune score high on the same institutional-integrity and pragmatic-outcomes axes that define your civic mantle. These aren't just sources that agree with you; they're sources that approach civic questions the way you do."
-
-**Example (Challenging, The Honest Broker):**
-"As an Honest Broker, your instinct is to weigh all sides — but these sources will push back on your tendency toward institutional trust. The Free Press and Persuasion both score high on the stability/change axis in directions that differ from yours, and they make the case for structural disruption in ways that deserve a serious read, even when you disagree."
-
-**Caching:** Cache blurbs per user per session. Regenerate only if the user's profile changes or sources are re-selected.
-
-**Fallback:** If the Claude call fails, show a static fallback: the existing one-line tier description. Never show an empty blurb or an error state.
-
-**Model:** `claude-sonnet-4-6` with prompt caching on the system prompt. Estimated cost: ~$0.003 per page load.
 
 ### 24.3 Source card
 
 - Name and creator/host
 - Format(s) — can be multiple
 - Longer description (2-3 sentences — enough to understand what the source covers and why it's worth reading)
-- **Card-level one-liner** — one sentence explaining why this specific source landed in this tier for this user. Generated in the same Claude call as the tier blurbs. Example: "In your Challenging tier because it scores high on the stability/change axis, where you lean toward gradual reform."
+- **Card-level one-liner** — a static one-liner per tier, shown on every card in that tier. Values: Confirming → "In step with how you already think." · Expanding → "Adjacent ground worth covering." · Challenging → "A serious case for the other side."
 - Lean label — one of: Left · Lean Left · Center · Lean Right · Right · Heterodox. No [P] flag.
 - ↗ link (opens in new tab)
 - Thumbs up / thumbs down

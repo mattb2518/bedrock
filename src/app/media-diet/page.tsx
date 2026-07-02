@@ -7,11 +7,10 @@ import { loadProfile } from '@/lib/quiz/sync'
 import { matchMedia, isBelowThresholdException } from '@/lib/engine/mediaMatch'
 import { buildMediaMatchKey } from '@/lib/engine/buildMediaMatchKey'
 import { mantleFor } from '@/lib/quiz/mantles'
-import { DIMENSIONS, poleLabel } from '@/lib/quiz/dimensions'
+import { MANTLE_TIER_BLURBS } from '@/data/media-blurbs'
 import type { MediaMatchResult, ScoredMediaSource, MediaTier } from '@/lib/engine/mediaMatch'
 import type { MediaSource } from '@/lib/engine/mediaMatch'
-import type { BlurbsResult, BlurbsRequest } from '@/app/api/media-blurbs/route'
-import type { Dimension, DimensionalProfile } from '@/types/quiz'
+import type { CivicType } from '@/types/quiz'
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -33,13 +32,28 @@ const TIER_META: Record<MediaTier, { label: string; description: string; color: 
   challenging: { label: 'Challenging', color: '#d97706',                  description: 'Challenge you where it counts. The best honest case against your strongest views. The most important tier.' },
 }
 
-// ── Lean label (no [P]) ───────────────────────────────────────────────────────
+const TIER_ONELINER: Record<MediaTier, string> = {
+  confirming:  'In step with how you already think.',
+  expanding:   'Adjacent ground worth covering.',
+  challenging: 'A serious case for the other side.',
+}
+
+// ── Lean label ────────────────────────────────────────────────────────────────
 
 function formatLean(coarseLean: string): string {
   return coarseLean
     .split('-')
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
     .join(' ')
+}
+
+// ── Source list formatter ─────────────────────────────────────────────────────
+
+function formatList(items: string[]): string {
+  if (items.length === 0) return ''
+  if (items.length === 1) return items[0]
+  if (items.length === 2) return `${items[0]} and ${items[1]}`
+  return `${items.slice(0, -1).join(', ')}, and ${items[items.length - 1]}`
 }
 
 // ── Feedback component ────────────────────────────────────────────────────────
@@ -188,7 +202,7 @@ function SourceCard({
           This source sits below our usual bar for reliability, but it&apos;s independently owned and a widely-read voice — so we&apos;ve included it while we expand the catalog in this part of the spectrum. Tell us if you disagree: hello@bedrock.guide.
         </p>
       )}
-      {/* Claude one-liner */}
+      {/* Static per-tier one-liner */}
       {oneLiner && (
         <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', lineHeight: '1.5', fontStyle: 'italic' }}>
           {oneLiner}
@@ -198,7 +212,7 @@ function SourceCard({
   )
 }
 
-// ── Tab nav (switches view, no scroll-spy) ────────────────────────────────────
+// ── Tab nav ───────────────────────────────────────────────────────────────────
 
 function TierTabNav({
   active,
@@ -374,23 +388,22 @@ function TierPanel({
   sources,
   userMantleType,
   userCompletionPercent,
-  blurb,
-  blurbsLoading,
-  cardOneLiners,
   toppedUp,
 }: {
   tier: MediaTier
   sources: ScoredMediaSource[]
   userMantleType: string | null
   userCompletionPercent: number
-  blurb: string | null
-  blurbsLoading: boolean
-  cardOneLiners: Record<string, string>
   toppedUp: boolean
 }) {
   const meta = TIER_META[tier]
   const isThin = sources.length > 0 && sources.length < THIN_TIER_MIN
   const isEmpty = sources.length === 0
+
+  // Static per-Mantle blurb with injected source names
+  const base = (userMantleType && MANTLE_TIER_BLURBS[userMantleType as CivicType]?.[tier]) || meta.description
+  const names = sources.slice(0, 5).map((s) => s.source.name)
+  const sourceLine = names.length ? ` You'll find that in ${formatList(names)}.` : ''
 
   return (
     <div>
@@ -399,10 +412,9 @@ function TierPanel({
         <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-heading)', fontWeight: 'var(--weight-bold)', color: meta.color, margin: '0 0 var(--space-1)' }}>
           {meta.label}
         </h2>
-        <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: '1.5' }}>{meta.description}</p>
-        {blurb && (
-          <p style={{ margin: 'var(--space-1) 0 0', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', lineHeight: '1.6' }}>{blurb}</p>
-        )}
+        <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: '1.5' }}>
+          {base}{sourceLine}
+        </p>
       </div>
 
       {/* Topped-up notice for Challenging — shown instead of thin-tier notice when top-up fired */}
@@ -419,7 +431,7 @@ function TierPanel({
         <div style={{ padding: 'var(--space-3)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--color-bg-surface)', marginBottom: 'var(--space-4)' }}>
           <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: '1.5' }}>
             {isEmpty
-              ? `Fewer recommendations than usual in this tier. As we grow the catalog and classify more sources, this section will fill in.`
+              ? `No recommendations in this tier at this time.`
               : `Fewer recommendations than usual in this tier — we're showing what we have. The catalog is growing.`}
           </p>
         </div>
@@ -434,7 +446,7 @@ function TierPanel({
             tier={tier}
             userMantleType={userMantleType}
             userCompletionPercent={userCompletionPercent}
-            oneLiner={cardOneLiners[s.source.name]}
+            oneLiner={TIER_ONELINER[tier]}
           />
         ))}
       </div>
@@ -444,7 +456,7 @@ function TierPanel({
 
 // ── Suggest a source ──────────────────────────────────────────────────────────
 
-function SuggestSourceForm() {
+function SuggestSourceForm({ isAnonymous }: { isAnonymous: boolean }) {
   const [open, setOpen] = useState(false)
   const [name, setName] = useState('')
   const [url, setUrl] = useState('')
@@ -481,6 +493,11 @@ function SuggestSourceForm() {
             ? `Good news — we already cover ${existingName || 'this one'}. If it's not showing in your recommendations, it's because it didn't match your values profile closely enough to land in one of your three tiers.`
             : `Thanks — we've got your suggestion. We'll evaluate it and follow up. Every source goes through the same review before anything appears.`}
         </p>
+        {!alreadyHave && isAnonymous && (
+          <p style={{ margin: 'var(--space-3) 0 0', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)' }}>
+            Since you're not signed in, this suggestion is anonymous — <a href="/signup" style={{ color: 'var(--color-blue-accent)', textDecoration: 'none' }}>create an account</a> for full features.
+          </p>
+        )}
       </div>
     )
   }
@@ -525,55 +542,6 @@ function SuggestSourceForm() {
   )
 }
 
-// ── Blurb request builder ─────────────────────────────────────────────────────
-
-function buildBlurbsRequest(
-  matchResult: MediaMatchResult,
-  result: { primaryType: string; topDimensions: Dimension[]; profile: DimensionalProfile },
-  oneLiner: string,
-): BlurbsRequest {
-  const profile = result.profile as unknown as Record<string, number>
-
-  // top dimensions → plain English
-  const topDims = result.topDimensions.slice(0, 3).map((dim) =>
-    poleLabel(dim as Dimension, profile[dim] ?? 50)
-  )
-
-  // bottom 2 = dimensions closest to 50 (most uncertain)
-  const bottomDims = DIMENSIONS
-    .map((d) => ({ key: d.key, certainty: Math.abs((profile[d.key] ?? 50) - 50) }))
-    .sort((a, b) => a.certainty - b.certainty)
-    .slice(0, 2)
-    .map((d) => poleLabel(d.key, profile[d.key] ?? 50))
-
-  function summarize(sources: ScoredMediaSource[]) {
-    return sources.slice(0, 5).map((s) => {
-      const sigAxes = Object.entries(s.source.dimensionCoverage)
-        .filter(([, v]) => v === 'signature')
-        .slice(0, 2)
-        .map(([k]) => {
-          const dim = DIMENSIONS.find((d) => d.key === k)
-          return dim ? `${dim.poleA}/${dim.poleB}` : k
-        })
-      return {
-        name: s.source.name,
-        lean: formatLean(s.source.coarseLean),
-        signatureAxes: sigAxes,
-      }
-    })
-  }
-
-  return {
-    mantleType: mantleFor(result.primaryType as import('@/types/quiz').CivicType).name,
-    oneLiner,
-    topDimensions: topDims,
-    bottomDimensions: bottomDims,
-    confirming:  summarize(matchResult.confirming),
-    expanding:   summarize(matchResult.expanding),
-    challenging: summarize(matchResult.challenging),
-  }
-}
-
 // ── Main page ─────────────────────────────────────────────────────────────────
 
 export default function MediaDietPage() {
@@ -582,7 +550,6 @@ export default function MediaDietPage() {
   const { mode, previewResult } = usePreviewStore()
 
   const [authChecked, setAuthChecked] = useState(false)
-  const [mediaBannerDismissed, setMediaBannerDismissed] = useState(false)
 
   useEffect(() => {
     if (session?.result) { setAuthChecked(true); return }
@@ -599,13 +566,10 @@ export default function MediaDietPage() {
   const isAnonymous = hasProfile && !session?.userId && mode === 'myself'
   const mantleType   = effectiveResult?.primaryType ?? null
   const completionPct = effectiveResult?.completionPercent ?? 0
-  const mantleInfo   = mantleType ? mantleFor(mantleType) : null
 
   const [activeTier, setActiveTier] = useState<MediaTier>('confirming')
   const [matchResult, setMatchResult] = useState<MediaMatchResult | null>(null)
   const [catalogError, setCatalogError] = useState<string | null>(null)
-  const [blurbs, setBlurbs] = useState<BlurbsResult | null>(null)
-  const [blurbsLoading, setBlurbsLoading] = useState(false)
 
   const loadRecommendations = useCallback(async () => {
     if (!effectiveResult) return
@@ -621,8 +585,7 @@ export default function MediaDietPage() {
     }
   }, [effectiveResult])
 
-  // Stable key — re-runs when the Mantle switches or the real profile changes,
-  // but not on incidental re-renders.
+  // Stable key — re-runs when the Mantle switches or the real profile changes
   const profileKey = effectiveResult
     ? `${effectiveResult.primaryType}:${JSON.stringify(effectiveResult.profile)}`
     : null
@@ -630,32 +593,10 @@ export default function MediaDietPage() {
   useEffect(() => {
     if (effectiveResult) {
       setMatchResult(null)
-      setBlurbs(null)
       loadRecommendations()
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profileKey])
-
-  // Fetch Claude blurbs once match result is ready
-  useEffect(() => {
-    if (!matchResult || !effectiveResult || !mantleInfo) return
-    let cancelled = false
-    setBlurbsLoading(true)
-    const body = buildBlurbsRequest(
-      matchResult,
-      { primaryType: effectiveResult.primaryType, topDimensions: effectiveResult.topDimensions as Dimension[], profile: effectiveResult.profile as unknown as DimensionalProfile },
-      mantleInfo.oneLiner,
-    )
-    fetch('/api/media-blurbs', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    })
-      .then((r) => r.json())
-      .then((data: BlurbsResult) => { if (!cancelled) { setBlurbs(data); setBlurbsLoading(false) } })
-      .catch(() => { if (!cancelled) setBlurbsLoading(false) })
-    return () => { cancelled = true }
-  }, [matchResult])
 
   // ── Loading — auth check ──────────────────────────────────────────────────
 
@@ -702,24 +643,8 @@ export default function MediaDietPage() {
     challenging: matchResult?.challenging ?? [],
   }
 
-  const tierBlurbs: Record<MediaTier, string | null> = {
-    confirming:  blurbs?.confirming_blurb  ?? null,
-    expanding:   blurbs?.expanding_blurb   ?? null,
-    challenging: blurbs?.challenging_blurb ?? null,
-  }
-
   return (
     <main style={{ maxWidth: 1100, margin: '0 auto', padding: 'var(--space-8) var(--space-4)' }}>
-
-      {/* Account banner for quiz-complete/no-account (13b) */}
-      {isAnonymous && !mediaBannerDismissed && (
-        <div style={{ backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border)', borderLeft: '3px solid var(--color-gold)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-4)', marginBottom: 'var(--space-6)', display: 'flex', alignItems: 'center', gap: 'var(--space-4)', flexWrap: 'wrap' }}>
-          <p style={{ flex: 1, margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)' }}>
-            Your results are temporary. <a href="/signup" style={{ color: 'var(--color-blue-accent)', textDecoration: 'none', fontWeight: 'var(--weight-semibold)' }}>Create a free account</a> to save them.
-          </p>
-          <button onClick={() => setMediaBannerDismissed(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', padding: 0, flexShrink: 0 }}>Dismiss</button>
-        </div>
-      )}
 
       {/* ── Page header ──────────────────────────────────────────────────── */}
       <div style={{ marginBottom: 'var(--space-10)' }}>
@@ -814,15 +739,12 @@ export default function MediaDietPage() {
             sources={tierSources[activeTier]}
             userMantleType={mantleType}
             userCompletionPercent={completionPct}
-            blurb={tierBlurbs[activeTier]}
-            blurbsLoading={blurbsLoading}
-            cardOneLiners={blurbs?.card_oneliners ?? {}}
             toppedUp={matchResult?.toppedUp[activeTier] ?? false}
           />
 
           {/* Suggest a source */}
           <div style={{ marginTop: 'var(--space-10)' }}>
-            <SuggestSourceForm />
+            <SuggestSourceForm isAnonymous={isAnonymous} />
           </div>
 
           {/* Claude's role disclosure */}
