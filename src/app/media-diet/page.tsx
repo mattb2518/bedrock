@@ -377,6 +377,7 @@ function TierPanel({
   blurb,
   blurbsLoading,
   cardOneLiners,
+  toppedUp,
 }: {
   tier: MediaTier
   sources: ScoredMediaSource[]
@@ -385,6 +386,7 @@ function TierPanel({
   blurb: string | null
   blurbsLoading: boolean
   cardOneLiners: Record<string, string>
+  toppedUp: boolean
 }) {
   const meta = TIER_META[tier]
   const isThin = sources.length > 0 && sources.length < THIN_TIER_MIN
@@ -403,8 +405,17 @@ function TierPanel({
         )}
       </div>
 
+      {/* Topped-up notice for Challenging — shown instead of thin-tier notice when top-up fired */}
+      {toppedUp && tier === 'challenging' && (
+        <div style={{ padding: 'var(--space-3)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--color-bg-surface)', marginBottom: 'var(--space-4)' }}>
+          <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: '1.5' }}>
+            The sharpest counterpoints the catalog has for you right now — this fills out as we add sources.
+          </p>
+        </div>
+      )}
+
       {/* Thin-tier notice */}
-      {(isThin || isEmpty) && (
+      {!toppedUp && (isThin || isEmpty) && (
         <div style={{ padding: 'var(--space-3)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--color-bg-surface)', marginBottom: 'var(--space-4)' }}>
           <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: '1.5' }}>
             {isEmpty
@@ -553,7 +564,7 @@ function buildBlurbsRequest(
   }
 
   return {
-    mantleType: mantleFor(result.primaryType).name,   // mantleFor already imported
+    mantleType: mantleFor(result.primaryType as import('@/types/quiz').CivicType).name,
     oneLiner,
     topDimensions: topDims,
     bottomDimensions: bottomDims,
@@ -806,6 +817,7 @@ export default function MediaDietPage() {
             blurb={tierBlurbs[activeTier]}
             blurbsLoading={blurbsLoading}
             cardOneLiners={blurbs?.card_oneliners ?? {}}
+            toppedUp={matchResult?.toppedUp[activeTier] ?? false}
           />
 
           {/* Suggest a source */}

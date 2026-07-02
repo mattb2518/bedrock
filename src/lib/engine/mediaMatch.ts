@@ -68,6 +68,7 @@ export interface MediaMatchResult {
   confirming: ScoredMediaSource[]
   expanding: ScoredMediaSource[]
   challenging: ScoredMediaSource[]
+  toppedUp: { confirming: boolean; expanding: boolean; challenging: boolean }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -270,8 +271,8 @@ function topUp(
   pool: ScoredMediaSource[],
   tier: MediaTier,
   placed: Set<string>
-): ScoredMediaSource[] {
-  if (current.length >= MIN_PER_TIER) return current
+): { sources: ScoredMediaSource[]; toppedUp: boolean } {
+  if (current.length >= MIN_PER_TIER) return { sources: current, toppedUp: false }
   const candidates = pool
     .filter((s) => !placed.has(s.source.id) && s.source.active === 'active')
     .filter((s) =>
@@ -286,7 +287,7 @@ function topUp(
     )
   const additions = candidates.slice(0, MIN_PER_TIER - current.length)
   for (const s of additions) placed.add(s.source.id)
-  return [...current, ...additions.map((s) => ({ ...s, tier }))]
+  return { sources: [...current, ...additions.map((s) => ({ ...s, tier }))], toppedUp: additions.length > 0 }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -330,13 +331,14 @@ export function matchMedia(
     ...sortedExpanding.map((s) => s.source.id),
     ...sortedChallenging.map((s) => s.source.id),
   ])
-  const finalConfirming  = topUp(sortedConfirming,  scoredAll, 'confirming',  placed)
-  const finalExpanding   = topUp(sortedExpanding,   scoredAll, 'expanding',   placed)
-  const finalChallenging = topUp(sortedChallenging, scoredAll, 'challenging', placed)
+  const { sources: finalConfirming,  toppedUp: tuConfirming  } = topUp(sortedConfirming,  scoredAll, 'confirming',  placed)
+  const { sources: finalExpanding,   toppedUp: tuExpanding   } = topUp(sortedExpanding,   scoredAll, 'expanding',   placed)
+  const { sources: finalChallenging, toppedUp: tuChallenging } = topUp(sortedChallenging, scoredAll, 'challenging', placed)
 
   return {
     confirming:  finalConfirming,
     expanding:   finalExpanding,
     challenging: finalChallenging,
+    toppedUp: { confirming: tuConfirming, expanding: tuExpanding, challenging: tuChallenging },
   }
 }
