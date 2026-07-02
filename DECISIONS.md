@@ -126,3 +126,34 @@ listed so nothing gets lost.
   into the per-pillar lists above where they need Matt's input.
 - Future Project research lands the same way: committed under `docs/` or
   `research/`, then reconciled with the matching design memo per pillar.
+
+---
+
+## Post-Launch Roadmap (captured July 1, 2026)
+
+Not spec — future work. These items are deferred until after launch. 
+Revisit in Claude Project sessions when ready to build.
+
+### Media Diet v2
+- **Ad Fontes API integration** — replace manually curated 60-source catalog with live Ad Fontes data. Currently blocked on pricing/licensing conversation (email drafted, pending send).
+- **AllSides ratings integration** — add AllSides bias ratings as a cross-reference signal. Currently blocked on non-commercial eligibility confirmation (email drafted, pending send).
+- **Article Bias Checker** — redesign as a proper standalone tool (not a right-rail widget). Full-width layout, unified input (URL / pasted text / file upload, no mode picker), clearer output model distinguishing source reliability from author bias from article framing. `classifyArticle.ts` stays; UX and concept need rethinking. See §24b (deferred).
+- **Source descriptions** — improve beyond current catalog entries; add author bios, publication history, notable work.
+- **Dynamic catalog growth** — automated ingestion pipeline for new source nominations. Currently manual (suggest-a-source → admin review queue).
+- **Returning-user memory** — "You've been reading X for 3 weeks" awareness layer. Requires conversation history infrastructure (currently clean-slate by design).
+
+### Your Ballot v2 (post-primaries, fall 2026)
+- **Real candidate classification pipeline** — Issues 3 and 4 from July 1 session. classifyCandidate() improvement: score all 8 axes reliably, Perplexity as fallback for live content, better confidence calibration for incumbents vs. challengers.
+- **Automated Beyond Your Ballot population** — Inngest background job running governance filter (§23.5) against all congressional candidates via congress.gov + FEC + Perplexity. Replaces manual static JSON population.
+- **Local races and ballot measures** — out of v1 scope. Requires Ballotpedia Ultralocal licensing (covers 31 states; 19 states including NY, MA, NJ still a gap).
+- **Printable ballot guide** — spec'd in §22.7, needs end-to-end testing once real candidate data is available.
+- **Challenger classification** — improve signal when live content can't be fetched. Perplexity as primary fallback for challengers with no congressional record.
+
+### Platform v2
+- **Returning-user homepage hero** — slide copy should change for returning users (currently same three slides for all users; deferred July 1 as a content/design decision requiring full slide copy rethink, not just CTA swap).
+- **Conversations save/history** — currently clean-slate by design (v1 decision). v2 feature: optional opt-in history with explicit user consent. Requires Supabase storage design and privacy policy update.
+- **Mobile app** — iOS and Android. Post-launch.
+- **Pricing/donation model** — not yet decided. Must be decided before or shortly after launch. Options: free, freemium, donation, subscription. Currently unresolved (flagged as pre-launch checklist item).
+- **National service / civic action layer** — mentioned in founder's political context. Longer-term platform extension beyond the four current pillars.
+- **`pew-typology.ts` Pew group attribution** — Pew group labels on all ten Mantle cards (in pre-launch checklist; not yet built). Carries over to v2 if not completed pre-launch.
+
