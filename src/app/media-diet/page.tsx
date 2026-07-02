@@ -462,16 +462,27 @@ export default function MediaDietPage() {
     <main style={{ maxWidth: 1100, margin: '0 auto', padding: 'var(--space-8) var(--space-4)' }}>
 
       {/* Page header */}
-      <div style={{ marginBottom: 'var(--space-8)' }}>
-        <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-display)', fontWeight: 'var(--weight-bold)', color: 'var(--color-text-primary)', marginBottom: 'var(--space-2)' }}>
+      <div style={{ marginBottom: 'var(--space-12)' }}>
+        <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-muted)', letterSpacing: 'var(--tracking-wider)', textTransform: 'uppercase', marginBottom: 'var(--space-5)' }}>
           Your Media Diet
-        </h1>
-        <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', margin: 0 }}>
-          Independent journalism matched to how you actually think.
-          {completionPct < 100 && (
-            <> — <a href="/quiz" style={{ color: 'var(--color-blue-accent)', textDecoration: 'none' }}>complete your profile</a> to refine these recommendations.</>
-          )}
         </p>
+        <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-h1)', color: 'var(--color-text-primary)', marginBottom: 'var(--space-6)', lineHeight: 'var(--leading-tight)' }}>
+          Journalism that deepens, expands, and challenges — based on what you actually believe.
+        </h1>
+        <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body-lg)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', marginBottom: 'var(--space-4)' }}>
+          Not your algorithm. Not your party&apos;s talking points. Not a feed that quietly confirms everything you already think.
+        </p>
+        <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body-lg)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', marginBottom: 'var(--space-4)' }}>
+          Your recommendations are built on your eight-dimension values profile — matched against a curated catalog of independent journalists, Substacks, and podcasts. Three tiers, by design: sources that reinforce your foundation, sources that broaden your view, and sources that push back where it matters.
+        </p>
+        <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body-lg)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', marginBottom: 'var(--space-4)' }}>
+          And if you want to check anything you&apos;re already reading — paste a URL into the Article Bias Checker and we&apos;ll tell you exactly what it&apos;s doing to your thinking.
+        </p>
+        {completionPct < 100 && (
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', margin: 0 }}>
+            <a href="/quiz" style={{ color: 'var(--color-blue-accent)', textDecoration: 'none' }}>Complete your profile</a> to refine these recommendations.
+          </p>
+        )}
       </div>
 
       <div style={{ display: 'flex', gap: 'var(--space-8)', alignItems: 'flex-start' }}>
