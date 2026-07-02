@@ -201,9 +201,9 @@ export default function PreviewBar() {
           cursor: 'pointer',
         }}
       >
-        <option value="">Mantle type…</option>
+        <option value="" style={{ color: '#000', backgroundColor: '#fff' }}>Mantle type…</option>
         {MANTLE_OPTIONS.map((m) => (
-          <option key={m.type} value={m.type}>{m.label}</option>
+          <option key={m.type} value={m.type} style={{ color: '#000', backgroundColor: '#fff' }}>{m.label}</option>
         ))}
       </select>
 
