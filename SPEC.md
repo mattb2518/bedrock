@@ -2905,6 +2905,41 @@ Infrastructure shared with Conversations print-to-PDF.
 
 Confirmed: does **NOT** enter the distance computation. Reason: demographic data is calibration context, not a values signal. Knowing someone is a "drifted-away moderate Democrat" helps interpret scores but should not change the matching math — that would reintroduce the partisan framing the product exists to avoid.
 
+### 22.10 Pre-general-election holding state (active at launch)
+
+Primary season runs through September 2026. General election candidate sets are not final until primaries complete. The Your Ballot page shows a polished holding state at launch rather than incomplete or changing candidate data.
+
+**Page structure (holding state):**
+
+Eyebrow: YOUR BALLOT
+
+Headline: Every race on your ballot, matched to your values.
+
+Subhead: From president to state legislature — we match every candidate against your eight-dimension civic values profile. Not by party. By how they actually think and vote.
+
+Body copy:
+We're waiting for primary season to wrap before we classify candidates. General election recommendations will be ready in fall 2026. We'd rather show you nothing now than show you something that changes next week.
+
+**Sample candidate card section:**
+Below the body copy, show 2-3 sample candidate cards with a diagonal "SAMPLE" watermark across each card. Cards should look exactly like the real candidate cards spec'd in §22.5 — name, office, match indicator, top axes, one-sentence explanation, links — but populated with clearly fictional placeholder data. Purpose: show users exactly what they're getting so they understand what to look forward to.
+
+**Methodology callout:**
+A brief section below the sample cards:
+"Here's how we classify candidates →" — links to /methodology
+One sentence: "Every placement is based on voting records, stated positions, and campaign platforms — never party affiliation. Human editors review every classification before it goes live."
+
+**CTA — two states:**
+
+Registered user (has account):
+"We'll email you at [user's email] when your ballot is ready. No action needed — you're on the list."
+Secondary: "In the meantime, complete your quiz to sharpen your recommendations →" (only if completion < 100%)
+
+Not registered / not signed in:
+Primary CTA button: "Take the quiz and get notified when your ballot is ready →"
+Below button: "Already have an account? Sign in →"
+
+**Transition:** When general election data is ready and classifications are complete, remove the holding state and show real recommendations. The holding state is a page-level flag in the codebase, not a middleware gate.
+
 ---
 
 ## 23. Beyond Your Ballot
@@ -2947,6 +2982,39 @@ For challengers without a voting record: only criteria 3 and 4 apply. This filte
 
 Federal congressional races only. Static JSON file at `src/data/beyond-ballot-candidates.json`, populated manually from congress.gov and FEC data **before the pillar goes live.** The engine runs against this static set. The file must be populated as a pre-launch editorial task (in the §21 pre-launch checklist).
 
+### 23.7 Pre-general-election holding state (active at launch)
+
+Same timing constraint as Your Ballot (§22.10). Beyond Your Ballot shows a holding state at launch.
+
+**Page structure (holding state):**
+
+Eyebrow: BEYOND YOUR BALLOT
+
+Headline: The races outside your district that actually matter.
+
+Subhead: Congress runs on margins. We surface the federal candidates worth your attention — and your support — even when you can't vote for them.
+
+Body copy:
+We're waiting for primary season to wrap before we classify candidates. Beyond Your Ballot recommendations will be ready in fall 2026 — we'll only surface candidates who meet our independent-minded governance criteria, and we can't evaluate that until we know who's actually on the ballot.
+
+**Sample candidate card section:**
+2-3 sample cards with diagonal "SAMPLE" watermark. Cards should look exactly like the real Beyond Your Ballot cards — name, office, state, match indicator, governance filter criteria met, donate link — but with clearly fictional placeholder data.
+
+**Methodology callout:**
+"Here's how we pick these candidates →" — links to /methodology
+Two sentences: "Every candidate clears a four-criteria independent-minded governance filter before we surface them. Then we match them to your values profile — same eight-dimension model as Your Ballot."
+
+**CTA — same two states as §22.10:**
+
+Registered user:
+"We'll email you at [user's email] when Beyond Your Ballot is ready."
+Secondary quiz completion nudge if applicable.
+
+Not registered:
+Primary CTA: "Take the quiz and get notified when Beyond Your Ballot is ready →"
+"Already have an account? Sign in →"
+
+**Transition:** Same flag-based approach as §22.10. Remove holding state when classifications are complete post-primaries.
 
 ---
 
@@ -2957,33 +3025,49 @@ Federal congressional races only. Static JSON file at `src/data/beyond-ballot-ca
 - **Full width:** three-tier recommendations. Scrolls.
 - **No right rail.** The Article Bias Checker has been deferred (see §24b). The recommendations are full-width.
 
-### 24.1b Tier navigation bar (tab view)
+### 24.1b Tier navigation bar
 
-A sticky tab bar sits just below the page header. Clicking a tab replaces the content area with that tier's sources only — no long scroll. Default tab on load: Confirming.
+A sticky nav bar sits just below the page header and above the first tier. It shows all three tier labels at once and serves as both a navigation aid and a structural signal that three tiers exist.
 
-- Three tabs: **Confirming · Expanding · Challenging**
-- Clicking switches the content view (not scroll-spy)
-- Sticky below nav height; active tab underlined with tier accent color
+- Three labels: **Confirming · Expanding · Challenging**
+- Clicking a label smooth-scrolls to that tier
+- Active label highlights as the user scrolls past each tier (scroll-spy behavior)
+- Sticky — stays at top of viewport as user scrolls through recommendations
+- Styling: subtle, secondary — not as prominent as the page header. Think tab-bar or pill-nav, not a hero element.
 
-### 24.1c Disclosures (two, below tab bar)
+### 24.1c Source card legend
 
-Two collapsible disclosures sit between the tab bar and the source cards. Both collapsed by default. Same toggle style.
+A **"What do these labels mean?"** disclosure sits between the tier-nav bar and the first tier. Always visible — not collapsed. Left-justified definitions, consistent text size throughout.
 
-**Disclosure 1 — "What do these labels mean?"**
-
-Toggle copy: *"What do these labels mean? ↓"* / *"Got it ↑"*
+**Legend content (exact copy, locked):**
 
 - **↗** — Opens the source in a new tab so you can peruse and subscribe
+
 - **👍 👎** — Tell us if this fits. We use your feedback to improve your future recommendations.
-- **Editorial Perspective** — Our assessment of the source's overall editorial viewpoint, based on topic selection, framing, and sourcing patterns. Values: Left · Lean Left · Center · Lean Right · Right · Heterodox
 
-No [P] flag. No Format pills entry.
+- **Editorial Perspective** — Our assessment of the source's overall editorial viewpoint, based on topic selection, framing, and sourcing patterns. Possible values:
+  - Left — consistent liberal/progressive framing
+  - Lean Left — generally center-left, with some partisan framing
+  - Center — balanced or deliberately nonpartisan
+  - Lean Right — generally center-right, with some partisan framing
+  - Right — consistent conservative framing
+  - Heterodox — doesn't fit the left-right spectrum; contrarian, cross-cutting, or ideologically independent
 
-**Disclosure 2 — "What do we mean by independent?"**
+**Notes for implementation:**
+- No [P] flag — removed. Lean label alone is sufficient.
+- No Format pills entry in the legend — format labels are self-explanatory.
+- No "Medium read" / "Deep read" labels on cards — remove these entirely, they are not spec'd and have no defined data source.
+- All definition text left-justified, same font size throughout.
 
-Toggle copy: *"What do we mean by independent? ↓"* / *"Got it ↑"*
+### 24.1d "What do we mean by independent?" disclosure
 
-Content: The editorial voice is not controlled by a corporate owner, political party, advertiser network, or institutional funder with a partisan agenda. Independent journalists still have to earn a living — subscriptions, advertising, private investors, foundation grants are all fine as long as they don't control what gets covered or how.
+A second collapsible disclosure, parallel to the legend (§24.1c), sitting immediately below it. Same visual treatment — same toggle style, same font, same layout.
+
+**Toggle copy:** *"What do we mean by independent? ↓"* / *"Got it ↑"*
+
+**Expanded content (exact copy, locked):**
+
+The editorial voice is not controlled by a corporate owner, political party, advertiser network, or institutional funder with a partisan agenda. Independent journalists still have to earn a living — subscriptions, advertising, private investors, foundation grants are all fine as long as they don't control what gets covered or how.
 
 A journalist with a Substack and ten thousand paying subscribers answers to those subscribers. A journalist working for a network owned by a Fortune 500 conglomerate answers to a board of directors. That's the difference that matters. CNN is not independent. A journalist who left CNN to run their own Substack is.
 
@@ -2997,14 +3081,14 @@ YOUR MEDIA DIET
 **Headline** (Libre Baskerville, H1):
 Journalism that deepens, expands, and challenges — based on what you actually believe.
 
-**Subhead** (DM Sans, body large, primary text color — immediately below headline):
+**Subhead** (DM Sans, body large, primary text color, above the intro paragraph):
 Not an algorithm designed to rage bait you. Not a political party's talking points. Not an echo chamber.
 
 **Intro paragraph** (DM Sans, body large, secondary text color):
 Your recommendations are built on your eight-dimension values profile — matched against a curated catalog of independent journalists, Substacks, and podcasts. Three tiers, by design: sources that reinforce your foundation, sources that broaden your view, and sources that push back where it matters.
 
-**Caveat** (DM Sans, italic, muted — immediately below intro):
-We're starting with 60 hand-curated sources — chosen for quality, independence, and range. More coming.
+**Caveat line** (DM Sans, italic, muted, below intro paragraph):
+*We're starting with 60 hand-curated sources — chosen for quality, independence, and range. More coming.*
 
 ### 24.2 Three-tier model
 
@@ -3012,21 +3096,63 @@ We're starting with 60 hand-curated sources — chosen for quality, independence
 - **Expanding — "expand how you think":** `agreement >= 0.4`, `tension_on_held <= 0.4`, `novel_coverage >= 0.5`, `reliability >= 60`, not already in confirming
 - **Challenging — "challenge you where it counts":** `tension_on_held >= 0.6`, `reliability >= 75`, `good_faith === 'high'`, `independence >= 50`
 
-Each tier tab displays with:
-- A tier blurb (Claude-generated, personalized — see §24.10). Falls back to static description if generation fails.
-- Source cards (≤5 per tier)
+Each tier displays with:
+- A dynamic personalized blurb (see §24.2a)
+- Source cards (~3–5 per tier to start), each with a card-level one-liner (see §24.3)
 - Thumbs up / thumbs down on every card
+
+### 24.2a Dynamic tier blurbs (Claude-generated)
+
+After the recommendation engine selects sources for each tier, a single Claude API call generates three personalized blurbs — one per tier — explaining why these sources landed where they did for this specific user.
+
+**Trigger:** After sources are selected, before the page renders. Show a loading state while blurbs generate.
+
+**Input to Claude (per call — all three tiers in one prompt):**
+- User's Mantle type name and one-liner
+- User's top 3 dimensions (highest-scoring Layer 1 axes) with plain-language labels
+- User's bottom 2 dimensions (lowest-scoring axes)
+- For each tier: list of source names, their lean labels, and their top 2 axis scores
+- The tier placement criteria (what made each source land where it did)
+
+**Output:** Three blurbs, one per tier, in JSON:
+```json
+{
+  "confirming": "string",
+  "expanding": "string", 
+  "challenging": "string"
+}
+```
+
+**Blurb requirements:**
+- 2-3 sentences each
+- Opens by naming the user's Mantle type: "As a [Mantle Type]..."
+- Names 1-2 specific sources from the tier by name
+- References the specific axes that drove placement (in plain language, not axis codes)
+- Explains the *why* — not just "these match you" but "these match you because..."
+- Tone: warm, confident, nonpartisan. Same voice as the quiz.
+- Never says "algorithm" or "score" — say "your values profile" or "how you think about X"
+
+**Example (Confirming, The Honest Broker):**
+"As an Honest Broker, you prize rigor and balance over tribal comfort — and that shows in this tier. Sources like Axios and The Texas Tribune score high on the same institutional-integrity and pragmatic-outcomes axes that define your civic mantle. These aren't just sources that agree with you; they're sources that approach civic questions the way you do."
+
+**Example (Challenging, The Honest Broker):**
+"As an Honest Broker, your instinct is to weigh all sides — but these sources will push back on your tendency toward institutional trust. The Free Press and Persuasion both score high on the stability/change axis in directions that differ from yours, and they make the case for structural disruption in ways that deserve a serious read, even when you disagree."
+
+**Caching:** Cache blurbs per user per session. Regenerate only if the user's profile changes or sources are re-selected.
+
+**Fallback:** If the Claude call fails, show a static fallback: the existing one-line tier description. Never show an empty blurb or an error state.
+
+**Model:** `claude-sonnet-4-6` with prompt caching on the system prompt. Estimated cost: ~$0.003 per page load.
 
 ### 24.3 Source card
 
-- Name and ↗ link (opens in new tab)
+- Name and creator/host
 - Format(s) — can be multiple
-- Description (2–3 sentences, source.attribution)
-- Card one-liner (Claude-generated, personalized — see §24.10, muted italic below description)
-- Lean label: Left / Lean Left / Center / Lean Right / Right / Heterodox — no [P] flag
-- 👍 👎 feedback buttons
-
-Not shown on cards: [P] flag, "Medium/Deep read" effort labels.
+- Longer description (2-3 sentences — enough to understand what the source covers and why it's worth reading)
+- **Card-level one-liner** — one sentence explaining why this specific source landed in this tier for this user. Generated in the same Claude call as the tier blurbs. Example: "In your Challenging tier because it scores high on the stability/change axis, where you lean toward gradual reform."
+- Lean label — one of: Left · Lean Left · Center · Lean Right · Right · Heterodox. No [P] flag.
+- ↗ link (opens in new tab)
+- Thumbs up / thumbs down
 
 ### 24.4 Feedback data saved per submission
 
@@ -3078,16 +3204,6 @@ Same bar, applied consistently regardless of direction.
 - Event-triggered re-review: ownership change, major reliability incident, funding change, editorial direction shift.
 - Every change bumps `last_reviewed` and is attributed in the audit log.
 - The Perplexity verify button in the admin tool is used for current-status checks.
-
-### 24.10 Dynamic tier blurbs (Claude-generated)
-
-After the recommendation engine selects sources, a single call to `claude-sonnet-4-6` generates three personalized blurbs (one per tier) plus a one-liner per source card. Triggered once per session after `matchMedia()` completes. Cached in component state; regenerates only if the profile changes.
-
-- **Tier blurb:** 2–3 sentences, opens "As a [Mantle Type]…", names 1–2 sources from the tier, references specific axes in plain language.
-- **Card one-liner:** one sentence explaining why this source landed in this tier for this user. Shown below description, muted italic style.
-- **Loading state:** "Personalizing your recommendations…" in place of blurb while in-flight.
-- **Fallback:** static tier description if generation fails. Never show empty blurb or error text.
-- **API route:** `POST /api/media-blurbs` — accepts mantle info + source summaries, returns JSON with blurbs and card_oneliners map.
 
 ---
 
