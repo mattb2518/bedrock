@@ -2,7 +2,7 @@
 // All four sections use the same collapsed accordion pattern so they read
 // as parallel — dimensions first, then positions, vote drivers, dealbreakers.
 
-import { useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
 import { DIMENSIONS } from '@/lib/quiz/dimensions'
 import { LAYER2_QUESTIONS } from '@/lib/quiz/layer2'
 import { LAYER3_QUESTIONS } from '@/lib/quiz/layer3'
@@ -12,12 +12,15 @@ import { IT_DEPENDS, type QuizAnswer, type QuizQuestion, type QuizSession } from
 
 // ── Shared accordion shell ────────────────────────────────────────────────────
 
+const AccordionCtx = createContext<{ openTitle: string | null; setOpenTitle: (t: string | null) => void }>({ openTitle: null, setOpenTitle: () => {} })
+
 function Accordion({ title, count, children }: { title: string; count?: number; children: React.ReactNode }) {
-  const [open, setOpen] = useState(false)
+  const { openTitle, setOpenTitle } = useContext(AccordionCtx)
+  const open = openTitle === title
   return (
     <div style={{ marginBottom: 'var(--space-6)' }}>
       <button
-        onClick={() => setOpen((o) => !o)}
+        onClick={() => setOpenTitle(open ? null : title)}
         style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', background: 'none', border: 'none', cursor: 'pointer', padding: 'var(--space-4) 0', borderBottom: '1px solid var(--color-border)' }}
       >
         <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-muted)', letterSpacing: 'var(--tracking-wider)', textTransform: 'uppercase' }}>
@@ -136,13 +139,16 @@ function DealbreakersSection({ dealbreakers, dealbreakerOther }: { dealbreakers:
 export default function ProfileDetails({ session }: { session: QuizSession }) {
   if (!session.result) return null
   const { answers, dealbreakers, dealbreakerOther } = session
+  const [openTitle, setOpenTitle] = useState<string | null>(null)
 
   return (
-    <div style={{ maxWidth: 700, margin: '0 auto', padding: '0 var(--space-6) var(--space-6)' }}>
-      <DimensionsSection result={session.result} />
-      <AnswerSection title="Your positions" questions={LAYER2_QUESTIONS} answers={answers} />
-      <AnswerSection title="What drives your vote" questions={LAYER3_QUESTIONS} answers={answers} />
-      <DealbreakersSection dealbreakers={dealbreakers} dealbreakerOther={dealbreakerOther} />
-    </div>
+    <AccordionCtx.Provider value={{ openTitle, setOpenTitle }}>
+      <div style={{ maxWidth: 700, margin: '0 auto', padding: '0 var(--space-6) var(--space-6)' }}>
+        <DimensionsSection result={session.result} />
+        <AnswerSection title="Your positions" questions={LAYER2_QUESTIONS} answers={answers} />
+        <AnswerSection title="What drives your vote" questions={LAYER3_QUESTIONS} answers={answers} />
+        <DealbreakersSection dealbreakers={dealbreakers} dealbreakerOther={dealbreakerOther} />
+      </div>
+    </AccordionCtx.Provider>
   )
 }
