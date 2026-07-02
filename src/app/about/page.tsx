@@ -18,7 +18,7 @@ export default function AboutPage() {
 
         <p>I'm frustrated — and I suspect you are too. Frustrated that real problems with real solutions sit unsolved year after year. Frustrated that the tools built for voters assume you have a party and flatten everything else. Frustrated that even engaged, thoughtful citizens walk into voting booths uninformed about most of what's on their ballot.</p>
 
-        <p>But frustration without action is just noise. So instead of waiting for someone else to fix it, I built something.</p>
+        <p>But frustration without action is just noise. So instead of waiting for someone else to fix it, I decided to celebrate our nation's 250th birthday by building something.</p>
 
         <p>Our political system has become so polarized that real problems stop getting solved. Not because solutions don't exist. Because solving them would require leaders to put country over party. Over self. Over their next fundraising email.</p>
 
@@ -30,7 +30,7 @@ export default function AboutPage() {
 
         <p>The fastest-growing voter segment in America — people who don't fully belong to either party — has no real civic infrastructure built for it.</p>
 
-        <p>Every existing tool assumes a party as a starting point. The media ecosystem sorts you into a tribe whether you want one or not. The political conversation treats you as a swing voter to be captured rather than a citizen to be served.</p>
+        <p>Every existing tool assumes a party as a starting point. The media ecosystem sorts you into a tribe whether you want one or not. Social media rewards rage with clickbait and algorithms designed to divide us and provoke outrage. The political conversation treats you as a swing voter to be captured rather than a citizen to be served.</p>
 
         <p>That's not an accident. It's a structural failure.</p>
 
