@@ -16,7 +16,7 @@ import type { DimensionalProfile } from "@/types/quiz";
 function PillarCards() {
   return (
     <div className="pillar-grid">
-      <Link href="/ballot" style={{ textDecoration: "none", display: "block", height: "100%" }}>
+      <Link href="/your-ballot" style={{ textDecoration: "none", display: "block", height: "100%" }}>
         <div style={{ backgroundColor: "var(--color-bg-surface)", border: "1px solid var(--color-border)", borderRadius: "var(--radius-lg)", padding: "var(--space-8)", borderTop: "3px solid var(--color-red)", transition: "var(--transition-base)", cursor: "pointer", height: "100%", boxSizing: "border-box" }}>
           <h3 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-h3)", color: "var(--color-text-primary)", marginBottom: "var(--space-3)" }}>Your Ballot</h3>
           <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-body)", color: "var(--color-text-secondary)", lineHeight: "var(--leading-relaxed)" }}>Every race, matched to your values. From president to school board.</p>
