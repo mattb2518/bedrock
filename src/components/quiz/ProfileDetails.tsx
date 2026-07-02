@@ -1,3 +1,5 @@
+'use client'
+
 // Results-page accordion sections: dimensions + deeper quiz layers.
 // All four sections use the same collapsed accordion pattern so they read
 // as parallel — dimensions first, then positions, vote drivers, dealbreakers.
@@ -137,9 +139,9 @@ function DealbreakersSection({ dealbreakers, dealbreakerOther }: { dealbreakers:
 // ── Export ────────────────────────────────────────────────────────────────────
 
 export default function ProfileDetails({ session }: { session: QuizSession }) {
+  const [openTitle, setOpenTitle] = useState<string | null>(null)
   if (!session.result) return null
   const { answers, dealbreakers, dealbreakerOther } = session
-  const [openTitle, setOpenTitle] = useState<string | null>(null)
 
   return (
     <AccordionCtx.Provider value={{ openTitle, setOpenTitle }}>
