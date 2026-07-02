@@ -669,8 +669,11 @@ function YourBallotHoldingState({
         <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body-lg)', color: 'var(--color-text-primary)', lineHeight: 'var(--leading-relaxed)', marginBottom: 'var(--space-4)' }}>
           From president to state legislature — we match every candidate against your eight-dimension civic values profile. Not by party. By how they actually think and vote.
         </p>
-        <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)' }}>
+        <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', marginBottom: 'var(--space-3)' }}>
           We&apos;re waiting for primary season to wrap before we classify candidates. General election recommendations will be ready in fall 2026. We&apos;d rather show you nothing now than show you something that changes next week.
+        </p>
+        <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)' }}>
+          We&apos;re starting with federal and statewide races, where the data is most reliable. Local races and ballot measures are harder — the information is patchy and inconsistent across jurisdictions — but we&apos;re working through it and will add coverage as we find sources we trust.
         </p>
       </div>
 
