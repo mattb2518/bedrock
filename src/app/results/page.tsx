@@ -7,36 +7,8 @@ import MantleReveal from '@/components/quiz/MantleReveal'
 import ProfileDetails from '@/components/quiz/ProfileDetails'
 import { useCallback, useState } from 'react'
 
-function AccountPrompt() {
-  const [dismissed, setDismissed] = useState(false)
-  if (dismissed) return null
-  return (
-    <div style={{ maxWidth: 700, margin: '0 auto', padding: '0 var(--space-6) var(--space-6)' }}>
-      <div style={{ backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-5)', display: 'flex', gap: 'var(--space-4)', alignItems: 'flex-start', flexWrap: 'wrap' }}>
-        <div style={{ flex: 1, minWidth: 200 }}>
-          <p style={{ margin: '0 0 var(--space-2)', fontFamily: 'var(--font-body)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-primary)', fontSize: 'var(--text-body)' }}>
-            Save your results
-          </p>
-          <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)' }}>
-            Create a free account to save your Civic Mantle and get personalized recommendations across all four pillars.
-          </p>
-        </div>
-        <div style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'center', flexShrink: 0 }}>
-          <Link href="/signup" style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--weight-semibold)', fontSize: 'var(--text-small)', backgroundColor: 'var(--color-red)', color: '#fff', textDecoration: 'none', padding: 'var(--space-2) var(--space-4)', borderRadius: 'var(--btn-radius)' }}>
-            Sign Up Free
-          </Link>
-          <button onClick={() => setDismissed(true)} style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
-            Skip for now
-          </button>
-        </div>
-      </div>
-    </div>
-  )
-}
-
 export default function ResultsPage() {
   const session = useQuizStore((s) => s.session)
-  const isAnonymous = !session?.userId
 
   if (!session?.result) {
     return (
@@ -60,7 +32,6 @@ export default function ResultsPage() {
   return (
     <>
       <MantleReveal result={session.result} hideDimBreakdown />
-      {isAnonymous && <AccountPrompt />}
       <div style={{ maxWidth: 700, margin: '0 auto', padding: '0 var(--space-6) var(--space-4)', textAlign: 'center' }}>
         <a href="#put-it-to-work" style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', textDecoration: 'none' }}>
           Put it to work ↓

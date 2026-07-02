@@ -649,7 +649,6 @@ function YourBallotHoldingState({
   const session = useQuizStore((s) => s.session)
   const setDemographics = useQuizStore((s) => s.setDemographics)
   const [userEmail, setUserEmail] = useState<string | null>(null)
-  const [bannerDismissed, setBannerDismissed] = useState(false)
   const [zipInput, setZipInput] = useState('')
   const [zipSaved, setZipSaved] = useState(false)
 
@@ -765,16 +764,6 @@ function YourBallotHoldingState({
         </p>
       </div>
 
-      {/* Account banner for quiz-complete/no-account users (13b) */}
-      {hasProfile && !isRegistered && !bannerDismissed && (
-        <div style={{ backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border)', borderLeft: '3px solid var(--color-gold)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-4)', marginBottom: 'var(--space-6)', display: 'flex', alignItems: 'center', gap: 'var(--space-4)', flexWrap: 'wrap' }}>
-          <p style={{ flex: 1, margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)' }}>
-            Your results are temporary. <a href="/signup" style={{ color: 'var(--color-blue-accent)', textDecoration: 'none', fontWeight: 'var(--weight-semibold)' }}>Create a free account</a> to save them and get notified when your ballot is ready.
-          </p>
-          <button onClick={() => setBannerDismissed(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', padding: 0, flexShrink: 0 }}>Dismiss</button>
-        </div>
-      )}
-
       {/* CTA */}
       {isRegistered ? (
         <div>
@@ -786,13 +775,6 @@ function YourBallotHoldingState({
               <a href="/quiz" style={{ color: 'var(--color-blue-accent)', textDecoration: 'none' }}>Complete your quiz to sharpen your recommendations →</a>
             </p>
           )}
-        </div>
-      ) : hasProfile ? (
-        // Quiz done, no account — suppress quiz CTA, just prompt signup
-        <div>
-          <a href="/signup" style={{ display: 'block', width: '100%', boxSizing: 'border-box', textAlign: 'center', fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', fontWeight: 'var(--weight-semibold)', color: '#fff', backgroundColor: 'var(--color-red)', textDecoration: 'none', padding: 'var(--space-4) var(--space-6)', borderRadius: 'var(--btn-radius)', marginBottom: 'var(--space-3)' }}>
-            Create an account to get notified →
-          </a>
         </div>
       ) : (
         <div>
