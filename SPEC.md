@@ -72,7 +72,7 @@ Civic identity → candidates outside your own district worth supporting — mat
   - **Open text:** "Tell us more — what shapes your answer?" Used when nuance is personal and hard to pre-enumerate
   - **Choice follow-up (select all that apply):** 3-4 specific sub-cases. Used when sub-cases are predictable
 - Each question gets one follow-up mechanic, decided at write time
-- **Dimension importance rating:** Single question at the end of Layer 1 — after all 20 questions, before the constellation reveal. Shows all eight dimensions as selectable tiles; user picks up to 3 that feel most central to their civic identity. Framing: *"You've just mapped how you think. Before we show you your constellation — which of these feel most central to who you are as a voter?"* Output feeds the recommendation engine as a weighting signal. Pushes Layer 1 to 21 items total.
+- **Dimension importance rating:** Single question at the end of Layer 1 — after all 14 questions, before the constellation reveal. Shows all eight dimensions as selectable tiles; user picks up to 3 that feel most central to their civic identity. Framing: *"You've just mapped how you think. Before we show you your constellation — which of these feel most central to who you are as a voter?"* Output feeds the recommendation engine as a weighting signal. Pushes Layer 1 to 15 items total.
 - **"Add context" on every question:** Small, subtle gray "+ add context" link below each answer. Expands an inline text field on click. No label saying "optional" — unobtrusiveness communicates that. Applies to all layers.
 - **Micro-reactions** after each answer: brief, warm, occasionally surprising, never partisan, occasionally humorous. User must tap, click, or press Enter to advance — no auto-advance. Click target should be the full screen or answer area, not a labeled button.
 - **Easter eggs:** American only — historical nuggets, serious trivia, or humor. Woven in naturally, roughly 1 per question. Mix of serious historical and lighter Americana.
@@ -670,7 +670,7 @@ During a severe pandemic, the federal government mandates vaccines, masks, and b
 
 *9 questions: issue positions*
 *Stem on every question: "Of the following, what's the right first move?"*
-*Bias-checked and cleared.*
+*Bias-reviewed (June 2026); audit pass in progress (July 2026).*
 
 ---
 
@@ -741,6 +741,9 @@ The Second Amendment protects an individual right to own firearms. The debate is
 
 **D.** Pass major new restrictions — universal background checks, a federal permit-to-purchase requirement, restrictions on military-style weapons, and stricter limits on who can carry where.
 *"The structural-change answer. Most other wealthy democracies treat firearms more like vehicles — licensed, regulated, and limited by type — and have dramatically lower gun violence rates."*
+
+**E.** Protect and expand gun rights — the problem is criminals, not lawful owners. Enforce existing laws against violent offenders, enact national concealed-carry reciprocity, and roll back restrictions that burden law-abiding owners without measurably reducing crime.
+*"The rights-first answer. The premise: an armed, law-abiding citizenry is a constitutional baseline, and policy aimed at lawful owners tends to miss where violence actually concentrates."*
 
 **It depends** → MC (select all that apply): *"What shapes your view?"*
 - Whether you think more laws would actually be enforced
@@ -896,7 +899,7 @@ Technology companies now know more about most Americans than the government does
 *8 questions: voting behavior and priority intensity*
 *Behavioral register — noticeably different feel from Layers 1 and 2*
 *No Easter egg on Q8 — it's the capstone*
-*Bias-checked and cleared.*
+*Bias-reviewed (June 2026); audit pass in progress (July 2026).*
 
 ---
 
@@ -2895,7 +2898,7 @@ Yellow flag on the card with the specific item name. The user decides whether to
 
 1. No party-line voting rate above 85% (incumbents with a record only)
 2. History of co-sponsoring or supporting bipartisan legislation (incumbents with a record only)
-3. Publicly committed to specific structural reforms — gerrymandering, campaign finance, filibuster reform — not vague unity language
+3. Publicly committed to a specific structural or institutional reform — for example redistricting/anti-gerrymandering reform, campaign-finance or disclosure reform, congressional term limits, age or tenure limits including Supreme Court term limits, debt-ceiling or budget-process reform, or limits on executive and emergency powers — not vague unity language. What counts is a concrete, checkable reform commitment, regardless of partisan direction
 4. Endorsed by a documented cross-partisan organization whose membership includes elected officials from both parties acting in a non-party capacity (for example, the Problem Solvers Caucus or Unite America) OR explicitly contested their own party's position on a major issue with a recorded vote or public statement
 
 For challengers without a voting record: only criteria 3 and 4 apply. This filter is **editorial.** Criteria are published on the Methodology page so users can evaluate the judgment.
@@ -3230,7 +3233,7 @@ Same structure, substituting source scoring for candidate scoring. Add:
 
 ### 25.3 Beyond Your Ballot governance filter — methodology paragraph
 
-> "Four criteria, must meet at least two: no party-line voting rate above 85% for incumbents; history of co-sponsoring bipartisan legislation; publicly committed to specific structural reforms (gerrymandering, campaign finance, filibuster reform — not vague unity language); endorsed by a documented cross-partisan organization whose membership includes elected officials from both parties acting in a non-party capacity (for example, the Problem Solvers Caucus or Unite America) or explicitly contested their own party's position with a recorded vote or statement. This filter is editorial. We define it, we apply it, we publish the criteria so you can evaluate our judgment."
+> "Four criteria, must meet at least two: no party-line voting rate above 85% for incumbents; history of co-sponsoring bipartisan legislation; publicly committed to a specific structural or institutional reform — redistricting, campaign finance and disclosure, congressional term limits, age or tenure limits including Supreme Court term limits, debt-ceiling or budget-process reform, or executive and emergency-power limits, not vague unity language, and regardless of partisan direction; endorsed by a documented cross-partisan organization whose membership includes elected officials from both parties acting in a non-party capacity (for example, the Problem Solvers Caucus or Unite America) or explicitly contested their own party's position with a recorded vote or statement. This filter is editorial. We define it, we apply it, we publish the criteria so you can evaluate our judgment."
 
 
 ---
