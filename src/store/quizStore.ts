@@ -52,8 +52,23 @@ interface QuizStore {
   setSessionFromCloud: (partial: Partial<QuizSession>) => void
 }
 
+const PENDING_ZIP_KEY = 'bedrock_pending_zip'
+
+export function savePendingZip(zip: string) {
+  try { localStorage.setItem(PENDING_ZIP_KEY, zip) } catch { /* ignore */ }
+}
+
+function consumePendingZip(): string | null {
+  try {
+    const zip = localStorage.getItem(PENDING_ZIP_KEY)
+    if (zip) localStorage.removeItem(PENDING_ZIP_KEY)
+    return zip
+  } catch { return null }
+}
+
 function newSession(): QuizSession {
   const now = new Date().toISOString()
+  const pendingZip = consumePendingZip()
   return {
     id: crypto.randomUUID(),
     currentLayer: 1,
@@ -64,6 +79,7 @@ function newSession(): QuizSession {
     completedLayers: [],
     startedAt: now,
     updatedAt: now,
+    ...(pendingZip ? { demographics: { zipCode: pendingZip } } : {}),
   }
 }
 
@@ -191,7 +207,15 @@ export const useQuizStore = create<QuizStore>()(
             startedAt: partial.startedAt ?? new Date().toISOString(),
             updatedAt: partial.updatedAt ?? new Date().toISOString(),
           }
-          return { session: { ...base, ...partial } }
+          const merged = { ...base, ...partial }
+          // Apply any pending ZIP that was saved before a session existed
+          if (!merged.demographics?.zipCode) {
+            const pendingZip = consumePendingZip()
+            if (pendingZip) {
+              merged.demographics = { ...merged.demographics, zipCode: pendingZip }
+            }
+          }
+          return { session: merged }
         }),
 
       attachUser: (userId) =>

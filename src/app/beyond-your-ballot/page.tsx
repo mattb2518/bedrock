@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useTransition, useMemo, useEffect } from 'react'
-import { useQuizStore } from '@/store/quizStore'
+import { useQuizStore, savePendingZip } from '@/store/quizStore'
 import { filterBeyondBallotCandidates, matchRace } from '@/lib/engine/match'
 import { buildMatchKey } from '@/lib/engine/buildMatchKey'
 import { resolveDistrict } from '@/lib/civic/resolveDistrict'
@@ -523,6 +523,16 @@ function BeyondYourBallotHoldingState({
             Personalized for ZIP <strong style={{ color: 'var(--color-text-primary)' }}>{session?.demographics?.zipCode}</strong>.{' '}
             <button onClick={() => { setZipSaved(false); setZipInput('') }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-blue-accent)', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', padding: 0 }}>Change</button>
           </p>
+        ) : zipSaved && !hasProfile ? (
+          <div>
+            <p style={{ margin: '0 0 var(--space-3)', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)' }}>
+              ZIP {zipInput} noted. To get notified when your recommendations are ready,{' '}
+              <a href="/signup" style={{ color: 'var(--color-blue-accent)', fontWeight: 'var(--weight-semibold)', textDecoration: 'none' }}>create a free account</a>
+              {' '}with your email — we&apos;ll send you a link the moment they&apos;re live. Or{' '}
+              <a href="/quiz" style={{ color: 'var(--color-blue-accent)', fontWeight: 'var(--weight-semibold)', textDecoration: 'none' }}>take the quiz</a>
+              {' '}to build your full profile and get matched candidates.
+            </p>
+          </div>
         ) : zipSaved ? (
           <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)' }}>
             ZIP {zipInput} saved. ✓
@@ -530,7 +540,9 @@ function BeyondYourBallotHoldingState({
         ) : (
           <>
             <p style={{ margin: '0 0 var(--space-3)', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)' }}>
-              Add your ZIP code so we can personalize your recommendations when they&apos;re ready.
+              {hasProfile
+                ? 'Add your ZIP code so we can personalize your recommendations when they\'re ready.'
+                : 'Add your ZIP code to personalize your recommendations. Then create an account so we can email you when they go live.'}
             </p>
             <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
               <input
@@ -545,7 +557,11 @@ function BeyondYourBallotHoldingState({
               <button
                 disabled={zipInput.length !== 5}
                 onClick={() => {
-                  setDemographics({ ...session?.demographics, zipCode: zipInput })
+                  if (session) {
+                    setDemographics({ ...session.demographics, zipCode: zipInput })
+                  } else {
+                    savePendingZip(zipInput)
+                  }
                   setZipSaved(true)
                 }}
                 style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: '#fff', backgroundColor: zipInput.length === 5 ? 'var(--color-blue-accent)' : 'var(--color-border)', border: 'none', borderRadius: 'var(--radius-md)', padding: 'var(--space-2) var(--space-4)', cursor: zipInput.length === 5 ? 'pointer' : 'not-allowed' }}
