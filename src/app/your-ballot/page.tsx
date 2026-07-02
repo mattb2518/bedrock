@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition, useMemo } from 'react'
+import { useState, useTransition, useMemo, useEffect } from 'react'
 import { useQuizStore } from '@/store/quizStore'
 import { matchRace } from '@/lib/engine/match'
 import { buildMatchKey } from '@/lib/engine/buildMatchKey'
@@ -496,6 +496,234 @@ function RaceSection({
   )
 }
 
+// ── Holding state flag (§22.10) ───────────────────────────────────────────────
+// Flip to false when general election classifications are ready (fall 2026).
+
+const HOLDING_STATE = true
+
+// ── Sample watermark ──────────────────────────────────────────────────────────
+
+function SampleWatermark() {
+  return (
+    <div style={{
+      position: 'absolute',
+      inset: 0,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      pointerEvents: 'none',
+      userSelect: 'none',
+      zIndex: 1,
+      overflow: 'hidden',
+      borderRadius: 'var(--radius-lg)',
+    }}>
+      <span style={{
+        fontFamily: 'var(--font-display)',
+        fontWeight: '700',
+        fontSize: '64px',
+        color: 'var(--color-text-primary)',
+        opacity: 0.1,
+        transform: 'rotate(-30deg)',
+        whiteSpace: 'nowrap',
+        letterSpacing: '0.1em',
+      }}>
+        SAMPLE
+      </span>
+    </div>
+  )
+}
+
+// ── Sample candidate card (Your Ballot) ───────────────────────────────────────
+
+interface SampleBallotCandidate {
+  name: string
+  party: string
+  office: string
+  confidence: 'confident' | 'lean'
+  explanation: string
+  alignedAxes: string[]
+  dealbreaker?: string
+  campaignSite: string
+}
+
+function SampleCandidateCard({ candidate }: { candidate: SampleBallotCandidate }) {
+  const color = candidate.confidence === 'confident' ? 'var(--color-green)' : 'var(--color-blue-accent)'
+  const label = candidate.confidence === 'confident' ? 'Strong match' : 'Moderate match'
+
+  return (
+    <div style={{
+      position: 'relative',
+      border: '1px solid var(--color-border)',
+      borderRadius: 'var(--radius-lg)',
+      padding: 'var(--space-5)',
+      backgroundColor: 'var(--color-bg-surface)',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 'var(--space-3)',
+    }}>
+      <SampleWatermark />
+
+      {/* Header */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+        <div>
+          <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-primary)' }}>
+            {candidate.name}
+          </p>
+          <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)' }}>
+            {candidate.office} · {candidate.party}
+          </p>
+        </div>
+        <span style={{ fontSize: 'var(--text-small)', fontFamily: 'var(--font-body)', fontWeight: 'var(--weight-semibold)', color, backgroundColor: 'var(--color-bg-base)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', padding: '2px 8px', whiteSpace: 'nowrap' }}>
+          {label}
+        </span>
+      </div>
+
+      {/* Explanation */}
+      <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)' }}>
+        {candidate.explanation}
+      </p>
+
+      {/* Aligned axes */}
+      <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)' }}>
+        <strong style={{ color: 'var(--color-text-primary)' }}>Aligns with you on:</strong>{' '}
+        {candidate.alignedAxes.join(', ')}
+      </p>
+
+      {/* Dealbreaker flag */}
+      {candidate.dealbreaker && (
+        <div style={{ backgroundColor: 'rgba(234, 179, 8, 0.1)', border: '1px solid rgba(234, 179, 8, 0.4)', borderRadius: 'var(--radius-sm)', padding: 'var(--space-2) var(--space-3)' }}>
+          <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-primary)' }}>
+            🚩 <strong>Dealbreaker flagged:</strong> {candidate.dealbreaker}
+          </p>
+        </div>
+      )}
+
+      {/* Links */}
+      <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
+        <a href={candidate.campaignSite} style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-blue-accent)', textDecoration: 'none' }}>
+          Campaign site ↗
+        </a>
+      </div>
+
+      {/* Learn more (non-interactive in sample) */}
+      <button disabled style={{ background: 'none', border: 'none', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', padding: 0, textAlign: 'left', cursor: 'default' }}>
+        ▸ Learn more — full axis breakdown, campaign finance, sources
+      </button>
+    </div>
+  )
+}
+
+const SAMPLE_BALLOT_CANDIDATES: SampleBallotCandidate[] = [
+  {
+    name: 'Alex Rivera',
+    party: 'Independent',
+    office: 'U.S. Senate · Westfield',
+    confidence: 'confident',
+    explanation: 'Rivera\'s voting record on institutional reform and fiscal federalism closely tracks how you scored on the rules-vs-outcomes and local-vs-federal axes — the two dimensions where your profile is most defined.',
+    alignedAxes: ['rules vs. outcomes', 'local vs. federal authority'],
+    campaignSite: '#',
+  },
+  {
+    name: 'Jordan Mitchell',
+    party: 'Democrat',
+    office: 'U.S. House · District 7, Lakeport',
+    confidence: 'lean',
+    explanation: 'Mitchell aligns on pragmatism and institutional trust but diverges from you on the markets-vs-governance axis — included because the overall distance is low and the divergence is on a dimension where you hold lighter views.',
+    alignedAxes: ['pragmatism vs. idealism', 'institutional trust'],
+    dealbreaker: 'Supported legislation restricting ballot access in 2022',
+    campaignSite: '#',
+  },
+]
+
+// ── Your Ballot holding state ─────────────────────────────────────────────────
+
+function YourBallotHoldingState({
+  completionPercent,
+  userId,
+}: {
+  completionPercent: number
+  userId: string | null
+}) {
+  const [userEmail, setUserEmail] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!userId) return
+    createClient().auth.getUser().then(({ data }) => {
+      setUserEmail(data.user?.email ?? null)
+    })
+  }, [userId])
+
+  const isRegistered = Boolean(userId)
+
+  return (
+    <main style={{ maxWidth: 860, margin: '0 auto', padding: 'var(--space-8) var(--space-4)' }}>
+
+      {/* Page header */}
+      <div style={{ marginBottom: 'var(--space-10)' }}>
+        <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-muted)', letterSpacing: 'var(--tracking-wider)', textTransform: 'uppercase', marginBottom: 'var(--space-5)' }}>
+          Your Ballot
+        </p>
+        <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-h1)', color: 'var(--color-text-primary)', lineHeight: 'var(--leading-tight)', marginBottom: 'var(--space-5)' }}>
+          Every race on your ballot, matched to your values.
+        </h1>
+        <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body-lg)', color: 'var(--color-text-primary)', lineHeight: 'var(--leading-relaxed)', marginBottom: 'var(--space-4)' }}>
+          From president to state legislature — we match every candidate against your eight-dimension civic values profile. Not by party. By how they actually think and vote.
+        </p>
+        <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)' }}>
+          We&apos;re waiting for primary season to wrap before we classify candidates. General election recommendations will be ready in fall 2026. We&apos;d rather show you nothing now than show you something that changes next week.
+        </p>
+      </div>
+
+      {/* Sample cards */}
+      <div style={{ marginBottom: 'var(--space-10)' }}>
+        <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-muted)', letterSpacing: 'var(--tracking-wider)', textTransform: 'uppercase', marginBottom: 'var(--space-4)' }}>
+          Here&apos;s what your ballot will look like
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+          {SAMPLE_BALLOT_CANDIDATES.map((c) => (
+            <SampleCandidateCard key={c.name} candidate={c} />
+          ))}
+        </div>
+      </div>
+
+      {/* Methodology callout */}
+      <div style={{ marginBottom: 'var(--space-10)', padding: 'var(--space-4)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--color-bg-surface)' }}>
+        <a href="/methodology" style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-blue-accent)', textDecoration: 'none' }}>
+          Here&apos;s how we classify candidates →
+        </a>
+        <p style={{ margin: 'var(--space-2) 0 0', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', lineHeight: 'var(--leading-relaxed)' }}>
+          Every placement is based on voting records, stated positions, and campaign platforms — never party affiliation. Human editors review every classification before it goes live.
+        </p>
+      </div>
+
+      {/* CTA */}
+      {isRegistered ? (
+        <div>
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-primary)', lineHeight: 'var(--leading-relaxed)', marginBottom: 'var(--space-3)' }}>
+            We&apos;ll email you at <strong>{userEmail ?? 'your address on file'}</strong> when your ballot is ready. No action needed — you&apos;re on the list.
+          </p>
+          {completionPercent < 100 && (
+            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)' }}>
+              <a href="/quiz" style={{ color: 'var(--color-blue-accent)', textDecoration: 'none' }}>Complete your quiz to sharpen your recommendations →</a>
+            </p>
+          )}
+        </div>
+      ) : (
+        <div>
+          <a href="/quiz" style={{ display: 'block', width: '100%', boxSizing: 'border-box', textAlign: 'center', fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', fontWeight: 'var(--weight-semibold)', color: '#fff', backgroundColor: 'var(--color-red)', textDecoration: 'none', padding: 'var(--space-4) var(--space-6)', borderRadius: 'var(--btn-radius)', marginBottom: 'var(--space-3)' }}>
+            Take the quiz and get notified when your ballot is ready →
+          </a>
+          <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', textAlign: 'center' }}>
+            Already have an account?{' '}
+            <a href="/signin" style={{ color: 'var(--color-blue-accent)', textDecoration: 'none' }}>Sign in →</a>
+          </p>
+        </div>
+      )}
+
+    </main>
+  )
+}
+
 // ── Main page ─────────────────────────────────────────────────────────────────
 
 export default function YourBallotPage() {
@@ -602,6 +830,11 @@ export default function YourBallotPage() {
         setAddressError('Could not look up that address. Try including your city, state, and ZIP code.')
       }
     })
+  }
+
+  // ── Holding state (§22.10) — all hooks above have run unconditionally ────
+  if (HOLDING_STATE && hasProfile) {
+    return <YourBallotHoldingState completionPercent={completionPercent} userId={userId} />
   }
 
   return (

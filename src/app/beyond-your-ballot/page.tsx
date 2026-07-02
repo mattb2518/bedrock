@@ -325,6 +325,239 @@ function CandidateCard({
   )
 }
 
+// ── Holding state flag (§23.7) ────────────────────────────────────────────────
+// Flip to false when general election classifications are ready (fall 2026).
+
+const HOLDING_STATE = true
+
+// ── Sample BYB card ───────────────────────────────────────────────────────────
+
+interface SampleBYBCandidate {
+  name: string
+  party: string
+  office: string
+  state: string
+  confidence: 'confident' | 'lean'
+  governanceCriteria: string[]
+  explanation: string
+  alignedAxes: string[]
+  dealbreaker?: string
+  donateLink: string
+}
+
+function SampleWatermark() {
+  return (
+    <div style={{
+      position: 'absolute',
+      inset: 0,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      pointerEvents: 'none',
+      userSelect: 'none',
+      zIndex: 1,
+      overflow: 'hidden',
+      borderRadius: 'var(--radius-lg)',
+    }}>
+      <span style={{
+        fontFamily: 'var(--font-display)',
+        fontWeight: '700',
+        fontSize: '64px',
+        color: 'var(--color-text-primary)',
+        opacity: 0.1,
+        transform: 'rotate(-30deg)',
+        whiteSpace: 'nowrap',
+        letterSpacing: '0.1em',
+      }}>
+        SAMPLE
+      </span>
+    </div>
+  )
+}
+
+function SampleBYBCard({ candidate }: { candidate: SampleBYBCandidate }) {
+  const color = candidate.confidence === 'confident' ? 'var(--color-green)' : 'var(--color-blue-accent)'
+  const label = candidate.confidence === 'confident' ? 'Strong match' : 'Moderate match'
+
+  return (
+    <div style={{
+      position: 'relative',
+      border: '1px solid var(--color-border)',
+      borderRadius: 'var(--radius-lg)',
+      padding: 'var(--space-5)',
+      backgroundColor: 'var(--color-bg-surface)',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 'var(--space-3)',
+    }}>
+      <SampleWatermark />
+
+      {/* Header */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+        <div>
+          <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-primary)' }}>
+            {candidate.name}
+          </p>
+          <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)' }}>
+            {candidate.office} · {candidate.state} · {candidate.party}
+          </p>
+        </div>
+        <span style={{ fontSize: 'var(--text-small)', fontFamily: 'var(--font-body)', fontWeight: 'var(--weight-semibold)', color, backgroundColor: 'var(--color-bg-base)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', padding: '2px 8px', whiteSpace: 'nowrap' }}>
+          {label}
+        </span>
+      </div>
+
+      {/* Governance criteria */}
+      <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)' }}>
+        <strong style={{ color: 'var(--color-text-primary)' }}>Governance criteria met:</strong>{' '}
+        {candidate.governanceCriteria.join(' · ')}
+      </p>
+
+      {/* Explanation */}
+      <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)' }}>
+        {candidate.explanation}
+      </p>
+
+      {/* Aligned axes */}
+      <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)' }}>
+        <strong style={{ color: 'var(--color-text-primary)' }}>Aligns with you on:</strong>{' '}
+        {candidate.alignedAxes.join(', ')}
+      </p>
+
+      {/* Dealbreaker flag */}
+      {candidate.dealbreaker && (
+        <div style={{ backgroundColor: 'rgba(234, 179, 8, 0.1)', border: '1px solid rgba(234, 179, 8, 0.4)', borderRadius: 'var(--radius-sm)', padding: 'var(--space-2) var(--space-3)' }}>
+          <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-primary)' }}>
+            🚩 <strong>Dealbreaker flagged:</strong> {candidate.dealbreaker}
+          </p>
+        </div>
+      )}
+
+      {/* Donate link */}
+      <div>
+        <a href={candidate.donateLink} style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-blue-accent)', textDecoration: 'none' }}>
+          Donate ↗
+        </a>
+      </div>
+    </div>
+  )
+}
+
+const SAMPLE_BYB_CANDIDATES: SampleBYBCandidate[] = [
+  {
+    name: 'Sam Okafor',
+    party: 'Republican',
+    office: 'U.S. Senate',
+    state: 'Northvale',
+    confidence: 'confident',
+    governanceCriteria: ['Bipartisan co-sponsorship', 'Cross-party endorsement'],
+    explanation: 'Okafor has a documented record of working across the aisle on budget process reform — directly relevant to the rules-vs-outcomes axis where your values are strongest.',
+    alignedAxes: ['rules vs. outcomes', 'institutional trust'],
+    donateLink: '#',
+  },
+  {
+    name: 'Casey Delgado',
+    party: 'Democrat',
+    office: 'U.S. House · District 12',
+    state: 'Eastmoor',
+    confidence: 'lean',
+    governanceCriteria: ['Publicly committed to structural reform'],
+    explanation: 'Delgado aligns closely on the stability-vs-change and individual-vs-collective axes, and has publicly broken with party leadership on filibuster reform — rare enough to clear the governance filter.',
+    alignedAxes: ['stability vs. change', 'individual vs. collective'],
+    dealbreaker: 'Voted against emergency disaster relief funding in 2021',
+    donateLink: '#',
+  },
+]
+
+// ── Beyond Your Ballot holding state ─────────────────────────────────────────
+
+function BeyondYourBallotHoldingState({
+  completionPercent,
+  userId,
+}: {
+  completionPercent: number
+  userId: string | null
+}) {
+  const [userEmail, setUserEmail] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!userId) return
+    createClient().auth.getUser().then(({ data }) => {
+      setUserEmail(data.user?.email ?? null)
+    })
+  }, [userId])
+
+  const isRegistered = Boolean(userId)
+
+  return (
+    <main style={{ maxWidth: 860, margin: '0 auto', padding: 'var(--space-8) var(--space-4)' }}>
+
+      {/* Page header */}
+      <div style={{ marginBottom: 'var(--space-10)' }}>
+        <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-muted)', letterSpacing: 'var(--tracking-wider)', textTransform: 'uppercase', marginBottom: 'var(--space-5)' }}>
+          Beyond Your Ballot
+        </p>
+        <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-h1)', color: 'var(--color-text-primary)', lineHeight: 'var(--leading-tight)', marginBottom: 'var(--space-5)' }}>
+          The races outside your district that actually matter.
+        </h1>
+        <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body-lg)', color: 'var(--color-text-primary)', lineHeight: 'var(--leading-relaxed)', marginBottom: 'var(--space-4)' }}>
+          Congress runs on margins. We surface the federal candidates worth your attention — and your support — even when you can&apos;t vote for them.
+        </p>
+        <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)' }}>
+          We&apos;re waiting for primary season to wrap before we classify candidates. Beyond Your Ballot recommendations will be ready in fall 2026 — we&apos;ll only surface candidates who meet our independent-minded governance criteria, and we can&apos;t evaluate that until we know who&apos;s actually on the ballot.
+        </p>
+      </div>
+
+      {/* Sample cards */}
+      <div style={{ marginBottom: 'var(--space-10)' }}>
+        <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-muted)', letterSpacing: 'var(--tracking-wider)', textTransform: 'uppercase', marginBottom: 'var(--space-4)' }}>
+          Here&apos;s what your recommendations will look like
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+          {SAMPLE_BYB_CANDIDATES.map((c) => (
+            <SampleBYBCard key={c.name} candidate={c} />
+          ))}
+        </div>
+      </div>
+
+      {/* Methodology callout */}
+      <div style={{ marginBottom: 'var(--space-10)', padding: 'var(--space-4)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--color-bg-surface)' }}>
+        <a href="/methodology" style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-blue-accent)', textDecoration: 'none' }}>
+          Here&apos;s how we pick these candidates →
+        </a>
+        <p style={{ margin: 'var(--space-2) 0 0', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', lineHeight: 'var(--leading-relaxed)' }}>
+          Every candidate clears a four-criteria independent-minded governance filter before we surface them. Then we match them to your values profile — same eight-dimension model as Your Ballot.
+        </p>
+      </div>
+
+      {/* CTA */}
+      {isRegistered ? (
+        <div>
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-primary)', lineHeight: 'var(--leading-relaxed)', marginBottom: 'var(--space-3)' }}>
+            We&apos;ll email you at <strong>{userEmail ?? 'your address on file'}</strong> when Beyond Your Ballot is ready. No action needed — you&apos;re on the list.
+          </p>
+          {completionPercent < 100 && (
+            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)' }}>
+              <a href="/quiz" style={{ color: 'var(--color-blue-accent)', textDecoration: 'none' }}>Complete your quiz to sharpen your recommendations →</a>
+            </p>
+          )}
+        </div>
+      ) : (
+        <div>
+          <a href="/quiz" style={{ display: 'block', width: '100%', boxSizing: 'border-box', textAlign: 'center', fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', fontWeight: 'var(--weight-semibold)', color: '#fff', backgroundColor: 'var(--color-red)', textDecoration: 'none', padding: 'var(--space-4) var(--space-6)', borderRadius: 'var(--btn-radius)', marginBottom: 'var(--space-3)' }}>
+            Take the quiz and get notified when Beyond Your Ballot is ready →
+          </a>
+          <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', textAlign: 'center' }}>
+            Already have an account?{' '}
+            <a href="/signin" style={{ color: 'var(--color-blue-accent)', textDecoration: 'none' }}>Sign in →</a>
+          </p>
+        </div>
+      )}
+
+    </main>
+  )
+}
+
 // ── Main page ─────────────────────────────────────────────────────────────────
 
 export default function BeyondYourBallotPage() {
@@ -409,6 +642,11 @@ export default function BeyondYourBallotPage() {
         setAddressError('Could not find that address. Try including your city and state.')
       }
     })
+  }
+
+  // ── Holding state (§23.7) — all hooks above have run unconditionally ────
+  if (HOLDING_STATE && hasProfile) {
+    return <BeyondYourBallotHoldingState completionPercent={completionPercent} userId={userId} />
   }
 
   return (
