@@ -2923,6 +2923,30 @@ Federal congressional races only. Static JSON file at `src/data/beyond-ballot-ca
 - **Full width:** three-tier recommendations. Scrolls.
 - **No right rail.** The Article Bias Checker has been deferred (see §24b). The recommendations are full-width.
 
+### 24.1b Tier navigation bar
+
+A sticky nav bar sits just below the page header and above the first tier. It shows all three tier labels at once and serves as both a navigation aid and a structural signal that three tiers exist.
+
+- Three labels: **Confirming · Expanding · Challenging**
+- Clicking a label smooth-scrolls to that tier
+- Active label highlights as the user scrolls past each tier (scroll-spy behavior)
+- Sticky — stays at top of viewport as user scrolls through recommendations
+- Styling: subtle, secondary — not as prominent as the page header. Think tab-bar or pill-nav, not a hero element.
+
+### 24.1c Source card legend
+
+A **"How this works"** disclosure sits between the tier-nav bar and the first tier. Collapsed by default. Clicking expands an inline panel (not a modal) with brief explanations of each UI element on the source cards.
+
+**Legend content (exact copy):**
+
+- **↗** — Opens the source in a new tab
+- **👍 👎** — Tell us if this fits. We use your feedback to improve future recommendations.
+- **Lean Left / Lean Right / Center** — The source's overall editorial perspective
+- **[P]** — Partisan Lean flagged: this source scores above our threshold for partisan framing. Included because it meets reliability standards — labeled so you can decide what to do with that.
+- **Format pills** (Newsletter, Podcast, etc.) — The format(s) this source publishes in
+
+Disclosure link copy: *"What do these labels mean? ↓"* / *"Got it ↑"* (toggle)
+
 ### 24.1a Page header copy (locked)
 
 The page opens with a header block above the recommendations. Matches the visual treatment of the Conversations page header.
