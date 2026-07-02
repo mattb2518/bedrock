@@ -54,7 +54,7 @@ Why they're challenging: high tension on held values, high reliability and good 
 
 Write three blurbs, one per tier. Each blurb:
 - 2-3 sentences
-- Opens with 'As a ${body.mantleType}...'
+- Opens with 'As ${body.mantleType}...'
 - Names 1-2 specific sources from the tier
 - References the specific axes that drove placement in plain language (not axis codes)
 - Explains the WHY, not just the what

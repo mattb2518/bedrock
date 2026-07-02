@@ -263,22 +263,30 @@ function diversitySort(
  * for the full hand-picked seed list, which is an editorial task (not engine code).
  * The engine signals when a fallback was applied via the returned flag.
  */
-function applyMantleSeedFallback(
-  tier: ScoredMediaSource[],
-  allSources: ScoredMediaSource[],
-  tierName: MediaTier,
+const MIN_PER_TIER = 3
+
+function topUp(
+  current: ScoredMediaSource[],
+  pool: ScoredMediaSource[],
+  tier: MediaTier,
   placed: Set<string>
-): { sources: ScoredMediaSource[]; usedFallback: boolean } {
-  if (tier.length > 0) return { sources: tier, usedFallback: false }
-
-  const fallback = allSources
+): ScoredMediaSource[] {
+  if (current.length >= MIN_PER_TIER) return current
+  const candidates = pool
     .filter((s) => !placed.has(s.source.id) && s.source.active === 'active')
-    .sort((a, b) => b.source.reliability - a.source.reliability)
-    .slice(0, 3)
-    .map((s) => ({ ...s, tier: tierName }))
-  for (const s of fallback) placed.add(s.source.id)
-
-  return { sources: fallback, usedFallback: fallback.length > 0 }
+    .filter((s) =>
+      tier === 'challenging'
+        ? s.source.reliability >= 65 && s.source.goodFaith !== 'low' && s.source.independence >= 50
+        : s.source.reliability >= 60
+    )
+    .sort((a, b) =>
+      tier === 'confirming'  ? b.agreement - a.agreement
+      : tier === 'challenging' ? b.tensionOnHeld - a.tensionOnHeld
+      : b.novelCoverage - a.novelCoverage
+    )
+  const additions = candidates.slice(0, MIN_PER_TIER - current.length)
+  for (const s of additions) placed.add(s.source.id)
+  return [...current, ...additions.map((s) => ({ ...s, tier }))]
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -292,10 +300,10 @@ export function matchMedia(
   // Only match against active sources
   const active = catalog.filter((s) => s.active === 'active')
 
-  const confirming: ScoredMediaSource[] = []
-  const expanding:  ScoredMediaSource[] = []
+  const confirming:  ScoredMediaSource[] = []
+  const expanding:   ScoredMediaSource[] = []
   const challenging: ScoredMediaSource[] = []
-  const all: ScoredMediaSource[] = []
+  const scoredAll:   ScoredMediaSource[] = []
 
   for (const source of active) {
     const agreement      = computeAgreement(key, source)
@@ -303,13 +311,12 @@ export function matchMedia(
     const novelCoverage  = computeNovelCoverage(key, source)
 
     const tier = assignTier({ agreement, tensionOnHeld, novelCoverage }, source)
-    if (!tier) continue
-
-    const scored: ScoredMediaSource = { source, agreement, tensionOnHeld, novelCoverage, tier }
-    all.push(scored)
+    // Keep every scored source in the pool; placeholder tier only used by topUp
+    const scored: ScoredMediaSource = { source, agreement, tensionOnHeld, novelCoverage, tier: tier ?? 'confirming' }
+    scoredAll.push(scored)
     if (tier === 'confirming')  confirming.push(scored)
-    if (tier === 'expanding')   expanding.push(scored)
-    if (tier === 'challenging') challenging.push(scored)
+    else if (tier === 'expanding')   expanding.push(scored)
+    else if (tier === 'challenging') challenging.push(scored)
   }
 
   // Diversity pass within each tier
@@ -317,15 +324,15 @@ export function matchMedia(
   const sortedExpanding   = diversitySort(expanding,   'expanding')
   const sortedChallenging = diversitySort(challenging, 'challenging')
 
-  // Per-mantle seed fallback for any empty tier — shared placed-set prevents cloning across tiers
+  // Top-up thin tiers from the full pool — shared placed-set prevents cross-tier duplication
   const placed = new Set<string>([
     ...sortedConfirming.map((s) => s.source.id),
     ...sortedExpanding.map((s) => s.source.id),
     ...sortedChallenging.map((s) => s.source.id),
   ])
-  const { sources: finalConfirming }  = applyMantleSeedFallback(sortedConfirming,  all, 'confirming',  placed)
-  const { sources: finalExpanding }   = applyMantleSeedFallback(sortedExpanding,   all, 'expanding',   placed)
-  const { sources: finalChallenging } = applyMantleSeedFallback(sortedChallenging, all, 'challenging', placed)
+  const finalConfirming  = topUp(sortedConfirming,  scoredAll, 'confirming',  placed)
+  const finalExpanding   = topUp(sortedExpanding,   scoredAll, 'expanding',   placed)
+  const finalChallenging = topUp(sortedChallenging, scoredAll, 'challenging', placed)
 
   return {
     confirming:  finalConfirming,

@@ -553,7 +553,7 @@ function buildBlurbsRequest(
   }
 
   return {
-    mantleType: result.primaryType,
+    mantleType: mantleFor(result.primaryType).name,   // mantleFor already imported
     oneLiner,
     topDimensions: topDims,
     bottomDimensions: bottomDims,
