@@ -2923,6 +2923,23 @@ Federal congressional races only. Static JSON file at `src/data/beyond-ballot-ca
 - **Main column (70–80% width):** three-tier recommendations. Scrolls.
 - **Right rail (20–30% width):** Article Bias Checker. Sticky/persistent as the user scrolls the main column. Visual distinction from the main column (subtle different background, thin border). Always visible, never buried. Not a popup or modal.
 
+### 24.1a Page header copy (locked)
+
+The page opens with a header block above the two-column layout. Matches the visual treatment of the Conversations page header.
+
+**Eyebrow** (small caps, muted, DM Sans):
+YOUR MEDIA DIET
+
+**Headline** (Libre Baskerville, H1):
+Journalism that deepens, expands, and challenges — based on what you actually believe.
+
+**Intro paragraph** (DM Sans, body large, secondary text color):
+Not your algorithm. Not your party's talking points. Not a feed that quietly confirms everything you already think.
+
+Your recommendations are built on your eight-dimension values profile — matched against a curated catalog of independent journalists, Substacks, and podcasts. Three tiers, by design: sources that reinforce your foundation, sources that broaden your view, and sources that push back where it matters.
+
+And if you want to check anything you're already reading — paste a URL into the Article Bias Checker and we'll tell you exactly what it's doing to your thinking.
+
 ### 24.2 Three-tier model
 
 - **Confirming — "deepen what you know":** `agreement >= 0.65`, `tension_on_held <= 0.3`, `reliability >= 60`
