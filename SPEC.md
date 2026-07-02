@@ -2004,37 +2004,6 @@ Four pillars in order, each with tri-color accent bar:
 *"Not red, not blue — red, white, and blue."* (gold italic Libre Baskerville 22px)
 Attribution: "From the *Country Over Self* podcast." (*Country Over Self* italicized)
 
----
-
-### Returning-User Homepage (signed in + quiz complete)
-
-When a signed-in user with a completed quiz profile lands on the homepage, the layout differs from the public homepage. Use the same `mounted && hasResult` pattern as the nav to detect returning users client-side.
-
-**1. Nav** — app nav (already implemented)
-
-**2. Hero** — same three rotating slides, same copy. Two changes:
-- Shrink the hero background color block (reduce vertical padding/height — feels less like a sales pitch, more like a greeting)
-- Remove the two CTA buttons underneath the slides entirely ("Find your bedrock →" and "How it works")
-
-**3. Civic Mantle section** — removed entirely for returning users
-
-**4. Your Actions section** (replaces the public Civic Mantle + Four Pillars section)
-- Eyebrow: YOUR ACTIONS
-- Headline: "Everything built on your civic mantle."
-- Four pillar cards exactly as they appear today — no changes to the cards themselves
-- Your Media Diet pillar copy updated in both public and returning-user views: *"Curated journalism that deepens, expands, and challenges."* (replaces old one-liner)
-
-**5. Your Mantle section** (new — returning user only, sits below Your Actions)
-A slimmed-down version of the Your Mantle page. Shows:
-- Mantle name + type (e.g. "The Honest Broker")
-- Constellation (radar chart)
-- Two or three top trait descriptors
-- Link: "Go to your mantle →" (links to /your-mantle)
-
-No retake link here — the Your Mantle page already has links to retake individual layers.
-
-**6. Tagline band** — unchanged
-
 ### Nav Links — Two States
 
 **Public nav (pre-login):**
@@ -2800,6 +2769,40 @@ Not raw numbers — an actionable summary requiring human judgment.
 - [ ] Open-source scoring code on GitHub, linked from the Methodology page
 - [ ] Beyond Your Ballot static JSON populated before the pillar goes live
 - [ ] **HARD BLOCKER — Run classification pipeline against all 60 sources in `src/data/media-catalog.csv` before launch.** The current fallback (`catalogAdapter.ts` `leanToAxisPlacement`) only populates 2–3 of the 8 dimensions per source based on a coarse left-right lean proxy, leaving axes like `stability_change`, `local_federal`, `national_global`, and `rules_outcomes` at zero confidence for every catalog source. This means Media Diet tier placements currently collapse toward a conventional left-right framing, which undermines the product's core differentiation (8-axis nuance beyond left-right). Real classification must run before this pillar reflects what Bedrock is actually for. Flagged Stage 9, 2026-06-30.
+
+### 21.10 Admin Preview Mode
+
+A persistent preview bar visible only to admins (Super Admin and Admin roles) on all app pages. Allows admins to test the full user experience without affecting their real account or any database records. All preview state lives in memory only — never written to Supabase, never persisted across sessions.
+
+**The bar sits at the very top of the viewport, above the main nav.** Thin, unobtrusive. Shows current preview mode and controls.
+
+**Three modes:**
+
+- **Myself** (default) — real profile, normal experience. Bar shows "Previewing as: Myself"
+- **New user** — clears quiz store to empty, shows all gated/empty states as a brand-new user would see them. Bar shows "PREVIEW MODE: New User" in a distinct color (warning orange `#E8A030`)
+- **Mantle type [dropdown]** — injects a synthetic completed profile for any of the ten Civic Mantle types. Bar shows "PREVIEW MODE: The Honest Broker" (or whichever type). Dropdown lists all ten types.
+
+**Toggle behavior:**
+- Switching modes is instant, no page reload
+- Switching back to "Myself" restores the real profile from the store (re-fetches from Supabase if needed)
+- A page refresh always clears preview mode and returns to "Myself"
+- A persistent "Exit preview" button always visible when in any non-Myself mode
+
+**Synthetic profiles for Mantle-type preview:**
+Each of the ten types needs a representative synthetic Layer 1 profile (8-axis scores) that reflects that type's values signature. These are used only for preview — never shown to real users, never stored. Claude Code should generate reasonable synthetic scores for each type based on the type descriptions in the spec. Super Admin can override individual axis scores for testing edge cases.
+
+**Scope of preview:**
+- Affects: homepage returning-user state, Media Diet recommendations, Ballot matching, Conversations profile injection, Beyond Your Ballot matching
+- Does NOT affect: admin tool itself, audit log, review queue, feedback dashboard
+- External API calls (Ballot candidates, etc.) still use real data — just matched against the synthetic profile
+
+**Privacy note:** Preview mode never exposes real user data. The privacy wall (no admin can read user quiz answers) is unchanged — preview mode uses synthetic data only, never pulls from real user profiles.
+
+**Visual treatment:**
+- Bar background: `#132238` (slightly darker than page bg)
+- Default state (Myself): very subtle, easy to ignore
+- Active preview state: left border in warning orange `#E8A030`, mode label in orange
+- "Exit preview" button: ghost button, right-aligned
 
 ---
 
