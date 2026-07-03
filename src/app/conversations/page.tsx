@@ -183,6 +183,29 @@ function parseExample(text: string, mode: Mode): { who: BlankState; topic: Blank
   return { who, topic, posture, wrong, worry }
 }
 
+// ─── localStorage custom chip helpers ────────────────────────────────────────
+
+const LS_CAP = 8
+const LS_CUSTOM_WHO = 'bedrock_custom_who'
+const LS_CUSTOM_TOPIC = 'bedrock_custom_topic'
+const LS_CUSTOM_POSTURE = 'bedrock_custom_posture'
+const LS_CUSTOM_WRONGORWORRY = 'bedrock_custom_wrongOrWorry'
+const LS_CUSTOM_VIBE = 'bedrock_custom_vibe'
+
+function lsGet(key: string): string[] {
+  if (typeof window === 'undefined') return []
+  try { return JSON.parse(localStorage.getItem(key) ?? '[]') as string[] } catch { return [] }
+}
+
+function lsAdd(key: string, value: string): string[] {
+  if (typeof window === 'undefined') return []
+  try {
+    const next = [value, ...lsGet(key).filter(v => v !== value)].slice(0, LS_CAP)
+    localStorage.setItem(key, JSON.stringify(next))
+    return next
+  } catch { return lsGet(key) }
+}
+
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
 function GuardrailsModal({ onClose }: { onClose: () => void }) {
@@ -294,7 +317,6 @@ interface SBProps {
   sbWrong: BlankState; setSbWrong: (v: BlankState) => void
   sbWorry: BlankState; setSbWorry: (v: BlankState) => void
   sbMirror: string; setSbMirror: (v: string) => void
-  sbBoxDetached: boolean; setSbBoxDetached: (v: boolean) => void
   sbTail: string; setSbTail: (v: string) => void
   sbPickerOpen: string | null; setSbPickerOpen: (v: string | null) => void
   sbCustomFor: string | null; setSbCustomFor: (v: string | null) => void
@@ -309,26 +331,28 @@ interface SBProps {
 function SentenceBuilderSection({
   mode, sbWho, setSbWho, sbTopic, setSbTopic, sbPosture, setSbPosture,
   sbWrong, setSbWrong, sbWorry, setSbWorry,
-  sbMirror, setSbMirror, sbBoxDetached, setSbBoxDetached,
+  sbMirror, setSbMirror,
   sbTail, setSbTail, sbPickerOpen, setSbPickerOpen, sbCustomFor, setSbCustomFor, sbCustomText, setSbCustomText,
   showExamples, onToggleExamples, examples, onLoadExample,
   error, submitLabel, onSubmit, submitDisabled,
 }: SBProps) {
   const customInputRef = useRef<HTMLInputElement>(null)
 
+  const [customWho, setCustomWho] = useState<string[]>([])
+  const [customTopic, setCustomTopic] = useState<string[]>([])
+  const [customPosture, setCustomPosture] = useState<string[]>([])
+  const [customWrong, setCustomWrong] = useState<string[]>([])
+
+  useEffect(() => {
+    setCustomWho(lsGet(LS_CUSTOM_WHO))
+    setCustomTopic(lsGet(LS_CUSTOM_TOPIC))
+    setCustomPosture(lsGet(LS_CUSTOM_POSTURE))
+    setCustomWrong(lsGet(LS_CUSTOM_WRONGORWORRY))
+  }, [])
+
   useEffect(() => {
     if (sbCustomFor && customInputRef.current) customInputRef.current.focus()
   }, [sbCustomFor])
-
-  const assembled = mode === 'openers'
-    ? assembleMode1(sbWho, sbTopic, sbPosture, sbWrong)
-    : assembleMode3(sbWho, sbTopic, sbPosture, sbWorry)
-
-  // Sync mirror box to assembled sentence while not detached
-  useEffect(() => {
-    if (!sbBoxDetached) setSbMirror(assembled)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [assembled, sbBoxDetached])
 
   const wrongOrWorry = mode === 'openers' ? sbWrong : sbWorry
   const setWrongOrWorry = mode === 'openers' ? setSbWrong : setSbWorry
@@ -343,37 +367,76 @@ function SentenceBuilderSection({
   }
 
   function selectWho(value: string) {
-    setSbWho({ value, kind: 'free', isEmpty: false })
+    const newWho = { value, kind: 'free' as const, isEmpty: false }
+    setSbWho(newWho)
+    setSbMirror(mode === 'openers'
+      ? assembleMode1(newWho, sbTopic, sbPosture, sbWrong)
+      : assembleMode3(newWho, sbTopic, sbPosture, sbWorry))
     setSbPickerOpen(null); setSbCustomFor(null); setSbCustomText('')
   }
   function selectTopic(value: string) {
-    setSbTopic({ value, kind: 'topic', isEmpty: false })
+    const newTopic = { value, kind: 'topic' as const, isEmpty: false }
+    setSbTopic(newTopic)
+    setSbMirror(mode === 'openers'
+      ? assembleMode1(sbWho, newTopic, sbPosture, sbWrong)
+      : assembleMode3(sbWho, newTopic, sbPosture, sbWorry))
     setSbPickerOpen(null); setSbCustomFor(null); setSbCustomText('')
   }
   function selectPosture(value: string) {
-    setSbPosture({ value, kind: 'posture', isEmpty: false })
+    const newPosture = { value, kind: 'posture' as const, isEmpty: false }
+    setSbPosture(newPosture)
+    setSbMirror(mode === 'openers'
+      ? assembleMode1(sbWho, sbTopic, newPosture, sbWrong)
+      : assembleMode3(sbWho, sbTopic, newPosture, sbWorry))
     setSbPickerOpen(null); setSbCustomFor(null); setSbCustomText('')
   }
   function selectWrongOrWorry(value: string) {
-    setWrongOrWorry({ value, kind: 'free', isEmpty: false })
+    const newBlank = { value, kind: 'free' as const, isEmpty: false }
+    setWrongOrWorry(newBlank)
+    setSbMirror(mode === 'openers'
+      ? assembleMode1(sbWho, sbTopic, sbPosture, newBlank)
+      : assembleMode3(sbWho, sbTopic, sbPosture, newBlank))
     setSbPickerOpen(null); setSbCustomFor(null); setSbCustomText('')
   }
 
   function clearBlank(key: string) {
+    const newWho = key === 'who' ? emptyBlank() : sbWho
+    const newTopic = key === 'topic' ? emptyBlank() : sbTopic
+    const newPosture = key === 'posture' ? emptyBlank() : sbPosture
+    const newWrong = (key === 'wrongOrWorry' && mode === 'openers') ? emptyBlank() : sbWrong
+    const newWorry = (key === 'wrongOrWorry' && mode === 'chat') ? emptyBlank() : sbWorry
     if (key === 'who') setSbWho(emptyBlank())
     else if (key === 'topic') setSbTopic(emptyBlank())
     else if (key === 'posture') setSbPosture(emptyBlank())
     else if (key === 'wrongOrWorry') setWrongOrWorry(emptyBlank())
+    setSbMirror(mode === 'openers'
+      ? assembleMode1(newWho, newTopic, newPosture, newWrong)
+      : assembleMode3(newWho, newTopic, newPosture, newWorry))
     setSbPickerOpen(null)
+  }
+
+  function normalizeWho(raw: string): string {
+    const t = raw.trim()
+    return t.toLowerCase().startsWith('my ') ? t : `my ${t}`
   }
 
   function submitCustom() {
     if (!sbCustomText.trim() || !sbCustomFor) return
-    const text = sbCustomText.trim()
-    if (sbCustomFor === 'who') selectWho(text)
-    else if (sbCustomFor === 'topic') selectTopic(text)
-    else if (sbCustomFor === 'posture') selectPosture(text)
-    else selectWrongOrWorry(text)
+    const raw = sbCustomText.trim()
+    if (sbCustomFor === 'who') {
+      const val = normalizeWho(raw)
+      setCustomWho(lsAdd(LS_CUSTOM_WHO, val))
+      selectWho(val)
+    } else if (sbCustomFor === 'topic') {
+      setCustomTopic(lsAdd(LS_CUSTOM_TOPIC, raw))
+      selectTopic(raw)
+    } else if (sbCustomFor === 'posture') {
+      setCustomPosture(lsAdd(LS_CUSTOM_POSTURE, raw))
+      selectPosture(raw)
+    } else {
+      setCustomWrong(lsAdd(LS_CUSTOM_WRONGORWORRY, raw))
+      selectWrongOrWorry(raw)
+    }
   }
 
   return (
@@ -399,6 +462,9 @@ function SentenceBuilderSection({
                 {SB_WHO.map(opt => (
                   <PickerChip key={opt} label={opt} selected={!sbWho.isEmpty && sbWho.value === opt} onClick={() => selectWho(opt)} />
                 ))}
+                {customWho.map(opt => (
+                  <PickerChip key={`c-${opt}`} label={opt} selected={!sbWho.isEmpty && sbWho.value === opt} onClick={() => selectWho(opt)} />
+                ))}
                 <PickerChip label="something else…" selected={false} onClick={() => setSbCustomFor('who')} muted />
               </div>
             )}
@@ -406,6 +472,9 @@ function SentenceBuilderSection({
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
                 {SB_TOPICS.map(opt => (
                   <PickerChip key={opt} label={opt} selected={!sbTopic.isEmpty && sbTopic.value === opt} onClick={() => selectTopic(opt)} />
+                ))}
+                {customTopic.map(opt => (
+                  <PickerChip key={`c-${opt}`} label={opt} selected={!sbTopic.isEmpty && sbTopic.value === opt} onClick={() => selectTopic(opt)} />
                 ))}
                 <PickerChip label="something else…" selected={false} onClick={() => setSbCustomFor('topic')} muted />
               </div>
@@ -415,6 +484,9 @@ function SentenceBuilderSection({
                 {SB_POSTURES.map(opt => (
                   <PickerChip key={opt} label={opt} selected={!sbPosture.isEmpty && sbPosture.value === opt} onClick={() => selectPosture(opt)} />
                 ))}
+                {customPosture.map(opt => (
+                  <PickerChip key={`c-${opt}`} label={opt} selected={!sbPosture.isEmpty && sbPosture.value === opt} onClick={() => selectPosture(opt)} />
+                ))}
                 <PickerChip label="something else…" selected={false} onClick={() => setSbCustomFor('posture')} muted />
               </div>
             )}
@@ -422,6 +494,9 @@ function SentenceBuilderSection({
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
                 {wrongOrWorryOptions.map(opt => (
                   <PickerChip key={opt} label={opt} selected={!wrongOrWorry.isEmpty && wrongOrWorry.value === opt} onClick={() => selectWrongOrWorry(opt)} />
+                ))}
+                {customWrong.map(opt => (
+                  <PickerChip key={`c-${opt}`} label={opt} selected={!wrongOrWorry.isEmpty && wrongOrWorry.value === opt} onClick={() => selectWrongOrWorry(opt)} />
                 ))}
                 <PickerChip label="something else…" selected={false} onClick={() => setSbCustomFor('wrongOrWorry')} muted />
               </div>
@@ -434,7 +509,7 @@ function SentenceBuilderSection({
                   onChange={e => setSbCustomText(e.target.value)}
                   onKeyDown={e => { if (e.key === 'Enter') submitCustom() }}
                   placeholder={
-                    sbCustomFor === 'who' ? 'Type a relationship…' :
+                    sbCustomFor === 'who' ? 'Type a name or relationship…' :
                     sbCustomFor === 'topic' ? 'Name the topic…' :
                     sbCustomFor === 'posture' ? 'Describe how they are about it…' :
                     'Describe what goes wrong…'
@@ -454,24 +529,11 @@ function SentenceBuilderSection({
         )}
       </div>
 
-      {/* 3. Mirror box (smart-detach) */}
+      {/* 3. Sentence box — chips always win; user may edit freely between chip clicks */}
       <div>
-        {sbBoxDetached && (
-          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 'var(--space-1)' }}>
-            <button
-              onClick={() => { setSbMirror(assembled); setSbBoxDetached(false) }}
-              style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline', textUnderlineOffset: '2px', padding: 0 }}
-            >
-              reset to sentence
-            </button>
-          </div>
-        )}
         <textarea
           value={sbMirror}
-          onChange={e => {
-            setSbMirror(e.target.value)
-            if (!sbBoxDetached) setSbBoxDetached(true)
-          }}
+          onChange={e => setSbMirror(e.target.value)}
           rows={4}
           style={{ width: '100%', fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-primary)', backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', padding: 'var(--space-4)', lineHeight: 'var(--leading-relaxed)', resize: 'vertical', boxSizing: 'border-box' }}
         />
@@ -555,6 +617,13 @@ function ResponseModeInput({
   const customChipRef = useRef<HTMLInputElement>(null)
   const [customChipFor, setCustomChipFor] = useState<string | null>(null)
   const [customChipText, setCustomChipText] = useState('')
+  const [customVibe, setCustomVibe] = useState<string[]>([])
+  const [customRespPosture, setCustomRespPosture] = useState<string[]>([])
+
+  useEffect(() => {
+    setCustomVibe(lsGet(LS_CUSTOM_VIBE))
+    setCustomRespPosture(lsGet(LS_CUSTOM_POSTURE))
+  }, [])
 
   useEffect(() => {
     if (customChipFor && customChipRef.current) customChipRef.current.focus()
@@ -562,7 +631,10 @@ function ResponseModeInput({
 
   function submitCustomChip() {
     if (!customChipText.trim() || !customChipFor) return
-    onToggleChip(customChipFor, customChipText.trim())
+    const val = customChipText.trim()
+    onToggleChip(customChipFor, val)
+    if (customChipFor === 'vibe') setCustomVibe(lsAdd(LS_CUSTOM_VIBE, val))
+    else setCustomRespPosture(lsAdd(LS_CUSTOM_POSTURE, val))
     setCustomChipFor(null); setCustomChipText('')
   }
 
@@ -627,44 +699,49 @@ function ResponseModeInput({
 
       {/* Vibe/posture chip tail */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
-        {CHIP_ROWS_RESPONSES.map(row => (
+        {CHIP_ROWS_RESPONSES.map(row => {
+          const rememberedCustom = row.key === 'vibe' ? customVibe : customRespPosture
+          const staticChips = row.chips.filter(c => c !== 'something else…')
+          const allBuiltin = new Set([...staticChips, ...rememberedCustom])
+          return (
           <div key={row.key}>
             <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', fontWeight: 'var(--weight-semibold)', margin: '0 0 var(--space-2) 0' }}>{row.label}</p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)', alignItems: 'center' }}>
-              {row.chips.map(chip => {
-                if (chip === 'something else…') {
-                  if (customChipFor === row.key) return null
-                  return (
-                    <button
-                      key={chip}
-                      onClick={() => { setCustomChipFor(row.key); setCustomChipText('') }}
-                      style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', padding: '4px 12px', borderRadius: 'var(--radius-full)', border: '1px dashed var(--color-border)', backgroundColor: 'transparent', color: 'var(--color-text-muted)', cursor: 'pointer', fontStyle: 'italic', whiteSpace: 'nowrap' }}
-                    >
-                      {chip}
-                    </button>
-                  )
-                }
+              {staticChips.map(chip => {
                 const selected = (chips[row.key] ?? []).includes(chip)
                 return (
-                  <button
-                    key={chip}
-                    onClick={() => onToggleChip(row.key, chip)}
+                  <button key={chip} onClick={() => onToggleChip(row.key, chip)}
                     style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', padding: '4px 12px', borderRadius: 'var(--radius-full)', border: selected ? '1px solid var(--color-blue-accent)' : '1px solid var(--color-border)', backgroundColor: selected ? 'var(--color-blue-accent)' : 'transparent', color: selected ? '#fff' : 'var(--color-text-secondary)', cursor: 'pointer', transition: 'all 0.15s', whiteSpace: 'nowrap' }}
                   >
                     {chip}
                   </button>
                 )
               })}
-              {/* Custom chip value (already selected) */}
-              {(chips[row.key] ?? []).filter(c => !row.chips.includes(c)).map(customVal => (
-                <button
-                  key={customVal}
-                  onClick={() => onToggleChip(row.key, customVal)}
+              {rememberedCustom.map(chip => {
+                const selected = (chips[row.key] ?? []).includes(chip)
+                return (
+                  <button key={`c-${chip}`} onClick={() => onToggleChip(row.key, chip)}
+                    style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', padding: '4px 12px', borderRadius: 'var(--radius-full)', border: selected ? '1px solid var(--color-blue-accent)' : '1px solid var(--color-border)', backgroundColor: selected ? 'var(--color-blue-accent)' : 'transparent', color: selected ? '#fff' : 'var(--color-text-secondary)', cursor: 'pointer', transition: 'all 0.15s', whiteSpace: 'nowrap' }}
+                  >
+                    {chip}
+                  </button>
+                )
+              })}
+              {/* Currently-selected custom chips not yet remembered */}
+              {(chips[row.key] ?? []).filter(c => !allBuiltin.has(c)).map(customVal => (
+                <button key={`sel-${customVal}`} onClick={() => onToggleChip(row.key, customVal)}
                   style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', padding: '4px 12px', borderRadius: 'var(--radius-full)', border: '1px solid var(--color-blue-accent)', backgroundColor: 'var(--color-blue-accent)', color: '#fff', cursor: 'pointer', transition: 'all 0.15s', whiteSpace: 'nowrap' }}
                 >
                   {customVal}
                 </button>
               ))}
+              {customChipFor !== row.key && (
+                <button onClick={() => { setCustomChipFor(row.key); setCustomChipText('') }}
+                  style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', padding: '4px 12px', borderRadius: 'var(--radius-full)', border: '1px dashed var(--color-border)', backgroundColor: 'transparent', color: 'var(--color-text-muted)', cursor: 'pointer', fontStyle: 'italic', whiteSpace: 'nowrap' }}
+                >
+                  something else…
+                </button>
+              )}
             </div>
             {customChipFor === row.key && (
               <div style={{ display: 'flex', gap: 'var(--space-2)', marginTop: 'var(--space-2)' }}>
@@ -695,7 +772,8 @@ function ResponseModeInput({
               </div>
             )}
           </div>
-        ))}
+        )
+      })}
       </div>
 
       <div>
@@ -804,7 +882,6 @@ export default function ConversationsPage() {
   const [sbWrong, setSbWrong] = useState<BlankState>(emptyBlank())
   const [sbWorry, setSbWorry] = useState<BlankState>(emptyBlank())
   const [sbMirror, setSbMirror] = useState('')
-  const [sbBoxDetached, setSbBoxDetached] = useState(false)
   const [sbTail, setSbTail] = useState('')
   const [sbPickerOpen, setSbPickerOpen] = useState<string | null>(null)
   const [sbCustomFor, setSbCustomFor] = useState<string | null>(null)
@@ -875,7 +952,7 @@ export default function ConversationsPage() {
         setActiveMode(null); setOutput(null)
         setFreeform(''); setChips({})
         setSbWho(emptyBlank()); setSbTopic(emptyBlank()); setSbPosture(emptyBlank()); setSbWrong(emptyBlank()); setSbWorry(emptyBlank())
-        setSbMirror(''); setSbBoxDetached(false)
+        setSbMirror('')
         setSbTail(''); setSbPickerOpen(null); setSbCustomFor(null); setSbCustomText('')
         setShowExamples(false); setError(null)
         setChatStarted(false); setChatMessages([]); setChatInput(''); setChatLoading(false)
@@ -916,7 +993,7 @@ export default function ConversationsPage() {
   function resetSB() {
     setSbWho(emptyBlank()); setSbTopic(emptyBlank()); setSbPosture(emptyBlank())
     setSbWrong(emptyBlank()); setSbWorry(emptyBlank())
-    setSbMirror(''); setSbBoxDetached(false)
+    setSbMirror('')
     setSbTail(''); setSbPickerOpen(null); setSbCustomFor(null); setSbCustomText('')
   }
 
@@ -938,7 +1015,7 @@ export default function ConversationsPage() {
       const p = parseExample(text, activeMode)
       setSbWho(p.who); setSbTopic(p.topic); setSbPosture(p.posture)
       setSbWrong(p.wrong); setSbWorry(p.worry)
-      setSbMirror(text); setSbBoxDetached(true)
+      setSbMirror(text)
       setSbTail(''); setSbPickerOpen(null); setShowExamples(false)
     }
   }
@@ -1123,7 +1200,7 @@ export default function ConversationsPage() {
           sbTopic={sbTopic} setSbTopic={setSbTopic}
           sbPosture={sbPosture} setSbPosture={setSbPosture}
           sbWrong={sbWrong} setSbWrong={setSbWrong} sbWorry={sbWorry} setSbWorry={setSbWorry}
-          sbMirror={sbMirror} setSbMirror={setSbMirror} sbBoxDetached={sbBoxDetached} setSbBoxDetached={setSbBoxDetached}
+          sbMirror={sbMirror} setSbMirror={setSbMirror}
           sbTail={sbTail} setSbTail={setSbTail}
           sbPickerOpen={sbPickerOpen} setSbPickerOpen={setSbPickerOpen}
           sbCustomFor={sbCustomFor} setSbCustomFor={setSbCustomFor}
@@ -1216,7 +1293,7 @@ export default function ConversationsPage() {
             sbTopic={sbTopic} setSbTopic={setSbTopic}
             sbPosture={sbPosture} setSbPosture={setSbPosture}
             sbWrong={sbWrong} setSbWrong={setSbWrong} sbWorry={sbWorry} setSbWorry={setSbWorry}
-            sbMirror={sbMirror} setSbMirror={setSbMirror} sbBoxDetached={sbBoxDetached} setSbBoxDetached={setSbBoxDetached}
+            sbMirror={sbMirror} setSbMirror={setSbMirror}
             sbTail={sbTail} setSbTail={setSbTail}
             sbPickerOpen={sbPickerOpen} setSbPickerOpen={setSbPickerOpen}
             sbCustomFor={sbCustomFor} setSbCustomFor={setSbCustomFor}

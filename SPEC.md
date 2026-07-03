@@ -2105,12 +2105,14 @@ WHO empty → "a family member"; WRONG empty → "it gets heated fast".
 **Layout order (sentence-builder modes, 2026-07-03):**
 1. Live sentence with blanks
 2. Inline picker (opens below sentence when a blank is tapped)
-3. **Mirror box** (smart-detach textarea) — syncs to assembled sentence while attached; first manual edit detaches; *"reset to sentence"* link appears top-right when detached; re-attaches on click. Loading an example populates the mirror box and detaches it (the example is now the editable submission text).
-4. **"Anything else?" tail** — independent textarea, always append-only, never mirrors.
+3. **Sentence box** — textarea that builds as chips are clicked. *Chips always win:* every chip click (or clear) overwrites the box with the re-assembled sentence, including over user edits. The user may freely edit between chip clicks but the next click will overwrite. Starts empty; fills front-to-back as blanks are filled. Loading an example populates the box with the full example text (the next chip click still overwrites).
+4. **"Anything else?" tail** — independent textarea, fully protected from chip overwrites.
 5. *"Want another example?"* link + examples panel (moved below both text boxes).
 6. Submit button.
 
-- **Submit:** `[mirrorBox, tail].filter(Boolean).join('\n')` → sent as `freeform` to `/api/conversations`. Mirror box fallback is the assembled sentence when blank.
+*(2026-07-03: replaced smart-detach mirroring with "chips always win" model. Removed the "reset to sentence" link.)*
+
+- **Submit:** `[sentenceBox, tail].filter(Boolean).join('\n')` → sent as `freeform` to `/api/conversations`. Box fallback is the assembled sentence when box is empty.
 
 **MODE 2 — Responses (freeform primary + chip tail)**
 
@@ -2135,8 +2137,10 @@ Same layout order as Mode 1 (mirror box + tail + examples below). On submit, mir
 **Blank behavior (all modes):**
 - All blanks are optional. Empty blanks resolve gracefully per the vanishing grammar above.
 - Empty blank pill: 90px min-width, shows *"tap to select"* in italic accent color.
-- Tapping a filled blank reopens its picker; a × clears it.
+- Tapping a filled blank reopens its picker; a × clears it (also rewrites the sentence box).
 - "something else…" opens an inline text field (not modal), focused immediately.
+- **WHO custom input:** "my " is auto-prepended — typing "father-in-law" produces "my father-in-law" in the sentence and as the chip label. Leading "my " is not doubled.
+- **Remembered custom chips (localStorage, device-local):** any custom value submitted via "something else…" (WHO, TOPIC, POSTURE, WRONG/WORRY, and Mode 2 vibe/posture) is stored in browser localStorage under `bedrock_custom_{blank}` and shown as a selectable chip in subsequent sessions. Cap: 8 values per blank (oldest dropped). These chips are **never sent to any server as stored data** — they flow through normally as part of the freeform text for the current submission only. This is a device-local convenience list and does **not** violate the §18.10 clean-slate server-side promise (see §18.10).
 
 ---
 
@@ -2160,7 +2164,7 @@ A quiet gray underlined link — *"Want another example?"* (Modes 1 and 3: appea
 **Mode 3 example pair (drafts the user is worried about):**
 - *"I'm going to tell my mom I think her church's politics are hurting people, and I know it's going to wreck Thanksgiving."* ↔ *"I want to tell my college kid that I think their professors are feeding them propaganda, without them writing me off as a boomer."*
 
-**Examples behavior with sentence builder (Modes 1 and 3):** Tapping an example parses it into the blanks where values map cleanly (WHO matched against SB_WHO list, topic/posture against SB_TOPICS/SB_POSTURES, wrong/worry against SB_WRONG/SB_WORRY), and drops the **full example text into the mirror box** (detaching it — the example is now the primary editable submission text). The tail box is cleared. The result is **fully editable** — loads, never locks. Any blank that didn't match stays empty and ready to fill.
+**Examples behavior with sentence builder (Modes 1 and 3):** Tapping an example parses it into the blanks where values map cleanly (WHO matched against SB_WHO list, topic/posture against SB_TOPICS/SB_POSTURES, wrong/worry against SB_WRONG/SB_WORRY), and drops the **full example text into the sentence box**. The tail box is cleared. The result is **fully editable** — loads, never locks. Any blank that didn't match stays empty. *Note:* the next chip click will overwrite the sentence box ("chips always win"), which is expected — tapping an example is the starting point, then blanks can be adjusted.
 
 **Mode 2 examples** continue to load the freeform quote box as before.
 
