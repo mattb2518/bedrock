@@ -477,7 +477,7 @@ function InputSection({
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
         {chipRows.map(row => (
           <div key={row.key}>
-            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', fontWeight: 'var(--weight-semibold)', margin: '0 0 var(--space-2) 0' }}>
+            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', fontWeight: 'var(--weight-semibold)', margin: '0 0 var(--space-2) 0' }}>
               {row.label}
             </p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
