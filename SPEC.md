@@ -2614,7 +2614,13 @@ Ratings conflict (external vs. existing Bedrock): surfaces automatically in the 
 
 ### 21.2 User lookup (Super Admin only)
 
-Search field by email or name. Returns: account creation date, quiz completion percentage (**not** answers, **not** scores, **not** any profile data), current role. Promote-to-Admin button. No further data exposed.
+Search field by email. Returns: account creation date, quiz completion percentage (**not** answers, **not** scores, **not** any profile data), current role. Actions per tile:
+
+- **Promote to Admin / Demote to User** — role management
+- **Delete user** — requires a second "Confirm — permanent" click; blocked on self-delete
+- **Edit email** — opens an inline field pre-populated with the current address; "Save & send confirmation" calls `updateUserEmail`, which updates the address via Supabase admin API and automatically fires a confirmation email to the new address via Supabase's built-in mailer. Logs to `classification_audit_log` with action `email_updated`. Intended for correcting registration typos.
+
+No profile content (answers, scores, demographics) is ever fetched or displayed here.
 
 ### 21.3 Review queue
 
