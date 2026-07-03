@@ -10,6 +10,12 @@ import type { QuizSession } from '@/types/quiz'
 
 type Mode = 'openers' | 'responses' | 'chat'
 
+interface BlankState {
+  value: string
+  kind: 'topic' | 'posture' | 'free'
+  isEmpty: boolean
+}
+
 interface ChipRow {
   key: string
   label: string
@@ -51,36 +57,26 @@ interface ChatMessage {
 
 // ─── Static data ─────────────────────────────────────────────────────────────
 
-const WHO = ['spouse/partner', 'parent', 'in-law', 'sibling', 'adult child', 'friend', 'neighbor', 'coworker', 'someone online', 'other']
-const TOPIC = ['immigration', 'climate', 'guns', 'abortion', 'economy', 'elections', 'race', 'foreign policy', 'healthcare', 'something local', 'other']
-const POSTURE = ["they've checked out entirely", "they think it's all rigged", "they only trust their own side's media", "they think people like me are the problem", "they just want to fight", "they've stopped listening", 'other']
-const WRONG = ['we talk past each other', 'it gets heated fast', 'I freeze up', 'they shut down', "we've never actually tried", 'other']
-const VIBE = ['genuinely curious', 'goading', 'angry', 'testing me', 'venting', 'trying to connect', 'other']
-const SAID_TO = ['me', 'someone I care about']
-const WORRIED = ["I'll get too heated", "I'll cave", "I'll freeze", "I'll say it wrong", "it'll blow up the relationship", 'other']
+const SB_WHO = ['my uncle', 'my sister', 'my dad', 'my brother-in-law', 'my aunt', 'my coworker', 'my neighbor', 'my old friend']
+const SB_TOPICS = ['immigration', 'guns', 'the election', 'abortion', 'the economy', 'climate', 'a specific politician']
+const SB_POSTURES = [
+  "they think people like me are the problem",
+  "they think it's all rigged",
+  "they've checked out entirely",
+  "they only trust their own side's media",
+  "they just want to fight",
+  "they've stopped listening",
+]
+const SB_WRONG = ['we talk past each other', 'it gets heated fast', 'I freeze up', 'they shut down', "we've never actually tried"]
+const SB_WORRY = ['get too heated', 'cave', 'freeze', 'say it wrong', 'blow up the relationship']
+const SB_VIBE = ['genuinely curious', 'goading', 'angry', 'testing me', 'venting', 'trying to connect']
 
-const CHIP_ROWS: Record<Mode, ChipRow[]> = {
-  openers: [
-    { key: 'posture', label: "What's their posture?", chips: POSTURE },
-    { key: 'wrong', label: 'What usually goes wrong?', chips: WRONG },
-  ],
-  responses: [
-    { key: 'vibe', label: "What's the vibe?", chips: VIBE },
-    { key: 'posture', label: "What's their posture?", chips: POSTURE },
-  ],
-  chat: [
-    { key: 'worried', label: 'What are you worried about?', chips: WORRIED },
-    { key: 'posture', label: "What's their posture?", chips: POSTURE },
-  ],
-}
+// Mode 2 keeps chip rows
+const CHIP_ROWS_RESPONSES: ChipRow[] = [
+  { key: 'vibe', label: "What's the vibe?", chips: [...SB_VIBE, 'something else…'] },
+  { key: 'posture', label: "What's their posture?", chips: [...SB_POSTURES, 'something else…'] },
+]
 
-const FREEFORM_PLACEHOLDER: Record<Mode, string> = {
-  openers: "What do you want to talk about — and what's making it hard?",
-  responses: 'What did they say? Paste it, or describe it.',
-  chat: "Describe the conversation you want to practice — who's the other person, what's the tension?",
-}
-
-// Examples always ship in pairs — one left-leaning, one right-leaning
 const EXAMPLES: Record<Mode, { left: string; right: string }[]> = {
   openers: [
     {
@@ -123,7 +119,7 @@ const ENERGY_COLORS: Record<string, string> = {
   'find the shared question': '#c4b5fd',
 }
 
-// ─── Animations ───────────────────────────────────────────────────────────────
+// ─── Animations ──────────────────────────────────────────────────────────────
 
 const ANIMATIONS = `
 @keyframes bedrock-spin { to { transform: rotate(360deg); } }
@@ -133,92 +129,99 @@ const ANIMATIONS = `
 }
 `
 
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+function emptyBlank(): BlankState {
+  return { value: '', kind: 'free', isEmpty: true }
+}
+
+function classifyFreeInput(text: string): 'topic' | 'posture' {
+  const t = text.toLowerCase().trim()
+  const pronounStarts = ['they ', 'he ', 'she ', 'we ', "i'm", 'it ']
+  const stanceWords = ['think', 'thinks', "won't", "can't", "doesn't", 'only', 'refuse', 'keeps', 'keep', 'always', 'never', 'want', 'wants']
+  if (pronounStarts.some(p => t.startsWith(p))) return 'posture'
+  if (stanceWords.some(w => t.includes(w))) return 'posture'
+  return 'topic'
+}
+
+function getConnective(top: BlankState): string {
+  if (top.isEmpty || top.kind !== 'posture') return 'about'
+  return 'and the hard part is that'
+}
+
+function assembleMode1(who: BlankState, top: BlankState, wrong: BlankState): string {
+  const w = who.isEmpty ? 'a family member' : who.value
+  const conn = getConnective(top)
+  const tv = top.isEmpty ? 'something we see differently' : top.value
+  const wr = wrong.isEmpty ? 'it gets heated fast' : wrong.value
+  return `I want to talk to ${w} ${conn} ${tv}, and what usually goes wrong is ${wr}.`
+}
+
+function assembleMode3(who: BlankState, top: BlankState, worry: BlankState): string {
+  const w = who.isEmpty ? 'a family member' : who.value
+  const conn = getConnective(top)
+  const tv = top.isEmpty ? 'something we see differently' : top.value
+  const wo = worry.isEmpty ? 'get too heated' : worry.value
+  return `I'm going to talk to ${w} ${conn} ${tv}, and I'm worried I'll ${wo}.`
+}
+
+function parseExample(text: string, mode: Mode): { who: BlankState; top: BlankState; wrong: BlankState; worry: BlankState } {
+  const lower = text.toLowerCase()
+  const who: BlankState = (() => {
+    const m = SB_WHO.find(w => lower.includes(w))
+    return m ? { value: m, kind: 'free', isEmpty: false } : emptyBlank()
+  })()
+  const top: BlankState = (() => {
+    const tm = SB_TOPICS.find(t => lower.includes(t))
+    if (tm) return { value: tm, kind: 'topic', isEmpty: false }
+    const pm = SB_POSTURES.find(p => lower.includes(p))
+    if (pm) return { value: pm, kind: 'posture', isEmpty: false }
+    return emptyBlank()
+  })()
+  const wrong: BlankState = mode === 'openers'
+    ? (() => { const m = SB_WRONG.find(w => lower.includes(w)); return m ? { value: m, kind: 'free', isEmpty: false } : emptyBlank() })()
+    : emptyBlank()
+  const worry: BlankState = mode === 'chat'
+    ? (() => { const m = SB_WORRY.find(w => lower.includes(w)); return m ? { value: m, kind: 'free', isEmpty: false } : emptyBlank() })()
+    : emptyBlank()
+  return { who, top, wrong, worry }
+}
+
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
 function GuardrailsModal({ onClose }: { onClose: () => void }) {
   return (
     <div
       onClick={onClose}
-      style={{
-        position: 'fixed',
-        inset: 0,
-        backgroundColor: 'rgba(0,0,0,0.5)',
-        zIndex: 1000,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 'var(--space-6)',
-      }}
+      style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'var(--space-6)' }}
     >
       <div
         onClick={e => e.stopPropagation()}
-        style={{
-          backgroundColor: 'var(--color-bg)',
-          border: '1px solid var(--color-border)',
-          borderRadius: 'var(--radius-lg)',
-          padding: 'var(--space-8)',
-          maxWidth: '520px',
-          width: '100%',
-          maxHeight: '80vh',
-          overflowY: 'auto',
-        }}
+        style={{ backgroundColor: 'var(--color-bg)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-8)', maxWidth: '520px', width: '100%', maxHeight: '80vh', overflowY: 'auto' }}
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 'var(--space-6)' }}>
           <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-h3)', color: 'var(--color-text-primary)', margin: 0 }}>
             How Back-and-forth works
           </h2>
-          <button
-            onClick={onClose}
-            style={{ fontFamily: 'var(--font-body)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text-muted)', fontSize: '22px', lineHeight: 1, padding: '0 0 0 var(--space-3)' }}
-          >
-            ×
-          </button>
+          <button onClick={onClose} style={{ fontFamily: 'var(--font-body)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text-muted)', fontSize: '22px', lineHeight: 1, padding: '0 0 0 var(--space-3)' }}>×</button>
         </div>
-
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
-          <div>
-            <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-primary)', marginBottom: 'var(--space-1)', fontSize: 'var(--text-body)', margin: '0 0 var(--space-1) 0' }}>
-              Claude plays the other person — charitably
-            </p>
-            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', margin: 0 }}>
-              Not a caricature, not a pushover. A reasonable human being who actually holds those views and has real reasons for them. The point is practice against something real, not target practice.
-            </p>
-          </div>
-
-          <div>
-            <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-primary)', margin: '0 0 var(--space-1) 0', fontSize: 'var(--text-body)' }}>
-              Guardrails are on
-            </p>
-            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', margin: 0 }}>
-              No personal attacks. No conspiracy theories or fabricated facts — even in character. If the conversation drifts into unproductive territory, Claude will redirect it. It won&apos;t help you &ldquo;win&rdquo; — the goal is a real conversation, not a debate victory.
-            </p>
-          </div>
-
-          <div>
-            <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-primary)', margin: '0 0 var(--space-1) 0', fontSize: 'var(--text-body)' }}>
-              Your conversation stays private
-            </p>
-            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', margin: 0 }}>
-              Nothing is saved. Each session starts clean — no memory of what you practiced before.
-            </p>
-          </div>
-
-          <div>
-            <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-primary)', margin: '0 0 var(--space-1) 0', fontSize: 'var(--text-body)' }}>
-              Sessions end when they&apos;re done
-            </p>
-            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', margin: 0 }}>
-              Claude will close the session when the conversation reaches a natural landing, or after around ten exchanges. When it closes, it steps out of character briefly with one coaching observation. You can also end anytime with the &ldquo;End practice&rdquo; button.
-            </p>
-          </div>
+          {([
+            { title: 'Claude plays the other person — charitably', body: "Not a caricature, not a pushover. A reasonable human being who actually holds those views and has real reasons for them. The point is practice against something real, not target practice." },
+            { title: 'Guardrails are on', body: "No personal attacks. No conspiracy theories or fabricated facts — even in character. If the conversation drifts into unproductive territory, Claude will redirect it. It won’t help you “win” — the goal is a real conversation, not a debate victory." },
+            { title: 'Your conversation stays private', body: "Nothing is saved. Each session starts clean — no memory of what you practiced before." },
+            { title: 'Sessions end when they’re done', body: "Claude will close the session when the conversation reaches a natural landing, or after around ten exchanges. When it closes, it steps out of character briefly with one coaching observation. You can also end anytime with the “End practice” button." },
+          ] as { title: string; body: string }[]).map(({ title, body }) => (
+            <div key={title}>
+              <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-primary)', marginBottom: 'var(--space-1)', fontSize: 'var(--text-body)', margin: '0 0 var(--space-1) 0' }}>{title}</p>
+              <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', margin: 0 }}>{body}</p>
+            </div>
+          ))}
         </div>
-
         <div style={{ marginTop: 'var(--space-8)', paddingTop: 'var(--space-5)', borderTop: '1px solid var(--color-border)' }}>
           <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', margin: 0 }}>
             Something off? We want to hear it.{' '}
-            <a href="mailto:hello@bedrock.guide" style={{ color: 'var(--color-blue-accent)' }}>
-              hello@bedrock.guide
-            </a>
+            <a href="mailto:hello@bedrock.guide" style={{ color: 'var(--color-blue-accent)' }}>hello@bedrock.guide</a>
           </p>
         </div>
       </div>
@@ -226,7 +229,44 @@ function GuardrailsModal({ onClose }: { onClose: () => void }) {
   )
 }
 
-function ChipButton({ label, selected, onClick }: { label: string; selected: boolean; onClick: () => void }) {
+function BlankPill({ label, value, isOpen, onClick, onClear }: {
+  label: string; value: string | null; isOpen: boolean; onClick: () => void; onClear?: () => void
+}) {
+  return (
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '2px', verticalAlign: 'middle' }}>
+      <button
+        onClick={onClick}
+        style={{
+          fontFamily: 'var(--font-body)',
+          fontSize: 'inherit',
+          fontStyle: value ? 'normal' : 'italic',
+          color: value ? 'var(--color-text-primary)' : 'var(--color-text-muted)',
+          backgroundColor: 'rgba(37,99,235,0.07)',
+          border: `1px solid ${isOpen ? 'var(--color-blue-accent)' : 'rgba(37,99,235,0.28)'}`,
+          borderRadius: '999px',
+          padding: '1px 12px',
+          cursor: 'pointer',
+          transition: 'border-color 0.15s',
+          display: 'inline-block',
+          lineHeight: 'inherit',
+        }}
+      >
+        {value ?? label}
+      </button>
+      {onClear && (
+        <button
+          onClick={e => { e.stopPropagation(); onClear() }}
+          title="Clear"
+          style={{ fontFamily: 'var(--font-body)', fontSize: '13px', color: 'var(--color-text-muted)', background: 'none', border: 'none', cursor: 'pointer', padding: '0 2px', lineHeight: 1 }}
+        >
+          ×
+        </button>
+      )}
+    </span>
+  )
+}
+
+function PickerChip({ label, selected, onClick, muted }: { label: string; selected: boolean; onClick: () => void; muted?: boolean }) {
   return (
     <button
       onClick={onClick}
@@ -235,12 +275,13 @@ function ChipButton({ label, selected, onClick }: { label: string; selected: boo
         fontSize: 'var(--text-small)',
         padding: '4px 12px',
         borderRadius: 'var(--radius-full)',
-        border: selected ? '1px solid var(--color-blue-accent)' : '1px solid var(--color-border)',
+        border: selected ? '1px solid var(--color-blue-accent)' : muted ? '1px dashed var(--color-border)' : '1px solid var(--color-border)',
         backgroundColor: selected ? 'var(--color-blue-accent)' : 'transparent',
-        color: selected ? '#fff' : 'var(--color-text-secondary)',
+        color: selected ? '#fff' : muted ? 'var(--color-text-muted)' : 'var(--color-text-secondary)',
         cursor: 'pointer',
         transition: 'all 0.15s',
         whiteSpace: 'nowrap',
+        fontStyle: muted ? 'italic' : 'normal',
       }}
     >
       {label}
@@ -248,143 +289,262 @@ function ChipButton({ label, selected, onClick }: { label: string; selected: boo
   )
 }
 
-function ResponseCard({ r }: { r: ConversationResponse }) {
-  const color = ENERGY_COLORS[r.energy] ?? 'var(--color-text-muted)'
-  return (
-    <div
-      style={{
-        backgroundColor: 'var(--color-bg-surface)',
-        border: r.recommended ? `2px solid ${color}` : '1px solid var(--color-border)',
-        borderRadius: 'var(--radius-lg)',
-        padding: 'var(--space-5)',
-      }}
-    >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-3)', flexWrap: 'wrap' }}>
-        <span
-          style={{
-            fontFamily: 'var(--font-body)',
-            fontSize: '11px',
-            fontWeight: 'var(--weight-semibold)',
-            letterSpacing: 'var(--tracking-wider)',
-            textTransform: 'uppercase',
-            color,
-            backgroundColor: `${color}18`,
-            padding: '2px 8px',
-            borderRadius: 'var(--radius-full)',
-          }}
-        >
-          {r.energy}
-        </span>
-        {r.recommended && (
-          <span
-            style={{
-              fontFamily: 'var(--font-body)',
-              fontSize: '11px',
-              fontWeight: 'var(--weight-semibold)',
-              letterSpacing: 'var(--tracking-wider)',
-              textTransform: 'uppercase',
-              color: 'var(--color-text-primary)',
-              backgroundColor: 'var(--color-bg-surface)',
-              border: '1px solid var(--color-border)',
-              padding: '2px 8px',
-              borderRadius: 'var(--radius-full)',
-            }}
-          >
-            recommended
-          </span>
-        )}
-      </div>
-      <p
-        style={{
-          fontFamily: 'var(--font-body)',
-          fontSize: 'var(--text-body)',
-          color: 'var(--color-text-primary)',
-          lineHeight: 'var(--leading-relaxed)',
-          marginBottom: 'var(--space-3)',
-          fontStyle: 'italic',
-        }}
-      >
-        &ldquo;{r.text}&rdquo;
-      </p>
-      <p
-        style={{
-          fontFamily: 'var(--font-body)',
-          fontSize: 'var(--text-small)',
-          color: 'var(--color-text-muted)',
-          lineHeight: 'var(--leading-relaxed)',
-          margin: 0,
-        }}
-      >
-        {r.doing}
-        {r.recommended && r.reason && ` — ${r.reason}`}
-      </p>
-    </div>
-  )
-}
-
-function TypingIndicator() {
-  return (
-    <div style={{
-      display: 'flex',
-      gap: '5px',
-      alignItems: 'center',
-      padding: 'var(--space-3) var(--space-4)',
-      backgroundColor: 'var(--color-bg-surface)',
-      border: '1px solid var(--color-border)',
-      borderRadius: 'var(--radius-lg)',
-      width: 'fit-content',
-    }}>
-      {[0, 1, 2].map(i => (
-        <div
-          key={i}
-          style={{
-            width: '6px',
-            height: '6px',
-            borderRadius: '50%',
-            backgroundColor: 'var(--color-text-muted)',
-            animation: `bedrock-bounce 1.2s ease-in-out ${i * 0.2}s infinite`,
-          }}
-        />
-      ))}
-    </div>
-  )
-}
-
-// ─── Input section (standalone to avoid unmount-on-rerender focus loss) ─────
-
-interface InputSectionProps {
-  freeform: string
-  onFreeformChange: (v: string) => void
-  placeholder: string
-  showExamples: boolean
-  onToggleExamples: () => void
+interface SBProps {
+  mode: 'openers' | 'chat'
+  sbWho: BlankState; setSbWho: (v: BlankState) => void
+  sbTop: BlankState; setSbTop: (v: BlankState) => void
+  sbWrong: BlankState; setSbWrong: (v: BlankState) => void
+  sbWorry: BlankState; setSbWorry: (v: BlankState) => void
+  sbTail: string; setSbTail: (v: string) => void
+  sbPickerOpen: string | null; setSbPickerOpen: (v: string | null) => void
+  sbCustomFor: string | null; setSbCustomFor: (v: string | null) => void
+  sbCustomText: string; setSbCustomText: (v: string) => void
+  showExamples: boolean; onToggleExamples: () => void
   examples: { left: string; right: string }[]
   onLoadExample: (text: string) => void
-  chipRows: ChipRow[]
-  chips: Record<string, string[]>
-  onToggleChip: (rowKey: string, chip: string) => void
   error: string | null
-  submitLabel: string
-  onSubmit: () => void
-  submitDisabled: boolean
+  submitLabel: string; onSubmit: () => void; submitDisabled: boolean
 }
 
-function InputSection({
-  freeform, onFreeformChange, placeholder,
+function SentenceBuilderSection({
+  mode, sbWho, setSbWho, sbTop, setSbTop, sbWrong, setSbWrong, sbWorry, setSbWorry,
+  sbTail, setSbTail, sbPickerOpen, setSbPickerOpen, sbCustomFor, setSbCustomFor, sbCustomText, setSbCustomText,
   showExamples, onToggleExamples, examples, onLoadExample,
-  chipRows, chips, onToggleChip,
   error, submitLabel, onSubmit, submitDisabled,
-}: InputSectionProps) {
+}: SBProps) {
+  const customInputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    if (sbCustomFor && customInputRef.current) customInputRef.current.focus()
+  }, [sbCustomFor])
+
+  const wrongOrWorry = mode === 'openers' ? sbWrong : sbWorry
+  const setWrongOrWorry = mode === 'openers' ? setSbWrong : setSbWorry
+  const wrongOrWorryOptions = mode === 'openers' ? SB_WRONG : SB_WORRY
+  const wrongOrWorryLabel = mode === 'openers' ? 'what happens' : "what you're worried about"
+  const sentenceStart = mode === 'openers' ? 'I want to talk to' : "I'm going to talk to"
+  const wrongOrWorryPrefix = mode === 'openers' ? ', and what usually goes wrong is' : ", and I'm worried I'll"
+
+  function togglePicker(key: string) {
+    setSbPickerOpen(sbPickerOpen === key ? null : key)
+    setSbCustomFor(null)
+    setSbCustomText('')
+  }
+
+  function selectValue(key: string, value: string, kind?: 'topic' | 'posture') {
+    const s: BlankState = { value, kind: kind ?? 'free', isEmpty: false }
+    if (key === 'who') setSbWho(s)
+    else if (key === 'top') setSbTop(s)
+    else if (key === 'wrongOrWorry') setWrongOrWorry(s)
+    setSbPickerOpen(null)
+    setSbCustomFor(null)
+    setSbCustomText('')
+  }
+
+  function clearBlank(key: string) {
+    if (key === 'who') setSbWho(emptyBlank())
+    else if (key === 'top') setSbTop(emptyBlank())
+    else if (key === 'wrongOrWorry') setWrongOrWorry(emptyBlank())
+    setSbPickerOpen(null)
+  }
+
+  function submitCustom() {
+    if (!sbCustomText.trim() || !sbCustomFor) return
+    const text = sbCustomText.trim()
+    if (sbCustomFor === 'top') {
+      selectValue('top', text, classifyFreeInput(text))
+    } else {
+      selectValue(sbCustomFor, text)
+    }
+  }
+
+  const conn = getConnective(sbTop)
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
+      {/* Live sentence */}
+      <div>
+        <div style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body-lg)', color: 'var(--color-text-primary)', lineHeight: 2, marginBottom: 'var(--space-3)' }}>
+          {sentenceStart}{' '}
+          <BlankPill label="who" value={sbWho.isEmpty ? null : sbWho.value} isOpen={sbPickerOpen === 'who'} onClick={() => togglePicker('who')} onClear={sbWho.isEmpty ? undefined : () => clearBlank('who')} />
+          {' '}{conn}{' '}
+          <BlankPill label="what — or how they are about it" value={sbTop.isEmpty ? null : sbTop.value} isOpen={sbPickerOpen === 'top'} onClick={() => togglePicker('top')} onClear={sbTop.isEmpty ? undefined : () => clearBlank('top')} />
+          {wrongOrWorryPrefix}{' '}
+          <BlankPill label={wrongOrWorryLabel} value={wrongOrWorry.isEmpty ? null : wrongOrWorry.value} isOpen={sbPickerOpen === 'wrongOrWorry'} onClick={() => togglePicker('wrongOrWorry')} onClear={wrongOrWorry.isEmpty ? undefined : () => clearBlank('wrongOrWorry')} />
+          {'.'}
+        </div>
+
+        {/* Inline picker */}
+        {sbPickerOpen && (
+          <div style={{ backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-blue-accent)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-4)', marginBottom: 'var(--space-3)' }}>
+            {sbPickerOpen === 'who' && (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+                {SB_WHO.map(opt => (
+                  <PickerChip key={opt} label={opt} selected={!sbWho.isEmpty && sbWho.value === opt} onClick={() => selectValue('who', opt)} />
+                ))}
+                <PickerChip label="something else…" selected={false} onClick={() => setSbCustomFor('who')} muted />
+              </div>
+            )}
+
+            {sbPickerOpen === 'top' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+                  {SB_TOPICS.map(opt => (
+                    <PickerChip key={opt} label={opt} selected={!sbTop.isEmpty && sbTop.kind === 'topic' && sbTop.value === opt} onClick={() => selectValue('top', opt, 'topic')} />
+                  ))}
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+                  <div style={{ flex: 1, height: '1px', backgroundColor: 'var(--color-border)' }} />
+                  <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', fontStyle: 'italic', whiteSpace: 'nowrap' }}>or the hard part is that…</span>
+                  <div style={{ flex: 1, height: '1px', backgroundColor: 'var(--color-border)' }} />
+                </div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+                  {SB_POSTURES.map(opt => (
+                    <PickerChip key={opt} label={opt} selected={!sbTop.isEmpty && sbTop.kind === 'posture' && sbTop.value === opt} onClick={() => selectValue('top', opt, 'posture')} />
+                  ))}
+                </div>
+                <div>
+                  <PickerChip label="something else…" selected={false} onClick={() => setSbCustomFor('top')} muted />
+                </div>
+              </div>
+            )}
+
+            {sbPickerOpen === 'wrongOrWorry' && (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+                {wrongOrWorryOptions.map(opt => (
+                  <PickerChip key={opt} label={opt} selected={!wrongOrWorry.isEmpty && wrongOrWorry.value === opt} onClick={() => selectValue('wrongOrWorry', opt)} />
+                ))}
+                <PickerChip label="something else…" selected={false} onClick={() => setSbCustomFor('wrongOrWorry')} muted />
+              </div>
+            )}
+
+            {/* Custom text input */}
+            {sbCustomFor && (
+              <div style={{ marginTop: 'var(--space-3)', display: 'flex', gap: 'var(--space-2)' }}>
+                <input
+                  ref={customInputRef}
+                  value={sbCustomText}
+                  onChange={e => setSbCustomText(e.target.value)}
+                  onKeyDown={e => { if (e.key === 'Enter') submitCustom() }}
+                  placeholder={
+                    sbCustomFor === 'who' ? 'Type a relationship…' :
+                    sbCustomFor === 'top' ? 'Describe the topic or their stance…' :
+                    'Describe what goes wrong…'
+                  }
+                  style={{
+                    flex: 1,
+                    fontFamily: 'var(--font-body)',
+                    fontSize: 'var(--text-small)',
+                    color: 'var(--color-text-primary)',
+                    backgroundColor: 'var(--color-bg)',
+                    border: '1px solid var(--color-blue-accent)',
+                    borderRadius: 'var(--radius-md)',
+                    padding: 'var(--space-2) var(--space-3)',
+                  }}
+                />
+                <button
+                  onClick={submitCustom}
+                  disabled={!sbCustomText.trim()}
+                  style={{
+                    fontFamily: 'var(--font-body)',
+                    fontSize: 'var(--text-small)',
+                    fontWeight: 'var(--weight-semibold)',
+                    color: '#fff',
+                    backgroundColor: sbCustomText.trim() ? 'var(--color-blue-accent)' : 'var(--color-text-muted)',
+                    border: 'none',
+                    borderRadius: 'var(--radius-md)',
+                    padding: 'var(--space-2) var(--space-4)',
+                    cursor: sbCustomText.trim() ? 'pointer' : 'not-allowed',
+                  }}
+                >
+                  Set
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Examples */}
+        <button
+          onClick={onToggleExamples}
+          style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', background: 'none', border: 'none', cursor: 'pointer', padding: 'var(--space-2) 0', textDecoration: 'underline', textUnderlineOffset: '2px' }}
+        >
+          {showExamples ? 'Hide examples' : 'Not sure what to type? Show me examples.'}
+        </button>
+
+        {showExamples && (
+          <div style={{ backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-5)', marginTop: 'var(--space-2)' }}>
+            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', marginBottom: 'var(--space-4)', fontStyle: 'italic' }}>
+              Real kinds of conversations people bring here &mdash; from every direction. Tap one to start, then make it yours.
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+              {examples.map((pair, i) => (
+                <div key={i} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-3)' }}>
+                  {[pair.left, pair.right].map((ex, j) => (
+                    <button
+                      key={j}
+                      onClick={() => onLoadExample(ex)}
+                      style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', backgroundColor: 'var(--color-bg)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', padding: 'var(--space-3)', textAlign: 'left', cursor: 'pointer', lineHeight: 'var(--leading-relaxed)' }}
+                    >
+                      {ex}
+                    </button>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Optional tail */}
+      <div>
+        <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', margin: '0 0 var(--space-2) 0', fontStyle: 'italic' }}>
+          anything else &mdash; the part only you can say; leave blank if the sentence says it
+        </p>
+        <textarea
+          value={sbTail}
+          onChange={e => setSbTail(e.target.value)}
+          rows={3}
+          style={{ width: '100%', fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-primary)', backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', padding: 'var(--space-4)', lineHeight: 'var(--leading-relaxed)', resize: 'vertical', boxSizing: 'border-box' }}
+        />
+      </div>
+
+      {/* Submit */}
+      <div>
+        {error && <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-red)', marginBottom: 'var(--space-3)' }}>{error}</p>}
+        <button
+          onClick={onSubmit}
+          disabled={submitDisabled}
+          style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--weight-semibold)', fontSize: 'var(--text-body)', color: '#fff', backgroundColor: submitDisabled ? 'var(--color-text-muted)' : 'var(--color-blue-accent)', border: 'none', borderRadius: 'var(--btn-radius)', padding: 'var(--btn-padding-y) var(--btn-padding-x)', cursor: submitDisabled ? 'not-allowed' : 'pointer', transition: 'background-color 0.15s' }}
+        >
+          {submitLabel}
+        </button>
+      </div>
+    </div>
+  )
+}
+
+// Mode 2 — freeform quote box primary, optional vibe/posture chip tail
+interface ResponseInputProps {
+  freeform: string; onFreeformChange: (v: string) => void
+  showExamples: boolean; onToggleExamples: () => void
+  examples: { left: string; right: string }[]
+  onLoadExample: (text: string) => void
+  chips: Record<string, string[]>; onToggleChip: (key: string, chip: string) => void
+  error: string | null; submitLabel: string; onSubmit: () => void; submitDisabled: boolean
+}
+
+function ResponseModeInput({
+  freeform, onFreeformChange, showExamples, onToggleExamples, examples, onLoadExample,
+  chips, onToggleChip, error, submitLabel, onSubmit, submitDisabled,
+}: ResponseInputProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
-  // On mount: record rows={4} height as the minimum so auto-resize only grows.
   useLayoutEffect(() => {
     const el = textareaRef.current
     if (el) el.style.minHeight = `${el.scrollHeight}px`
   }, [])
 
-  // Sync textarea value when parent pushes a new value (mode reset, example load).
-  // useLayoutEffect runs before paint to avoid a one-frame flash.
   useLayoutEffect(() => {
     const el = textareaRef.current
     if (el && el.value !== freeform) {
@@ -405,40 +565,16 @@ function InputSection({
             e.target.style.height = 'auto'
             e.target.style.height = `${e.target.scrollHeight}px`
           }}
-          placeholder={placeholder}
+          placeholder="What did they say? Paste it, or describe it."
           rows={4}
-          style={{
-            width: '100%',
-            fontFamily: 'var(--font-body)',
-            fontSize: 'var(--text-body)',
-            color: 'var(--color-text-primary)',
-            backgroundColor: 'var(--color-bg-surface)',
-            border: '1px solid var(--color-border)',
-            borderRadius: 'var(--radius-md)',
-            padding: 'var(--space-4)',
-            lineHeight: 'var(--leading-relaxed)',
-            resize: 'none',
-            overflow: 'hidden',
-            boxSizing: 'border-box',
-          }}
+          style={{ width: '100%', fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-primary)', backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', padding: 'var(--space-4)', lineHeight: 'var(--leading-relaxed)', resize: 'none', overflow: 'hidden', boxSizing: 'border-box' }}
         />
         <button
           onClick={onToggleExamples}
-          style={{
-            fontFamily: 'var(--font-body)',
-            fontSize: 'var(--text-small)',
-            color: 'var(--color-text-muted)',
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            padding: 'var(--space-2) 0',
-            textDecoration: 'underline',
-            textUnderlineOffset: '2px',
-          }}
+          style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', background: 'none', border: 'none', cursor: 'pointer', padding: 'var(--space-2) 0', textDecoration: 'underline', textUnderlineOffset: '2px' }}
         >
           {showExamples ? 'Hide examples' : 'Not sure what to type? Show me examples.'}
         </button>
-
         {showExamples && (
           <div style={{ backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-5)', marginTop: 'var(--space-2)' }}>
             <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', marginBottom: 'var(--space-4)', fontStyle: 'italic' }}>
@@ -447,22 +583,11 @@ function InputSection({
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
               {examples.map((pair, i) => (
                 <div key={i} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-3)' }}>
-                  {([pair.left, pair.right] as string[]).map((ex, j) => (
+                  {[pair.left, pair.right].map((ex, j) => (
                     <button
                       key={j}
                       onClick={() => onLoadExample(ex)}
-                      style={{
-                        fontFamily: 'var(--font-body)',
-                        fontSize: 'var(--text-small)',
-                        color: 'var(--color-text-secondary)',
-                        backgroundColor: 'var(--color-bg)',
-                        border: '1px solid var(--color-border)',
-                        borderRadius: 'var(--radius-md)',
-                        padding: 'var(--space-3)',
-                        textAlign: 'left',
-                        cursor: 'pointer',
-                        lineHeight: 'var(--leading-relaxed)',
-                      }}
+                      style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', backgroundColor: 'var(--color-bg)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', padding: 'var(--space-3)', textAlign: 'left', cursor: 'pointer', lineHeight: 'var(--leading-relaxed)' }}
                     >
                       {ex}
                     </button>
@@ -474,20 +599,31 @@ function InputSection({
         )}
       </div>
 
+      {/* Vibe/posture chip tail */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
-        {chipRows.map(row => (
+        {CHIP_ROWS_RESPONSES.map(row => (
           <div key={row.key}>
-            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', fontWeight: 'var(--weight-semibold)', margin: '0 0 var(--space-2) 0' }}>
-              {row.label}
-            </p>
+            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', fontWeight: 'var(--weight-semibold)', margin: '0 0 var(--space-2) 0' }}>{row.label}</p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
               {row.chips.map(chip => (
-                <ChipButton
+                <button
                   key={chip}
-                  label={chip}
-                  selected={(chips[row.key] ?? []).includes(chip)}
                   onClick={() => onToggleChip(row.key, chip)}
-                />
+                  style={{
+                    fontFamily: 'var(--font-body)',
+                    fontSize: 'var(--text-small)',
+                    padding: '4px 12px',
+                    borderRadius: 'var(--radius-full)',
+                    border: (chips[row.key] ?? []).includes(chip) ? '1px solid var(--color-blue-accent)' : '1px solid var(--color-border)',
+                    backgroundColor: (chips[row.key] ?? []).includes(chip) ? 'var(--color-blue-accent)' : 'transparent',
+                    color: (chips[row.key] ?? []).includes(chip) ? '#fff' : 'var(--color-text-secondary)',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {chip}
+                </button>
               ))}
             </div>
           </div>
@@ -495,26 +631,11 @@ function InputSection({
       </div>
 
       <div>
-        {error && (
-          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-red)', marginBottom: 'var(--space-3)' }}>
-            {error}
-          </p>
-        )}
+        {error && <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-red)', marginBottom: 'var(--space-3)' }}>{error}</p>}
         <button
           onClick={onSubmit}
           disabled={submitDisabled}
-          style={{
-            fontFamily: 'var(--font-body)',
-            fontWeight: 'var(--weight-semibold)',
-            fontSize: 'var(--text-body)',
-            color: '#fff',
-            backgroundColor: submitDisabled ? 'var(--color-text-muted)' : 'var(--color-blue-accent)',
-            border: 'none',
-            borderRadius: 'var(--btn-radius)',
-            padding: 'var(--btn-padding-y) var(--btn-padding-x)',
-            cursor: submitDisabled ? 'not-allowed' : 'pointer',
-            transition: 'background-color 0.15s',
-          }}
+          style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--weight-semibold)', fontSize: 'var(--text-body)', color: '#fff', backgroundColor: submitDisabled ? 'var(--color-text-muted)' : 'var(--color-blue-accent)', border: 'none', borderRadius: 'var(--btn-radius)', padding: 'var(--btn-padding-y) var(--btn-padding-x)', cursor: submitDisabled ? 'not-allowed' : 'pointer', transition: 'background-color 0.15s' }}
         >
           {submitLabel}
         </button>
@@ -523,7 +644,33 @@ function InputSection({
   )
 }
 
-// ─── How it Works accordion (hash-openable) ───────────────────────────────────
+function ResponseCard({ r }: { r: ConversationResponse }) {
+  const color = ENERGY_COLORS[r.energy] ?? 'var(--color-text-muted)'
+  return (
+    <div style={{ backgroundColor: 'var(--color-bg-surface)', border: r.recommended ? `2px solid ${color}` : '1px solid var(--color-border)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-5)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-3)', flexWrap: 'wrap' }}>
+        <span style={{ fontFamily: 'var(--font-body)', fontSize: '11px', fontWeight: 'var(--weight-semibold)', letterSpacing: 'var(--tracking-wider)', textTransform: 'uppercase', color, backgroundColor: `${color}18`, padding: '2px 8px', borderRadius: 'var(--radius-full)' }}>{r.energy}</span>
+        {r.recommended && (
+          <span style={{ fontFamily: 'var(--font-body)', fontSize: '11px', fontWeight: 'var(--weight-semibold)', letterSpacing: 'var(--tracking-wider)', textTransform: 'uppercase', color: 'var(--color-text-primary)', backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border)', padding: '2px 8px', borderRadius: 'var(--radius-full)' }}>recommended</span>
+        )}
+      </div>
+      <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-primary)', lineHeight: 'var(--leading-relaxed)', marginBottom: 'var(--space-3)', fontStyle: 'italic' }}>&ldquo;{r.text}&rdquo;</p>
+      <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', lineHeight: 'var(--leading-relaxed)', margin: 0 }}>
+        {r.doing}{r.recommended && r.reason && ` — ${r.reason}`}
+      </p>
+    </div>
+  )
+}
+
+function TypingIndicator() {
+  return (
+    <div style={{ display: 'flex', gap: '5px', alignItems: 'center', padding: 'var(--space-3) var(--space-4)', backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-lg)', width: 'fit-content' }}>
+      {[0, 1, 2].map(i => (
+        <div key={i} style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: 'var(--color-text-muted)', animation: `bedrock-bounce 1.2s ease-in-out ${i * 0.2}s infinite` }} />
+      ))}
+    </div>
+  )
+}
 
 function HowItWorksAccordion() {
   const [open, setOpen] = useState(false)
@@ -576,16 +723,30 @@ export default function ConversationsPage() {
   const mantleName = session?.result?.primaryType ? mantleFor(session.result.primaryType).name : null
   const [convBannerDismissed, setConvBannerDismissed] = useState(false)
 
-  // Openers / Responses state
   const [activeMode, setActiveMode] = useState<Mode | null>(null)
+
+  // Mode 2 state
   const [freeform, setFreeform] = useState('')
   const [chips, setChips] = useState<Record<string, string[]>>({})
+
+  // Sentence builder state (Modes 1 and 3)
+  const [sbWho, setSbWho] = useState<BlankState>(emptyBlank())
+  const [sbTop, setSbTop] = useState<BlankState>(emptyBlank())
+  const [sbWrong, setSbWrong] = useState<BlankState>(emptyBlank())
+  const [sbWorry, setSbWorry] = useState<BlankState>(emptyBlank())
+  const [sbTail, setSbTail] = useState('')
+  const [sbPickerOpen, setSbPickerOpen] = useState<string | null>(null)
+  const [sbCustomFor, setSbCustomFor] = useState<string | null>(null)
+  const [sbCustomText, setSbCustomText] = useState('')
+
+  // Shared UI
   const [showExamples, setShowExamples] = useState(false)
   const [output, setOutput] = useState<ConversationOutput | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [submittedText, setSubmittedText] = useState('')
 
-  // Back-and-forth chat state
+  // Chat state
   const [chatStarted, setChatStarted] = useState(false)
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([])
   const [chatInput, setChatInput] = useState('')
@@ -594,28 +755,16 @@ export default function ConversationsPage() {
   const [chatEndMessage, setChatEndMessage] = useState('')
   const [chatContext, setChatContext] = useState('')
 
-  // Modal
   const [showGuardrails, setShowGuardrails] = useState(false)
-
-  // Expanded coaching tip — key is `${msgIndex}-${moveIndex}`
   const [expandedTipKey, setExpandedTipKey] = useState<string | null>(null)
-  const [copiedKey, setCopiedKey] = useState<string | null>(null)
-
-  // Pre-practice coach brief from __START__ response
   const [coachBrief, setCoachBrief] = useState<string | null>(null)
   const [coachBriefVisible, setCoachBriefVisible] = useState(true)
-
-  // Sensitive-topic warning banner
   const [showSensitiveBanner, setShowSensitiveBanner] = useState(false)
 
-  // Stable print date (computed once on mount)
   const [printDate] = useState(() => new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }))
-
-  // SSR guard for portal
   const [portalMounted, setPortalMounted] = useState(false)
   useEffect(() => { setPortalMounted(true) }, [])
 
-  // Inject print styles once on mount
   useEffect(() => {
     const style = document.createElement('style')
     style.id = 'bedrock-print-styles'
@@ -631,66 +780,44 @@ export default function ConversationsPage() {
     return () => { document.getElementById('bedrock-print-styles')?.remove() }
   }, [])
 
-  // Scroll new messages into view as they arrive
   const messagesEndRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
   }, [chatMessages, chatLoading])
 
-  // Keep focus on chat input after each send so spacebar doesn't land on Send button
   const chatInputRef = useRef<HTMLTextAreaElement>(null)
 
-  // Back-button support: handle in-page history entries
   useEffect(() => {
     function handlePop(e: PopStateEvent) {
       const state = e.state as { bedrockStep?: string; mode?: Mode } | null
       const step = state?.bedrockStep
       if (step === 'mode') {
-        // Back to mode-select from output or chat
         setActiveMode(state?.mode ?? null)
         setOutput(null)
-        setChatStarted(false)
-        setChatMessages([])
-        setChatInput('')
-        setChatLoading(false)
-        setChatEnded(false)
-        setChatEndMessage('')
-        setChatContext('')
-        setCoachBrief(null)
-        setCoachBriefVisible(true)
-        setShowSensitiveBanner(false)
-        setExpandedTipKey(null)
-        setError(null)
+        setChatStarted(false); setChatMessages([]); setChatInput(''); setChatLoading(false)
+        setChatEnded(false); setChatEndMessage(''); setChatContext('')
+        setCoachBrief(null); setCoachBriefVisible(true); setShowSensitiveBanner(false)
+        setExpandedTipKey(null); setError(null)
       } else if (step === 'output') {
-        // Back between two output states — show the form
         setOutput(null)
       } else {
-        // Back to landing (before any mode was selected)
-        setActiveMode(null)
-        setOutput(null)
-        setFreeform('')
-        setChips({})
-        setShowExamples(false)
-        setError(null)
-        setChatStarted(false)
-        setChatMessages([])
-        setChatInput('')
-        setChatLoading(false)
-        setChatEnded(false)
-        setChatEndMessage('')
-        setChatContext('')
-        setCoachBrief(null)
-        setCoachBriefVisible(true)
-        setShowSensitiveBanner(false)
+        setActiveMode(null); setOutput(null)
+        setFreeform(''); setChips({})
+        setSbWho(emptyBlank()); setSbTop(emptyBlank()); setSbWrong(emptyBlank()); setSbWorry(emptyBlank())
+        setSbTail(''); setSbPickerOpen(null); setSbCustomFor(null); setSbCustomText('')
+        setShowExamples(false); setError(null)
+        setChatStarted(false); setChatMessages([]); setChatInput(''); setChatLoading(false)
+        setChatEnded(false); setChatEndMessage(''); setChatContext('')
+        setCoachBrief(null); setCoachBriefVisible(true); setShowSensitiveBanner(false)
         setExpandedTipKey(null)
       }
     }
     window.addEventListener('popstate', handlePop)
     return () => window.removeEventListener('popstate', handlePop)
-  }, []) // state setters are stable — empty deps is correct
+  }, [])
 
   const SENSITIVE_KEYWORDS = ['abuse', 'abusive', 'violence', 'violent', 'assault', 'hitting', 'hurt me', 'hurting me', 'threatening', 'stalking', 'harassment', 'suicid', 'self-harm', 'self harm', 'cutting myself', 'crisis', 'domestic', 'ptsd', 'trauma']
-  function isSensitiveTopic(text: string): boolean {
+  function isSensitiveTopic(text: string) {
     const lower = text.toLowerCase()
     return SENSITIVE_KEYWORDS.some(kw => lower.includes(kw))
   }
@@ -698,95 +825,87 @@ export default function ConversationsPage() {
   function toggleChip(rowKey: string, chip: string) {
     setChips(prev => {
       const current = prev[rowKey] ?? []
-      const next = current.includes(chip)
-        ? current.filter(c => c !== chip)
-        : [...current, chip]
+      const next = current.includes(chip) ? current.filter(c => c !== chip) : [...current, chip]
       return { ...prev, [rowKey]: next }
     })
   }
 
+  function getSubmitString(): string {
+    if (activeMode === 'openers') {
+      const allEmpty = sbWho.isEmpty && sbTop.isEmpty && sbWrong.isEmpty
+      if (allEmpty && sbTail.trim()) return sbTail.trim()
+      const sentence = assembleMode1(sbWho, sbTop, sbWrong)
+      return sbTail.trim() ? `${sentence}\n${sbTail.trim()}` : sentence
+    }
+    if (activeMode === 'chat') {
+      const allEmpty = sbWho.isEmpty && sbTop.isEmpty && sbWorry.isEmpty
+      if (allEmpty && sbTail.trim()) return sbTail.trim()
+      const sentence = assembleMode3(sbWho, sbTop, sbWorry)
+      return sbTail.trim() ? `${sentence}\n${sbTail.trim()}` : sentence
+    }
+    return freeform
+  }
+
+  function resetSB() {
+    setSbWho(emptyBlank()); setSbTop(emptyBlank()); setSbWrong(emptyBlank()); setSbWorry(emptyBlank())
+    setSbTail(''); setSbPickerOpen(null); setSbCustomFor(null); setSbCustomText('')
+  }
+
   function selectMode(mode: Mode) {
-    setActiveMode(mode)
-    setOutput(null)
-    setFreeform('')
-    setChips({})
-    setShowExamples(false)
-    setError(null)
-    setChatStarted(false)
-    setChatMessages([])
-    setChatInput('')
-    setChatLoading(false)
-    setChatEnded(false)
-    setChatEndMessage('')
-    setChatContext('')
-    setCoachBrief(null)
-    setCoachBriefVisible(true)
-    setShowSensitiveBanner(false)
-    setExpandedTipKey(null)
+    setActiveMode(mode); setOutput(null)
+    setFreeform(''); setChips({}); resetSB()
+    setShowExamples(false); setError(null)
+    setChatStarted(false); setChatMessages([]); setChatInput(''); setChatLoading(false)
+    setChatEnded(false); setChatEndMessage(''); setChatContext('')
+    setCoachBrief(null); setCoachBriefVisible(true); setShowSensitiveBanner(false); setExpandedTipKey(null)
     window.history.pushState({ bedrockStep: 'mode', mode }, '')
   }
 
   function loadExample(text: string) {
-    setFreeform(text)
-    setShowExamples(false)
+    if (activeMode === 'responses') {
+      setFreeform(text); setShowExamples(false); return
+    }
+    if (activeMode === 'openers' || activeMode === 'chat') {
+      const p = parseExample(text, activeMode)
+      setSbWho(p.who); setSbTop(p.top); setSbWrong(p.wrong); setSbWorry(p.worry)
+      setSbTail(text); setSbPickerOpen(null); setShowExamples(false)
+    }
   }
 
   function reset() {
-    setOutput(null)
-    setFreeform('')
-    setChips({})
-    setShowExamples(false)
-    setError(null)
-    setChatStarted(false)
-    setChatMessages([])
-    setChatInput('')
-    setChatLoading(false)
-    setChatEnded(false)
-    setChatEndMessage('')
-    setChatContext('')
-    setCoachBrief(null)
-    setCoachBriefVisible(true)
-    setShowSensitiveBanner(false)
-    setExpandedTipKey(null)
+    setOutput(null); setFreeform(''); setChips({}); resetSB()
+    setShowExamples(false); setError(null); setSubmittedText('')
+    setChatStarted(false); setChatMessages([]); setChatInput(''); setChatLoading(false)
+    setChatEnded(false); setChatEndMessage(''); setChatContext('')
+    setCoachBrief(null); setCoachBriefVisible(true); setShowSensitiveBanner(false); setExpandedTipKey(null)
   }
 
-  function goHome() {
-    reset()
-    setActiveMode(null)
-  }
+  function goHome() { reset(); setActiveMode(null) }
 
   async function restartChat() {
-    setChatMessages([])
-    setChatInput('')
+    setChatMessages([]); setChatInput('')
     if (chatInputRef.current) chatInputRef.current.style.height = 'auto'
-    setChatEnded(false)
-    setChatEndMessage('')
-    setCoachBrief(null)
-    setCoachBriefVisible(true)
-    setExpandedTipKey(null)
-    setError(null)
-    // handleStartChat recomputes context from freeform/chips and re-calls the API
+    setChatEnded(false); setChatEndMessage('')
+    setCoachBrief(null); setCoachBriefVisible(true); setExpandedTipKey(null); setError(null)
     await handleStartChat()
   }
 
   async function handleSubmit() {
-    if (!freeform.trim() || !activeMode || activeMode === 'chat') return
-    setLoading(true)
-    setError(null)
-    setOutput(null)
-
+    if (!activeMode || activeMode === 'chat') return
+    const submitStr = getSubmitString()
+    if (!submitStr.trim()) return
+    setLoading(true); setError(null); setOutput(null); setSubmittedText(submitStr)
     try {
       const res = await fetch('/api/conversations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ session: (session ?? null) as QuizSession | null, mode: activeMode, chips, freeform }),
+        body: JSON.stringify({ session: (session ?? null) as QuizSession | null, mode: activeMode, chips, freeform: submitStr }),
       })
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
         throw new Error((data as Record<string, string>).error ?? 'Request failed')
       }
-      const data = await res.json()
-      setOutput(data as ConversationOutput)
+      setOutput(await res.json() as ConversationOutput)
       window.history.pushState({ bedrockStep: 'output' }, '')
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Something went wrong — try again')
@@ -796,50 +915,27 @@ export default function ConversationsPage() {
   }
 
   async function handleStartChat() {
-    if (!freeform.trim()) return
-
-    const chipLines = Object.entries(chips)
-      .filter(([, vals]) => vals.length > 0)
-      .map(([key, vals]) => `${key}: ${vals.join(', ')}`)
-
-    const context = [
-      freeform.trim(),
-      ...(chipLines.length > 0 ? [`Context: ${chipLines.join(' | ')}`] : []),
-    ].join('\n')
-
-    setChatContext(context)
-    setChatLoading(true)
-    setError(null)
-    if (isSensitiveTopic(freeform)) setShowSensitiveBanner(true)
-
+    const setupStr = getSubmitString()
+    if (!setupStr.trim()) return
+    const chipLines = Object.entries(chips).filter(([, vals]) => vals.length > 0).map(([key, vals]) => `${key}: ${vals.join(', ')}`)
+    const context = [setupStr.trim(), ...(chipLines.length > 0 ? [`Context: ${chipLines.join(' | ')}`] : [])].join('\n')
+    setChatContext(context); setChatLoading(true); setError(null)
+    if (isSensitiveTopic(setupStr)) setShowSensitiveBanner(true)
     try {
       const res = await fetch('/api/conversations/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          session: (session ?? null) as QuizSession | null,
-          context,
-          messages: [{ role: 'user', content: '__START__' }],
-          turnCount: 0,
-        }),
+        body: JSON.stringify({ session: (session ?? null) as QuizSession | null, context, messages: [{ role: 'user', content: '__START__' }], turnCount: 0 }),
       })
-
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
         throw new Error((data as Record<string, string>).error ?? 'Request failed')
       }
-
       const data = await res.json() as { brief?: string; reply: string; ended: boolean; endMessage?: string; hint?: ChatHint }
-
-      setChatStarted(true)
-      setCoachBrief(data.brief ?? null)
+      setChatStarted(true); setCoachBrief(data.brief ?? null)
       setChatMessages([{ role: 'assistant', content: data.reply, hint: data.hint }])
       window.history.pushState({ bedrockStep: 'chatActive' }, '')
-
-      if (data.ended) {
-        setChatEnded(true)
-        setChatEndMessage(data.endMessage ?? '')
-      }
+      if (data.ended) { setChatEnded(true); setChatEndMessage(data.endMessage ?? '') }
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Something went wrong — try again')
     } finally {
@@ -849,65 +945,36 @@ export default function ConversationsPage() {
 
   async function handleChatSend() {
     if (!chatInput.trim() || chatLoading || chatEnded) return
-
     const userMessage: ChatMessage = { role: 'user', content: chatInput.trim() }
     const updatedMessages = [...chatMessages, userMessage]
-
-    setChatMessages(updatedMessages)
-    setChatInput('')
+    setChatMessages(updatedMessages); setChatInput('')
     if (chatInputRef.current) chatInputRef.current.style.height = 'auto'
-    setChatLoading(true)
-    setError(null)
-
-    // turnCount = number of assistant turns in history (before this response)
+    setChatLoading(true); setError(null)
     const turnCount = updatedMessages.filter(m => m.role === 'assistant').length
-
-    // Full API message history: __START__ + all displayed messages (strip hint — API only accepts role+content)
-    const apiMessages = [
-      { role: 'user' as const, content: '__START__' },
-      ...updatedMessages.map(m => ({ role: m.role, content: m.content })),
-    ]
-
+    const apiMessages = [{ role: 'user' as const, content: '__START__' }, ...updatedMessages.map(m => ({ role: m.role, content: m.content }))]
     try {
       const res = await fetch('/api/conversations/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          session: (session ?? null) as QuizSession | null,
-          context: chatContext,
-          messages: apiMessages,
-          turnCount,
-        }),
+        body: JSON.stringify({ session: (session ?? null) as QuizSession | null, context: chatContext, messages: apiMessages, turnCount }),
       })
-
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
         throw new Error((data as Record<string, string>).error ?? 'Request failed')
       }
-
       const data = await res.json() as { reply: string; ended: boolean; endMessage?: string; hint?: ChatHint }
-
       setChatMessages(prev => [...prev, { role: 'assistant', content: data.reply, hint: data.hint }])
-
-      if (data.ended) {
-        setChatEnded(true)
-        setChatEndMessage(data.endMessage ?? '')
-      }
+      if (data.ended) { setChatEnded(true); setChatEndMessage(data.endMessage ?? '') }
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Something went wrong — try again')
     } finally {
       setChatLoading(false)
-      // Restore focus so the next keystroke (including space) goes to the textarea, not the Send button
       setTimeout(() => chatInputRef.current?.focus(), 50)
     }
   }
 
-  function endChat() {
-    setChatEnded(true)
-    setChatEndMessage('(You ended the practice session.)')
-  }
+  function endChat() { setChatEnded(true); setChatEndMessage('(You ended the practice session.)') }
 
-  const chipRows = activeMode ? CHIP_ROWS[activeMode] : []
   const examples = activeMode ? EXAMPLES[activeMode] : []
 
   return (
@@ -916,7 +983,6 @@ export default function ConversationsPage() {
       <style>{ANIMATIONS}</style>
       {showGuardrails && <GuardrailsModal onClose={() => setShowGuardrails(false)} />}
 
-      {/* Account banner for quiz-complete/no-account (13b) */}
       {isAnonymous && !convBannerDismissed && (
         <div style={{ backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border)', borderLeft: '3px solid var(--color-gold)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-4)', marginBottom: 'var(--space-6)', display: 'flex', alignItems: 'center', gap: 'var(--space-4)', flexWrap: 'wrap' }}>
           <p style={{ flex: 1, margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)' }}>
@@ -926,7 +992,6 @@ export default function ConversationsPage() {
         </div>
       )}
 
-      {/* Hero */}
       <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-blue-accent)', letterSpacing: 'var(--tracking-wider)', textTransform: 'uppercase', marginBottom: 'var(--space-5)' }}>
         Your Conversations
       </p>
@@ -949,19 +1014,16 @@ export default function ConversationsPage() {
 
       <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', marginBottom: 'var(--space-10)' }}>
         Built on the Ladder of Inference (Argyris / Senge).{' '}
-        <a href="#how-it-works" style={{ color: 'var(--color-blue-accent)', textDecoration: 'none' }}>How it works →</a>
+        <a href="#how-it-works" style={{ color: 'var(--color-blue-accent)', textDecoration: 'none' }}>How it works &rarr;</a>
       </p>
 
-      {/* No-profile nudge */}
       {!hasProfile && (
         <div style={{ backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-5)', marginBottom: 'var(--space-8)', display: 'flex', alignItems: 'center', gap: 'var(--space-4)', flexWrap: 'wrap' }}>
           <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', flex: 1, margin: 0 }}>
             <strong style={{ color: 'var(--color-text-primary)' }}>Take the quiz and this gets sharper.</strong>{' '}
             Right now it works from what you type. Once you have a profile, it knows your bridge before you say a word.
           </p>
-          <a href="/quiz" style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-blue-accent)', textDecoration: 'none', whiteSpace: 'nowrap' }}>
-            Take the quiz &rarr;
-          </a>
+          <a href="/quiz" style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-blue-accent)', textDecoration: 'none', whiteSpace: 'nowrap' }}>Take the quiz &rarr;</a>
         </div>
       )}
 
@@ -971,98 +1033,65 @@ export default function ConversationsPage() {
           <button
             key={mode}
             onClick={() => selectMode(mode)}
-            style={{
-              fontFamily: 'var(--font-body)',
-              textAlign: 'left',
-              background: activeMode === mode ? 'var(--color-bg-surface)' : 'transparent',
-              border: activeMode === mode ? '2px solid var(--color-blue-accent)' : '1px solid var(--color-border)',
-              borderRadius: 'var(--radius-lg)',
-              padding: 'var(--space-5)',
-              cursor: 'pointer',
-              transition: 'border-color 0.15s, background 0.15s',
-            }}
+            style={{ fontFamily: 'var(--font-body)', textAlign: 'left', background: activeMode === mode ? 'var(--color-bg-surface)' : 'transparent', border: activeMode === mode ? '2px solid var(--color-blue-accent)' : '1px solid var(--color-border)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-5)', cursor: 'pointer', transition: 'border-color 0.15s, background 0.15s' }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-2)' }}>
-              <p style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-h4)', color: 'var(--color-text-primary)', margin: 0 }}>
-                {title}
-              </p>
-              {beta && (
-                <span style={{
-                  fontFamily: 'var(--font-body)',
-                  fontSize: '10px',
-                  fontWeight: 'var(--weight-semibold)',
-                  letterSpacing: 'var(--tracking-wider)',
-                  textTransform: 'uppercase',
-                  color: 'var(--color-gold)',
-                  backgroundColor: 'rgba(196,150,53,0.1)',
-                  border: '1px solid var(--color-gold)',
-                  padding: '1px 6px',
-                  borderRadius: 'var(--radius-full)',
-                }}>
-                  Beta
-                </span>
-              )}
+              <p style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-h4)', color: 'var(--color-text-primary)', margin: 0 }}>{title}</p>
+              {beta && <span style={{ fontFamily: 'var(--font-body)', fontSize: '10px', fontWeight: 'var(--weight-semibold)', letterSpacing: 'var(--tracking-wider)', textTransform: 'uppercase', color: 'var(--color-gold)', backgroundColor: 'rgba(196,150,53,0.1)', border: '1px solid var(--color-gold)', padding: '1px 6px', borderRadius: 'var(--radius-full)' }}>Beta</span>}
             </div>
-            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', margin: 0 }}>
-              {desc}
-            </p>
+            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', margin: 0 }}>{desc}</p>
           </button>
         ))}
       </div>
 
-      {/* Openers / Responses — input */}
-      {activeMode && activeMode !== 'chat' && !output && (
-        <InputSection
-          freeform={freeform}
-          onFreeformChange={setFreeform}
-          placeholder={FREEFORM_PLACEHOLDER[activeMode]}
-          showExamples={showExamples}
-          onToggleExamples={() => setShowExamples(s => !s)}
-          examples={examples}
-          onLoadExample={loadExample}
-          chipRows={chipRows}
-          chips={chips}
-          onToggleChip={toggleChip}
-          error={error}
-          submitLabel={loading ? 'Decoding…' : 'Decode this →'}
-          onSubmit={handleSubmit}
-          submitDisabled={!freeform.trim() || loading}
+      {/* Mode 1 — Openers: sentence builder */}
+      {activeMode === 'openers' && !output && !loading && (
+        <SentenceBuilderSection
+          mode="openers"
+          sbWho={sbWho} setSbWho={setSbWho} sbTop={sbTop} setSbTop={setSbTop}
+          sbWrong={sbWrong} setSbWrong={setSbWrong} sbWorry={sbWorry} setSbWorry={setSbWorry}
+          sbTail={sbTail} setSbTail={setSbTail}
+          sbPickerOpen={sbPickerOpen} setSbPickerOpen={setSbPickerOpen}
+          sbCustomFor={sbCustomFor} setSbCustomFor={setSbCustomFor}
+          sbCustomText={sbCustomText} setSbCustomText={setSbCustomText}
+          showExamples={showExamples} onToggleExamples={() => setShowExamples(s => !s)}
+          examples={examples} onLoadExample={loadExample}
+          error={error} submitLabel={loading ? 'Decoding…' : 'Decode this →'}
+          onSubmit={() => void handleSubmit()} submitDisabled={loading}
         />
       )}
 
-      {/* Openers / Responses — loading spinner */}
+      {/* Mode 2 — Responses */}
+      {activeMode === 'responses' && !output && !loading && (
+        <ResponseModeInput
+          freeform={freeform} onFreeformChange={setFreeform}
+          showExamples={showExamples} onToggleExamples={() => setShowExamples(s => !s)}
+          examples={examples} onLoadExample={loadExample}
+          chips={chips} onToggleChip={toggleChip}
+          error={error} submitLabel={loading ? 'Decoding…' : 'Decode this →'}
+          onSubmit={() => void handleSubmit()} submitDisabled={!freeform.trim() || loading}
+        />
+      )}
+
+      {/* Openers/Responses loading spinner */}
       {loading && activeMode !== 'chat' && (
         <div style={{ textAlign: 'center', padding: 'var(--space-12) 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-4)' }}>
-          <div style={{
-            width: '32px',
-            height: '32px',
-            borderRadius: '50%',
-            border: '3px solid var(--color-border)',
-            borderTopColor: 'var(--color-blue-accent)',
-            animation: 'bedrock-spin 0.75s linear infinite',
-          }} />
-          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-muted)', margin: 0 }}>
-            Reading past the surface…
-          </p>
+          <div style={{ width: '32px', height: '32px', borderRadius: '50%', border: '3px solid var(--color-border)', borderTopColor: 'var(--color-blue-accent)', animation: 'bedrock-spin 0.75s linear infinite' }} />
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-muted)', margin: 0 }}>Reading past the surface…</p>
         </div>
       )}
 
-      {/* Openers / Responses — output */}
+      {/* Output */}
       {output && !loading && activeMode !== 'chat' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-8)' }}>
-
           <div style={{ backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', padding: 'var(--space-4) var(--space-5)' }}>
-            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', fontStyle: 'italic', margin: 0 }}>
-              {output.reflectBack}
-            </p>
+            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', fontStyle: 'italic', margin: 0 }}>{output.reflectBack}</p>
           </div>
 
           <div>
             <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-gold)', letterSpacing: 'var(--tracking-wider)', textTransform: 'uppercase', marginBottom: 'var(--space-4)' }}>
               The decode
-              {hasProfile && mantleName && (
-                <span style={{ fontSize: '10px', fontStyle: 'italic', color: 'var(--color-text-muted)', marginLeft: '10px' }}>Read through the lens of {mantleName}</span>
-              )}
+              {hasProfile && mantleName && <span style={{ fontSize: '10px', fontStyle: 'italic', color: 'var(--color-text-muted)', marginLeft: '10px' }}>Read through the lens of {mantleName}</span>}
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
               {([
@@ -1073,12 +1102,8 @@ export default function ConversationsPage() {
                 <div key={label} style={{ display: 'flex', gap: 'var(--space-4)' }}>
                   <div style={{ width: '4px', backgroundColor: 'var(--color-gold)', borderRadius: 'var(--radius-full)', flexShrink: 0 }} />
                   <div>
-                    <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--weight-semibold)', fontSize: 'var(--text-small)', color: 'var(--color-text-primary)', marginBottom: 'var(--space-1)', textTransform: 'uppercase', letterSpacing: 'var(--tracking-wider)' }}>
-                      {label}
-                    </p>
-                    <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', margin: 0 }}>
-                      {text}
-                    </p>
+                    <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--weight-semibold)', fontSize: 'var(--text-small)', color: 'var(--color-text-primary)', marginBottom: 'var(--space-1)', textTransform: 'uppercase', letterSpacing: 'var(--tracking-wider)' }}>{label}</p>
+                    <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', margin: 0 }}>{text}</p>
                   </div>
                 </div>
               ))}
@@ -1086,15 +1111,9 @@ export default function ConversationsPage() {
           </div>
 
           <div>
-            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-gold)', letterSpacing: 'var(--tracking-wider)', textTransform: 'uppercase', marginBottom: 'var(--space-4)' }}>
-              Ways in
-            </p>
+            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-gold)', letterSpacing: 'var(--tracking-wider)', textTransform: 'uppercase', marginBottom: 'var(--space-4)' }}>Ways in</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
-              {[...output.responses]
-                .sort((a, b) => (b.recommended ? 1 : 0) - (a.recommended ? 1 : 0))
-                .map((r, i) => (
-                  <ResponseCard key={i} r={r} />
-                ))}
+              {[...output.responses].sort((a, b) => (b.recommended ? 1 : 0) - (a.recommended ? 1 : 0)).map((r, i) => <ResponseCard key={i} r={r} />)}
             </div>
           </div>
 
@@ -1103,340 +1122,105 @@ export default function ConversationsPage() {
           </p>
 
           <div style={{ display: 'flex', gap: 'var(--space-3)', flexWrap: 'wrap', paddingTop: 'var(--space-4)', borderTop: '1px solid var(--color-border)' }}>
-            <button
-              onClick={reset}
-              style={{
-                fontFamily: 'var(--font-body)',
-                fontWeight: 'var(--weight-semibold)',
-                fontSize: 'var(--text-body)',
-                color: '#fff',
-                backgroundColor: 'var(--color-blue-accent)',
-                border: 'none',
-                borderRadius: 'var(--btn-radius)',
-                padding: 'var(--btn-padding-y) var(--btn-padding-x)',
-                cursor: 'pointer',
-              }}
-            >
-              New conversation &rarr;
-            </button>
-            <button
-              onClick={() => setOutput(null)}
-              style={{
-                fontFamily: 'var(--font-body)',
-                fontWeight: 'var(--weight-semibold)',
-                fontSize: 'var(--text-body)',
-                color: 'var(--color-text-secondary)',
-                backgroundColor: 'transparent',
-                border: '1px solid var(--color-border)',
-                borderRadius: 'var(--btn-radius)',
-                padding: 'var(--btn-padding-y) var(--btn-padding-x)',
-                cursor: 'pointer',
-              }}
-            >
-              Change the input
-            </button>
-            <button
-              onClick={() => window.print()}
-              style={{
-                fontFamily: 'var(--font-body)',
-                fontWeight: 'var(--weight-semibold)',
-                fontSize: 'var(--text-body)',
-                color: 'var(--color-text-secondary)',
-                backgroundColor: 'transparent',
-                border: '1px solid var(--color-border)',
-                borderRadius: 'var(--btn-radius)',
-                padding: 'var(--btn-padding-y) var(--btn-padding-x)',
-                cursor: 'pointer',
-              }}
-            >
-              Print / Save as PDF
-            </button>
+            <button onClick={reset} style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--weight-semibold)', fontSize: 'var(--text-body)', color: '#fff', backgroundColor: 'var(--color-blue-accent)', border: 'none', borderRadius: 'var(--btn-radius)', padding: 'var(--btn-padding-y) var(--btn-padding-x)', cursor: 'pointer' }}>New conversation &rarr;</button>
+            <button onClick={() => setOutput(null)} style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--weight-semibold)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', backgroundColor: 'transparent', border: '1px solid var(--color-border)', borderRadius: 'var(--btn-radius)', padding: 'var(--btn-padding-y) var(--btn-padding-x)', cursor: 'pointer' }}>Change the input</button>
+            <button onClick={() => window.print()} style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--weight-semibold)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', backgroundColor: 'transparent', border: '1px solid var(--color-border)', borderRadius: 'var(--btn-radius)', padding: 'var(--btn-padding-y) var(--btn-padding-x)', cursor: 'pointer' }}>Print / Save as PDF</button>
           </div>
         </div>
       )}
 
-      {/* Back-and-forth — setup */}
+      {/* Mode 3 — Back-and-forth setup: sentence builder */}
       {activeMode === 'chat' && !chatStarted && !chatLoading && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
-
           <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', margin: 0 }}>
             Claude plays the other person — charitably, not as a caricature. Real practice against something real.{' '}
-            <button
-              onClick={() => setShowGuardrails(true)}
-              style={{
-                fontFamily: 'var(--font-body)',
-                fontSize: 'var(--text-small)',
-                fontWeight: 'var(--weight-semibold)',
-                color: 'var(--color-blue-accent)',
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                padding: 0,
-                display: 'inline',
-              }}
-            >
-              How this works &rarr;
-            </button>
+            <button onClick={() => setShowGuardrails(true)} style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-blue-accent)', background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'inline' }}>How this works &rarr;</button>
           </p>
-
-          <InputSection
-            freeform={freeform}
-            onFreeformChange={setFreeform}
-            placeholder={FREEFORM_PLACEHOLDER['chat']}
-            showExamples={showExamples}
-            onToggleExamples={() => setShowExamples(s => !s)}
-            examples={examples}
-            onLoadExample={loadExample}
-            chipRows={chipRows}
-            chips={chips}
-            onToggleChip={toggleChip}
-            error={error}
-            submitLabel="Start chatting →"
-            onSubmit={handleStartChat}
-            submitDisabled={!freeform.trim()}
+          <SentenceBuilderSection
+            mode="chat"
+            sbWho={sbWho} setSbWho={setSbWho} sbTop={sbTop} setSbTop={setSbTop}
+            sbWrong={sbWrong} setSbWrong={setSbWrong} sbWorry={sbWorry} setSbWorry={setSbWorry}
+            sbTail={sbTail} setSbTail={setSbTail}
+            sbPickerOpen={sbPickerOpen} setSbPickerOpen={setSbPickerOpen}
+            sbCustomFor={sbCustomFor} setSbCustomFor={setSbCustomFor}
+            sbCustomText={sbCustomText} setSbCustomText={setSbCustomText}
+            showExamples={showExamples} onToggleExamples={() => setShowExamples(s => !s)}
+            examples={examples} onLoadExample={loadExample}
+            error={error} submitLabel="Start chatting →"
+            onSubmit={() => void handleStartChat()} submitDisabled={false}
           />
         </div>
       )}
 
-      {/* Back-and-forth — starting up spinner */}
+      {/* Mode 3 — Starting spinner */}
       {activeMode === 'chat' && !chatStarted && chatLoading && (
         <div style={{ textAlign: 'center', padding: 'var(--space-12) 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-4)' }}>
-          <div style={{
-            width: '32px',
-            height: '32px',
-            borderRadius: '50%',
-            border: '3px solid var(--color-border)',
-            borderTopColor: 'var(--color-blue-accent)',
-            animation: 'bedrock-spin 0.75s linear infinite',
-          }} />
-          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-muted)', margin: 0 }}>
-            Setting up your practice conversation…
-          </p>
+          <div style={{ width: '32px', height: '32px', borderRadius: '50%', border: '3px solid var(--color-border)', borderTopColor: 'var(--color-blue-accent)', animation: 'bedrock-spin 0.75s linear infinite' }} />
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-muted)', margin: 0 }}>Setting up your practice conversation…</p>
         </div>
       )}
 
-      {/* Back-and-forth — chat UI */}
+      {/* Mode 3 — Chat UI (unchanged) */}
       {activeMode === 'chat' && chatStarted && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
-
-          {/* Chat header */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 'var(--space-3)', borderBottom: '1px solid var(--color-border)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
-              <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-primary)', margin: 0 }}>
-                Back-and-forth
-              </p>
-              <span style={{
-                fontFamily: 'var(--font-body)',
-                fontSize: '10px',
-                fontWeight: 'var(--weight-semibold)',
-                letterSpacing: 'var(--tracking-wider)',
-                textTransform: 'uppercase',
-                color: 'var(--color-gold)',
-                backgroundColor: 'rgba(196,150,53,0.1)',
-                border: '1px solid var(--color-gold)',
-                padding: '1px 6px',
-                borderRadius: 'var(--radius-full)',
-              }}>
-                Beta
-              </span>
-              <button
-                onClick={() => setShowGuardrails(true)}
-                style={{
-                  fontFamily: 'var(--font-body)',
-                  fontSize: 'var(--text-small)',
-                  color: 'var(--color-text-muted)',
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  textDecoration: 'underline',
-                  textUnderlineOffset: '2px',
-                  padding: 0,
-                }}
-              >
-                How this works
-              </button>
+              <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-primary)', margin: 0 }}>Back-and-forth</p>
+              <span style={{ fontFamily: 'var(--font-body)', fontSize: '10px', fontWeight: 'var(--weight-semibold)', letterSpacing: 'var(--tracking-wider)', textTransform: 'uppercase', color: 'var(--color-gold)', backgroundColor: 'rgba(196,150,53,0.1)', border: '1px solid var(--color-gold)', padding: '1px 6px', borderRadius: 'var(--radius-full)' }}>Beta</span>
+              <button onClick={() => setShowGuardrails(true)} style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline', textUnderlineOffset: '2px', padding: 0 }}>How this works</button>
               {coachBrief && !coachBriefVisible && (
-                <button
-                  onClick={() => setCoachBriefVisible(true)}
-                  style={{
-                    fontFamily: 'var(--font-body)',
-                    fontSize: 'var(--text-small)',
-                    color: 'var(--color-gold)',
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                    textDecoration: 'underline',
-                    textUnderlineOffset: '2px',
-                    padding: 0,
-                  }}
-                >
-                  Coach&rsquo;s note
-                </button>
+                <button onClick={() => setCoachBriefVisible(true)} style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-gold)', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline', textUnderlineOffset: '2px', padding: 0 }}>Coach&rsquo;s note</button>
               )}
             </div>
             {!chatEnded && (
-              <button
-                onClick={endChat}
-                style={{
-                  fontFamily: 'var(--font-body)',
-                  fontSize: 'var(--text-small)',
-                  fontWeight: 'var(--weight-semibold)',
-                  color: 'var(--color-text-muted)',
-                  backgroundColor: 'transparent',
-                  border: '1px solid var(--color-border)',
-                  borderRadius: 'var(--btn-radius)',
-                  padding: 'var(--space-2) var(--space-3)',
-                  cursor: 'pointer',
-                }}
-              >
-                End practice
-              </button>
+              <button onClick={endChat} style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-muted)', backgroundColor: 'transparent', border: '1px solid var(--color-border)', borderRadius: 'var(--btn-radius)', padding: 'var(--space-2) var(--space-3)', cursor: 'pointer' }}>End practice</button>
             )}
           </div>
 
-          {/* Context strip */}
-          <div style={{
-            backgroundColor: 'var(--color-bg-surface)',
-            border: '1px solid var(--color-border)',
-            borderRadius: 'var(--radius-md)',
-            padding: 'var(--space-3) var(--space-4)',
-          }}>
+          <div style={{ backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', padding: 'var(--space-3) var(--space-4)' }}>
             <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', margin: 0 }}>
-              <strong style={{ color: 'var(--color-text-secondary)' }}>Practicing:</strong>{' '}
-              {chatContext}
+              <strong style={{ color: 'var(--color-text-secondary)' }}>Practicing:</strong>{' '}{chatContext}
             </p>
           </div>
 
-          {/* Sensitive-topic banner */}
           {showSensitiveBanner && (
-            <div style={{
-              backgroundColor: 'var(--color-bg-surface)',
-              border: '1px solid var(--color-border)',
-              borderRadius: 'var(--radius-md)',
-              padding: 'var(--space-3) var(--space-4)',
-              display: 'flex',
-              gap: 'var(--space-3)',
-              alignItems: 'flex-start',
-            }}>
+            <div style={{ backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', padding: 'var(--space-3) var(--space-4)', display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start' }}>
               <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', margin: 0, flex: 1 }}>
                 <strong style={{ color: 'var(--color-text-primary)' }}>This sounds like a sensitive situation.</strong>{' '}
                 Back-and-forth is a conversation practice tool, not a substitute for professional support. If you or someone you know needs help, please reach out to a counselor or crisis line.
               </p>
-              <button
-                onClick={() => setShowSensitiveBanner(false)}
-                style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', background: 'none', border: 'none', cursor: 'pointer', padding: 0, flexShrink: 0 }}
-              >
-                ✕
-              </button>
+              <button onClick={() => setShowSensitiveBanner(false)} style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', background: 'none', border: 'none', cursor: 'pointer', padding: 0, flexShrink: 0 }}>✕</button>
             </div>
           )}
 
-          {/* Pre-practice coach brief */}
           {coachBrief && coachBriefVisible && (
-            <div style={{
-              backgroundColor: 'rgba(196,150,53,0.07)',
-              border: '1px solid rgba(196,150,53,0.3)',
-              borderRadius: 'var(--radius-md)',
-              padding: 'var(--space-3) var(--space-4)',
-              display: 'flex',
-              gap: 'var(--space-3)',
-              alignItems: 'flex-start',
-            }}>
+            <div style={{ backgroundColor: 'rgba(196,150,53,0.07)', border: '1px solid rgba(196,150,53,0.3)', borderRadius: 'var(--radius-md)', padding: 'var(--space-3) var(--space-4)', display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start' }}>
               <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', margin: 0, flex: 1 }}>
-                <strong style={{ color: 'var(--color-gold)' }}>Coach&rsquo;s note:</strong>{' '}
-                {coachBrief}
+                <strong style={{ color: 'var(--color-gold)' }}>Coach&rsquo;s note:</strong>{' '}{coachBrief}
               </p>
-              <button
-                onClick={() => setCoachBriefVisible(false)}
-                style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', background: 'none', border: 'none', cursor: 'pointer', padding: 0, flexShrink: 0 }}
-              >
-                ✕
-              </button>
+              <button onClick={() => setCoachBriefVisible(false)} style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', background: 'none', border: 'none', cursor: 'pointer', padding: 0, flexShrink: 0 }}>✕</button>
             </div>
           )}
 
-          {/* Message area */}
-          <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 'var(--space-1)',
-            padding: 'var(--space-3) 0',
-          }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)', padding: 'var(--space-3) 0' }}>
             {chatMessages.map((msg, i) => (
               <div key={i}>
-                {/* Sender label */}
-                <p style={{
-                  fontFamily: 'var(--font-body)',
-                  fontSize: '11px',
-                  fontWeight: 'var(--weight-semibold)',
-                  color: 'var(--color-text-muted)',
-                  textAlign: msg.role === 'user' ? 'right' : 'left',
-                  margin: '0 4px var(--space-1)',
-                  letterSpacing: 'var(--tracking-wider)',
-                  textTransform: 'uppercase',
-                }}>
+                <p style={{ fontFamily: 'var(--font-body)', fontSize: '11px', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-muted)', textAlign: msg.role === 'user' ? 'right' : 'left', margin: '0 4px var(--space-1)', letterSpacing: 'var(--tracking-wider)', textTransform: 'uppercase' }}>
                   {msg.role === 'user' ? 'You' : 'Them'}
                 </p>
-
-                {/* Bubble */}
                 <div style={{ display: 'flex', justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start' }}>
-                  <div style={{
-                    maxWidth: '78%',
-                    backgroundColor: msg.role === 'user' ? 'var(--color-blue-accent)' : 'var(--color-bg-surface)',
-                    color: msg.role === 'user' ? '#fff' : 'var(--color-text-primary)',
-                    border: msg.role === 'user' ? 'none' : '1px solid var(--color-border)',
-                    borderRadius: msg.role === 'user' ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
-                    padding: 'var(--space-3) var(--space-4)',
-                    fontFamily: 'var(--font-body)',
-                    fontSize: 'var(--text-body)',
-                    lineHeight: 'var(--leading-relaxed)',
-                  }}>
+                  <div style={{ maxWidth: '78%', backgroundColor: msg.role === 'user' ? 'var(--color-blue-accent)' : 'var(--color-bg-surface)', color: msg.role === 'user' ? '#fff' : 'var(--color-text-primary)', border: msg.role === 'user' ? 'none' : '1px solid var(--color-border)', borderRadius: msg.role === 'user' ? '18px 18px 4px 18px' : '18px 18px 18px 4px', padding: 'var(--space-3) var(--space-4)', fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', lineHeight: 'var(--leading-relaxed)' }}>
                     {msg.content}
                   </div>
                 </div>
-
-                {/* Coaching hint (assistant messages only) */}
                 {msg.role === 'assistant' && msg.hint && (
-                  <div style={{
-                    marginTop: 'var(--space-2)',
-                    marginBottom: 'var(--space-3)',
-                    marginLeft: '4px',
-                    backgroundColor: 'rgba(196,150,53,0.06)',
-                    border: '1px solid rgba(196,150,53,0.25)',
-                    borderRadius: 'var(--radius-md)',
-                    padding: 'var(--space-3) var(--space-4)',
-                    maxWidth: '78%',
-                  }}>
-                    <p style={{
-                      fontFamily: 'var(--font-body)',
-                      fontSize: 'var(--text-small)',
-                      color: 'var(--color-text-secondary)',
-                      lineHeight: 'var(--leading-relaxed)',
-                      margin: '0 0 var(--space-2) 0',
-                    }}>
-                      <strong style={{ color: 'var(--color-gold)' }}>Decoding this:</strong>{' '}
-                      {msg.hint.read}
+                  <div style={{ marginTop: 'var(--space-2)', marginBottom: 'var(--space-3)', marginLeft: '4px', backgroundColor: 'rgba(196,150,53,0.06)', border: '1px solid rgba(196,150,53,0.25)', borderRadius: 'var(--radius-md)', padding: 'var(--space-3) var(--space-4)', maxWidth: '78%' }}>
+                    <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', margin: '0 0 var(--space-2) 0' }}>
+                      <strong style={{ color: 'var(--color-gold)' }}>Decoding this:</strong>{' '}{msg.hint.read}
                     </p>
                     <div style={{ marginBottom: 'var(--space-2)' }}>
-                      <span style={{
-                        fontFamily: 'var(--font-body)',
-                        fontSize: '11px',
-                        fontWeight: 'var(--weight-semibold)',
-                        color: 'var(--color-gold)',
-                        letterSpacing: 'var(--tracking-wider)',
-                        textTransform: 'uppercase',
-                      }}>
-                        Try:
-                      </span>
-                      <span style={{
-                        fontFamily: 'var(--font-body)',
-                        fontSize: '11px',
-                        color: 'var(--color-text-muted)',
-                        marginLeft: 'var(--space-2)',
-                        fontStyle: 'italic',
-                      }}>
-                        tap any for coaching
-                      </span>
+                      <span style={{ fontFamily: 'var(--font-body)', fontSize: '11px', fontWeight: 'var(--weight-semibold)', color: 'var(--color-gold)', letterSpacing: 'var(--tracking-wider)', textTransform: 'uppercase' }}>Try:</span>
+                      <span style={{ fontFamily: 'var(--font-body)', fontSize: '11px', color: 'var(--color-text-muted)', marginLeft: 'var(--space-2)', fontStyle: 'italic' }}>tap any for coaching</span>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 'var(--space-2)', marginBottom: 'var(--space-1)' }}>
                       {msg.hint.moves.map((move, mi) => {
@@ -1446,20 +1230,7 @@ export default function ConversationsPage() {
                           <button
                             key={mi}
                             onClick={() => setExpandedTipKey(isOpen ? null : tipKey)}
-                            style={{
-                              fontFamily: 'var(--font-body)',
-                              fontSize: '11px',
-                              color: isOpen ? '#fff' : 'var(--color-text-secondary)',
-                              backgroundColor: isOpen ? 'var(--color-gold)' : 'var(--color-bg)',
-                              border: `1px solid ${isOpen ? 'var(--color-gold)' : 'rgba(196,150,53,0.3)'}`,
-                              borderRadius: 'var(--radius-full)',
-                              padding: '2px 10px',
-                              cursor: 'pointer',
-                              transition: 'all 0.15s',
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '4px',
-                            }}
+                            style={{ fontFamily: 'var(--font-body)', fontSize: '11px', color: isOpen ? '#fff' : 'var(--color-text-secondary)', backgroundColor: isOpen ? 'var(--color-gold)' : 'var(--color-bg)', border: `1px solid ${isOpen ? 'var(--color-gold)' : 'rgba(196,150,53,0.3)'}`, borderRadius: 'var(--radius-full)', padding: '2px 10px', cursor: 'pointer', transition: 'all 0.15s', display: 'flex', alignItems: 'center', gap: '4px' }}
                           >
                             {typeof move === 'string' ? move : move.label}
                             <span style={{ fontSize: '9px', opacity: 0.7 }}>{isOpen ? '▲' : '▼'}</span>
@@ -1467,26 +1238,12 @@ export default function ConversationsPage() {
                         )
                       })}
                     </div>
-                    {/* Expanded coaching tip with copy button */}
                     {msg.hint.moves.map((move, mi) => {
                       const tipKey = `${i}-${mi}`
                       const tip = typeof move === 'string' ? null : move.tip
                       return expandedTipKey === tipKey && tip ? (
-                        <div key={mi} style={{
-                          marginTop: 'var(--space-2)',
-                          paddingTop: 'var(--space-2)',
-                          borderTop: '1px solid rgba(196,150,53,0.2)',
-                        }}>
-                          <p style={{
-                            fontFamily: 'var(--font-body)',
-                            fontSize: 'var(--text-small)',
-                            color: 'var(--color-text-secondary)',
-                            lineHeight: 'var(--leading-relaxed)',
-                            margin: '0 0 var(--space-2) 0',
-                            fontStyle: 'italic',
-                          }}>
-                            {tip}
-                          </p>
+                        <div key={mi} style={{ marginTop: 'var(--space-2)', paddingTop: 'var(--space-2)', borderTop: '1px solid rgba(196,150,53,0.2)' }}>
+                          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', margin: '0 0 var(--space-2) 0', fontStyle: 'italic' }}>{tip}</p>
                           <button
                             onClick={() => {
                               const phrase = move.phrase ?? tip
@@ -1500,17 +1257,7 @@ export default function ConversationsPage() {
                                 }
                               }, 0)
                             }}
-                            style={{
-                              fontFamily: 'var(--font-body)',
-                              fontSize: '11px',
-                              color: 'var(--color-blue-accent)',
-                              backgroundColor: 'transparent',
-                              border: '1px solid var(--color-blue-accent)',
-                              borderRadius: 'var(--radius-full)',
-                              padding: '2px 10px',
-                              cursor: 'pointer',
-                              transition: 'all 0.15s',
-                            }}
+                            style={{ fontFamily: 'var(--font-body)', fontSize: '11px', color: 'var(--color-blue-accent)', backgroundColor: 'transparent', border: '1px solid var(--color-blue-accent)', borderRadius: 'var(--radius-full)', padding: '2px 10px', cursor: 'pointer', transition: 'all 0.15s' }}
                           >
                             Add to chat
                           </button>
@@ -1529,21 +1276,8 @@ export default function ConversationsPage() {
             )}
 
             {chatEnded && chatEndMessage && (
-              <div style={{
-                backgroundColor: 'rgba(196,150,53,0.08)',
-                border: '1px solid var(--color-gold)',
-                borderRadius: 'var(--radius-lg)',
-                padding: 'var(--space-4) var(--space-5)',
-                marginTop: 'var(--space-3)',
-              }}>
-                <p style={{
-                  fontFamily: 'var(--font-body)',
-                  fontSize: 'var(--text-small)',
-                  color: 'var(--color-text-secondary)',
-                  lineHeight: 'var(--leading-relaxed)',
-                  fontStyle: 'italic',
-                  margin: 0,
-                }}>
+              <div style={{ backgroundColor: 'rgba(196,150,53,0.08)', border: '1px solid var(--color-gold)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-4) var(--space-5)', marginTop: 'var(--space-3)' }}>
+                <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', fontStyle: 'italic', margin: 0 }}>
                   {chatEndMessage.replace(/^\(|\)$/g, '')}
                 </p>
               </div>
@@ -1552,174 +1286,54 @@ export default function ConversationsPage() {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Chat error */}
-          {error && (
-            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-red)', margin: 0 }}>
-              {error}
-            </p>
-          )}
+          {error && <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-red)', margin: 0 }}>{error}</p>}
 
-          {/* Chat input or post-session actions */}
           {!chatEnded ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-            <div style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-end' }}>
-              <textarea
-                ref={chatInputRef}
-                value={chatInput}
-                onChange={e => {
-                  setChatInput(e.target.value)
-                  // Auto-expand
-                  e.target.style.height = 'auto'
-                  e.target.style.height = `${e.target.scrollHeight}px`
-                }}
-                onKeyDown={e => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault()
-                    void handleChatSend()
-                  }
-                }}
-                placeholder="Your response… (Enter to send, Shift+Enter for new line)"
-                rows={2}
-                disabled={chatLoading}
-                style={{
-                  flex: 1,
-                  fontFamily: 'var(--font-body)',
-                  fontSize: 'var(--text-body)',
-                  color: 'var(--color-text-primary)',
-                  backgroundColor: 'var(--color-bg-surface)',
-                  border: '1px solid var(--color-border)',
-                  borderRadius: 'var(--radius-md)',
-                  padding: 'var(--space-3) var(--space-4)',
-                  lineHeight: 'var(--leading-relaxed)',
-                  resize: 'none',
-                  overflow: 'hidden',
-                  boxSizing: 'border-box',
-                  opacity: chatLoading ? 0.6 : 1,
-                  minHeight: '64px',
-                }}
-              />
-              <button
-                onClick={() => void handleChatSend()}
-                disabled={!chatInput.trim() || chatLoading}
-                style={{
-                  fontFamily: 'var(--font-body)',
-                  fontWeight: 'var(--weight-semibold)',
-                  fontSize: 'var(--text-body)',
-                  color: '#fff',
-                  backgroundColor: !chatInput.trim() || chatLoading ? 'var(--color-text-muted)' : 'var(--color-blue-accent)',
-                  border: 'none',
-                  borderRadius: 'var(--btn-radius)',
-                  padding: 'var(--btn-padding-y) var(--btn-padding-x)',
-                  cursor: !chatInput.trim() || chatLoading ? 'not-allowed' : 'pointer',
-                  whiteSpace: 'nowrap',
-                  flexShrink: 0,
-                }}
-              >
-                Send &rarr;
-              </button>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-              <button
-                onClick={endChat}
-                style={{
-                  fontFamily: 'var(--font-body)',
-                  fontSize: 'var(--text-small)',
-                  fontWeight: 'var(--weight-semibold)',
-                  color: 'var(--color-text-muted)',
-                  backgroundColor: 'transparent',
-                  border: '1px solid var(--color-border)',
-                  borderRadius: 'var(--btn-radius)',
-                  padding: 'var(--space-2) var(--space-3)',
-                  cursor: 'pointer',
-                }}
-              >
-                End practice
-              </button>
-            </div>
+              <div style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-end' }}>
+                <textarea
+                  ref={chatInputRef}
+                  value={chatInput}
+                  onChange={e => { setChatInput(e.target.value); e.target.style.height = 'auto'; e.target.style.height = `${e.target.scrollHeight}px` }}
+                  onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void handleChatSend() } }}
+                  placeholder="Your response… (Enter to send, Shift+Enter for new line)"
+                  rows={2}
+                  disabled={chatLoading}
+                  style={{ flex: 1, fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-primary)', backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', padding: 'var(--space-3) var(--space-4)', lineHeight: 'var(--leading-relaxed)', resize: 'none', overflow: 'hidden', boxSizing: 'border-box', opacity: chatLoading ? 0.6 : 1, minHeight: '64px' }}
+                />
+                <button
+                  onClick={() => void handleChatSend()}
+                  disabled={!chatInput.trim() || chatLoading}
+                  style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--weight-semibold)', fontSize: 'var(--text-body)', color: '#fff', backgroundColor: !chatInput.trim() || chatLoading ? 'var(--color-text-muted)' : 'var(--color-blue-accent)', border: 'none', borderRadius: 'var(--btn-radius)', padding: 'var(--btn-padding-y) var(--btn-padding-x)', cursor: !chatInput.trim() || chatLoading ? 'not-allowed' : 'pointer', whiteSpace: 'nowrap', flexShrink: 0 }}
+                >
+                  Send &rarr;
+                </button>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <button onClick={endChat} style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-muted)', backgroundColor: 'transparent', border: '1px solid var(--color-border)', borderRadius: 'var(--btn-radius)', padding: 'var(--space-2) var(--space-3)', cursor: 'pointer' }}>End practice</button>
+              </div>
             </div>
           ) : (
             <div style={{ display: 'flex', gap: 'var(--space-3)', flexWrap: 'wrap', paddingTop: 'var(--space-4)', borderTop: '1px solid var(--color-border)' }}>
-              <button
-                onClick={reset}
-                style={{
-                  fontFamily: 'var(--font-body)',
-                  fontWeight: 'var(--weight-semibold)',
-                  fontSize: 'var(--text-body)',
-                  color: '#fff',
-                  backgroundColor: 'var(--color-blue-accent)',
-                  border: 'none',
-                  borderRadius: 'var(--btn-radius)',
-                  padding: 'var(--btn-padding-y) var(--btn-padding-x)',
-                  cursor: 'pointer',
-                }}
-              >
-                Try another &rarr;
-              </button>
-              <button
-                onClick={() => void restartChat()}
-                style={{
-                  fontFamily: 'var(--font-body)',
-                  fontWeight: 'var(--weight-semibold)',
-                  fontSize: 'var(--text-body)',
-                  color: 'var(--color-text-secondary)',
-                  backgroundColor: 'transparent',
-                  border: '1px solid var(--color-border)',
-                  borderRadius: 'var(--btn-radius)',
-                  padding: 'var(--btn-padding-y) var(--btn-padding-x)',
-                  cursor: 'pointer',
-                }}
-              >
-                Practice same conversation again
-              </button>
-              <button
-                onClick={goHome}
-                style={{
-                  fontFamily: 'var(--font-body)',
-                  fontWeight: 'var(--weight-semibold)',
-                  fontSize: 'var(--text-body)',
-                  color: 'var(--color-text-secondary)',
-                  backgroundColor: 'transparent',
-                  border: '1px solid var(--color-border)',
-                  borderRadius: 'var(--btn-radius)',
-                  padding: 'var(--btn-padding-y) var(--btn-padding-x)',
-                  cursor: 'pointer',
-                }}
-              >
-                Back to Conversations
-              </button>
-              <button
-                onClick={() => window.print()}
-                style={{
-                  fontFamily: 'var(--font-body)',
-                  fontWeight: 'var(--weight-semibold)',
-                  fontSize: 'var(--text-body)',
-                  color: 'var(--color-text-secondary)',
-                  backgroundColor: 'transparent',
-                  border: '1px solid var(--color-border)',
-                  borderRadius: 'var(--btn-radius)',
-                  padding: 'var(--btn-padding-y) var(--btn-padding-x)',
-                  cursor: 'pointer',
-                }}
-              >
-                Print / Save as PDF
-              </button>
+              <button onClick={reset} style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--weight-semibold)', fontSize: 'var(--text-body)', color: '#fff', backgroundColor: 'var(--color-blue-accent)', border: 'none', borderRadius: 'var(--btn-radius)', padding: 'var(--btn-padding-y) var(--btn-padding-x)', cursor: 'pointer' }}>Try another &rarr;</button>
+              <button onClick={() => void restartChat()} style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--weight-semibold)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', backgroundColor: 'transparent', border: '1px solid var(--color-border)', borderRadius: 'var(--btn-radius)', padding: 'var(--btn-padding-y) var(--btn-padding-x)', cursor: 'pointer' }}>Practice same conversation again</button>
+              <button onClick={goHome} style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--weight-semibold)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', backgroundColor: 'transparent', border: '1px solid var(--color-border)', borderRadius: 'var(--btn-radius)', padding: 'var(--btn-padding-y) var(--btn-padding-x)', cursor: 'pointer' }}>Back to Conversations</button>
+              <button onClick={() => window.print()} style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--weight-semibold)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', backgroundColor: 'transparent', border: '1px solid var(--color-border)', borderRadius: 'var(--btn-radius)', padding: 'var(--btn-padding-y) var(--btn-padding-x)', cursor: 'pointer' }}>Print / Save as PDF</button>
             </div>
           )}
         </div>
       )}
 
-      {/* Clean-slate footer note */}
       {!output && !loading && !(activeMode === 'chat' && chatStarted) && (
         <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', marginTop: 'var(--space-12)', fontStyle: 'italic' }}>
           One thing this doesn&apos;t do yet: remember. Each conversation starts fresh &mdash; it won&apos;t recall that you talked to your brother-in-law last week and ask how it went. That&apos;s coming.
         </p>
       )}
 
-      {/* How it Works accordion */}
       <HowItWorksAccordion />
     </div>
 
-    {/* Print layout — portal into body, hidden on screen, shown @media print */}
+    {/* Print layout */}
     {portalMounted && createPortal(
       <div className="bedrock-print-layout" style={{ fontFamily: 'system-ui, sans-serif', color: '#1a1a18', background: 'white' }}>
         {output && activeMode && activeMode !== 'chat' && (() => {
@@ -1729,9 +1343,9 @@ export default function ConversationsPage() {
             ? 'This is a simulated, AI-generated analysis from bedrock.guide to help you start a difficult conversation. The situation has been decoded and several ways in are surfaced below. These are starting points, not scripts — the words are yours to change.'
             : 'This is a simulated, AI-generated analysis from bedrock.guide to help you respond to something that was said. The subtext has been decoded and several response options are surfaced below. These are starting points, not scripts — the words are yours to change.'
           const chipLines = Object.entries(chips).filter(([, v]) => v.length > 0).map(([k, v]) => `${k}: ${v.join(', ')}`)
+          const printSituation = activeMode === 'openers' ? submittedText : freeform
           return (
             <>
-              {/* Header */}
               <div style={{ borderBottom: '1.5px solid #1a1a18', paddingBottom: '18px', marginBottom: '22px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <svg width="26" height="26" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
@@ -1742,43 +1356,23 @@ export default function ConversationsPage() {
                       <rect x="0" y="41" width="60" height="13" fill="#E8E4DA"/>
                     </g>
                   </svg>
-                  <span style={{ fontSize: '20px', fontWeight: 500, fontStyle: 'italic', letterSpacing: '-0.3px' }}>
-                    Bedrock<span style={{ fontStyle: 'normal', fontWeight: 400, color: '#888', fontSize: '17px' }}>.guide</span>
-                  </span>
+                  <span style={{ fontSize: '20px', fontWeight: 500, fontStyle: 'italic', letterSpacing: '-0.3px' }}>Bedrock<span style={{ fontStyle: 'normal', fontWeight: 400, color: '#888', fontSize: '17px' }}>.guide</span></span>
                 </div>
                 <span style={{ fontSize: '12px', color: '#888' }}>{printDate}</span>
               </div>
-
               <p style={{ fontSize: '14px', fontWeight: 600, letterSpacing: '-0.2px', color: '#1a1a18', marginBottom: '6px' }}>{modeTitle}</p>
               <p style={{ fontSize: '13px', color: '#555', lineHeight: 1.65, marginBottom: '20px' }}>{descriptor}</p>
-
-              {/* Situation box */}
               <p style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#888', marginBottom: '8px' }}>{situationLabel}</p>
               <div style={{ background: '#f6f5f2', borderRadius: '8px', padding: '14px 18px', marginBottom: '24px' }}>
-                <p style={{ fontSize: '13px', color: '#1a1a18', lineHeight: 1.65, margin: 0 }}>{freeform}</p>
-                {chipLines.length > 0 && (
-                  <p style={{ fontSize: '12px', color: '#888', marginTop: '8px', marginBottom: 0 }}>{chipLines.join(' · ')}</p>
-                )}
+                <p style={{ fontSize: '13px', color: '#1a1a18', lineHeight: 1.65, margin: 0 }}>{printSituation}</p>
+                {chipLines.length > 0 && <p style={{ fontSize: '12px', color: '#888', marginTop: '8px', marginBottom: 0 }}>{chipLines.join(' · ')}</p>}
               </div>
-
-              {/* reflectBack */}
-              <p style={{ fontSize: '14px', color: '#444', lineHeight: 1.7, fontStyle: 'italic', marginBottom: '28px', paddingBottom: '24px', borderBottom: '0.5px solid #ddd' }}>
-                {output.reflectBack}
-              </p>
-
-              {/* The decode */}
+              <p style={{ fontSize: '14px', color: '#444', lineHeight: 1.7, fontStyle: 'italic', marginBottom: '28px', paddingBottom: '24px', borderBottom: '0.5px solid #ddd' }}>{output.reflectBack}</p>
               <p style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#b8922a', marginBottom: '16px' }}>
-                The decode
-                {hasProfile && mantleName && (
-                  <span style={{ fontSize: '10px', fontStyle: 'italic', color: '#888', marginLeft: '10px' }}>Read through the lens of {mantleName}</span>
-                )}
+                The decode{hasProfile && mantleName && <span style={{ fontSize: '10px', fontStyle: 'italic', color: '#888', marginLeft: '10px' }}>Read through the lens of {mantleName}</span>}
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '28px', paddingBottom: '24px', borderBottom: '0.5px solid #ddd' }}>
-                {([
-                  { label: 'The surface', text: output.surface },
-                  { label: 'The worry underneath', text: output.worry },
-                  { label: 'The opening', text: output.opening },
-                ] as { label: string; text: string }[]).map(({ label, text }) => (
+                {([{ label: 'The surface', text: output.surface }, { label: 'The worry underneath', text: output.worry }, { label: 'The opening', text: output.opening }] as { label: string; text: string }[]).map(({ label, text }) => (
                   <div key={label} style={{ display: 'flex', gap: '14px' }}>
                     <div style={{ width: '3px', background: '#b8922a', borderRadius: '2px', flexShrink: 0, marginTop: '2px' }} />
                     <div>
@@ -1788,41 +1382,28 @@ export default function ConversationsPage() {
                   </div>
                 ))}
               </div>
-
-              {/* Ways in */}
               <p style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#b8922a', marginBottom: '16px' }}>Ways in</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginBottom: '32px' }}>
-                {[...output.responses]
-                  .sort((a, b) => (b.recommended ? 1 : 0) - (a.recommended ? 1 : 0))
-                  .map((r, i) => {
-                    const color = ENERGY_COLORS[r.energy] ?? '#888'
-                    return (
-                      <div key={i} style={{ border: r.recommended ? `2px solid ${color}` : '1px solid #ddd', borderRadius: '8px', padding: '14px 18px' }}>
-                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '10px', flexWrap: 'wrap' }}>
-                          <span style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.07em', textTransform: 'uppercase', color, background: `${color}18`, padding: '2px 8px', borderRadius: '12px' }}>{r.energy}</span>
-                          {r.recommended && <span style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#555', border: '1px solid #ddd', padding: '2px 8px', borderRadius: '12px' }}>recommended</span>}
-                        </div>
-                        <p style={{ fontSize: '14px', color: '#1a1a18', lineHeight: 1.65, fontStyle: 'italic', marginBottom: '8px' }}>&ldquo;{r.text}&rdquo;</p>
-                        <p style={{ fontSize: '12.5px', color: '#666', lineHeight: 1.6, margin: 0 }}>
-                          {r.doing}{r.recommended && r.reason ? ` — ${r.reason}` : ''}
-                        </p>
+                {[...output.responses].sort((a, b) => (b.recommended ? 1 : 0) - (a.recommended ? 1 : 0)).map((r, i) => {
+                  const color = ENERGY_COLORS[r.energy] ?? '#888'
+                  return (
+                    <div key={i} style={{ border: r.recommended ? `2px solid ${color}` : '1px solid #ddd', borderRadius: '8px', padding: '14px 18px' }}>
+                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '10px', flexWrap: 'wrap' }}>
+                        <span style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.07em', textTransform: 'uppercase', color, background: `${color}18`, padding: '2px 8px', borderRadius: '12px' }}>{r.energy}</span>
+                        {r.recommended && <span style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#555', border: '1px solid #ddd', padding: '2px 8px', borderRadius: '12px' }}>recommended</span>}
                       </div>
-                    )
-                  })}
+                      <p style={{ fontSize: '14px', color: '#1a1a18', lineHeight: 1.65, fontStyle: 'italic', marginBottom: '8px' }}>&ldquo;{r.text}&rdquo;</p>
+                      <p style={{ fontSize: '12.5px', color: '#666', lineHeight: 1.6, margin: 0 }}>{r.doing}{r.recommended && r.reason ? ` — ${r.reason}` : ''}</p>
+                    </div>
+                  )
+                })}
               </div>
-
               <hr style={{ border: 'none', borderTop: '0.5px solid #ddd', marginBottom: '28px' }} />
-
-              {/* Footer — same as chat */}
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
                   <svg width="18" height="18" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
                     <clipPath id="op-peak-foot"><polygon points="4,52 24,14 38,30 48,20 56,52"/></clipPath>
-                    <g clipPath="url(#op-peak-foot)">
-                      <rect x="0" y="14" width="60" height="14" fill="#6B9FEA"/>
-                      <rect x="0" y="28" width="60" height="13" fill="#D44035"/>
-                      <rect x="0" y="41" width="60" height="13" fill="#E8E4DA"/>
-                    </g>
+                    <g clipPath="url(#op-peak-foot)"><rect x="0" y="14" width="60" height="14" fill="#6B9FEA"/><rect x="0" y="28" width="60" height="13" fill="#D44035"/><rect x="0" y="41" width="60" height="13" fill="#E8E4DA"/></g>
                   </svg>
                   <span style={{ fontSize: '15px', fontWeight: 500, fontStyle: 'italic' }}>Bedrock<span style={{ fontStyle: 'normal', fontWeight: 400, color: '#888', fontSize: '13px' }}>.guide</span></span>
                 </div>
@@ -1837,67 +1418,41 @@ export default function ConversationsPage() {
 
         {chatStarted && chatMessages.length > 0 && (
           <>
-            {/* Header */}
             <div style={{ borderBottom: '1.5px solid #1a1a18', paddingBottom: '18px', marginBottom: '22px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <svg width="26" height="26" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
                   <clipPath id="print-peak"><polygon points="4,52 24,14 38,30 48,20 56,52"/></clipPath>
-                  <g clipPath="url(#print-peak)">
-                    <rect x="0" y="14" width="60" height="14" fill="#6B9FEA"/>
-                    <rect x="0" y="28" width="60" height="13" fill="#D44035"/>
-                    <rect x="0" y="41" width="60" height="13" fill="#E8E4DA"/>
-                  </g>
+                  <g clipPath="url(#print-peak)"><rect x="0" y="14" width="60" height="14" fill="#6B9FEA"/><rect x="0" y="28" width="60" height="13" fill="#D44035"/><rect x="0" y="41" width="60" height="13" fill="#E8E4DA"/></g>
                 </svg>
-                <span style={{ fontSize: '20px', fontWeight: 500, fontStyle: 'italic', letterSpacing: '-0.3px' }}>
-                  Bedrock<span style={{ fontStyle: 'normal', fontWeight: 400, color: '#888', fontSize: '17px' }}>.guide</span>
-                </span>
+                <span style={{ fontSize: '20px', fontWeight: 500, fontStyle: 'italic', letterSpacing: '-0.3px' }}>Bedrock<span style={{ fontStyle: 'normal', fontWeight: 400, color: '#888', fontSize: '17px' }}>.guide</span></span>
               </div>
               <span style={{ fontSize: '12px', color: '#888' }}>{printDate}</span>
             </div>
-
-            {/* Descriptor */}
             <p style={{ fontSize: '13px', color: '#555', lineHeight: 1.65, marginBottom: '20px' }}>
               This is a simulated, AI-generated practice transcript from <strong>bedrock.guide</strong>. The responses attributed to &ldquo;Them&rdquo; are entirely fabricated by an AI and do not represent any real person&rsquo;s words or views. This is a conversation rehearsal tool — not a record of any actual exchange. Coaching notes appear below each AI response.
             </p>
-
-            {/* Setup box */}
             <p style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#888', marginBottom: '8px' }}>Your setup</p>
             <div style={{ background: '#f6f5f2', borderRadius: '8px', padding: '14px 18px', marginBottom: '24px' }}>
               <p style={{ fontSize: '13px', color: '#1a1a18', lineHeight: 1.65, margin: 0 }}>{chatContext}</p>
             </div>
-
-            {/* Coach brief */}
             {coachBrief && (
               <div style={{ background: '#fdf8ee', border: '1px solid #e8d49a', borderRadius: '8px', padding: '12px 16px', marginBottom: '24px' }}>
-                <p style={{ fontSize: '12px', color: '#555', lineHeight: 1.6, margin: 0 }}>
-                  <strong style={{ color: '#8a6c1a' }}>Coach&rsquo;s note:</strong> {coachBrief}
-                </p>
+                <p style={{ fontSize: '12px', color: '#555', lineHeight: 1.6, margin: 0 }}><strong style={{ color: '#8a6c1a' }}>Coach&rsquo;s note:</strong> {coachBrief}</p>
               </div>
             )}
-
             <hr style={{ border: 'none', borderTop: '0.5px solid #ddd', marginBottom: '24px' }} />
-
-            {/* Transcript */}
             {chatMessages.map((msg, i) => (
               <div key={i} style={{ marginBottom: '20px' }}>
-                <p style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: msg.role === 'user' ? '#185FA5' : '#888', marginBottom: '5px' }}>
-                  {msg.role === 'user' ? 'You' : 'Them'}
-                </p>
-                <p style={{ fontSize: '14px', color: '#1a1a18', lineHeight: 1.65, marginBottom: msg.role === 'assistant' && msg.hint ? '8px' : 0 }}>
-                  {msg.content}
-                </p>
+                <p style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: msg.role === 'user' ? '#185FA5' : '#888', marginBottom: '5px' }}>{msg.role === 'user' ? 'You' : 'Them'}</p>
+                <p style={{ fontSize: '14px', color: '#1a1a18', lineHeight: 1.65, marginBottom: msg.role === 'assistant' && msg.hint ? '8px' : 0 }}>{msg.content}</p>
                 {msg.role === 'assistant' && msg.hint && (
                   <div style={{ background: '#f6f5f2', borderRadius: '8px', padding: '12px 16px' }}>
                     <p style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#555', marginBottom: '5px' }}>Decoding this</p>
-                    <p style={{ fontSize: '12.5px', color: '#444', lineHeight: 1.6, fontStyle: 'italic', marginBottom: msg.hint.moves.length ? '8px' : 0 }}>
-                      {msg.hint.read}
-                    </p>
+                    <p style={{ fontSize: '12.5px', color: '#444', lineHeight: 1.6, fontStyle: 'italic', marginBottom: msg.hint.moves.length ? '8px' : 0 }}>{msg.hint.read}</p>
                     {msg.hint.moves.length > 0 && (
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
                         {msg.hint.moves.map((move, mi) => (
-                          <span key={mi} style={{ fontSize: '11px', color: '#185FA5', background: '#e6f1fb', borderRadius: '4px', padding: '3px 8px' }}>
-                            {typeof move === 'string' ? move : move.label}
-                          </span>
+                          <span key={mi} style={{ fontSize: '11px', color: '#185FA5', background: '#e6f1fb', borderRadius: '4px', padding: '3px 8px' }}>{typeof move === 'string' ? move : move.label}</span>
                         ))}
                       </div>
                     )}
@@ -1905,40 +1460,23 @@ export default function ConversationsPage() {
                 )}
               </div>
             ))}
-
-            {/* End message */}
             {chatEndMessage && chatEndMessage !== '(You ended the practice session.)' && (
               <div style={{ background: '#fdf8ee', border: '1px solid #e8d49a', borderRadius: '8px', padding: '14px 18px', marginBottom: '24px', marginTop: '8px' }}>
                 <p style={{ fontSize: '13px', color: '#555', lineHeight: 1.65, fontStyle: 'italic', margin: 0 }}>{chatEndMessage}</p>
               </div>
             )}
-
             <hr style={{ border: 'none', borderTop: '0.5px solid #ddd', marginTop: '32px', marginBottom: '28px' }} />
-
-            {/* Footer */}
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
                 <svg width="18" height="18" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
                   <clipPath id="print-peak-foot"><polygon points="4,52 24,14 38,30 48,20 56,52"/></clipPath>
-                  <g clipPath="url(#print-peak-foot)">
-                    <rect x="0" y="14" width="60" height="14" fill="#6B9FEA"/>
-                    <rect x="0" y="28" width="60" height="13" fill="#D44035"/>
-                    <rect x="0" y="41" width="60" height="13" fill="#E8E4DA"/>
-                  </g>
+                  <g clipPath="url(#print-peak-foot)"><rect x="0" y="14" width="60" height="14" fill="#6B9FEA"/><rect x="0" y="28" width="60" height="13" fill="#D44035"/><rect x="0" y="41" width="60" height="13" fill="#E8E4DA"/></g>
                 </svg>
-                <span style={{ fontSize: '15px', fontWeight: 500, fontStyle: 'italic' }}>
-                  Bedrock<span style={{ fontStyle: 'normal', fontWeight: 400, color: '#888', fontSize: '13px' }}>.guide</span>
-                </span>
+                <span style={{ fontSize: '15px', fontWeight: 500, fontStyle: 'italic' }}>Bedrock<span style={{ fontStyle: 'normal', fontWeight: 400, color: '#888', fontSize: '13px' }}>.guide</span></span>
               </div>
-              <p style={{ fontSize: '12.5px', color: '#555', lineHeight: 1.75, marginBottom: '14px' }}>
-                Hard conversations don&rsquo;t get easier by avoiding them — but they get more manageable with practice. Bedrock.guide is a free civic tool that helps you understand where you actually stand on the issues, see how your values connect to real policy choices, and rehearse the conversations that matter before they happen in real life.
-              </p>
-              <p style={{ fontSize: '13px', color: '#1a1a18', lineHeight: 1.75, marginBottom: '14px' }}>
-                Most civic tools are built to tell you what to think. Bedrock.guide is built to help you think — starting with your own values, not a party line or an algorithm&rsquo;s agenda. A short quiz maps your civic identity (your &ldquo;mantle&rdquo;), then four tools put it to work: your ballot matched to your values, a curated media diet, a window into Congress beyond your own races, and — as in this transcript — practice for the hard conversations before they happen. All grounded in how you actually think, not someone else&rsquo;s agenda.
-              </p>
-              <p style={{ fontSize: '12.5px', color: '#555', lineHeight: 1.75, marginBottom: '16px' }}>
-                If someone shared this with you, you can try it yourself — it&rsquo;s free and takes about five minutes to get started.
-              </p>
+              <p style={{ fontSize: '12.5px', color: '#555', lineHeight: 1.75, marginBottom: '14px' }}>Hard conversations don&rsquo;t get easier by avoiding them — but they get more manageable with practice. Bedrock.guide is a free civic tool that helps you understand where you actually stand on the issues, see how your values connect to real policy choices, and rehearse the conversations that matter before they happen in real life.</p>
+              <p style={{ fontSize: '13px', color: '#1a1a18', lineHeight: 1.75, marginBottom: '14px' }}>Most civic tools are built to tell you what to think. Bedrock.guide is built to help you think — starting with your own values, not a party line or an algorithm&rsquo;s agenda. A short quiz maps your civic identity (your &ldquo;mantle&rdquo;), then four tools put it to work: your ballot matched to your values, a curated media diet, a window into Congress beyond your own races, and — as in this transcript — practice for the hard conversations before they happen. All grounded in how you actually think, not someone else&rsquo;s agenda.</p>
+              <p style={{ fontSize: '12.5px', color: '#555', lineHeight: 1.75, marginBottom: '16px' }}>If someone shared this with you, you can try it yourself — it&rsquo;s free and takes about five minutes to get started.</p>
               <p style={{ fontSize: '13px', fontWeight: 600, color: '#185FA5' }}>bedrock.guide</p>
             </div>
           </>

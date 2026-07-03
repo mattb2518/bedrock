@@ -2075,30 +2075,47 @@ Each mode = one freeform box (carries the irreducible, unpredictable part) + opt
 
 ---
 
-### 18.4 Chip Sets (exact — Code should not improvise these)
+### 18.4 Input Structure — Guided Sentence Builder + Freeform
 
-**All chips:** optional, single-tap-to-toggle, none required to submit. Every chip row ends in **"other"**, which opens a tiny inline text field (same pattern as the quiz's "+ add context") — never a dead end. The "who" lists are **relationship-typed, not name-typed** — no names, no PII in chips; anything specific goes in freeform.
+**Architecture:** Modes 1 and 3 use a **sentence builder** — a live sentence with tappable blanks that assembles into a single freeform string sent to the decode endpoint. There is ONE input surface per mode. The assembled sentence IS the submission; there is no parallel chip payload for Modes 1 or 3. Mode 2 keeps a freeform quote box as its primary surface with an optional chip tail.
 
-**MODE 1 — Start one**
-Freeform box: *"What do you want to talk about — and what's making it hard?"*
-- **What's their posture?** → they've checked out entirely · they think it's all rigged · they only trust their own side's media · they think people like me are the problem · they just want to fight · they've stopped listening · other
-- **What usually goes wrong?** → we talk past each other · it gets heated fast · I freeze up · they shut down · we've never actually tried · other
+**MODE 1 — Openers (sentence builder)**
 
-**MODE 2 — Respond to one**
-Freeform box: *"What did they say? Paste it, or describe it."*
-- **What's the vibe?** → genuinely curious · goading · angry · testing me · venting · trying to connect · other
-- **What's their posture?** → (same posture list)
+Live sentence: *"I want to talk to [WHO] [about / and the hard part is that] [TOPIC-OR-POSTURE], and what usually goes wrong is [WRONG]."*
 
-**MODE 3 — Back-and-forth**
-Freeform box: *"What's the conversation about — and who are you practicing with?"*
-- **What are you worried about?** → I'll get too heated · I'll cave · I'll freeze · I'll say it wrong · it'll blow up the relationship · other
-- **What's their posture?** → (same posture list)
+- Tapping a blank opens an **inline picker** (a card below the sentence, not a modal) showing options + "something else…" → inline text field.
+- **[WHO] options:** my uncle · my sister · my dad · my brother-in-law · my aunt · my coworker · my neighbor · my old friend · something else…
+- **[TOPIC-OR-POSTURE] picker:** two rows separated by a divider labeled *"or the hard part is that…"*
+  - Topic row: immigration · guns · the election · abortion · the economy · climate · a specific politician
+  - Posture row: they think people like me are the problem · they think it's all rigged · they've checked out entirely · they only trust their own side's media · they just want to fight · they've stopped listening
+  - something else… → inline text field (classifies as topic or posture via heuristic)
+- **[WRONG] options:** we talk past each other · it gets heated fast · I freeze up · they shut down · we've never actually tried · something else…
+- **Grammar-shaping (deterministic, no model call):** topic-shaped selection → connective is *"about"*; posture-shaped selection → connective is *"and the hard part is that"*. Free-typed input routes via leading-pronoun / stance-verb heuristic.
+- **Optional tail:** a small textarea labeled *"anything else — the part only you can say; leave blank if the sentence says it"* appended after the sentence on submit.
+- **Submit:** assembles blanks + tail into ONE string → sent as `freeform` to `/api/conversations`.
 
-*(who / said-to / topic chips removed 2026-07-02 — they duplicated the freeform box and caused mismatch conflicts; kept only the additive chips that frame approach and emotional weather)*
+**MODE 2 — Responses (freeform primary + chip tail)**
 
-**Chip logic notes for Code:**
-- **Topic and posture are NOT mutually exclusive.** A user can tap "immigration" AND "they think people like me are the problem" — that combination is high-value (subject + emotional weather). Never force either/or. The "or is it more of a posture?" framing is user-facing guidance, not a logic constraint.
-- **"Vibe" (Mode 2) and "posture" are high-signal.** They route the *approach*, not just flavor the response. "Goading" vs. "genuinely curious" flips the whole decode. Posture routes toward the Mantle dimension it implicates (e.g. "it's all rigged" → Trust↔Skepticism; "checked out" → Pragmatism/efficacy). Spec the model to treat these as routing inputs.
+Primary surface: freeform textarea — *"What did they say? Paste it, or describe it."*
+
+Optional chip tail (routing inputs, not flavor):
+- **What's the vibe?** → genuinely curious · goading · angry · testing me · venting · trying to connect · something else…
+- **What's their posture?** → they think people like me are the problem · they think it's all rigged · they've checked out entirely · they only trust their own side's media · they just want to fight · they've stopped listening · something else…
+
+Chips are sent as the `chips` payload alongside `freeform`. Vibe and posture route the decode approach — "Goading" vs. "genuinely curious" flips the whole read. Posture routes toward the Mantle dimension it implicates (e.g. "it's all rigged" → Trust↔Skepticism; "checked out" → Pragmatism/efficacy).
+
+**MODE 3 — Back-and-forth setup (sentence builder)**
+
+Live sentence: *"I'm going to talk to [WHO] [about / and the hard part is that] [TOPIC-OR-POSTURE], and I'm worried I'll [WORRY]."*
+
+Same blank/picker pattern as Mode 1. [WORRY] options: get too heated · cave · freeze · say it wrong · blow up the relationship · something else…
+
+Optional tail as in Mode 1. On submit, assembles into ONE string → handed to §18.6b chat architecture as setup context. **Do not touch the chat loop, coaching panel, or §18.6b when editing this input layer.**
+
+**Blank behavior:**
+- All blanks are optional. Empty blanks resolve to safe defaults on assembly (e.g. "a family member", "something we see differently", "it gets heated fast").
+- Tapping an already-filled blank reopens the picker; a × clears it.
+- "something else…" opens an inline text field inline (not modal), focused immediately.
 
 ---
 
@@ -2123,6 +2140,10 @@ Under each mode's freeform box: a quiet gray link — *"Not sure what to type? S
 
 **Mode 3 example pair (drafts the user is worried about):**
 - *"I'm going to tell my mom I think her church's politics are hurting people, and I know it's going to wreck Thanksgiving."* ↔ *"I want to tell my college kid that I think their professors are feeding them propaganda, without them writing me off as a boomer."*
+
+**Examples behavior with sentence builder (Modes 1 and 3):** Tapping an example parses it into the blanks where values map cleanly (WHO matched against SB_WHO list, topic/posture against SB_TOPICS/SB_POSTURES, wrong/worry against SB_WRONG/SB_WORRY), and drops the full example text into the tail textarea as a fallback. The result is **fully editable** — loads, never locks. Any blank that didn't match stays empty and ready to fill.
+
+**Mode 2 examples** continue to load the freeform quote box as before.
 
 ---
 

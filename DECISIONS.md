@@ -157,3 +157,20 @@ Revisit in Claude Project sessions when ready to build.
 - **National service / civic action layer** — mentioned in founder's political context. Longer-term platform extension beyond the four current pillars.
 - **`pew-typology.ts` Pew group attribution** — Pew group labels on all ten Mantle cards (in pre-launch checklist; not yet built). Carries over to v2 if not completed pre-launch.
 
+
+---
+
+## 2026-07-03 — Conversations input: guided sentence-builder replaces chip-wall
+
+**Decision:** Replace the freeform-box-plus-chip-wall input pattern in all three Conversations modes with a guided sentence-builder for Modes 1 and 3, and a freeform-primary + chip-tail pattern for Mode 2.
+
+**What changed:**
+- Mode 1 (Openers): Sentence "I want to talk to [WHO] [connective] [TOPIC-OR-POSTURE], and what usually goes wrong is [WRONG]." with tappable blanks, inline pickers, optional tail. Assembles into ONE string sent to decode endpoint.
+- Mode 2 (Responses): Freeform quote box remains primary. Chip tail for "What's the vibe?" and "What's their posture?" sent as routing inputs (unchanged from prior architecture, chips are still a separate payload).
+- Mode 3 (Back-and-forth setup): Sentence "I'm going to talk to [WHO] [connective] [TOPIC-OR-POSTURE], and I'm worried I'll [WORRY]." Same blank/picker pattern. Hands off unchanged to §18.6b chat architecture.
+
+**Why:** The chip-wall beside the freeform box created two parallel input surfaces that could conflict (user fills freeform with a topic, taps a different posture chip — mismatch). The sentence builder is ONE surface: the blanks compose the freeform string itself. The old standalone chips were removed 2026-07-02; this is not re-adding them.
+
+**Grammar-shaping:** Deterministic (no model call). Topic chip → connective "about"; posture chip → connective "and the hard part is that". Free-typed input classified by leading-pronoun / stance-verb heuristic.
+
+**Rollback:** Single commit touching only `src/app/conversations/page.tsx`, `SPEC.md`, and `DECISIONS.md`. Cleanly revertable via `git revert <sha>` with zero side effects on output rendering, §18.6b chat loop, or §18.7 profile injection.
