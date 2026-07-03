@@ -100,8 +100,8 @@ const EXAMPLES: Record<Mode, { left: string; right: string }[]> = {
   ],
   chat: [
     {
-      left: "I need to practice talking to my uncle who thinks climate action is just an attack on working people.",
-      right: "I need to practice talking to my college roommate who thinks fossil fuels should be banned tomorrow.",
+      left: "I'm going to tell my mom I think her church's politics are hurting people, and I know it's going to wreck Thanksgiving.",
+      right: "I want to tell my college kid that I think their professors are feeding them propaganda, without them writing me off as a boomer.",
     },
   ],
 }
