@@ -235,7 +235,7 @@ function BlankPill({ value, isOpen, onClick, onClear }: {
         style={{
           fontFamily: 'var(--font-body)',
           fontSize: 'inherit',
-          color: value ? 'var(--color-text-primary)' : 'transparent',
+          color: value ? 'var(--color-text-primary)' : 'rgba(37,99,235,0.5)',
           backgroundColor: 'rgba(37,99,235,0.10)',
           border: `1px solid ${isOpen ? 'var(--color-blue-accent)' : 'rgba(37,99,235,0.28)'}`,
           borderRadius: '999px',
@@ -244,10 +244,11 @@ function BlankPill({ value, isOpen, onClick, onClear }: {
           transition: 'border-color 0.15s',
           display: 'inline-block',
           lineHeight: 'inherit',
-          minWidth: value ? 'auto' : '44px',
+          minWidth: value ? 'auto' : '90px',
+          fontStyle: value ? 'normal' : 'italic',
         }}
       >
-        {value ?? <span style={{ color: 'rgba(37,99,235,0.45)', userSelect: 'none' }}>_</span>}
+        {value ?? 'tap to select'}
       </button>
       {onClear && (
         <button
@@ -292,6 +293,8 @@ interface SBProps {
   sbPosture: BlankState; setSbPosture: (v: BlankState) => void
   sbWrong: BlankState; setSbWrong: (v: BlankState) => void
   sbWorry: BlankState; setSbWorry: (v: BlankState) => void
+  sbMirror: string; setSbMirror: (v: string) => void
+  sbBoxDetached: boolean; setSbBoxDetached: (v: boolean) => void
   sbTail: string; setSbTail: (v: string) => void
   sbPickerOpen: string | null; setSbPickerOpen: (v: string | null) => void
   sbCustomFor: string | null; setSbCustomFor: (v: string | null) => void
@@ -306,6 +309,7 @@ interface SBProps {
 function SentenceBuilderSection({
   mode, sbWho, setSbWho, sbTopic, setSbTopic, sbPosture, setSbPosture,
   sbWrong, setSbWrong, sbWorry, setSbWorry,
+  sbMirror, setSbMirror, sbBoxDetached, setSbBoxDetached,
   sbTail, setSbTail, sbPickerOpen, setSbPickerOpen, sbCustomFor, setSbCustomFor, sbCustomText, setSbCustomText,
   showExamples, onToggleExamples, examples, onLoadExample,
   error, submitLabel, onSubmit, submitDisabled,
@@ -315,6 +319,16 @@ function SentenceBuilderSection({
   useEffect(() => {
     if (sbCustomFor && customInputRef.current) customInputRef.current.focus()
   }, [sbCustomFor])
+
+  const assembled = mode === 'openers'
+    ? assembleMode1(sbWho, sbTopic, sbPosture, sbWrong)
+    : assembleMode3(sbWho, sbTopic, sbPosture, sbWorry)
+
+  // Sync mirror box to assembled sentence while not detached
+  useEffect(() => {
+    if (!sbBoxDetached) setSbMirror(assembled)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [assembled, sbBoxDetached])
 
   const wrongOrWorry = mode === 'openers' ? sbWrong : sbWorry
   const setWrongOrWorry = mode === 'openers' ? setSbWrong : setSbWorry
@@ -363,8 +377,8 @@ function SentenceBuilderSection({
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
-      {/* Live sentence */}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
+      {/* 1. Live sentence with blanks + 2. inline picker */}
       <div>
         <div style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body-lg)', color: 'var(--color-text-primary)', lineHeight: 2, marginBottom: 'var(--space-3)' }}>
           {sentenceStart}{' '}
@@ -378,7 +392,6 @@ function SentenceBuilderSection({
           {'.'}
         </div>
 
-        {/* Inline picker */}
         {sbPickerOpen && (
           <div style={{ backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-blue-accent)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-4)', marginBottom: 'var(--space-3)' }}>
             {sbPickerOpen === 'who' && (
@@ -389,7 +402,6 @@ function SentenceBuilderSection({
                 <PickerChip label="something else…" selected={false} onClick={() => setSbCustomFor('who')} muted />
               </div>
             )}
-
             {sbPickerOpen === 'topic' && (
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
                 {SB_TOPICS.map(opt => (
@@ -398,7 +410,6 @@ function SentenceBuilderSection({
                 <PickerChip label="something else…" selected={false} onClick={() => setSbCustomFor('topic')} muted />
               </div>
             )}
-
             {sbPickerOpen === 'posture' && (
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
                 {SB_POSTURES.map(opt => (
@@ -407,7 +418,6 @@ function SentenceBuilderSection({
                 <PickerChip label="something else…" selected={false} onClick={() => setSbCustomFor('posture')} muted />
               </div>
             )}
-
             {sbPickerOpen === 'wrongOrWorry' && (
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
                 {wrongOrWorryOptions.map(opt => (
@@ -416,8 +426,6 @@ function SentenceBuilderSection({
                 <PickerChip label="something else…" selected={false} onClick={() => setSbCustomFor('wrongOrWorry')} muted />
               </div>
             )}
-
-            {/* Custom text input */}
             {sbCustomFor && (
               <div style={{ marginTop: 'var(--space-3)', display: 'flex', gap: 'var(--space-2)' }}>
                 <input
@@ -431,31 +439,12 @@ function SentenceBuilderSection({
                     sbCustomFor === 'posture' ? 'Describe how they are about it…' :
                     'Describe what goes wrong…'
                   }
-                  style={{
-                    flex: 1,
-                    fontFamily: 'var(--font-body)',
-                    fontSize: 'var(--text-small)',
-                    color: 'var(--color-text-primary)',
-                    backgroundColor: 'var(--color-bg)',
-                    border: '1px solid var(--color-blue-accent)',
-                    borderRadius: 'var(--radius-md)',
-                    padding: 'var(--space-2) var(--space-3)',
-                  }}
+                  style={{ flex: 1, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-primary)', backgroundColor: 'var(--color-bg)', border: '1px solid var(--color-blue-accent)', borderRadius: 'var(--radius-md)', padding: 'var(--space-2) var(--space-3)' }}
                 />
                 <button
                   onClick={submitCustom}
                   disabled={!sbCustomText.trim()}
-                  style={{
-                    fontFamily: 'var(--font-body)',
-                    fontSize: 'var(--text-small)',
-                    fontWeight: 'var(--weight-semibold)',
-                    color: '#fff',
-                    backgroundColor: sbCustomText.trim() ? 'var(--color-blue-accent)' : 'var(--color-text-muted)',
-                    border: 'none',
-                    borderRadius: 'var(--radius-md)',
-                    padding: 'var(--space-2) var(--space-4)',
-                    cursor: sbCustomText.trim() ? 'pointer' : 'not-allowed',
-                  }}
+                  style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: '#fff', backgroundColor: sbCustomText.trim() ? 'var(--color-blue-accent)' : 'var(--color-text-muted)', border: 'none', borderRadius: 'var(--radius-md)', padding: 'var(--space-2) var(--space-4)', cursor: sbCustomText.trim() ? 'pointer' : 'not-allowed' }}
                 >
                   Set
                 </button>
@@ -463,15 +452,52 @@ function SentenceBuilderSection({
             )}
           </div>
         )}
+      </div>
 
-        {/* Examples */}
+      {/* 3. Mirror box (smart-detach) */}
+      <div>
+        {sbBoxDetached && (
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 'var(--space-1)' }}>
+            <button
+              onClick={() => { setSbMirror(assembled); setSbBoxDetached(false) }}
+              style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline', textUnderlineOffset: '2px', padding: 0 }}
+            >
+              reset to sentence
+            </button>
+          </div>
+        )}
+        <textarea
+          value={sbMirror}
+          onChange={e => {
+            setSbMirror(e.target.value)
+            if (!sbBoxDetached) setSbBoxDetached(true)
+          }}
+          rows={4}
+          style={{ width: '100%', fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-primary)', backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', padding: 'var(--space-4)', lineHeight: 'var(--leading-relaxed)', resize: 'vertical', boxSizing: 'border-box' }}
+        />
+      </div>
+
+      {/* 4. Tail box */}
+      <div>
+        <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', margin: '0 0 var(--space-2) 0', fontStyle: 'italic' }}>
+          Anything else you want to add?
+        </p>
+        <textarea
+          value={sbTail}
+          onChange={e => setSbTail(e.target.value)}
+          rows={2}
+          style={{ width: '100%', fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-primary)', backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', padding: 'var(--space-4)', lineHeight: 'var(--leading-relaxed)', resize: 'vertical', boxSizing: 'border-box' }}
+        />
+      </div>
+
+      {/* 5. Examples (below both text boxes) */}
+      <div>
         <button
           onClick={onToggleExamples}
           style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', background: 'none', border: 'none', cursor: 'pointer', padding: 'var(--space-2) 0', textDecoration: 'underline', textUnderlineOffset: '2px' }}
         >
-          {showExamples ? 'Hide examples' : 'Not sure what to type? Show me examples.'}
+          {showExamples ? 'Hide examples' : 'Want another example?'}
         </button>
-
         {showExamples && (
           <div style={{ backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-5)', marginTop: 'var(--space-2)' }}>
             <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', marginBottom: 'var(--space-4)', fontStyle: 'italic' }}>
@@ -496,20 +522,7 @@ function SentenceBuilderSection({
         )}
       </div>
 
-      {/* Optional tail */}
-      <div>
-        <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', margin: '0 0 var(--space-2) 0', fontStyle: 'italic' }}>
-          anything else &mdash; the part only you can say; leave blank if the sentence says it
-        </p>
-        <textarea
-          value={sbTail}
-          onChange={e => setSbTail(e.target.value)}
-          rows={3}
-          style={{ width: '100%', fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-primary)', backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', padding: 'var(--space-4)', lineHeight: 'var(--leading-relaxed)', resize: 'vertical', boxSizing: 'border-box' }}
-        />
-      </div>
-
-      {/* Submit */}
+      {/* 6. Submit */}
       <div>
         {error && <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-red)', marginBottom: 'var(--space-3)' }}>{error}</p>}
         <button
@@ -539,6 +552,19 @@ function ResponseModeInput({
   chips, onToggleChip, error, submitLabel, onSubmit, submitDisabled,
 }: ResponseInputProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const customChipRef = useRef<HTMLInputElement>(null)
+  const [customChipFor, setCustomChipFor] = useState<string | null>(null)
+  const [customChipText, setCustomChipText] = useState('')
+
+  useEffect(() => {
+    if (customChipFor && customChipRef.current) customChipRef.current.focus()
+  }, [customChipFor])
+
+  function submitCustomChip() {
+    if (!customChipText.trim() || !customChipFor) return
+    onToggleChip(customChipFor, customChipText.trim())
+    setCustomChipFor(null); setCustomChipText('')
+  }
 
   useLayoutEffect(() => {
     const el = textareaRef.current
@@ -604,28 +630,70 @@ function ResponseModeInput({
         {CHIP_ROWS_RESPONSES.map(row => (
           <div key={row.key}>
             <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', fontWeight: 'var(--weight-semibold)', margin: '0 0 var(--space-2) 0' }}>{row.label}</p>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
-              {row.chips.map(chip => (
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)', alignItems: 'center' }}>
+              {row.chips.map(chip => {
+                if (chip === 'something else…') {
+                  if (customChipFor === row.key) return null
+                  return (
+                    <button
+                      key={chip}
+                      onClick={() => { setCustomChipFor(row.key); setCustomChipText('') }}
+                      style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', padding: '4px 12px', borderRadius: 'var(--radius-full)', border: '1px dashed var(--color-border)', backgroundColor: 'transparent', color: 'var(--color-text-muted)', cursor: 'pointer', fontStyle: 'italic', whiteSpace: 'nowrap' }}
+                    >
+                      {chip}
+                    </button>
+                  )
+                }
+                const selected = (chips[row.key] ?? []).includes(chip)
+                return (
+                  <button
+                    key={chip}
+                    onClick={() => onToggleChip(row.key, chip)}
+                    style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', padding: '4px 12px', borderRadius: 'var(--radius-full)', border: selected ? '1px solid var(--color-blue-accent)' : '1px solid var(--color-border)', backgroundColor: selected ? 'var(--color-blue-accent)' : 'transparent', color: selected ? '#fff' : 'var(--color-text-secondary)', cursor: 'pointer', transition: 'all 0.15s', whiteSpace: 'nowrap' }}
+                  >
+                    {chip}
+                  </button>
+                )
+              })}
+              {/* Custom chip value (already selected) */}
+              {(chips[row.key] ?? []).filter(c => !row.chips.includes(c)).map(customVal => (
                 <button
-                  key={chip}
-                  onClick={() => onToggleChip(row.key, chip)}
-                  style={{
-                    fontFamily: 'var(--font-body)',
-                    fontSize: 'var(--text-small)',
-                    padding: '4px 12px',
-                    borderRadius: 'var(--radius-full)',
-                    border: (chips[row.key] ?? []).includes(chip) ? '1px solid var(--color-blue-accent)' : '1px solid var(--color-border)',
-                    backgroundColor: (chips[row.key] ?? []).includes(chip) ? 'var(--color-blue-accent)' : 'transparent',
-                    color: (chips[row.key] ?? []).includes(chip) ? '#fff' : 'var(--color-text-secondary)',
-                    cursor: 'pointer',
-                    transition: 'all 0.15s',
-                    whiteSpace: 'nowrap',
-                  }}
+                  key={customVal}
+                  onClick={() => onToggleChip(row.key, customVal)}
+                  style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', padding: '4px 12px', borderRadius: 'var(--radius-full)', border: '1px solid var(--color-blue-accent)', backgroundColor: 'var(--color-blue-accent)', color: '#fff', cursor: 'pointer', transition: 'all 0.15s', whiteSpace: 'nowrap' }}
                 >
-                  {chip}
+                  {customVal}
                 </button>
               ))}
             </div>
+            {customChipFor === row.key && (
+              <div style={{ display: 'flex', gap: 'var(--space-2)', marginTop: 'var(--space-2)' }}>
+                <input
+                  ref={customChipRef}
+                  value={customChipText}
+                  onChange={e => setCustomChipText(e.target.value)}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter') submitCustomChip()
+                    if (e.key === 'Escape') { setCustomChipFor(null); setCustomChipText('') }
+                  }}
+                  placeholder="Type your own…"
+                  style={{ flex: 1, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-primary)', backgroundColor: 'var(--color-bg)', border: '1px solid var(--color-blue-accent)', borderRadius: 'var(--radius-md)', padding: 'var(--space-2) var(--space-3)' }}
+                />
+                <button
+                  onClick={submitCustomChip}
+                  disabled={!customChipText.trim()}
+                  style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: '#fff', backgroundColor: customChipText.trim() ? 'var(--color-blue-accent)' : 'var(--color-text-muted)', border: 'none', borderRadius: 'var(--radius-md)', padding: 'var(--space-2) var(--space-4)', cursor: customChipText.trim() ? 'pointer' : 'not-allowed' }}
+                >
+                  Set
+                </button>
+                <button
+                  onClick={() => { setCustomChipFor(null); setCustomChipText('') }}
+                  style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', background: 'none', border: 'none', cursor: 'pointer', padding: 'var(--space-2)' }}
+                >
+                  ✕
+                </button>
+              </div>
+            )}
           </div>
         ))}
       </div>
@@ -735,6 +803,8 @@ export default function ConversationsPage() {
   const [sbPosture, setSbPosture] = useState<BlankState>(emptyBlank())
   const [sbWrong, setSbWrong] = useState<BlankState>(emptyBlank())
   const [sbWorry, setSbWorry] = useState<BlankState>(emptyBlank())
+  const [sbMirror, setSbMirror] = useState('')
+  const [sbBoxDetached, setSbBoxDetached] = useState(false)
   const [sbTail, setSbTail] = useState('')
   const [sbPickerOpen, setSbPickerOpen] = useState<string | null>(null)
   const [sbCustomFor, setSbCustomFor] = useState<string | null>(null)
@@ -805,6 +875,7 @@ export default function ConversationsPage() {
         setActiveMode(null); setOutput(null)
         setFreeform(''); setChips({})
         setSbWho(emptyBlank()); setSbTopic(emptyBlank()); setSbPosture(emptyBlank()); setSbWrong(emptyBlank()); setSbWorry(emptyBlank())
+        setSbMirror(''); setSbBoxDetached(false)
         setSbTail(''); setSbPickerOpen(null); setSbCustomFor(null); setSbCustomText('')
         setShowExamples(false); setError(null)
         setChatStarted(false); setChatMessages([]); setChatInput(''); setChatLoading(false)
@@ -832,17 +903,12 @@ export default function ConversationsPage() {
   }
 
   function getSubmitString(): string {
-    if (activeMode === 'openers') {
-      const allEmpty = sbWho.isEmpty && sbTopic.isEmpty && sbPosture.isEmpty && sbWrong.isEmpty
-      if (allEmpty && sbTail.trim()) return sbTail.trim()
-      const sentence = assembleMode1(sbWho, sbTopic, sbPosture, sbWrong)
-      return sbTail.trim() ? `${sentence}\n${sbTail.trim()}` : sentence
-    }
-    if (activeMode === 'chat') {
-      const allEmpty = sbWho.isEmpty && sbTopic.isEmpty && sbPosture.isEmpty && sbWorry.isEmpty
-      if (allEmpty && sbTail.trim()) return sbTail.trim()
-      const sentence = assembleMode3(sbWho, sbTopic, sbPosture, sbWorry)
-      return sbTail.trim() ? `${sentence}\n${sbTail.trim()}` : sentence
+    if (activeMode === 'openers' || activeMode === 'chat') {
+      const fallback = activeMode === 'openers'
+        ? assembleMode1(sbWho, sbTopic, sbPosture, sbWrong)
+        : assembleMode3(sbWho, sbTopic, sbPosture, sbWorry)
+      const main = sbMirror.trim() || fallback
+      return sbTail.trim() ? `${main}\n${sbTail.trim()}` : main
     }
     return freeform
   }
@@ -850,6 +916,7 @@ export default function ConversationsPage() {
   function resetSB() {
     setSbWho(emptyBlank()); setSbTopic(emptyBlank()); setSbPosture(emptyBlank())
     setSbWrong(emptyBlank()); setSbWorry(emptyBlank())
+    setSbMirror(''); setSbBoxDetached(false)
     setSbTail(''); setSbPickerOpen(null); setSbCustomFor(null); setSbCustomText('')
   }
 
@@ -871,7 +938,8 @@ export default function ConversationsPage() {
       const p = parseExample(text, activeMode)
       setSbWho(p.who); setSbTopic(p.topic); setSbPosture(p.posture)
       setSbWrong(p.wrong); setSbWorry(p.worry)
-      setSbTail(text); setSbPickerOpen(null); setShowExamples(false)
+      setSbMirror(text); setSbBoxDetached(true)
+      setSbTail(''); setSbPickerOpen(null); setShowExamples(false)
     }
   }
 
@@ -1055,6 +1123,7 @@ export default function ConversationsPage() {
           sbTopic={sbTopic} setSbTopic={setSbTopic}
           sbPosture={sbPosture} setSbPosture={setSbPosture}
           sbWrong={sbWrong} setSbWrong={setSbWrong} sbWorry={sbWorry} setSbWorry={setSbWorry}
+          sbMirror={sbMirror} setSbMirror={setSbMirror} sbBoxDetached={sbBoxDetached} setSbBoxDetached={setSbBoxDetached}
           sbTail={sbTail} setSbTail={setSbTail}
           sbPickerOpen={sbPickerOpen} setSbPickerOpen={setSbPickerOpen}
           sbCustomFor={sbCustomFor} setSbCustomFor={setSbCustomFor}
@@ -1147,6 +1216,7 @@ export default function ConversationsPage() {
             sbTopic={sbTopic} setSbTopic={setSbTopic}
             sbPosture={sbPosture} setSbPosture={setSbPosture}
             sbWrong={sbWrong} setSbWrong={setSbWrong} sbWorry={sbWorry} setSbWorry={setSbWorry}
+            sbMirror={sbMirror} setSbMirror={setSbMirror} sbBoxDetached={sbBoxDetached} setSbBoxDetached={setSbBoxDetached}
             sbTail={sbTail} setSbTail={setSbTail}
             sbPickerOpen={sbPickerOpen} setSbPickerOpen={setSbPickerOpen}
             sbCustomFor={sbCustomFor} setSbCustomFor={setSbCustomFor}

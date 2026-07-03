@@ -2083,7 +2083,7 @@ Each mode = one freeform box (carries the irreducible, unpredictable part) + opt
 
 Live sentence with four independent tappable blanks: *"I want to talk to [WHO] about [TOPIC], and the hard part is that [POSTURE], and what usually goes wrong is [WRONG]."*
 
-Tapping any blank opens an **inline picker** (card below the sentence, not a modal). All blanks are independent and optional. Empty blank = a visibly-empty accent-tinted pill; filled blank shows the selected value. No placeholder label text inside the pill.
+Tapping any blank opens an **inline picker** (card below the sentence, not a modal). All blanks are independent and optional. Empty blank = accent-tinted pill (min-width 90px) showing *"tap to select"* in italic accent color — an action cue, not a descriptor label. Filled blank shows the selected value in normal weight.
 
 - **[WHO] options:** my mom · my dad · my sister · my brother · my aunt · my uncle · my coworker · my neighbor · something else…
 - **[TOPIC] picker:** immigration · guns · the election · abortion · the economy · climate · a specific politician · something else… (kind always `topic`)
@@ -2102,8 +2102,15 @@ WHO empty → "a family member"; WRONG empty → "it gets heated fast".
 
 *(2026-07-03: single grammar-shaped blank → two independent blanks. The single blank hid the posture path behind a divider and made it impossible for a situation to carry both a subject and a dynamic. Two blanks let the sentence be as expressive as the reality.)*
 
-- **Optional tail:** textarea *"anything else — the part only you can say; leave blank if the sentence says it"* appended on submit.
-- **Submit:** assembles blanks + tail into ONE string → sent as `freeform` to `/api/conversations`.
+**Layout order (sentence-builder modes, 2026-07-03):**
+1. Live sentence with blanks
+2. Inline picker (opens below sentence when a blank is tapped)
+3. **Mirror box** (smart-detach textarea) — syncs to assembled sentence while attached; first manual edit detaches; *"reset to sentence"* link appears top-right when detached; re-attaches on click. Loading an example populates the mirror box and detaches it (the example is now the editable submission text).
+4. **"Anything else?" tail** — independent textarea, always append-only, never mirrors.
+5. *"Want another example?"* link + examples panel (moved below both text boxes).
+6. Submit button.
+
+- **Submit:** `[mirrorBox, tail].filter(Boolean).join('\n')` → sent as `freeform` to `/api/conversations`. Mirror box fallback is the assembled sentence when blank.
 
 **MODE 2 — Responses (freeform primary + chip tail)**
 
@@ -2115,16 +2122,19 @@ Optional chip tail (routing inputs, not flavor):
 
 Chips are sent as the `chips` payload alongside `freeform`. Vibe and posture route the decode approach — "Goading" vs. "genuinely curious" flips the whole read. Posture routes toward the Mantle dimension it implicates (e.g. "it's all rigged" → Trust↔Skepticism; "checked out" → Pragmatism/efficacy).
 
+"something else…" on any chip row opens an inline text field (same pattern as Mode 1/3 pickers — not a chip toggle). Submitting adds the typed value as a selected chip. *(2026-07-03: previously dead — just toggled the literal string "something else…")*
+
 **MODE 3 — Back-and-forth setup (sentence builder)**
 
 Same two-blank split as Mode 1. Live sentence: *"I'm going to talk to [WHO] about [TOPIC], and the hard part is that [POSTURE], and I'm worried I'll [WORRY]."*
 
 Same graceful-vanishing grammar. [WORRY] options: get too heated · cave · freeze · say it wrong · blow up the relationship · something else…
 
-Optional tail as in Mode 1. On submit, assembles into ONE string → handed to §18.6b chat architecture as setup context. **Do not touch the chat loop, coaching panel, or §18.6b when editing this input layer.**
+Same layout order as Mode 1 (mirror box + tail + examples below). On submit, mirror-box + tail → handed to §18.6b chat architecture as setup context. **Do not touch the chat loop, coaching panel, or §18.6b when editing this input layer.**
 
 **Blank behavior (all modes):**
 - All blanks are optional. Empty blanks resolve gracefully per the vanishing grammar above.
+- Empty blank pill: 90px min-width, shows *"tap to select"* in italic accent color.
 - Tapping a filled blank reopens its picker; a × clears it.
 - "something else…" opens an inline text field (not modal), focused immediately.
 
@@ -2132,7 +2142,7 @@ Optional tail as in Mode 1. On submit, assembles into ONE string → handed to �
 
 ### 18.5 "Show me examples" Affordance (content-neutral by construction)
 
-Under each mode's freeform box: a quiet gray link — *"Not sure what to type? Show me examples."* Same subtle styling as the quiz's "+ add context". On tap, expands an inline panel of example cards. Does not navigate away or overwrite what the user already typed.
+A quiet gray underlined link — *"Want another example?"* (Modes 1 and 3: appears **below** both the mirror box and the tail box. Mode 2: appears below the freeform textarea). On tap, expands an inline panel of example cards. Does not navigate away or overwrite what the user already typed. *(2026-07-03: renamed from "Not sure what to type? Show me examples." and moved below both text boxes for Modes 1 and 3.)*
 
 **Hard rules (these are the nonpartisan guarantee, not guidelines):**
 - Examples ship and update **in pairs only** — one that reads left-leaning, one right-leaning, always shown together. Never an odd number, never one side without its mirror. The pairing invariant holds across any future edits.
@@ -2150,7 +2160,7 @@ Under each mode's freeform box: a quiet gray link — *"Not sure what to type? S
 **Mode 3 example pair (drafts the user is worried about):**
 - *"I'm going to tell my mom I think her church's politics are hurting people, and I know it's going to wreck Thanksgiving."* ↔ *"I want to tell my college kid that I think their professors are feeding them propaganda, without them writing me off as a boomer."*
 
-**Examples behavior with sentence builder (Modes 1 and 3):** Tapping an example parses it into the blanks where values map cleanly (WHO matched against SB_WHO list, topic/posture against SB_TOPICS/SB_POSTURES, wrong/worry against SB_WRONG/SB_WORRY), and drops the full example text into the tail textarea as a fallback. The result is **fully editable** — loads, never locks. Any blank that didn't match stays empty and ready to fill.
+**Examples behavior with sentence builder (Modes 1 and 3):** Tapping an example parses it into the blanks where values map cleanly (WHO matched against SB_WHO list, topic/posture against SB_TOPICS/SB_POSTURES, wrong/worry against SB_WRONG/SB_WORRY), and drops the **full example text into the mirror box** (detaching it — the example is now the primary editable submission text). The tail box is cleared. The result is **fully editable** — loads, never locks. Any blank that didn't match stays empty and ready to fill.
 
 **Mode 2 examples** continue to load the freeform quote box as before.
 
