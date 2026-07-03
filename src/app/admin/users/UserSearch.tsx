@@ -11,7 +11,7 @@ interface UserRow {
   role: string
 }
 
-export default function UserSearch({ users }: { users: UserRow[] }) {
+export default function UserSearch({ users, currentUserId }: { users: UserRow[]; currentUserId: string }) {
   const [query, setQuery] = useState('')
   const [feedback, setFeedback] = useState<{ userId: string; msg: string; ok: boolean } | null>(null)
   const [isPending, startTransition] = useTransition()
@@ -117,23 +117,25 @@ export default function UserSearch({ users }: { users: UserRow[] }) {
               {u.role === 'super_admin' && (
                 <span style={{ fontSize: 11, color: 'var(--color-text-tertiary)', padding: '4px 12px' }}>Super Admin</span>
               )}
-              <button
-                disabled={isPending}
-                onClick={() => handleDeleteClick(u.id)}
-                style={{
-                  padding: '4px 12px',
-                  borderRadius: 4,
-                  fontSize: 11,
-                  fontWeight: 600,
-                  cursor: isPending ? 'not-allowed' : 'pointer',
-                  border: 'none',
-                  opacity: isPending ? 0.6 : 1,
-                  background: deleteConfirm === u.id ? 'rgba(239,68,68,0.25)' : 'rgba(239,68,68,0.1)',
-                  color: '#ef4444',
-                }}
-              >
-                {deleteConfirm === u.id ? 'Confirm — permanent' : 'Delete user'}
-              </button>
+              {u.id !== currentUserId && (
+                <button
+                  disabled={isPending}
+                  onClick={() => handleDeleteClick(u.id)}
+                  style={{
+                    padding: '4px 12px',
+                    borderRadius: 4,
+                    fontSize: 11,
+                    fontWeight: 600,
+                    cursor: isPending ? 'not-allowed' : 'pointer',
+                    border: 'none',
+                    opacity: isPending ? 0.6 : 1,
+                    background: deleteConfirm === u.id ? 'rgba(239,68,68,0.25)' : 'rgba(239,68,68,0.1)',
+                    color: '#ef4444',
+                  }}
+                >
+                  {deleteConfirm === u.id ? 'Confirm — permanent' : 'Delete user'}
+                </button>
+              )}
             </div>
           </div>
         ))}

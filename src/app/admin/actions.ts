@@ -319,6 +319,12 @@ export async function demoteToUser(userId: string) {
 
 export async function deleteUser(userId: string) {
   await requireSuperAdminRole()
+
+  const actorId = await getActorUserId()
+  if (actorId && actorId === userId) {
+    throw new Error('You cannot delete your own account.')
+  }
+
   const admin = createAdminClient()
 
   // tagged_by is TEXT (not a FK), so no cascade — must null manually

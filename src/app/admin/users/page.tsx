@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { getCurrentUserRole } from '@/lib/auth/getRole'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { createClient } from '@/lib/supabase/server'
 import UserSearch from './UserSearch'
 
 // ── Privacy wall: this file is the ONLY server-side data path for user lookup.
@@ -13,6 +14,10 @@ export default async function UsersPage() {
   if (role !== 'super_admin') {
     redirect('/admin')
   }
+
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  const currentUserId = user?.id ?? ''
 
   const admin = createAdminClient()
 
@@ -53,7 +58,7 @@ export default async function UsersPage() {
         Super Admin only. Shows account creation date, quiz completion %, and role. No profile content is accessible here.
       </p>
 
-      <UserSearch users={userList} />
+      <UserSearch users={userList} currentUserId={currentUserId} />
     </div>
   )
 }
