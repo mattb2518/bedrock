@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react'
 import { promoteToAdmin, demoteToUser, deleteUser } from '@/app/admin/actions'
 
-interface UserRow {
+interface UserRow  {
   id: string
   email: string
   createdAt: string
