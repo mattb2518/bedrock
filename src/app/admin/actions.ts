@@ -273,6 +273,31 @@ export async function reclassifyEntry(type: EntryType, id: string) {
   revalidatePath(`/admin/review/${type}/${id}`)
 }
 
+// ── Update user email (Super Admin only) ──────────────────────────────────────
+// Updating without email_confirm: true causes Supabase to send a confirmation
+// email to the new address automatically via its built-in mailer.
+
+export async function updateUserEmail(userId: string, newEmail: string) {
+  await requireSuperAdminRole()
+  const actorId = await getActorUserId()
+  const trimmed = newEmail.trim().toLowerCase()
+  if (!trimmed.includes('@') || !trimmed.includes('.')) throw new Error('Invalid email address.')
+
+  const admin = createAdminClient()
+  const { error } = await admin.auth.admin.updateUserById(userId, { email: trimmed })
+  if (error) throw new Error(error.message)
+
+  await writeAuditLog({
+    entryType: 'candidate',
+    entryId: userId,
+    action: 'email_updated',
+    actorUserId: actorId,
+    notes: `Email updated to ${trimmed}`,
+  })
+
+  revalidatePath('/admin/users')
+}
+
 // ── Promote / Demote user (Super Admin only) ──────────────────────────────────
 
 export async function promoteToAdmin(userId: string) {

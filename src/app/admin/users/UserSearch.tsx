@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { promoteToAdmin, demoteToUser, deleteUser } from '@/app/admin/actions'
+import { promoteToAdmin, demoteToUser, deleteUser, updateUserEmail } from '@/app/admin/actions'
 
 interface UserRow  {
   id: string
@@ -16,6 +16,8 @@ export default function UserSearch({ users, currentUserId }: { users: UserRow[];
   const [feedback, setFeedback] = useState<{ userId: string; msg: string; ok: boolean } | null>(null)
   const [isPending, startTransition] = useTransition()
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
+  const [editingEmail, setEditingEmail] = useState<string | null>(null)
+  const [emailDraft, setEmailDraft] = useState('')
 
   const filtered = query.trim()
     ? users.filter((u) => u.email.toLowerCase().includes(query.toLowerCase()))
@@ -31,6 +33,18 @@ export default function UserSearch({ users, currentUserId }: { users: UserRow[];
         setFeedback({ userId, msg: e instanceof Error ? e.message : 'Error', ok: false })
       }
     })
+  }
+
+  function handleEditEmailClick(userId: string, currentEmail: string) {
+    setEditingEmail(userId)
+    setEmailDraft(currentEmail)
+    setFeedback(null)
+    setDeleteConfirm(null)
+  }
+
+  function handleEmailSave(userId: string) {
+    act(() => updateUserEmail(userId, emailDraft), userId, 'Email updated — confirmation sent to new address.')
+    setEditingEmail(null)
   }
 
   function handleDeleteClick(userId: string) {
@@ -90,20 +104,52 @@ export default function UserSearch({ users, currentUserId }: { users: UserRow[];
             borderRadius: 8,
             background: 'rgba(255,255,255,0.02)',
           }}>
-            <div>
+            <div style={{ flex: 1, minWidth: 0 }}>
               <p style={{ fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-primary)', marginBottom: 2 }}>
                 {u.email}
               </p>
               <p style={{ fontSize: 11, color: 'var(--color-text-tertiary)' }}>
                 Joined {new Date(u.createdAt).toLocaleDateString()} · Quiz {u.completionPercent}% complete · Role: {u.role}
               </p>
+              {editingEmail === u.id && (
+                <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginTop: 8, flexWrap: 'wrap' }}>
+                  <input
+                    type="email"
+                    value={emailDraft}
+                    onChange={e => setEmailDraft(e.target.value)}
+                    onKeyDown={e => { if (e.key === 'Enter') handleEmailSave(u.id); if (e.key === 'Escape') setEditingEmail(null) }}
+                    autoFocus
+                    style={{ padding: '4px 8px', borderRadius: 4, border: '1px solid rgba(255,255,255,0.2)', background: 'rgba(255,255,255,0.08)', color: 'var(--color-text-primary)', fontSize: 12, width: 240 }}
+                  />
+                  <button
+                    disabled={isPending || !emailDraft.trim()}
+                    onClick={() => handleEmailSave(u.id)}
+                    style={{ padding: '4px 10px', borderRadius: 4, fontSize: 11, fontWeight: 600, border: 'none', background: 'rgba(34,197,94,0.2)', color: '#22c55e', cursor: 'pointer' }}
+                  >
+                    Save &amp; send confirmation
+                  </button>
+                  <button
+                    onClick={() => setEditingEmail(null)}
+                    style={{ padding: '4px 8px', borderRadius: 4, fontSize: 11, border: 'none', background: 'transparent', color: 'var(--color-text-tertiary)', cursor: 'pointer' }}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              )}
               {feedback?.userId === u.id && (
                 <p style={{ fontSize: 11, color: feedback.ok ? '#22c55e' : '#ef4444', marginTop: 4 }}>
                   {feedback.msg}
                 </p>
               )}
             </div>
-            <div style={{ display: 'flex', gap: 'var(--space-2)', flexShrink: 0, marginLeft: 'var(--space-4)' }}>
+            <div style={{ display: 'flex', gap: 'var(--space-2)', flexShrink: 0, marginLeft: 'var(--space-4)', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+              <button
+                disabled={isPending}
+                onClick={() => handleEditEmailClick(u.id, u.email)}
+                style={{ padding: '4px 12px', borderRadius: 4, fontSize: 11, fontWeight: 600, cursor: isPending ? 'not-allowed' : 'pointer', border: 'none', opacity: isPending ? 0.6 : 1, background: 'rgba(96,165,250,0.15)', color: '#60a5fa' }}
+              >
+                Edit email
+              </button>
               {u.role !== 'admin' && u.role !== 'super_admin' && (
                 <button disabled={isPending} onClick={() => act(() => promoteToAdmin(u.id), u.id)} style={btnStyle('promote')}>
                   Promote to Admin
