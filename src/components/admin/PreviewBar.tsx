@@ -5,8 +5,19 @@ import { createClient } from '@/lib/supabase/client'
 import { usePreviewStore } from '@/store/previewStore'
 import { MANTLES, classifyProfile } from '@/lib/quiz/mantles'
 import type { CivicType, QuizResult } from '@/types/quiz'
+import { ALL_DIMENSIONS } from '@/lib/engine/match'
+import type { Dimension } from '@/lib/engine/match'
 
 // ── Synthetic QuizResult builder ──────────────────────────────────────────────
+
+function topHeldDimensions(profile: Record<Dimension, number>): Dimension[] {
+  return [...ALL_DIMENSIONS]
+    .sort(
+      (a, b) =>
+        Math.abs((profile[b] ?? 50) - 50) - Math.abs((profile[a] ?? 50) - 50)
+    )
+    .slice(0, 3)
+}
 
 function syntheticResult(type: CivicType): QuizResult {
   const mantle = MANTLES.find((m) => m.type === type)!
@@ -15,7 +26,7 @@ function syntheticResult(type: CivicType): QuizResult {
     primaryType: type,
     secondaryTypes: ranked.secondary.slice(0, 3),
     profile: mantle.profile,
-    topDimensions: [],
+    topDimensions: topHeldDimensions(mantle.profile),
     completedLayers: [1, 2, 3, 4],
     completionPercent: 100,
   }
