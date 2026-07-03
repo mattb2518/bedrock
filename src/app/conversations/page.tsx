@@ -120,7 +120,7 @@ const ENERGY_COLORS: Record<string, string> = {
   'disarm with warmth': '#d97706',
   'get curious': '#2563eb',
   'name it lightly': '#16a34a',
-  'find the shared question': '#7c3aed',
+  'find the shared question': '#a78bfa',
 }
 
 // ─── Animations ───────────────────────────────────────────────────────────────
