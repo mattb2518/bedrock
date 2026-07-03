@@ -90,6 +90,9 @@ const PILLAR_SECTIONS: PillarSection[] = [
     content: (
       <>
         <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)' }}>
+          This shows how your values compare to your representatives&apos; actual public record — not a rating or grade.
+        </p>
+        <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)' }}>
           When you enter your address, we fetch the candidates running in your district from congress.gov, the FEC, and your state&apos;s legislative database. For candidates we haven&apos;t seen before, we classify them in real time — reading their public record, voting history, and stated positions, then scoring them on the same eight dimensions as your values profile. This takes a moment on your first lookup; every subsequent user in the same district gets instant results from our cache. Incumbents with voting records get more confident placements. Challengers with only campaign platforms get real placements but lower confidence scores — we can&apos;t know yet if they&apos;ll follow through, and we say so.
         </p>
         <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)' }}>

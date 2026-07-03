@@ -178,12 +178,15 @@ function assignTier(
     return 'confirming'
   }
 
-  // Challenging: v1 loosening (was tension>=0.60, reliability>=75, goodFaith==='high', independence>=50).
-  // Relaxed to fill the flagship tier; revisit under the v2 reliability-signal rework.
+  // Challenging: floor recalibrated per DECISIONS.md 2026-07-03 and SPEC.md §24.2.
+  // tensionOnHeld floor lowered to 0.40 — first threshold where every Mantle clears the
+  // §24.7 three-source minimum against all 25 qualifying sources (reliability≥75,
+  // goodFaith='high', independence≥50). Prior relaxation (0.55/reliability65/goodFaith!='low')
+  // was solving for the wrong variable. Quality floors restored to original spec values.
   if (
-    tensionOnHeld >= 0.55 &&
-    source.reliability >= 65 &&
-    source.goodFaith !== 'low' &&
+    tensionOnHeld >= 0.40 &&
+    source.reliability >= 75 &&
+    source.goodFaith === 'high' &&
     source.independence >= 50
   ) {
     return 'challenging'

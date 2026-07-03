@@ -315,7 +315,12 @@ export const MEDIA_CONFIRMING: MediaSource = {
   },
 }
 
-/** Mid-agreement, mid-tension, high novel coverage → Expanding */
+/**
+ * Mid-agreement, mid-tension, high novel coverage → Expanding.
+ * stability_change at 25 puts tensionOnHeld at 0.35 — above Confirming's 0.30 ceiling
+ * (so it fails Confirming) and below Challenging's 0.40 floor (so it fails Challenging),
+ * landing cleanly in Expanding.
+ */
 export const MEDIA_EXPANDING: MediaSource = {
   ...BASE_SOURCE,
   id: 'media-expanding',
@@ -327,6 +332,7 @@ export const MEDIA_EXPANDING: MediaSource = {
   independence: 70,
   goodFaith: 'high',
   axisPlacement: {
+    stability_change:      mediaPl(25),   // user 60 → distance 0.35, tensionOnHeld = 0.35
     rules_outcomes:        mediaPl(70),   // somewhat away from user's 45
     markets_governance:    mediaPl(40),   // somewhat away from user's 55
     trust_skepticism:      mediaPl(30),   // away from user's 50

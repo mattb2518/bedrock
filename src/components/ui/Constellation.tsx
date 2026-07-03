@@ -36,6 +36,8 @@ type ConstellationProps = {
   showLabels?: boolean;
   showGrid?: boolean;
   viewBox?: string;
+  /** Optional second series rendered as an overlay (e.g. an official's placement vs. the user's shape). */
+  overlaySeries?: { scores: number[]; label: string; color?: string };
 };
 
 export default function Constellation({
@@ -46,6 +48,7 @@ export default function Constellation({
   showLabels = true,
   showGrid = true,
   viewBox = "0 0 400 400",
+  overlaySeries,
 }: ConstellationProps) {
   const cx = 200, cy = 200, r = 140;
   const n = scores.length;
@@ -58,6 +61,14 @@ export default function Constellation({
 
   const dataPoints = scores.map((s, i) => pt(s, i));
   const dataPolygon = dataPoints.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(" ");
+
+  const overlayColor = overlaySeries?.color ?? "#F59E0B";  // amber for official overlay
+  const overlayPoints = overlaySeries
+    ? overlaySeries.scores.map((s, i) => pt(s, i))
+    : null;
+  const overlayPolygon = overlayPoints
+    ? overlayPoints.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(" ")
+    : null;
   const gridPolygons = [0.25, 0.5, 0.75, 1.0].map(scale =>
     Array.from({ length: n }, (_, i) => pt(scale, i))
       .map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(" ")
@@ -87,11 +98,20 @@ export default function Constellation({
         const end = pt(1, i);
         return <line key={i} x1={cx} y1={cy} x2={end.x.toFixed(1)} y2={end.y.toFixed(1)} stroke="rgba(107,159,234,0.18)" strokeWidth="1" />;
       })}
-      {/* Data polygon */}
+      {/* Data polygon (user's shape) */}
       <polygon points={dataPolygon} fill="rgba(107,159,234,0.2)" stroke="#6B9FEA" strokeWidth="2" strokeLinejoin="round" />
       {dataPoints.map((p, i) => (
         <circle key={i} cx={p.x.toFixed(1)} cy={p.y.toFixed(1)} r="4" fill="#6B9FEA" />
       ))}
+      {/* Overlay polygon (e.g. official's placement) */}
+      {overlayPolygon && overlayPoints && (
+        <>
+          <polygon points={overlayPolygon} fill="none" stroke={overlayColor} strokeWidth="2" strokeLinejoin="round" strokeDasharray="5 3" />
+          {overlayPoints.map((p, i) => (
+            <circle key={i} cx={p.x.toFixed(1)} cy={p.y.toFixed(1)} r="3" fill={overlayColor} />
+          ))}
+        </>
+      )}
       {/* Outer pole labels (high pole) */}
       {showLabels && outerPts.map((p, i) => (
         <text key={i} x={p.x.toFixed(1)} y={(p.y + 4).toFixed(1)}
@@ -108,6 +128,15 @@ export default function Constellation({
           {innerLabels[i]}
         </text>
       ))}
+      {/* Legend when overlay is present */}
+      {overlaySeries && (
+        <g>
+          <circle cx="20" cy="390" r="4" fill="#6B9FEA" />
+          <text x="28" y="394" fontSize="9" fill="rgba(232,228,218,0.7)" fontFamily="DM Sans, sans-serif">You</text>
+          <circle cx="60" cy="390" r="3" fill={overlayColor} />
+          <text x="68" y="394" fontSize="9" fill="rgba(232,228,218,0.7)" fontFamily="DM Sans, sans-serif">{overlaySeries.label}</text>
+        </g>
+      )}
     </svg>
   );
 }

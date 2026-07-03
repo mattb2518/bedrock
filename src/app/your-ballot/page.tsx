@@ -2,16 +2,19 @@
 
 import { useState, useTransition, useMemo, useEffect } from 'react'
 import { useQuizStore, savePendingZip } from '@/store/quizStore'
-import { matchRace } from '@/lib/engine/match'
+import { matchRace, ALL_DIMENSIONS } from '@/lib/engine/match'
 import { buildMatchKey } from '@/lib/engine/buildMatchKey'
 import { resolveDistrict } from '@/lib/civic/resolveDistrict'
 import { fetchFederalCandidates } from '@/lib/civic/federalCandidates'
 import { fetchStateLegCandidates } from '@/lib/civic/stateLegCandidates'
+import { fetchCurrentOfficials } from '@/lib/civic/currentOfficials'
 import { createClient } from '@/lib/supabase/client'
-import type { RankedCandidate, RaceResult, ConfidenceBand } from '@/lib/engine/match'
+import type { RankedCandidate, RaceResult, ConfidenceBand, Dimension } from '@/lib/engine/match'
 import type { FederalCandidate, FederalBallot } from '@/lib/civic/federalCandidates'
 import type { StateLegBallot } from '@/lib/civic/stateLegCandidates'
+import type { CurrentOfficial, CurrentOfficialsBallot } from '@/lib/civic/currentOfficials'
 import { isStateLegCandidate, type BallotCandidate } from '@/lib/civic/ballotTypes'
+import Constellation from '@/components/ui/Constellation'
 
 // ── Quiz completion → display percent ─────────────────────────────────────────
 
@@ -496,6 +499,401 @@ function RaceSection({
   )
 }
 
+// ── Officials mode (§22b) ─────────────────────────────────────────────────────
+
+// Dimension order matching Constellation.tsx DIMENSION_AXES.outer
+const CONSTELLATION_DIMS: Dimension[] = [
+  'stability_change',
+  'local_federal',
+  'national_global',
+  'rules_outcomes',
+  'markets_governance',
+  'pragmatism_idealism',
+  'individual_collective',
+  'trust_skepticism',
+]
+
+function officialScoresForConstellation(official: CurrentOfficial): number[] {
+  return CONSTELLATION_DIMS.map((dim) => {
+    const ap = official.axisPlacement[dim]
+    return ap ? ap.score / 100 : 0
+  })
+}
+
+function userScoresForConstellation(dimensionScores: Record<Dimension, number>): number[] {
+  return CONSTELLATION_DIMS.map((dim) => (dimensionScores[dim] ?? 50) / 100)
+}
+
+// ── OfficialCard ──────────────────────────────────────────────────────────────
+
+function OfficialCard({
+  official,
+  ranked,
+  userDimensionScores,
+  officialName,
+}: {
+  official: CurrentOfficial
+  ranked: RankedCandidate
+  userDimensionScores: Record<Dimension, number>
+  officialName: string
+}) {
+  const { topAlignedAxes, topDivergentAxes, unknownDealbreakers } = ranked
+
+  // Dealbreaker crosses — flags only, never exclusion (§22b.4)
+  const crossedDealbreakers = Object.entries(official.dealbreakers)
+    .filter(([, v]) => v.status === 'crosses')
+    .map(([k]) => k)
+
+  const userScores = userScoresForConstellation(userDimensionScores)
+  const officialScores = officialScoresForConstellation(official)
+
+  return (
+    <div style={{
+      border: '1px solid var(--color-border)',
+      borderRadius: 'var(--radius-lg)',
+      padding: 'var(--space-5)',
+      backgroundColor: 'var(--color-bg-surface)',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 'var(--space-4)',
+    }}>
+      {/* Header */}
+      <div>
+        <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-primary)' }}>
+          {official.name}
+        </p>
+        <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)' }}>
+          {official.office}{official.party ? ` · ${official.party}` : ''}
+        </p>
+      </div>
+
+      {/* Constellation overlay */}
+      <div style={{ maxWidth: 300, margin: '0 auto' }}>
+        <Constellation
+          scores={userScores}
+          overlaySeries={{ scores: officialScores, label: officialName }}
+          size={280}
+          showLabels={true}
+          showGrid={true}
+        />
+      </div>
+
+      {/* Per-dimension convergence/divergence */}
+      {(topAlignedAxes.length > 0 || topDivergentAxes.length > 0) && (
+        <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)' }}>
+          {topAlignedAxes.length > 0 && (
+            <><strong style={{ color: 'var(--color-text-primary)' }}>Aligns with you on:</strong>{' '}
+            {topAlignedAxes.map((a) => AXIS_LABEL[a] ?? a).join(', ')}</>
+          )}
+          {topAlignedAxes.length > 0 && topDivergentAxes.length > 0 && ' · '}
+          {topDivergentAxes.length > 0 && (
+            <><strong style={{ color: 'var(--color-text-primary)' }}>Diverges on:</strong>{' '}
+            {topDivergentAxes.map((a) => AXIS_LABEL[a] ?? a).join(', ')}</>
+          )}
+        </p>
+      )}
+
+      {/* Crossed dealbreaker flag — flag only, no exclusion (§22b.4) */}
+      {crossedDealbreakers.length > 0 && (
+        <div style={{
+          backgroundColor: '#fef9c3',
+          border: '1px solid #fde047',
+          borderRadius: 'var(--radius-sm)',
+          padding: 'var(--space-2) var(--space-3)',
+          display: 'flex',
+          gap: 'var(--space-2)',
+          alignItems: 'flex-start',
+        }}>
+          <span aria-hidden>⚠</span>
+          <div>
+            <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: '#92400e' }}>
+              Crosses one of your dealbreakers — you decide
+            </p>
+            <p style={{ margin: '2px 0 0', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: '#92400e' }}>
+              {crossedDealbreakers.join(', ')}
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Unknown dealbreaker flags */}
+      {unknownDealbreakers.length > 0 && (
+        <div style={{
+          backgroundColor: 'var(--color-bg-surface)',
+          border: '1px solid var(--color-border)',
+          borderRadius: 'var(--radius-sm)',
+          padding: 'var(--space-2) var(--space-3)',
+        }}>
+          <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)' }}>
+            <strong style={{ color: 'var(--color-text-primary)' }}>Couldn&apos;t verify:</strong>{' '}
+            {unknownDealbreakers.join(', ')} — research this yourself before deciding.
+          </p>
+        </div>
+      )}
+
+      {/* Low-confidence disclosure for state legislators with thin records (§22b.4) */}
+      {official.lowConfidence && (
+        <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', fontStyle: 'italic' }}>
+          Limited voting record available — this comparison may be less precise than for other officials.
+        </p>
+      )}
+    </div>
+  )
+}
+
+// ── YourOfficialsMode ─────────────────────────────────────────────────────────
+
+function YourOfficialsMode({
+  completionPercent,
+  userId,
+  hasProfile,
+}: {
+  completionPercent: number
+  userId: string | null
+  hasProfile: boolean
+}) {
+  const session = useQuizStore((s) => s.session)
+  const [address, setAddress] = useState('')
+  const [resolvedAddress, setResolvedAddress] = useState<string | null>(null)
+  const [officials, setOfficials] = useState<CurrentOfficialsBallot | null>(null)
+  const [addressError, setAddressError] = useState<string | null>(null)
+  const [isPending, startTransition] = useTransition()
+
+  const matchKey = useMemo(() => {
+    if (!session?.result) return null
+    return buildMatchKey(session.result, session)
+  }, [session])
+
+  // Run each official through the match engine to get aligned/divergent axes
+  const rankedByOfficialId = useMemo<Map<string, RankedCandidate>>(() => {
+    if (!matchKey || !officials) return new Map()
+    const allOfficials: (CurrentOfficial | null)[] = [
+      ...officials.senators,
+      officials.representative,
+      officials.governor,
+      officials.stateUpperLeg,
+      officials.stateLowerLeg,
+    ]
+    const present = allOfficials.filter((o): o is CurrentOfficial => o !== null)
+    const result = new Map<string, RankedCandidate>()
+    for (const official of present) {
+      const raceResult = matchRace({
+        raceId: `official-${official.id}`,
+        candidates: [official],
+        key: matchKey,
+        dealbreakersAsFlags: true,  // officials: flags only, never exclusion
+      })
+      if (raceResult.ranked[0]) {
+        result.set(official.id, raceResult.ranked[0])
+      }
+    }
+    return result
+  }, [matchKey, officials])
+
+  function handleAddressSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    const trimmed = address.trim()
+    if (!trimmed) return
+    setAddressError(null)
+    startTransition(async () => {
+      try {
+        const { normalizedAddress, state, congressionalDistrict, stateSenateDistrict, stateHouseDistrict } = await resolveDistrict(trimmed)
+        if (!state) {
+          setAddressError('Could not determine your state from that address. Try including your city and state.')
+          return
+        }
+        const result = await fetchCurrentOfficials(state, congressionalDistrict, stateSenateDistrict, stateHouseDistrict)
+        setOfficials(result)
+        setResolvedAddress(normalizedAddress ?? trimmed)
+      } catch {
+        setAddressError('Could not look up that address. Try including your city, state, and ZIP code.')
+      }
+    })
+  }
+
+  const userDimensionScores = (session?.result?.profile ?? {}) as Record<Dimension, number>
+
+  const officialsToShow: { official: CurrentOfficial; label: string }[] = officials
+    ? [
+        ...officials.senators.map((o) => ({ official: o, label: o.name.split(',')[0] })),
+        ...(officials.representative ? [{ official: officials.representative, label: officials.representative.name.split(',')[0] }] : []),
+        ...(officials.governor ? [{ official: officials.governor, label: officials.governor.name.split(',')[0] }] : []),
+        ...(officials.stateUpperLeg ? [{ official: officials.stateUpperLeg, label: officials.stateUpperLeg.name.split(',')[0] }] : []),
+        ...(officials.stateLowerLeg ? [{ official: officials.stateLowerLeg, label: officials.stateLowerLeg.name.split(',')[0] }] : []),
+      ]
+    : []
+
+  return (
+    <main style={{ maxWidth: 720, margin: '0 auto', padding: 'var(--space-8) var(--space-4)' }}>
+
+      {/* Eyebrow + headline (§22b.1) */}
+      <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-red)', letterSpacing: 'var(--tracking-wider)', textTransform: 'uppercase', marginBottom: 'var(--space-4)' }}>
+        Your Officials
+      </p>
+      <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-h1)', color: 'var(--color-text-primary)', lineHeight: 'var(--leading-tight)', marginBottom: 'var(--space-5)' }}>
+        Every office, matched to your values — right now.
+      </h1>
+      <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', marginBottom: 'var(--space-6)' }}>
+        Your ballot candidates aren&apos;t finalized yet. In the meantime, see how your currently-serving officials line up against your civic values — using the exact same matching model.
+      </p>
+
+      {/* Quiz gate */}
+      {!hasProfile ? (
+        <div style={{
+          border: '1px solid var(--color-border)',
+          borderRadius: 'var(--radius-lg)',
+          padding: 'var(--space-8)',
+          textAlign: 'center',
+          backgroundColor: 'var(--color-bg-surface)',
+        }}>
+          <p style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-heading)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-primary)', marginBottom: 'var(--space-3)' }}>
+            Start with the quiz
+          </p>
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', marginBottom: 'var(--space-5)', maxWidth: 480, margin: '0 auto var(--space-5)' }}>
+            Your Officials matches your representatives to your specific values. Without a profile, there&apos;s nothing to match against.
+          </p>
+          <a
+            href="/quiz"
+            style={{
+              display: 'inline-block',
+              fontFamily: 'var(--font-body)',
+              fontSize: 'var(--text-body)',
+              fontWeight: 'var(--weight-semibold)',
+              color: '#fff',
+              backgroundColor: 'var(--color-blue-accent)',
+              textDecoration: 'none',
+              padding: 'var(--space-3) var(--space-6)',
+              borderRadius: 'var(--radius-sm)',
+            }}
+          >
+            Take the quiz →
+          </a>
+        </div>
+      ) : (
+        <>
+          {/* Address form */}
+          <div style={{ marginBottom: 'var(--space-8)' }}>
+            {resolvedAddress ? (
+              <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', margin: 0 }}>
+                Showing officials for{' '}
+                <strong style={{ color: 'var(--color-text-primary)' }}>{resolvedAddress}</strong>{' '}
+                <button
+                  onClick={() => { setResolvedAddress(null); setOfficials(null); setAddress('') }}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-blue-accent)', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', padding: 0 }}
+                >
+                  Change
+                </button>
+              </p>
+            ) : (
+              <form onSubmit={handleAddressSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+                <label style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-primary)' }}>
+                  Your address — to find your representatives
+                </label>
+                <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
+                  <input
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                    placeholder="123 Main St, Anytown, VA 22101"
+                    aria-label="Your street address"
+                    style={{
+                      fontFamily: 'var(--font-body)',
+                      fontSize: 'var(--text-small)',
+                      padding: 'var(--space-2) var(--space-3)',
+                      border: '1px solid var(--color-border)',
+                      borderRadius: 'var(--radius-sm)',
+                      backgroundColor: 'var(--color-bg-base)',
+                      color: 'var(--color-text-primary)',
+                      flex: '1 1 280px',
+                      minWidth: 0,
+                    }}
+                  />
+                  <button
+                    type="submit"
+                    disabled={isPending || !address.trim()}
+                    style={{
+                      fontFamily: 'var(--font-body)',
+                      fontSize: 'var(--text-small)',
+                      fontWeight: 'var(--weight-semibold)',
+                      padding: 'var(--space-2) var(--space-4)',
+                      borderRadius: 'var(--radius-sm)',
+                      border: 'none',
+                      backgroundColor: 'var(--color-blue-accent)',
+                      color: '#fff',
+                      cursor: isPending ? 'default' : 'pointer',
+                      whiteSpace: 'nowrap',
+                      opacity: !address.trim() ? 0.5 : 1,
+                    }}
+                  >
+                    {isPending ? 'Looking up officials…' : 'Find my officials'}
+                  </button>
+                </div>
+                {addressError && (
+                  <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-red)' }}>
+                    {addressError}
+                  </p>
+                )}
+                <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)' }}>
+                  Your address is used only to identify your district. It is not stored.
+                </p>
+              </form>
+            )}
+          </div>
+
+          {/* Loading state */}
+          {isPending && (
+            <div style={{ padding: 'var(--space-6)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-lg)', backgroundColor: 'var(--color-bg-surface)' }}>
+              <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-primary)' }}>
+                Looking up your officials…
+              </p>
+              <p style={{ margin: 'var(--space-2) 0 0', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)' }}>
+                Fetching your representatives and comparing them to your values profile.
+              </p>
+            </div>
+          )}
+
+          {/* Officials cards */}
+          {officials && !isPending && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-8)' }}>
+              {officials.governorCoverageNote && (
+                <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)' }}>
+                  Note: {officials.governorCoverageNote}
+                </p>
+              )}
+              {officialsToShow.length === 0 && (
+                <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)' }}>
+                  No officials found for this address. Check back later.
+                </p>
+              )}
+              {officialsToShow.map(({ official, label }) => {
+                const ranked = rankedByOfficialId.get(official.id)
+                if (!ranked) return null
+                return (
+                  <OfficialCard
+                    key={official.id}
+                    official={official}
+                    ranked={ranked}
+                    userDimensionScores={userDimensionScores}
+                    officialName={label}
+                  />
+                )
+              })}
+              {/* Methodology link */}
+              <div style={{ padding: 'var(--space-4)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--color-bg-surface)' }}>
+                <a href="/methodology#ballot" style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-blue-accent)', textDecoration: 'none' }}>
+                  How we classify officials →
+                </a>
+                <p style={{ margin: 'var(--space-2) 0 0', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', lineHeight: 'var(--leading-relaxed)' }}>
+                  This shows how your values compare to your representatives&apos; actual public record — not a rating or grade.
+                </p>
+              </div>
+            </div>
+          )}
+        </>
+      )}
+    </main>
+  )
+}
+
 // ── Holding state flag (§22.10) ───────────────────────────────────────────────
 // Flip to false when general election classifications are ready (fall 2026).
 
@@ -900,9 +1298,9 @@ export default function YourBallotPage() {
     })
   }
 
-  // ── Holding state (§22.10) — all hooks above have run unconditionally ────
+  // ── Out of season → officials mode (§22b.1) — all hooks above have run unconditionally ────
   if (HOLDING_STATE) {
-    return <YourBallotHoldingState completionPercent={completionPercent} userId={userId} hasProfile={hasProfile} />
+    return <YourOfficialsMode completionPercent={completionPercent} userId={userId} hasProfile={hasProfile} />
   }
 
   return (
