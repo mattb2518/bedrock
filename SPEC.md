@@ -2081,17 +2081,28 @@ Each mode = one freeform box (carries the irreducible, unpredictable part) + opt
 
 **MODE 1 — Openers (sentence builder)**
 
-Live sentence: *"I want to talk to [WHO] [about / and the hard part is that] [TOPIC-OR-POSTURE], and what usually goes wrong is [WRONG]."*
+Live sentence with four independent tappable blanks: *"I want to talk to [WHO] about [TOPIC], and the hard part is that [POSTURE], and what usually goes wrong is [WRONG]."*
 
-- Tapping a blank opens an **inline picker** (a card below the sentence, not a modal) showing options + "something else…" → inline text field.
-- **[WHO] options:** my uncle · my sister · my dad · my brother-in-law · my aunt · my coworker · my neighbor · my old friend · something else…
-- **[TOPIC-OR-POSTURE] picker:** two rows separated by a divider labeled *"or the hard part is that…"*
-  - Topic row: immigration · guns · the election · abortion · the economy · climate · a specific politician
-  - Posture row: they think people like me are the problem · they think it's all rigged · they've checked out entirely · they only trust their own side's media · they just want to fight · they've stopped listening
-  - something else… → inline text field (classifies as topic or posture via heuristic)
+Tapping any blank opens an **inline picker** (card below the sentence, not a modal). All blanks are independent and optional. Empty blank = a visibly-empty accent-tinted pill; filled blank shows the selected value. No placeholder label text inside the pill.
+
+- **[WHO] options:** my mom · my dad · my sister · my brother · my aunt · my uncle · my coworker · my neighbor · something else…
+- **[TOPIC] picker:** immigration · guns · the election · abortion · the economy · climate · a specific politician · something else… (kind always `topic`)
+- **[POSTURE] picker:** they think people like me are the problem · they think it's all rigged · they've checked out entirely · they only trust their own side's media · they just want to fight · they've stopped listening · something else… (kind always `posture`)
 - **[WRONG] options:** we talk past each other · it gets heated fast · I freeze up · they shut down · we've never actually tried · something else…
-- **Grammar-shaping (deterministic, no model call):** topic-shaped selection → connective is *"about"*; posture-shaped selection → connective is *"and the hard part is that"*. Free-typed input routes via leading-pronoun / stance-verb heuristic.
-- **Optional tail:** a small textarea labeled *"anything else — the part only you can say; leave blank if the sentence says it"* appended after the sentence on submit.
+
+**Graceful-vanishing grammar (deterministic, no model call):** empty slots drop their connective — never dangle a connective on an unfilled blank.
+- Both TOPIC and POSTURE filled: *"I want to talk to {WHO} about {TOPIC}, and the hard part is that {POSTURE}, and what usually goes wrong is {WRONG}."*
+- TOPIC only: *"I want to talk to {WHO} about {TOPIC}, and what usually goes wrong is {WRONG}."*
+- POSTURE only: *"I want to talk to {WHO}, and the hard part is that {POSTURE}, and what usually goes wrong is {WRONG}."*
+- Neither: *"I want to talk to {WHO} about something we see differently, and what usually goes wrong is {WRONG}."*
+
+WHO empty → "a family member"; WRONG empty → "it gets heated fast".
+
+`classifyFreeInput` is used only as fallback for free-typed "something else…" text in topic/posture pickers. Tapped chips have fixed kind (`topic` or `posture`) and do not go through the heuristic.
+
+*(2026-07-03: single grammar-shaped blank → two independent blanks. The single blank hid the posture path behind a divider and made it impossible for a situation to carry both a subject and a dynamic. Two blanks let the sentence be as expressive as the reality.)*
+
+- **Optional tail:** textarea *"anything else — the part only you can say; leave blank if the sentence says it"* appended on submit.
 - **Submit:** assembles blanks + tail into ONE string → sent as `freeform` to `/api/conversations`.
 
 **MODE 2 — Responses (freeform primary + chip tail)**
@@ -2106,16 +2117,16 @@ Chips are sent as the `chips` payload alongside `freeform`. Vibe and posture rou
 
 **MODE 3 — Back-and-forth setup (sentence builder)**
 
-Live sentence: *"I'm going to talk to [WHO] [about / and the hard part is that] [TOPIC-OR-POSTURE], and I'm worried I'll [WORRY]."*
+Same two-blank split as Mode 1. Live sentence: *"I'm going to talk to [WHO] about [TOPIC], and the hard part is that [POSTURE], and I'm worried I'll [WORRY]."*
 
-Same blank/picker pattern as Mode 1. [WORRY] options: get too heated · cave · freeze · say it wrong · blow up the relationship · something else…
+Same graceful-vanishing grammar. [WORRY] options: get too heated · cave · freeze · say it wrong · blow up the relationship · something else…
 
 Optional tail as in Mode 1. On submit, assembles into ONE string → handed to §18.6b chat architecture as setup context. **Do not touch the chat loop, coaching panel, or §18.6b when editing this input layer.**
 
-**Blank behavior:**
-- All blanks are optional. Empty blanks resolve to safe defaults on assembly (e.g. "a family member", "something we see differently", "it gets heated fast").
-- Tapping an already-filled blank reopens the picker; a × clears it.
-- "something else…" opens an inline text field inline (not modal), focused immediately.
+**Blank behavior (all modes):**
+- All blanks are optional. Empty blanks resolve gracefully per the vanishing grammar above.
+- Tapping a filled blank reopens its picker; a × clears it.
+- "something else…" opens an inline text field (not modal), focused immediately.
 
 ---
 
@@ -2130,10 +2141,8 @@ Under each mode's freeform box: a quiet gray link — *"Not sure what to type? S
 - Tapping **loads, never locks** — text drops into the freeform box fully editable.
 - Panel header (light framing): *"Real kinds of conversations people bring here — from every direction. Tap one to start, then make it yours."*
 
-**Mode 2 example pairs (three pairs):**
+**Mode 2 example pair (one pair — revised 2026-07-03, down from three):**
 - *"My uncle posted that the 2020 election was stolen and anyone who says otherwise is part of the cover-up."* ↔ *"My sister says anyone who voted Republican is a threat to democracy and she can't respect them as a person."*
-- *"A coworker told me that defunding the police is the only way to stop racist violence."* ↔ *"A coworker told me undocumented immigrants are driving the crime wave and we need mass deportations now."*
-- *"My dad says billionaires don't pay their fair share and the whole system is rigged for the rich."* ↔ *"My dad says we're becoming a socialist country and people just want handouts instead of working."*
 
 **Mode 1 example pair (posture-shaped, opening not reacting):**
 - *"I want to talk to my brother-in-law about guns without it turning into the same fight we always have."* ↔ *"I want to bring up immigration with my aunt, but she thinks anyone who wants border security is a racist."*

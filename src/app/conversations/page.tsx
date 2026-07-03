@@ -57,7 +57,7 @@ interface ChatMessage {
 
 // ─── Static data ─────────────────────────────────────────────────────────────
 
-const SB_WHO = ['my uncle', 'my sister', 'my dad', 'my brother-in-law', 'my aunt', 'my coworker', 'my neighbor', 'my old friend']
+const SB_WHO = ['my mom', 'my dad', 'my sister', 'my brother', 'my aunt', 'my uncle', 'my coworker', 'my neighbor']
 const SB_TOPICS = ['immigration', 'guns', 'the election', 'abortion', 'the economy', 'climate', 'a specific politician']
 const SB_POSTURES = [
   "they think people like me are the problem",
@@ -89,14 +89,6 @@ const EXAMPLES: Record<Mode, { left: string; right: string }[]> = {
       left: "My uncle posted that the 2020 election was stolen and anyone who says otherwise is part of the cover-up.",
       right: "My sister says anyone who voted Republican is a threat to democracy and she can't respect them as a person.",
     },
-    {
-      left: "A coworker told me that defunding the police is the only way to stop racist violence.",
-      right: "A coworker told me undocumented immigrants are driving the crime wave and we need mass deportations now.",
-    },
-    {
-      left: "My dad says billionaires don't pay their fair share and the whole system is rigged for the rich.",
-      right: "My dad says we're becoming a socialist country and people just want handouts instead of working.",
-    },
   ],
   chat: [
     {
@@ -109,7 +101,7 @@ const EXAMPLES: Record<Mode, { left: string; right: string }[]> = {
 const MODE_CARDS: { mode: Mode; title: string; desc: string; beta?: boolean }[] = [
   { mode: 'openers', title: 'Openers', desc: 'Open a conversation with someone who sees it differently.' },
   { mode: 'responses', title: 'Responses', desc: "Someone said the thing. Get a better answer than the one you'd fire back." },
-  { mode: 'chat', title: 'Back-and-forth', desc: 'Practice with Claude playing the other person.', beta: true },
+  { mode: 'chat', title: 'Back-and-forth', desc: 'Practice with Claude playing the other person.' },
 ]
 
 const ENERGY_COLORS: Record<string, string> = {
@@ -144,39 +136,43 @@ function classifyFreeInput(text: string): 'topic' | 'posture' {
   return 'topic'
 }
 
-function getConnective(top: BlankState): string {
-  if (top.isEmpty || top.kind !== 'posture') return 'about'
-  return 'and the hard part is that'
-}
-
-function assembleMode1(who: BlankState, top: BlankState, wrong: BlankState): string {
+function assembleMode1(who: BlankState, topic: BlankState, posture: BlankState, wrong: BlankState): string {
   const w = who.isEmpty ? 'a family member' : who.value
-  const conn = getConnective(top)
-  const tv = top.isEmpty ? 'something we see differently' : top.value
   const wr = wrong.isEmpty ? 'it gets heated fast' : wrong.value
-  return `I want to talk to ${w} ${conn} ${tv}, and what usually goes wrong is ${wr}.`
+  if (!topic.isEmpty && !posture.isEmpty)
+    return `I want to talk to ${w} about ${topic.value}, and the hard part is that ${posture.value}, and what usually goes wrong is ${wr}.`
+  if (!topic.isEmpty)
+    return `I want to talk to ${w} about ${topic.value}, and what usually goes wrong is ${wr}.`
+  if (!posture.isEmpty)
+    return `I want to talk to ${w}, and the hard part is that ${posture.value}, and what usually goes wrong is ${wr}.`
+  return `I want to talk to ${w} about something we see differently, and what usually goes wrong is ${wr}.`
 }
 
-function assembleMode3(who: BlankState, top: BlankState, worry: BlankState): string {
+function assembleMode3(who: BlankState, topic: BlankState, posture: BlankState, worry: BlankState): string {
   const w = who.isEmpty ? 'a family member' : who.value
-  const conn = getConnective(top)
-  const tv = top.isEmpty ? 'something we see differently' : top.value
   const wo = worry.isEmpty ? 'get too heated' : worry.value
-  return `I'm going to talk to ${w} ${conn} ${tv}, and I'm worried I'll ${wo}.`
+  if (!topic.isEmpty && !posture.isEmpty)
+    return `I'm going to talk to ${w} about ${topic.value}, and the hard part is that ${posture.value}, and I'm worried I'll ${wo}.`
+  if (!topic.isEmpty)
+    return `I'm going to talk to ${w} about ${topic.value}, and I'm worried I'll ${wo}.`
+  if (!posture.isEmpty)
+    return `I'm going to talk to ${w}, and the hard part is that ${posture.value}, and I'm worried I'll ${wo}.`
+  return `I'm going to talk to ${w} about something we see differently, and I'm worried I'll ${wo}.`
 }
 
-function parseExample(text: string, mode: Mode): { who: BlankState; top: BlankState; wrong: BlankState; worry: BlankState } {
+function parseExample(text: string, mode: Mode): { who: BlankState; topic: BlankState; posture: BlankState; wrong: BlankState; worry: BlankState } {
   const lower = text.toLowerCase()
   const who: BlankState = (() => {
     const m = SB_WHO.find(w => lower.includes(w))
     return m ? { value: m, kind: 'free', isEmpty: false } : emptyBlank()
   })()
-  const top: BlankState = (() => {
+  const topic: BlankState = (() => {
     const tm = SB_TOPICS.find(t => lower.includes(t))
-    if (tm) return { value: tm, kind: 'topic', isEmpty: false }
+    return tm ? { value: tm, kind: 'topic', isEmpty: false } : emptyBlank()
+  })()
+  const posture: BlankState = (() => {
     const pm = SB_POSTURES.find(p => lower.includes(p))
-    if (pm) return { value: pm, kind: 'posture', isEmpty: false }
-    return emptyBlank()
+    return pm ? { value: pm, kind: 'posture', isEmpty: false } : emptyBlank()
   })()
   const wrong: BlankState = mode === 'openers'
     ? (() => { const m = SB_WRONG.find(w => lower.includes(w)); return m ? { value: m, kind: 'free', isEmpty: false } : emptyBlank() })()
@@ -184,7 +180,7 @@ function parseExample(text: string, mode: Mode): { who: BlankState; top: BlankSt
   const worry: BlankState = mode === 'chat'
     ? (() => { const m = SB_WORRY.find(w => lower.includes(w)); return m ? { value: m, kind: 'free', isEmpty: false } : emptyBlank() })()
     : emptyBlank()
-  return { who, top, wrong, worry }
+  return { who, topic, posture, wrong, worry }
 }
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
@@ -229,8 +225,8 @@ function GuardrailsModal({ onClose }: { onClose: () => void }) {
   )
 }
 
-function BlankPill({ label, value, isOpen, onClick, onClear }: {
-  label: string; value: string | null; isOpen: boolean; onClick: () => void; onClear?: () => void
+function BlankPill({ value, isOpen, onClick, onClear }: {
+  value: string | null; isOpen: boolean; onClick: () => void; onClear?: () => void
 }) {
   return (
     <span style={{ display: 'inline-flex', alignItems: 'center', gap: '2px', verticalAlign: 'middle' }}>
@@ -239,9 +235,8 @@ function BlankPill({ label, value, isOpen, onClick, onClear }: {
         style={{
           fontFamily: 'var(--font-body)',
           fontSize: 'inherit',
-          fontStyle: value ? 'normal' : 'italic',
-          color: value ? 'var(--color-text-primary)' : 'var(--color-text-muted)',
-          backgroundColor: 'rgba(37,99,235,0.07)',
+          color: value ? 'var(--color-text-primary)' : 'transparent',
+          backgroundColor: 'rgba(37,99,235,0.10)',
           border: `1px solid ${isOpen ? 'var(--color-blue-accent)' : 'rgba(37,99,235,0.28)'}`,
           borderRadius: '999px',
           padding: '1px 12px',
@@ -249,9 +244,10 @@ function BlankPill({ label, value, isOpen, onClick, onClear }: {
           transition: 'border-color 0.15s',
           display: 'inline-block',
           lineHeight: 'inherit',
+          minWidth: value ? 'auto' : '44px',
         }}
       >
-        {value ?? label}
+        {value ?? <span style={{ color: 'rgba(37,99,235,0.45)', userSelect: 'none' }}>_</span>}
       </button>
       {onClear && (
         <button
@@ -292,7 +288,8 @@ function PickerChip({ label, selected, onClick, muted }: { label: string; select
 interface SBProps {
   mode: 'openers' | 'chat'
   sbWho: BlankState; setSbWho: (v: BlankState) => void
-  sbTop: BlankState; setSbTop: (v: BlankState) => void
+  sbTopic: BlankState; setSbTopic: (v: BlankState) => void
+  sbPosture: BlankState; setSbPosture: (v: BlankState) => void
   sbWrong: BlankState; setSbWrong: (v: BlankState) => void
   sbWorry: BlankState; setSbWorry: (v: BlankState) => void
   sbTail: string; setSbTail: (v: string) => void
@@ -307,7 +304,8 @@ interface SBProps {
 }
 
 function SentenceBuilderSection({
-  mode, sbWho, setSbWho, sbTop, setSbTop, sbWrong, setSbWrong, sbWorry, setSbWorry,
+  mode, sbWho, setSbWho, sbTopic, setSbTopic, sbPosture, setSbPosture,
+  sbWrong, setSbWrong, sbWorry, setSbWorry,
   sbTail, setSbTail, sbPickerOpen, setSbPickerOpen, sbCustomFor, setSbCustomFor, sbCustomText, setSbCustomText,
   showExamples, onToggleExamples, examples, onLoadExample,
   error, submitLabel, onSubmit, submitDisabled,
@@ -321,7 +319,6 @@ function SentenceBuilderSection({
   const wrongOrWorry = mode === 'openers' ? sbWrong : sbWorry
   const setWrongOrWorry = mode === 'openers' ? setSbWrong : setSbWorry
   const wrongOrWorryOptions = mode === 'openers' ? SB_WRONG : SB_WORRY
-  const wrongOrWorryLabel = mode === 'openers' ? 'what happens' : "what you're worried about"
   const sentenceStart = mode === 'openers' ? 'I want to talk to' : "I'm going to talk to"
   const wrongOrWorryPrefix = mode === 'openers' ? ', and what usually goes wrong is' : ", and I'm worried I'll"
 
@@ -331,19 +328,27 @@ function SentenceBuilderSection({
     setSbCustomText('')
   }
 
-  function selectValue(key: string, value: string, kind?: 'topic' | 'posture') {
-    const s: BlankState = { value, kind: kind ?? 'free', isEmpty: false }
-    if (key === 'who') setSbWho(s)
-    else if (key === 'top') setSbTop(s)
-    else if (key === 'wrongOrWorry') setWrongOrWorry(s)
-    setSbPickerOpen(null)
-    setSbCustomFor(null)
-    setSbCustomText('')
+  function selectWho(value: string) {
+    setSbWho({ value, kind: 'free', isEmpty: false })
+    setSbPickerOpen(null); setSbCustomFor(null); setSbCustomText('')
+  }
+  function selectTopic(value: string) {
+    setSbTopic({ value, kind: 'topic', isEmpty: false })
+    setSbPickerOpen(null); setSbCustomFor(null); setSbCustomText('')
+  }
+  function selectPosture(value: string) {
+    setSbPosture({ value, kind: 'posture', isEmpty: false })
+    setSbPickerOpen(null); setSbCustomFor(null); setSbCustomText('')
+  }
+  function selectWrongOrWorry(value: string) {
+    setWrongOrWorry({ value, kind: 'free', isEmpty: false })
+    setSbPickerOpen(null); setSbCustomFor(null); setSbCustomText('')
   }
 
   function clearBlank(key: string) {
     if (key === 'who') setSbWho(emptyBlank())
-    else if (key === 'top') setSbTop(emptyBlank())
+    else if (key === 'topic') setSbTopic(emptyBlank())
+    else if (key === 'posture') setSbPosture(emptyBlank())
     else if (key === 'wrongOrWorry') setWrongOrWorry(emptyBlank())
     setSbPickerOpen(null)
   }
@@ -351,14 +356,11 @@ function SentenceBuilderSection({
   function submitCustom() {
     if (!sbCustomText.trim() || !sbCustomFor) return
     const text = sbCustomText.trim()
-    if (sbCustomFor === 'top') {
-      selectValue('top', text, classifyFreeInput(text))
-    } else {
-      selectValue(sbCustomFor, text)
-    }
+    if (sbCustomFor === 'who') selectWho(text)
+    else if (sbCustomFor === 'topic') selectTopic(text)
+    else if (sbCustomFor === 'posture') selectPosture(text)
+    else selectWrongOrWorry(text)
   }
-
-  const conn = getConnective(sbTop)
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
@@ -366,11 +368,13 @@ function SentenceBuilderSection({
       <div>
         <div style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body-lg)', color: 'var(--color-text-primary)', lineHeight: 2, marginBottom: 'var(--space-3)' }}>
           {sentenceStart}{' '}
-          <BlankPill label="who" value={sbWho.isEmpty ? null : sbWho.value} isOpen={sbPickerOpen === 'who'} onClick={() => togglePicker('who')} onClear={sbWho.isEmpty ? undefined : () => clearBlank('who')} />
-          {' '}{conn}{' '}
-          <BlankPill label="what — or how they are about it" value={sbTop.isEmpty ? null : sbTop.value} isOpen={sbPickerOpen === 'top'} onClick={() => togglePicker('top')} onClear={sbTop.isEmpty ? undefined : () => clearBlank('top')} />
+          <BlankPill value={sbWho.isEmpty ? null : sbWho.value} isOpen={sbPickerOpen === 'who'} onClick={() => togglePicker('who')} onClear={sbWho.isEmpty ? undefined : () => clearBlank('who')} />
+          {' about '}
+          <BlankPill value={sbTopic.isEmpty ? null : sbTopic.value} isOpen={sbPickerOpen === 'topic'} onClick={() => togglePicker('topic')} onClear={sbTopic.isEmpty ? undefined : () => clearBlank('topic')} />
+          {', and the hard part is that '}
+          <BlankPill value={sbPosture.isEmpty ? null : sbPosture.value} isOpen={sbPickerOpen === 'posture'} onClick={() => togglePicker('posture')} onClear={sbPosture.isEmpty ? undefined : () => clearBlank('posture')} />
           {wrongOrWorryPrefix}{' '}
-          <BlankPill label={wrongOrWorryLabel} value={wrongOrWorry.isEmpty ? null : wrongOrWorry.value} isOpen={sbPickerOpen === 'wrongOrWorry'} onClick={() => togglePicker('wrongOrWorry')} onClear={wrongOrWorry.isEmpty ? undefined : () => clearBlank('wrongOrWorry')} />
+          <BlankPill value={wrongOrWorry.isEmpty ? null : wrongOrWorry.value} isOpen={sbPickerOpen === 'wrongOrWorry'} onClick={() => togglePicker('wrongOrWorry')} onClear={wrongOrWorry.isEmpty ? undefined : () => clearBlank('wrongOrWorry')} />
           {'.'}
         </div>
 
@@ -380,39 +384,34 @@ function SentenceBuilderSection({
             {sbPickerOpen === 'who' && (
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
                 {SB_WHO.map(opt => (
-                  <PickerChip key={opt} label={opt} selected={!sbWho.isEmpty && sbWho.value === opt} onClick={() => selectValue('who', opt)} />
+                  <PickerChip key={opt} label={opt} selected={!sbWho.isEmpty && sbWho.value === opt} onClick={() => selectWho(opt)} />
                 ))}
                 <PickerChip label="something else…" selected={false} onClick={() => setSbCustomFor('who')} muted />
               </div>
             )}
 
-            {sbPickerOpen === 'top' && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
-                  {SB_TOPICS.map(opt => (
-                    <PickerChip key={opt} label={opt} selected={!sbTop.isEmpty && sbTop.kind === 'topic' && sbTop.value === opt} onClick={() => selectValue('top', opt, 'topic')} />
-                  ))}
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-                  <div style={{ flex: 1, height: '1px', backgroundColor: 'var(--color-border)' }} />
-                  <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', fontStyle: 'italic', whiteSpace: 'nowrap' }}>or the hard part is that…</span>
-                  <div style={{ flex: 1, height: '1px', backgroundColor: 'var(--color-border)' }} />
-                </div>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
-                  {SB_POSTURES.map(opt => (
-                    <PickerChip key={opt} label={opt} selected={!sbTop.isEmpty && sbTop.kind === 'posture' && sbTop.value === opt} onClick={() => selectValue('top', opt, 'posture')} />
-                  ))}
-                </div>
-                <div>
-                  <PickerChip label="something else…" selected={false} onClick={() => setSbCustomFor('top')} muted />
-                </div>
+            {sbPickerOpen === 'topic' && (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+                {SB_TOPICS.map(opt => (
+                  <PickerChip key={opt} label={opt} selected={!sbTopic.isEmpty && sbTopic.value === opt} onClick={() => selectTopic(opt)} />
+                ))}
+                <PickerChip label="something else…" selected={false} onClick={() => setSbCustomFor('topic')} muted />
+              </div>
+            )}
+
+            {sbPickerOpen === 'posture' && (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+                {SB_POSTURES.map(opt => (
+                  <PickerChip key={opt} label={opt} selected={!sbPosture.isEmpty && sbPosture.value === opt} onClick={() => selectPosture(opt)} />
+                ))}
+                <PickerChip label="something else…" selected={false} onClick={() => setSbCustomFor('posture')} muted />
               </div>
             )}
 
             {sbPickerOpen === 'wrongOrWorry' && (
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
                 {wrongOrWorryOptions.map(opt => (
-                  <PickerChip key={opt} label={opt} selected={!wrongOrWorry.isEmpty && wrongOrWorry.value === opt} onClick={() => selectValue('wrongOrWorry', opt)} />
+                  <PickerChip key={opt} label={opt} selected={!wrongOrWorry.isEmpty && wrongOrWorry.value === opt} onClick={() => selectWrongOrWorry(opt)} />
                 ))}
                 <PickerChip label="something else…" selected={false} onClick={() => setSbCustomFor('wrongOrWorry')} muted />
               </div>
@@ -428,7 +427,8 @@ function SentenceBuilderSection({
                   onKeyDown={e => { if (e.key === 'Enter') submitCustom() }}
                   placeholder={
                     sbCustomFor === 'who' ? 'Type a relationship…' :
-                    sbCustomFor === 'top' ? 'Describe the topic or their stance…' :
+                    sbCustomFor === 'topic' ? 'Name the topic…' :
+                    sbCustomFor === 'posture' ? 'Describe how they are about it…' :
                     'Describe what goes wrong…'
                   }
                   style={{
@@ -731,7 +731,8 @@ export default function ConversationsPage() {
 
   // Sentence builder state (Modes 1 and 3)
   const [sbWho, setSbWho] = useState<BlankState>(emptyBlank())
-  const [sbTop, setSbTop] = useState<BlankState>(emptyBlank())
+  const [sbTopic, setSbTopic] = useState<BlankState>(emptyBlank())
+  const [sbPosture, setSbPosture] = useState<BlankState>(emptyBlank())
   const [sbWrong, setSbWrong] = useState<BlankState>(emptyBlank())
   const [sbWorry, setSbWorry] = useState<BlankState>(emptyBlank())
   const [sbTail, setSbTail] = useState('')
@@ -803,7 +804,7 @@ export default function ConversationsPage() {
       } else {
         setActiveMode(null); setOutput(null)
         setFreeform(''); setChips({})
-        setSbWho(emptyBlank()); setSbTop(emptyBlank()); setSbWrong(emptyBlank()); setSbWorry(emptyBlank())
+        setSbWho(emptyBlank()); setSbTopic(emptyBlank()); setSbPosture(emptyBlank()); setSbWrong(emptyBlank()); setSbWorry(emptyBlank())
         setSbTail(''); setSbPickerOpen(null); setSbCustomFor(null); setSbCustomText('')
         setShowExamples(false); setError(null)
         setChatStarted(false); setChatMessages([]); setChatInput(''); setChatLoading(false)
@@ -832,22 +833,23 @@ export default function ConversationsPage() {
 
   function getSubmitString(): string {
     if (activeMode === 'openers') {
-      const allEmpty = sbWho.isEmpty && sbTop.isEmpty && sbWrong.isEmpty
+      const allEmpty = sbWho.isEmpty && sbTopic.isEmpty && sbPosture.isEmpty && sbWrong.isEmpty
       if (allEmpty && sbTail.trim()) return sbTail.trim()
-      const sentence = assembleMode1(sbWho, sbTop, sbWrong)
+      const sentence = assembleMode1(sbWho, sbTopic, sbPosture, sbWrong)
       return sbTail.trim() ? `${sentence}\n${sbTail.trim()}` : sentence
     }
     if (activeMode === 'chat') {
-      const allEmpty = sbWho.isEmpty && sbTop.isEmpty && sbWorry.isEmpty
+      const allEmpty = sbWho.isEmpty && sbTopic.isEmpty && sbPosture.isEmpty && sbWorry.isEmpty
       if (allEmpty && sbTail.trim()) return sbTail.trim()
-      const sentence = assembleMode3(sbWho, sbTop, sbWorry)
+      const sentence = assembleMode3(sbWho, sbTopic, sbPosture, sbWorry)
       return sbTail.trim() ? `${sentence}\n${sbTail.trim()}` : sentence
     }
     return freeform
   }
 
   function resetSB() {
-    setSbWho(emptyBlank()); setSbTop(emptyBlank()); setSbWrong(emptyBlank()); setSbWorry(emptyBlank())
+    setSbWho(emptyBlank()); setSbTopic(emptyBlank()); setSbPosture(emptyBlank())
+    setSbWrong(emptyBlank()); setSbWorry(emptyBlank())
     setSbTail(''); setSbPickerOpen(null); setSbCustomFor(null); setSbCustomText('')
   }
 
@@ -867,7 +869,8 @@ export default function ConversationsPage() {
     }
     if (activeMode === 'openers' || activeMode === 'chat') {
       const p = parseExample(text, activeMode)
-      setSbWho(p.who); setSbTop(p.top); setSbWrong(p.wrong); setSbWorry(p.worry)
+      setSbWho(p.who); setSbTopic(p.topic); setSbPosture(p.posture)
+      setSbWrong(p.wrong); setSbWorry(p.worry)
       setSbTail(text); setSbPickerOpen(null); setShowExamples(false)
     }
   }
@@ -1048,7 +1051,9 @@ export default function ConversationsPage() {
       {activeMode === 'openers' && !output && !loading && (
         <SentenceBuilderSection
           mode="openers"
-          sbWho={sbWho} setSbWho={setSbWho} sbTop={sbTop} setSbTop={setSbTop}
+          sbWho={sbWho} setSbWho={setSbWho}
+          sbTopic={sbTopic} setSbTopic={setSbTopic}
+          sbPosture={sbPosture} setSbPosture={setSbPosture}
           sbWrong={sbWrong} setSbWrong={setSbWrong} sbWorry={sbWorry} setSbWorry={setSbWorry}
           sbTail={sbTail} setSbTail={setSbTail}
           sbPickerOpen={sbPickerOpen} setSbPickerOpen={setSbPickerOpen}
@@ -1138,7 +1143,9 @@ export default function ConversationsPage() {
           </p>
           <SentenceBuilderSection
             mode="chat"
-            sbWho={sbWho} setSbWho={setSbWho} sbTop={sbTop} setSbTop={setSbTop}
+            sbWho={sbWho} setSbWho={setSbWho}
+            sbTopic={sbTopic} setSbTopic={setSbTopic}
+            sbPosture={sbPosture} setSbPosture={setSbPosture}
             sbWrong={sbWrong} setSbWrong={setSbWrong} sbWorry={sbWorry} setSbWorry={setSbWorry}
             sbTail={sbTail} setSbTail={setSbTail}
             sbPickerOpen={sbPickerOpen} setSbPickerOpen={setSbPickerOpen}
