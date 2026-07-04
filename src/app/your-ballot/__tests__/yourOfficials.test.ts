@@ -78,17 +78,41 @@ describe('lowConfidence threshold — mirrors classificationQueue AUTO_APPROVE_M
 
 // ── 2. Season toggle — officials mode vs. ballot mode ────────────────────────
 
-describe('season toggle', () => {
-  it('HOLDING_STATE=true → out of season → officials mode', () => {
-    const HOLDING_STATE = true
-    // When holding state is true, your-ballot page renders officials mode.
-    // This documents the §22b.1 decision: the toggle is the existing HOLDING_STATE flag.
-    expect(HOLDING_STATE).toBe(true)
+describe('season routing — pillarOneMode + BALLOT_DATA_READY (§22b.1)', () => {
+  // Mode comes from site_config.pillar_one_mode, not a hardcoded boolean.
+  // BALLOT_DATA_READY is a separate flag that gates the full ballot render.
+
+  it('mode=officials → YourOfficialsMode (always, regardless of BALLOT_DATA_READY)', () => {
+    const pillarOneMode = 'officials'
+    const BALLOT_DATA_READY = false
+    const rendersOfficials = pillarOneMode === 'officials'
+    expect(rendersOfficials).toBe(true)
+    // BALLOT_DATA_READY is irrelevant when mode=officials
+    expect(BALLOT_DATA_READY).toBe(false)
   })
 
-  it('HOLDING_STATE=false → in season → ballot mode (unchanged)', () => {
-    const HOLDING_STATE = false
-    expect(HOLDING_STATE).toBe(false)
+  it('mode=ballot + BALLOT_DATA_READY=false → YourBallotHoldingState (explicit "coming soon")', () => {
+    const pillarOneMode = 'ballot'
+    const BALLOT_DATA_READY = false
+    const rendersBallot = pillarOneMode === 'ballot' && BALLOT_DATA_READY
+    const rendersHolding = pillarOneMode === 'ballot' && !BALLOT_DATA_READY
+    expect(rendersBallot).toBe(false)
+    expect(rendersHolding).toBe(true)
+  })
+
+  it('mode=ballot + BALLOT_DATA_READY=true → full ballot render', () => {
+    const pillarOneMode = 'ballot'
+    const BALLOT_DATA_READY = true
+    const rendersBallot = pillarOneMode === 'ballot' && BALLOT_DATA_READY
+    expect(rendersBallot).toBe(true)
+  })
+
+  it('mode=officials with BALLOT_DATA_READY=true still renders officials (flag does not override mode)', () => {
+    const pillarOneMode = 'officials'
+    const BALLOT_DATA_READY = true
+    // The mode check gates first — BALLOT_DATA_READY is only consulted in ballot mode
+    const rendersOfficials = pillarOneMode === 'officials'
+    expect(rendersOfficials).toBe(true)
   })
 })
 

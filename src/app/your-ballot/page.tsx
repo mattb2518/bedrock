@@ -658,11 +658,58 @@ function YourOfficialsMode({
   const session = useQuizStore((s) => s.session)
   const pillarOneMode = usePillarOneMode()
   const p1 = PILLAR_ONE[pillarOneMode]
-  const [address, setAddress] = useState('')
-  const [resolvedAddress, setResolvedAddress] = useState<string | null>(null)
+  const [savedAddress, setSavedAddress] = useState<string | null>(null)
+  const [showAddressInput, setShowAddressInput] = useState(false)
   const [officials, setOfficials] = useState<CurrentOfficialsBallot | null>(null)
-  const [addressError, setAddressError] = useState<string | null>(null)
+  const [fetchError, setFetchError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
+
+  // Load saved address from profile on mount; auto-fetch officials if found
+  useEffect(() => {
+    if (!userId) return
+    const supabase = createClient()
+    void supabase.from('quiz_profiles').select('formatted_address').eq('user_id', userId).maybeSingle().then(({ data }) => {
+      const addr = data?.formatted_address
+      if (addr) {
+        setSavedAddress(addr)
+        startTransition(async () => {
+          try {
+            const { state, congressionalDistrict, stateSenateDistrict, stateHouseDistrict } = await resolveDistrict(addr)
+            if (!state) return
+            const result = await fetchCurrentOfficials(state, congressionalDistrict, stateSenateDistrict, stateHouseDistrict)
+            setOfficials(result)
+          } catch { /* user can retry via Change */ }
+        })
+      }
+    })
+  }, [userId]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  async function handleAddressSelect(formattedAddress: string) {
+    setSavedAddress(formattedAddress)
+    setShowAddressInput(false)
+    setOfficials(null)
+    setFetchError(null)
+    savePendingAddress(formattedAddress)
+    if (userId) {
+      await createClient().from('quiz_profiles').upsert(
+        { user_id: userId, formatted_address: formattedAddress },
+        { onConflict: 'user_id' }
+      )
+    }
+    startTransition(async () => {
+      try {
+        const { state, congressionalDistrict, stateSenateDistrict, stateHouseDistrict } = await resolveDistrict(formattedAddress)
+        if (!state) {
+          setFetchError('Could not determine your state from that address. Try including your city and state.')
+          return
+        }
+        const result = await fetchCurrentOfficials(state, congressionalDistrict, stateSenateDistrict, stateHouseDistrict)
+        setOfficials(result)
+      } catch {
+        setFetchError('Could not look up that address. Try including your city, state, and ZIP code.')
+      }
+    })
+  }
 
   const matchKey = useMemo(() => {
     if (!session?.result) return null
@@ -694,27 +741,6 @@ function YourOfficialsMode({
     }
     return result
   }, [matchKey, officials])
-
-  function handleAddressSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    const trimmed = address.trim()
-    if (!trimmed) return
-    setAddressError(null)
-    startTransition(async () => {
-      try {
-        const { normalizedAddress, state, congressionalDistrict, stateSenateDistrict, stateHouseDistrict } = await resolveDistrict(trimmed)
-        if (!state) {
-          setAddressError('Could not determine your state from that address. Try including your city and state.')
-          return
-        }
-        const result = await fetchCurrentOfficials(state, congressionalDistrict, stateSenateDistrict, stateHouseDistrict)
-        setOfficials(result)
-        setResolvedAddress(normalizedAddress ?? trimmed)
-      } catch {
-        setAddressError('Could not look up that address. Try including your city, state, and ZIP code.')
-      }
-    })
-  }
 
   const userDimensionScores = (session?.result?.profile ?? {}) as Record<Dimension, number>
 
@@ -776,71 +802,31 @@ function YourOfficialsMode({
         </div>
       ) : (
         <>
-          {/* Address form */}
+          {/* Address — §22d: AddressAutocomplete or stored-address read path */}
           <div style={{ marginBottom: 'var(--space-8)' }}>
-            {resolvedAddress ? (
-              <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', margin: 0 }}>
-                Showing officials for{' '}
-                <strong style={{ color: 'var(--color-text-primary)' }}>{resolvedAddress}</strong>{' '}
+            {savedAddress && !showAddressInput ? (
+              <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)' }}>
+                Matched to{' '}
+                <strong style={{ color: 'var(--color-text-primary)' }}>{savedAddress}</strong>
+                {' · '}
                 <button
-                  onClick={() => { setResolvedAddress(null); setOfficials(null); setAddress('') }}
+                  onClick={() => { setShowAddressInput(true); setOfficials(null); setFetchError(null) }}
                   style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-blue-accent)', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', padding: 0 }}
                 >
                   Change
                 </button>
               </p>
             ) : (
-              <form onSubmit={handleAddressSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-                <label style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-primary)' }}>
-                  Your address — to find your representatives
-                </label>
-                <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
-                  <input
-                    value={address}
-                    onChange={(e) => setAddress(e.target.value)}
-                    placeholder="123 Main St, Anytown, VA 22101"
-                    aria-label="Your street address"
-                    style={{
-                      fontFamily: 'var(--font-body)',
-                      fontSize: 'var(--text-small)',
-                      padding: 'var(--space-2) var(--space-3)',
-                      border: '1px solid var(--color-border)',
-                      borderRadius: 'var(--radius-sm)',
-                      backgroundColor: 'var(--color-bg-base)',
-                      color: 'var(--color-text-primary)',
-                      flex: '1 1 280px',
-                      minWidth: 0,
-                    }}
-                  />
-                  <button
-                    type="submit"
-                    disabled={isPending || !address.trim()}
-                    style={{
-                      fontFamily: 'var(--font-body)',
-                      fontSize: 'var(--text-small)',
-                      fontWeight: 'var(--weight-semibold)',
-                      padding: 'var(--space-2) var(--space-4)',
-                      borderRadius: 'var(--radius-sm)',
-                      border: 'none',
-                      backgroundColor: 'var(--color-blue-accent)',
-                      color: '#fff',
-                      cursor: isPending ? 'default' : 'pointer',
-                      whiteSpace: 'nowrap',
-                      opacity: !address.trim() ? 0.5 : 1,
-                    }}
-                  >
-                    {isPending ? 'Looking up officials…' : 'Find my officials'}
-                  </button>
-                </div>
-                {addressError && (
-                  <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-red)' }}>
-                    {addressError}
-                  </p>
-                )}
-                <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)' }}>
-                  Your address is used only to identify your district. It is not stored.
-                </p>
-              </form>
+              <AddressAutocomplete
+                placeholder="Start typing your street address…"
+                onSelect={(addr) => { void handleAddressSelect(addr) }}
+                initialValue={savedAddress ?? ''}
+              />
+            )}
+            {fetchError && (
+              <p style={{ margin: 'var(--space-2) 0 0', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-red)' }}>
+                {fetchError}
+              </p>
             )}
           </div>
 
@@ -904,10 +890,11 @@ function YourOfficialsMode({
   )
 }
 
-// ── Holding state flag (§22.10) ───────────────────────────────────────────────
-// Flip to false when general election classifications are ready (fall 2026).
-
-const HOLDING_STATE = true
+// ── Ballot data readiness flag ────────────────────────────────────────────────
+// Flip to true when classified_candidates has approved rows for at least one state.
+// When mode='ballot' and this is false, YourBallotHoldingState renders explicitly
+// rather than silently falling back to officials mode.
+const BALLOT_DATA_READY = false
 
 // ── Sample watermark ──────────────────────────────────────────────────────────
 
@@ -1180,8 +1167,12 @@ export default function YourBallotPage() {
   const session = useQuizStore((s) => s.session)
   const hasProfile = Boolean(session?.result)
   const completionPercent = session?.result?.completionPercent ?? 0
+  const userId = session?.userId ?? null
 
-  const [address, setAddress] = useState('')
+  const pillarOneMode = usePillarOneMode()
+
+  const [savedAddress, setSavedAddress] = useState<string | null>(null)
+  const [showAddressInput, setShowAddressInput] = useState(false)
   const [resolvedAddress, setResolvedAddress] = useState<string | null>(null)
   const [ballot, setBallot] = useState<FederalBallot | null>(null)
   const [stateLegBallot, setStateLegBallot] = useState<StateLegBallot | null>(null)
@@ -1189,6 +1180,33 @@ export default function YourBallotPage() {
   const [isPending, startTransition] = useTransition()
 
   const [showHowItWorks, setShowHowItWorks] = useState(false)
+
+  // Load saved address from profile on mount; auto-fetch ballot when data becomes ready
+  useEffect(() => {
+    if (!userId) return
+    const supabase = createClient()
+    void supabase.from('quiz_profiles').select('formatted_address').eq('user_id', userId).maybeSingle().then(({ data }) => {
+      const addr = data?.formatted_address
+      if (addr) {
+        setSavedAddress(addr)
+        if (BALLOT_DATA_READY) {
+          startTransition(async () => {
+            try {
+              const { normalizedAddress, state, congressionalDistrict, stateSenateDistrict, stateHouseDistrict } = await resolveDistrict(addr)
+              if (!state) return
+              const [federalBallot, stateLeg] = await Promise.all([
+                fetchFederalCandidates(state, congressionalDistrict),
+                fetchStateLegCandidates(state, stateSenateDistrict, stateHouseDistrict).catch(() => null),
+              ])
+              setBallot(federalBallot)
+              setStateLegBallot(stateLeg)
+              setResolvedAddress(normalizedAddress ?? addr)
+            } catch { /* user can retry via Change */ }
+          })
+        }
+      }
+    })
+  }, [userId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Build MatchKey once per session
   const matchKey = useMemo(() => {
@@ -1252,39 +1270,54 @@ export default function YourBallotPage() {
     return results
   }, [matchKey, ballot, stateLegBallot])
 
-  const userId = session?.userId ?? null
   const mantleType = session?.result?.primaryType ?? null
   const displayPct = completionIndicatorPct(completionPercent)
 
-  function handleAddressSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    const trimmed = address.trim()
-    if (!trimmed) return
+  async function handleAddressSelect(formattedAddress: string) {
+    setSavedAddress(formattedAddress)
+    setShowAddressInput(false)
+    setBallot(null)
+    setStateLegBallot(null)
+    setResolvedAddress(null)
     setAddressError(null)
+    savePendingAddress(formattedAddress)
+    if (userId) {
+      await createClient().from('quiz_profiles').upsert(
+        { user_id: userId, formatted_address: formattedAddress },
+        { onConflict: 'user_id' }
+      )
+    }
     startTransition(async () => {
       try {
-        const { normalizedAddress, state, congressionalDistrict, stateSenateDistrict, stateHouseDistrict } = await resolveDistrict(trimmed)
+        const { normalizedAddress, state, congressionalDistrict, stateSenateDistrict, stateHouseDistrict } = await resolveDistrict(formattedAddress)
         if (!state) {
           setAddressError('Could not determine your state from that address. Try including your city and state.')
           return
         }
-        // Fetch federal and state legislative in parallel
         const [federalBallot, stateLeg] = await Promise.all([
           fetchFederalCandidates(state, congressionalDistrict),
           fetchStateLegCandidates(state, stateSenateDistrict, stateHouseDistrict).catch(() => null),
         ])
         setBallot(federalBallot)
         setStateLegBallot(stateLeg)
-        setResolvedAddress(normalizedAddress ?? trimmed)
+        setResolvedAddress(normalizedAddress ?? formattedAddress)
       } catch {
         setAddressError('Could not look up that address. Try including your city, state, and ZIP code.')
       }
     })
   }
 
-  // ── Out of season → officials mode (§22b.1) — all hooks above have run unconditionally ────
-  if (HOLDING_STATE) {
+  // ── Season routing — driven by site_config.pillar_one_mode, not a hardcoded flag ──────────
+  // Officials mode: always renders YourOfficialsMode.
+  // Ballot mode + no data yet: renders YourBallotHoldingState (explicit "coming soon").
+  // Ballot mode + data ready: falls through to full ballot render below.
+  // Never silently overrides the admin's season choice.
+  if (pillarOneMode === 'officials') {
     return <YourOfficialsMode completionPercent={completionPercent} userId={userId} hasProfile={hasProfile} />
+  }
+
+  if (!BALLOT_DATA_READY) {
+    return <YourBallotHoldingState completionPercent={completionPercent} userId={userId} hasProfile={hasProfile} />
   }
 
   return (
@@ -1374,71 +1407,45 @@ export default function YourBallotPage() {
         </div>
       ) : (
         <>
-          {/* ── Address form (Layer 1+ only — hasProfile is true here) ─────────── */}
+          {/* ── Address — §22d: AddressAutocomplete or stored-address read path ── */}
           <div style={{ marginBottom: 'var(--space-8)' }}>
             {resolvedAddress ? (
               <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', margin: 0 }}>
                 Showing results for{' '}
-                <strong style={{ color: 'var(--color-text-primary)' }}>{resolvedAddress}</strong>{' '}
+                <strong style={{ color: 'var(--color-text-primary)' }}>{resolvedAddress}</strong>
+                {' · '}
                 <button
-                  onClick={() => { setResolvedAddress(null); setBallot(null); setStateLegBallot(null); setAddress('') }}
+                  onClick={() => { setResolvedAddress(null); setBallot(null); setStateLegBallot(null); setShowAddressInput(true) }}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-blue-accent)', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', padding: 0 }}
+                >
+                  Change
+                </button>
+              </p>
+            ) : savedAddress && !showAddressInput ? (
+              <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', margin: 0 }}>
+                Matched to{' '}
+                <strong style={{ color: 'var(--color-text-primary)' }}>{savedAddress}</strong>
+                {' · '}
+                <button
+                  onClick={() => setShowAddressInput(true)}
                   style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-blue-accent)', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', padding: 0 }}
                 >
                   Change
                 </button>
               </p>
             ) : (
-              <form onSubmit={handleAddressSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-                <label style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-primary)' }}>
-                  Your address — to find your federal races
-                </label>
-                <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
-                  <input
-                    value={address}
-                    onChange={(e) => setAddress(e.target.value)}
-                    placeholder="123 Main St, Anytown, VA 22101"
-                    aria-label="Your street address"
-                    style={{
-                      fontFamily: 'var(--font-body)',
-                      fontSize: 'var(--text-small)',
-                      padding: 'var(--space-2) var(--space-3)',
-                      border: '1px solid var(--color-border)',
-                      borderRadius: 'var(--radius-sm)',
-                      backgroundColor: 'var(--color-bg-base)',
-                      color: 'var(--color-text-primary)',
-                      flex: '1 1 280px',
-                      minWidth: 0,
-                    }}
-                  />
-                  <button
-                    type="submit"
-                    disabled={isPending || !address.trim()}
-                    style={{
-                      fontFamily: 'var(--font-body)',
-                      fontSize: 'var(--text-small)',
-                      fontWeight: 'var(--weight-semibold)',
-                      padding: 'var(--space-2) var(--space-4)',
-                      borderRadius: 'var(--radius-sm)',
-                      border: 'none',
-                      backgroundColor: 'var(--color-blue-accent)',
-                      color: '#fff',
-                      cursor: isPending ? 'default' : 'pointer',
-                      whiteSpace: 'nowrap',
-                      opacity: !address.trim() ? 0.5 : 1,
-                    }}
-                  >
-                    {isPending ? 'Building ballot…' : 'Find my ballot'}
-                  </button>
-                </div>
+              <>
+                <AddressAutocomplete
+                  placeholder="Start typing your street address…"
+                  onSelect={(addr) => { void handleAddressSelect(addr) }}
+                  initialValue={savedAddress ?? ''}
+                />
                 {addressError && (
-                  <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-red)' }}>
+                  <p style={{ margin: 'var(--space-2) 0 0', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-red)' }}>
                     {addressError}
                   </p>
                 )}
-                <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)' }}>
-                  Your address is used only to identify your congressional district. It is not stored.
-                </p>
-              </form>
+              </>
             )}
           </div>
 
