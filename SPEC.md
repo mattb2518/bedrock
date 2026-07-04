@@ -2745,7 +2745,7 @@ A persistent preview bar visible only to admins (Super Admin and Admin roles) on
 
 **Toggle behavior:**
 - Switching modes is instant, no page reload
-- **New User** sets `previewResult: null` in the memory-only preview store — does NOT call `resetQuiz` and does NOT touch the persisted session. Switching back to "Myself" restores instantly because the real store was never touched.
+- **New User** sets `previewResult: null` in the memory-only preview store — does NOT call `resetQuiz` and does NOT touch the persisted session. Switching back to "Myself" restores instantly because the real store was never touched. `HomeContent` reads `previewStore.mode` and forces the public (no-quiz-result) layout when `mode === 'new_user'`, overriding any real quiz result in the persisted store.
 - Switching back to "Myself" restores the real profile from the store (re-fetches from Supabase if needed)
 - A page refresh always clears preview mode and returns to "Myself"
 - A persistent "Exit preview" button always visible when in any non-Myself mode
