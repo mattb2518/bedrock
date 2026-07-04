@@ -70,7 +70,7 @@ export const LAYER3_QUESTIONS: QuizQuestion[] = [
       { id: 'L3-Q5-c', text: 'Entirely depends on the record — incumbency itself is neutral. A strong record deserves reelection. A weak one deserves a challenger.', microReaction: 'Incumbency is neither a credential nor a scarlet letter. The question is always the same: did they do the job well?', scores: {} },
     ],
     dependsFollowUp: { type: 'open_text', prompt: 'What shapes how you think about incumbents — the office, how long they’ve served, what they did with the time?' },
-    easterEgg: '“Throw out the bums — but not my bums.” Congressional reelection rates have been above 90% in every cycle since 1996. Public approval of Congress over the same period has averaged 20%. Americans don’t want to throw the bums out — just everyone else’s.',
+    easterEgg: '“Throw out the bums — but not my bums.” Congressional reelection rates have been above 90% in every cycle since 1996. Public approval of Congress over the same period has averaged 20%. Americans don’t want to throw their bums out — just everyone else’s.',
   },
   {
     id: 'L3-Q6',

@@ -8,15 +8,56 @@
 // and each dimension bar's marker slides from center to its scored position.
 
 import { useEffect, useState } from 'react'
+import Image from 'next/image'
 import Constellation from '@/components/ui/Constellation'
 import { DIMENSIONS, profileToRadar, isCentered } from '@/lib/quiz/dimensions'
 import { mantleFor, type Mantle } from '@/lib/quiz/mantles'
 import type { DimensionalProfile, QuizResult } from '@/types/quiz'
 
+// Inline SVG silhouette fallback for missing portrait images (SPEC §4 Forebear Imagery)
+function SilhouetteSVG({ size = 32, style }: { size?: number; style?: React.CSSProperties }) {
+  return (
+    <svg viewBox="0 0 100 100" fill="currentColor" className="text-[var(--color-text-muted)]"
+      style={{ width: size, height: size, color: 'var(--color-text-muted)', ...style }}>
+      <circle cx="50" cy="35" r="18"/>
+      <path d="M15,90 Q15,65 50,65 Q85,65 85,90 Z"/>
+    </svg>
+  )
+}
+
+// Portrait image with grayscale + silhouette fallback
+function ForebearPortrait({ mantle, size = 32, objectPosition }: { mantle: Mantle; size: number; objectPosition?: string }) {
+  const [imgFailed, setImgFailed] = useState(false)
+  const src = `/forebears/${mantle.type}.jpg`
+
+  if (imgFailed) {
+    return (
+      <div style={{ width: size, height: size, borderRadius: '50%', overflow: 'hidden', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border)' }}>
+        <SilhouetteSVG size={size * 0.7} />
+      </div>
+    )
+  }
+
+  return (
+    <div style={{ width: size, height: size, borderRadius: '50%', overflow: 'hidden', position: 'relative', display: 'inline-block' }}>
+      <Image
+        src={src}
+        alt={mantle.figure.name}
+        fill
+        style={{ objectFit: 'cover', objectPosition: objectPosition ?? '50% 15%', filter: 'grayscale(100%)' }}
+        onError={() => setImgFailed(true)}
+        sizes={`${size}px`}
+      />
+    </div>
+  )
+}
+
 function FlipCard({ mantle, large = false, flipped, onFlip }: { mantle: Mantle; large?: boolean; flipped: boolean; onFlip: () => void }) {
   const pad = large ? 'var(--space-8)' : 'var(--space-5)'
   const nameSize = large ? 'var(--text-h2)' : 'var(--text-body-lg)'
   const height = large ? 260 : 200
+  const backPos = mantle.portraitPosition?.back ?? '50% 20%'
+  const frontPos = mantle.portraitPosition?.front ?? '50% 15%'
   const face: React.CSSProperties = {
     position: 'absolute',
     inset: 0,
@@ -32,19 +73,32 @@ function FlipCard({ mantle, large = false, flipped, onFlip }: { mantle: Mantle; 
   return (
     <div onClick={onFlip} style={{ cursor: 'pointer', perspective: '1200px', height }} title={flipped ? 'Click to flip back' : 'Click to flip'}>
       <div style={{ position: 'relative', width: '100%', height: '100%', transformStyle: 'preserve-3d', transition: 'transform 0.5s ease', transform: flipped ? 'rotateY(180deg)' : 'rotateY(0deg)' }}>
+        {/* Front face */}
         <div style={{ ...face, backgroundColor: 'var(--color-bg-surface)' }}>
           <p style={{ fontFamily: 'var(--font-display)', fontSize: nameSize, color: 'var(--color-text-primary)', lineHeight: 'var(--leading-tight)', margin: 0 }}>{mantle.name}</p>
           <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', margin: 0 }}>{mantle.workingName}</p>
-          <p style={{ fontFamily: 'var(--font-body)', fontSize: large ? 'var(--text-body-lg)' : 'var(--text-body)', color: 'var(--color-gold)', fontStyle: 'italic', lineHeight: 'var(--leading-relaxed)', margin: 0, flex: 1 }}>"{mantle.oneLiner}."</p>
-          <p style={{ fontFamily: 'var(--font-body)', fontSize: '11px', color: 'var(--color-text-muted)', margin: 0, textAlign: 'right', opacity: 0.6 }}>flip to meet your forebear →</p>
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: large ? 'var(--text-body-lg)' : 'var(--text-body)', color: 'var(--color-gold)', fontStyle: 'italic', lineHeight: 'var(--leading-relaxed)', margin: 0, flex: 1 }}>&ldquo;{mantle.oneLiner}.&rdquo;</p>
+          {/* Front thumbnail + flip affordance */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 'var(--space-2)' }}>
+            <p style={{ fontFamily: 'var(--font-body)', fontSize: '11px', color: 'var(--color-text-muted)', margin: 0, opacity: 0.6 }}>flip to meet your forebear →</p>
+            <ForebearPortrait mantle={mantle} size={32} objectPosition={frontPos} />
+          </div>
         </div>
-        <div style={{ ...face, backgroundColor: 'var(--color-bg-deep, #0f1f33)', transform: 'rotateY(180deg)' }}>
-          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-micro)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-muted)', letterSpacing: 'var(--tracking-wider)', textTransform: 'uppercase', margin: 0 }}>
-            An early {mantle.name.replace(/^The /, '')}
-          </p>
-          <p style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: nameSize, color: 'var(--color-text-primary)', margin: 0, lineHeight: 'var(--leading-tight)' }}>{mantle.figure.name}</p>
-          <p style={{ fontFamily: 'var(--font-body)', fontSize: large ? 'var(--text-body)' : 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', margin: 0, flex: 1 }}>{mantle.figure.why}</p>
-          <p style={{ fontFamily: 'var(--font-body)', fontSize: '11px', color: 'var(--color-text-muted)', margin: 0, textAlign: 'right', opacity: 0.6 }}>← flip back</p>
+        {/* Back face */}
+        <div style={{ ...face, backgroundColor: 'var(--color-bg-deep, #0f1f33)', transform: 'rotateY(180deg)', overflow: 'hidden' }}>
+          {/* Full-bleed portrait on back */}
+          <div style={{ position: 'absolute', inset: 0, borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
+            <ForebearPortrait mantle={mantle} size={height} objectPosition={backPos} />
+          </div>
+          {/* Text overlay */}
+          <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', height: '100%', gap: 'var(--space-2)', backgroundColor: 'rgba(0,0,0,0.55)', borderRadius: 'var(--radius-lg)', padding: pad, boxSizing: 'border-box' }}>
+            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-micro)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-muted)', letterSpacing: 'var(--tracking-wider)', textTransform: 'uppercase', margin: 0 }}>
+              An early {mantle.name.replace(/^The /, '')}
+            </p>
+            <p style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: nameSize, color: 'var(--color-text-primary)', margin: 0, lineHeight: 'var(--leading-tight)' }}>{mantle.figure.name}</p>
+            <p style={{ fontFamily: 'var(--font-body)', fontSize: large ? 'var(--text-body)' : 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', margin: 0, flex: 1 }}>{mantle.figure.why}</p>
+            <p style={{ fontFamily: 'var(--font-body)', fontSize: '11px', color: 'var(--color-text-muted)', margin: 0, textAlign: 'right', opacity: 0.6 }}>← flip back</p>
+          </div>
         </div>
       </div>
     </div>
@@ -125,6 +179,13 @@ export default function MantleReveal({ result, headerCta, hideDimBreakdown = fal
             ))}
           </div>
         </div>
+      )}
+
+      {/* Fingerprint line (SPEC §4 A8) */}
+      {!centered && (
+        <p style={{ ...rise(0.65), fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', fontStyle: 'italic', textAlign: 'center', maxWidth: 480, marginInline: 'auto', marginTop: 'var(--space-6)', lineHeight: 'var(--leading-relaxed)' }}>
+          This is your civic fingerprint — no one else&apos;s constellation looks quite like it. Flip the card to meet the American who wore this mantle before you.
+        </p>
       )}
 
       {/* Dimensional breakdown — collapsed by default; hidden on /results where it

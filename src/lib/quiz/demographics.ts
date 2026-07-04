@@ -92,4 +92,10 @@ export const REGIONS = ['Northeast', 'South', 'Midwest', 'West', 'Other']
 
 // Question 4 — open text (optional).
 export const DEMOGRAPHIC_OTHER_PROMPT =
-  'Anything else about your political background that would help us understand where you’re coming from? Totally optional — but we’re genuinely curious.'
+  "Anything else about your political background that would help us understand where you're coming from? Totally optional — but we're genuinely curious."
+
+// Question 5 — news sources (optional free text, SPEC §12 A11).
+// Stored as context_media_sources on the profile. Not used in scoring or matching.
+// Surfaced in admin as a deduped frequency list — input to the media catalog candidate pipeline.
+export const MEDIA_SOURCES_PROMPT =
+  "Which news sources do you already read, watch, or listen to regularly?"

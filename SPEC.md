@@ -62,6 +62,25 @@ Civic identity → candidates outside your own district worth supporting — mat
 
 **Progressive depth model:** Users get real value from Layer 1 alone. Each subsequent layer deepens the profile and sharpens recommendations. Profile completeness indicator: ~40% after L1, ~65% after L2, ~85% after L3, ~100% after L4.
 
+### Unlock Ladder
+
+Each layer completion unlocks a pillar. This is the reward architecture: completion percentage is abstract; unlocked features are concrete.
+
+| Complete | Unlocks | Rationale |
+|---|---|---|
+| Layer 1 | Your Conversations (+ Mantle, constellation) | Conversations injects Layer 1 only (existing architectural wall) — fully functional at L1 |
+| Layer 2 | Your Media Diet | Positions sharpen media matching meaningfully |
+| Layer 3 | Pillar 1 (Your Ballot / Your Officials, per §22c mode) + Beyond Your Ballot | Voting behavior + priority intensity required for credible matching, in both seasonal faces |
+| Layer 4 | No new pillar — sharpens Pillar 1 with dealbreaker exclusions | Framed as "give it its edge" |
+
+**Gating rules:**
+- Pillar routes check the user's layer completion. A locked pillar page renders a locked state: one-paragraph description of the pillar, which layer unlocks it, and a "Resume the quiz" CTA deep-linking to their exact position. No pillar content is rendered behind the lock.
+- Pillar 1's locked state reads all labels/blurbs from PILLAR_ONE[mode] (§22c) — a season flip touches zero unlock copy.
+- This ladder supersedes prior per-page soft-gate thresholds (§22.3 quiz gate, Media Diet no-profile gate) where they conflict. Those in-page mechanics are unified into the ladder's locked state; post-unlock depth prompts (e.g., "complete Layer 4 to sharpen with dealbreakers") remain.
+- Homepage and /results pillar cards show a small lock badge + "Unlocks after Layer N" on locked pillars, and an "Unlocked" treatment on available ones.
+- Completion percentage remains, displayed alongside the unlock ladder — not replaced by it.
+- Anonymous users follow the same rules from session-stored completion.
+
 ### Quiz Format Rules
 
 - **3 options + "It depends"** on every question (not 4 options)
@@ -176,6 +195,7 @@ A callout paragraph displayed on the /civic-mantle page, styled as a bordered as
 **Reveal copy structure:**
 *"You are [The Primary Type] — [working name one-liner]."*
 *"With strong affinities for [Secondary 1] and [Secondary 2]."* (if 2 secondaries clear threshold)
+"This is your civic fingerprint — no one else's constellation looks quite like it. Flip the card to meet the American who wore this mantle before you."
 
 **Myers-Briggs/DISC parallel:** Named type is the headline. Constellation is the visual proof. Dimensional breakdown is the supporting detail. Secondary types add nuance and make results feel personal rather than generic.
 
@@ -198,6 +218,11 @@ Three edge cases the recommendation engine must detect and handle with dedicated
 *"Your profile is unusual. Your answers don't cluster around a single type — they pull from several directions at once. That's not a bug. It usually means you think about civic life across more axes than most voters, or that your worldview combines elements most people keep separate. Here's what we can tell:"* [show top 3 partial matches with similarity scores] *"Your recommendations will weight the dimensions you actually scored highest on, rather than forcing a single identity."*
 
 **Engine implication.** All three cases need the recommendation engine to fall back to dimension-weighted matching rather than type-weighted matching. Worth flagging in the engine spec — see Section 11 of recommendation-engine.md.
+
+### Forebear Imagery
+- Card back: portrait of the referenced historical figure, grayscale treatment via CSS filter, if /public/forebears/{mantle-slug}.jpg exists; otherwise a neutral inline-SVG silhouette (head-and-shoulders bust, single flat fill in the muted text color), same circular frame.
+- Card front: small circular thumbnail (portrait if available, silhouette otherwise) in the lower-right corner adjacent to the existing "flip to meet your forebear →" affordance.
+- Images are stored uncropped (max 600px wide, color); all framing is CSS: object-fit cover with object-position 50% 20% on the back, 50% 15% on the front thumbnail. A per-slug portraitPosition override field in the mantle data (defaulting to those values) allows one-line framing fixes without re-processing images.
 
 ---
 
@@ -223,6 +248,76 @@ Communicated via progress bar design, not explicit question numbering. Gives loc
 - After Layer 2: completeness ~65%
 - After Layer 3: completeness ~85%
 - Curiosity-driven, not guilt-driven
+
+### Interlayer Unlock Screens
+
+After each layer's final question (after the Mantle reveal in Layer 1's case), an unlock screen renders three stacked elements:
+
+1. **Unlock card.** "Unlocked: [Pillar name]" with pillar icon and a one-line payoff description. Layer 1's screen carries two unlocks visually: the Mantle/constellation (revealed above) and Your Conversations. Layer 3's unlock card names Pillar 1 via PILLAR_ONE[mode].
+2. **Templated "what we've learned" summary.** Deterministic, from stored scores — no API call.
+   - After L1: take the two dimensions with the largest deviation from 50. Template: *"So far: you lean [pole] over [pole], and [pole] over [pole]. That combination is rarer than you'd think — and it shapes every recommendation from here."* If fewer than two dimensions deviate more than 10 points, centered variant: *"So far: you sit closer to the middle than most — which is itself a signature. The next layer is where it sharpens."*
+   - After L2: *"Your values now have positions attached — [n] issues mapped. Your matches just got sharper."*
+   - After L3: *"We now know not just what you believe, but what actually moves your vote. [Pillar 1 tileTitle] is live."*
+3. **Forward tease.** Next layer's time cost + what it unlocks, e.g. after L1: *"Layer 2 — about 4 minutes — unlocks Your Media Diet."* After L3: *"Layer 4 — the dealbreaker checklist — gives [Pillar 1 tileTitle] its edge."* Progress line uses existing completion percentages ("You're 40% mapped"). Buttons: "Keep going" (primary), "Explore what you've unlocked" (secondary → the newly unlocked pillar).
+
+Tone: eager, warm, celebratory — this is the payoff moment. Never guilt-driven.
+
+### Homepage Teaser — Ghost Constellation
+
+The public homepage front door is a question, not a description. Four quick questions render inline near the top of the homepage, producing a partial "ghost" constellation. Applies to PublicHome only; ReturningHome is unchanged.
+
+**Flow:** HeroSlider (unchanged) → compressed opening (two lines) → T1 → T2 → T3 → T4 → ghost constellation reveal → CTA into full quiz. A quiet "Skip to the full quiz →" text link is visible throughout. The existing mantle-explainer content compresses to a short block beneath the teaser; the #build pillar section remains below.
+
+**Opening copy:** *"What kind of voter are you — underneath the noise? Four quick questions to sketch it."*
+
+**Format:** Same interaction pattern as the quiz (3 options + "It depends," randomized order, "It depends" pinned last), but NO follow-up mechanic, NO add-context link, NO Easter eggs. One micro-reaction per question (same for all answers), tap/Enter to advance.
+
+**Ghost constellation reveal:** Existing radar component with a ghost variant — 4 of 8 axes populated, dashed stroke, ~40% opacity fill; unmapped axes as empty gridlines with grayed labels. Caption: *"A sketch, not a reading."* Below: *"Your full constellation — and your Civic Mantle — takes fifteen questions and about ten minutes."* Primary CTA: "Finish your constellation →" (→ /quiz). Secondary: "How this works" (→ /methodology).
+
+**Scoring** (axis scale 0 = first pole, 100 = second pole, matching existing dimension convention). Teaser answers stored as `teaser_responses` (session; persisted to profile if authenticated) for analytics only — they do NOT feed the engine and do NOT pre-fill Layer 1.
+
+**T1 — Trust ↔ Skepticism.** *"A government agency releases a report that contradicts something you believed. Your first instinct?"*
+- A. Update my view — career experts with real data usually beat my hunches. → 75 (Trust)
+- B. Check who funded it and what they'd gain before I move an inch. → 25 (Skepticism)
+- C. Trust the data, not the press release — read past the summary, because the framing is where reports get bent. → 55
+- It depends → 50
+- Micro-reaction: *"Noted. How you weigh evidence shapes more of your politics than any single issue does."*
+
+**T2 — Stability ↔ Change.** *"When something in the country is clearly broken, it's better to..."*
+- A. Fix it fast, even imperfectly — waiting has costs too. → 75 (Change)
+- B. Move deliberately — quick fixes to complex systems usually break something else. → 25 (Stability)
+- C. Pilot it small — let a few states or cities run the experiment before it goes national. → 60
+- It depends → 50
+- Micro-reaction: *"Good. Pace-of-change instinct is one of the deepest dividers in American life — and it doesn't follow party lines."*
+
+**T3 — Individual ↔ Collective.** *"What holds a free society together, most fundamentally?"*
+- A. People free to run their own lives and make their own choices. → 25 (Individual)
+- B. People willing to give something up for one another. → 75 (Collective)
+- C. The layer in between — families, congregations, clubs, neighborhoods — doing what neither the individual nor the state can. → 60
+- It depends → 50
+- Micro-reaction: *"That one goes back to the Founders — literally. They argued about it for an entire summer."*
+
+**T4 — Pragmatism ↔ Idealism.** *"A deal passes that gets 60% of what you want and locks in 40% you dislike. That's..."*
+- A. A win. Sixty beats zero, and politics is the art of the next deal. → 25 (Pragmatism)
+- B. A trap. Locking in the bad 40% can cost more than waiting for a better hand. → 75 (Idealism)
+- C. Judged by direction, not percentage — does it bend things the right way over time? → 45
+- It depends → 50
+- Micro-reaction: *"The 60% question has broken more coalitions than any policy ever has."*
+
+Bias check: performed pre-spec. All options defensible across partisan lines; no "correct" answer; C options are real positions.
+
+### AI Reflect-Back on "It depends" Open Text
+
+When a user answers "It depends" (or any option carrying a followUpPrompt) and types open text, the micro-reaction for that answer is replaced by a one-sentence AI reflection of their nuance — the "I've been heard" moment.
+
+- Server route: POST /api/quiz/reflect. Same Claude Sonnet model + server-side key pattern as existing API routes.
+- System prompt requirements: one sentence, warm, nonpartisan; reflect the tension or condition the user named; never evaluate correctness; never name parties or politicians; never give advice. Max ~40 output tokens.
+- Timeout 2.5s; on timeout, error, or empty text, fall back silently to the static micro-reaction.
+- Applies wherever open-text follow-ups exist, all layers. Not in the homepage teaser.
+
+### Layer 2 Persistent Micro-Label
+
+Every Layer 2 question card carries a small persistent label above the options: "Your best first move — not your whole theory."
 
 ### Results Reveal
 
@@ -262,7 +357,9 @@ Most civic tools ask where you stand on the issues. We're asking something diffe
 
 We want to know how you think. Not which party you agree with, not which policies you support — but the underlying values that drive those positions. The stuff that's been true about you for twenty years.
 
-Fourteen questions. About eight minutes. No wrong answers — only honest ones.
+Fifteen questions. About ten minutes. That alone earns your Civic Mantle and your constellation — and unlocks your first tool.
+
+Three optional layers after that sharpen everything: another 15–20 minutes total, whenever you want them. Each one unlocks something new.
 
 One thing: every question has an "It depends" option. It's not a cop-out — it's often the most accurate answer. If you pick it, we'll ask one quick follow-up. Your nuance is the point.
 
@@ -787,6 +884,8 @@ American public education produces wildly unequal outcomes depending almost enti
 
 Setting aside border enforcement, the legal immigration system determines who gets to come to America and how. Of the following, what's the right first move?
 
+*These options pull in opposite directions on purpose — pick your first move.*
+
 **A.** Shift to a skills-based points system — select immigrants primarily for education, skills, and economic potential. Canada and Australia do this.
 *"About two-thirds of American green cards go to family members of existing residents — a policy designed in 1965 that changed the composition of immigration considerably."*
 
@@ -995,7 +1094,7 @@ When an incumbent is running for reelection, how does that affect your thinking?
 
 **It depends** → OT: *"What shapes how you think about incumbents — the office, how long they've served, what they did with the time?"*
 
-**[EE]:** *"'Throw out the bums — but not my bums.' Congressional reelection rates have been above 90% in every cycle since 1996. Public approval of Congress over the same period has averaged 20%. Americans don't want to throw the bums out — just everyone else's."*
+**[EE]:** *"'Throw out the bums — but not my bums.' Congressional reelection rates have been above 90% in every cycle since 1996. Public approval of Congress over the same period has averaged 20%. Americans don't want to throw their bums out — just everyone else's."*
 
 
 ---
@@ -1353,7 +1452,7 @@ Read the full methodology →
 The quiz builds in four stages — each one going deeper than the last.
 
 *Layer 1 — Your values foundation.*
-Fourteen questions about what you believe at the level of principle. Closes with one question: of the eight dimensions, which feel most central to who you are as a voter? Then — before you move on — your constellation appears for the first time. A radar chart unique to you across all eight dimensions. The shape is yours. No one else's will look exactly like it.
+Fifteen questions about what you believe at the level of principle. Closes with one question: of the eight dimensions, which feel most central to who you are as a voter? Then — before you move on — your constellation appears for the first time. A radar chart unique to you across all eight dimensions. The shape is yours. No one else's will look exactly like it.
 
 *Layer 2 — Your real-world positions.*
 Nine questions on actual policy debates and real events — chosen specifically because they produce cross-partisan discomfort. This is where stated values meet actual positions. Sometimes they align. Sometimes they don't. Both are useful.
@@ -1523,7 +1622,7 @@ We're not going to claim the result is perfect. Bias-checking is a practice, not
 **How the quiz is structured.**
 Four layers, each going deeper than the last. Full description in How It Works →
 
-*Layer 1 — Values foundation:* Fourteen questions across three tiers — eight anchor questions establishing your baseline on each dimension, four crossover questions loading on two dimensions simultaneously, and two synthesis questions loading on three or more at once. Closes with a dimension importance rating, then your first constellation reveal.
+*Layer 1 — Values foundation:* Fifteen questions across three tiers — eight anchor questions establishing your baseline on each dimension, four crossover questions loading on two dimensions simultaneously, and two synthesis questions loading on three or more at once. Closes with a dimension importance rating, then your first constellation reveal.
 
 *Layer 2 — Reality check:* Nine questions — real policy debates and actual events chosen specifically because they produce cross-partisan discomfort.
 
@@ -1879,6 +1978,9 @@ Appears only if user selects "drifted away," "registered but vote differently," 
 "Anything else about your political background that would help us understand where you're coming from? Totally optional — but we're genuinely curious."
 
 [Free text field — no character limit, no required response]
+
+### Question 5 — Sources you already use (optional, free text)
+"Which news sources do you already read, watch, or listen to regularly?" Stored as context_media_sources on the profile. Not used in scoring or matching. Surfaced in admin as a deduped frequency list — input to the media catalog candidate pipeline.
 
 ### Data Handling
 - Demographic responses treated identically to quiz responses: same storage, same protections, same deletion rights
@@ -3170,7 +3272,7 @@ Journalism that deepens, expands, and challenges — based on what you actually 
 Not an algorithm designed to rage bait you. Not a political party's talking points. Not an echo chamber.
 
 **Intro paragraph** (DM Sans, body large, secondary text color):
-Your recommendations are built on your eight-dimension values profile — matched against a curated catalog of independent journalists, Substacks, and podcasts. Three tiers, by design: sources that reinforce your foundation, sources that broaden your view, and sources that push back where it matters.
+Here's a set of outlets picked for how you actually think — not for a party you don't belong to. Some you'll jibe with immediately. Some will stretch you. A few will challenge you on purpose. That's the point — and that's the diet.
 
 **Caveat line** (DM Sans, italic, muted, below intro paragraph):
 *We're starting with 62 hand-curated sources — chosen for quality, independence, reliability, and range. More coming.*
@@ -3558,7 +3660,7 @@ A 6-slide modal carousel shown automatically to first-time visitors. Designed to
 **Slide 1 — Mission**
 - Headline: You are not red. You are not blue.
 - Subhead: You are more complicated than that — and so is your vote.
-- Body: Bedrock is a civic identity platform for independent-minded voters. One values quiz. Four tools to help you understand what you actually believe, vote it, read it, talk about it, and fund it.
+- Body: Bedrock is a civic identity platform for independent-minded voters. One values quiz. Four tools to help you understand what you actually believe — then vote it, read it, talk about it, and fund it.
 
 **Slide 2 — The Quiz**
 - Headline: It starts with how you think — not where you stand.

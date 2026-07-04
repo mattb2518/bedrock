@@ -8,6 +8,8 @@ import { buildMatchKey } from '@/lib/engine/buildMatchKey'
 import { resolveDistrict } from '@/lib/civic/resolveDistrict'
 import { createClient } from '@/lib/supabase/client'
 import { triggerBYBClassification } from './actions'
+import LockedPillarGate from '@/components/ui/LockedPillarGate'
+import { getUnlockState } from '@/lib/quiz/unlockState'
 import candidates from '@/data/beyond-ballot-candidates'
 import type { RankedCandidate } from '@/lib/engine/match'
 import type { BYBCandidateRecord } from '@/data/beyond-ballot-candidates'
@@ -602,6 +604,8 @@ function BeyondYourBallotHoldingState({
 
 export default function BeyondYourBallotPage() {
   const session = useQuizStore((s) => s.session)
+  const layersCompleted = session?.completedLayers?.length ?? 0
+  const unlock = getUnlockState(layersCompleted)
   const hasProfile = Boolean(session?.result)
 
   const [address, setAddress] = useState('')
@@ -682,6 +686,18 @@ export default function BeyondYourBallotPage() {
         setAddressError('Could not find that address. Try including your city and state.')
       }
     })
+  }
+
+  // ── Unlock gate (SPEC §2 Unlock Ladder) ─────────────────────────────────
+  if (!unlock.beyondYourBallot) {
+    return (
+      <LockedPillarGate
+        pillarName="Beyond Your Ballot"
+        description="Candidates outside your own district worth supporting — matched to your values, focused on federal races where a presence in Congress would shift the balance of power toward independent-minded governance. Unlocks after Layer 3 of the quiz."
+        unlocksAfterLayer={3}
+        accentColor="var(--color-rose)"
+      />
+    )
   }
 
   // ── Holding state (§23.7) — all hooks above have run unconditionally ────

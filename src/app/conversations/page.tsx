@@ -5,6 +5,8 @@ import { createPortal } from 'react-dom'
 import { useQuizStore } from '@/store/quizStore'
 import { mantleFor } from '@/lib/quiz/mantles'
 import type { QuizSession } from '@/types/quiz'
+import LockedPillarGate from '@/components/ui/LockedPillarGate'
+import { getUnlockState } from '@/lib/quiz/unlockState'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -864,6 +866,8 @@ function HowItWorksAccordion() {
 
 export default function ConversationsPage() {
   const session = useQuizStore(s => s.session)
+  const layersCompleted = session?.completedLayers?.length ?? 0
+  const unlock = getUnlockState(layersCompleted)
   const hasProfile = Boolean(session?.result)
   const isAnonymous = hasProfile && !session?.userId
   const mantleName = session?.result?.primaryType ? mantleFor(session.result.primaryType).name : null
@@ -1124,6 +1128,18 @@ export default function ConversationsPage() {
   function endChat() { setChatEnded(true); setChatEndMessage('(You ended the practice session.)') }
 
   const examples = activeMode ? EXAMPLES[activeMode] : []
+
+  // ── Unlock gate (SPEC §2 Unlock Ladder) ──────────────────────────────────
+  if (!unlock.conversations) {
+    return (
+      <LockedPillarGate
+        pillarName="Your Conversations"
+        description="Claude-powered prep for difficult conversations across political difference. Knows your values, your bridge, and the gaps — before you say a word. Unlocks when you complete Layer 1 of the quiz."
+        unlocksAfterLayer={1}
+        accentColor="var(--color-blue-accent)"
+      />
+    )
+  }
 
   return (
     <>

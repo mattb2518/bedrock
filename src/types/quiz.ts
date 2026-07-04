@@ -109,6 +109,7 @@ export interface Demographics {
   region?: string
   regionGrewUp?: string // region they grew up in (formative, pairs with age + upbringing)
   note?: string
+  mediaSources?: string // context_media_sources: news sources the user already reads (SPEC §12 A11)
   completed?: boolean // user reached and dismissed the module (answered or skipped)
 }
 

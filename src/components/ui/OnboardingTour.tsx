@@ -108,7 +108,7 @@ export default function OnboardingTour({ pillarOneMode = 'officials' }: { pillar
       id: 'mission',
       headline: "You're not red. You're not blue.",
       subhead: "You're more complicated than that — and so is your vote.",
-      body: "Bedrock is a civic identity platform for independent-minded voters. One values quiz. Four tools to help you understand what you actually believe, vote it, read it, talk about it, and fund it.",
+      body: "Bedrock is a civic identity platform for independent-minded voters. One values quiz. Four tools to help you understand what you actually believe — then vote it, read it, talk about it, and fund it.",
       accent: 'var(--color-blue)',
       pill: 'Welcome to Bedrock.guide',
     },

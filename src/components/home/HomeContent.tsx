@@ -3,7 +3,9 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import HeroSlider from "@/components/layout/HeroSlider";
+import { getUnlockState } from "@/lib/quiz/unlockState";
 import MantleConstellation from "@/components/ui/MantleConstellation";
+import HomeTeaser from "@/components/home/HomeTeaser";
 import Constellation from "@/components/ui/Constellation";
 import { DIMENSION_PAIRS } from "@/components/ui/Constellation";
 import { useQuizStore } from "@/store/quizStore";
@@ -15,35 +17,48 @@ import { usePreviewStore } from "@/store/previewStore";
 
 // ── Shared pillar cards ───────────────────────────────────────────────────────
 
-function PillarCards({ pillarOneMode }: { pillarOneMode: PillarOneMode }) {
+function LockBadge({ layer }: { layer: number }) {
+  return (
+    <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", fontSize: "11px", fontFamily: "var(--font-body)", color: "var(--color-text-muted)", marginTop: "var(--space-3)" }}>
+      🔒 Unlocks after Layer {layer}
+    </span>
+  );
+}
+
+function PillarCards({ pillarOneMode, layersCompleted = 0 }: { pillarOneMode: PillarOneMode; layersCompleted?: number }) {
   const p1 = PILLAR_ONE[pillarOneMode]
+  const unlock = getUnlockState(layersCompleted)
   return (
     <div className="pillar-grid">
       <Link href="/your-ballot" style={{ textDecoration: "none", display: "block", height: "100%" }}>
-        <div style={{ backgroundColor: "var(--color-bg-surface)", border: "1px solid var(--color-border)", borderRadius: "var(--radius-lg)", padding: "var(--space-8)", borderTop: "3px solid var(--color-red)", transition: "var(--transition-base)", cursor: "pointer", height: "100%", boxSizing: "border-box" }}>
+        <div style={{ backgroundColor: "var(--color-bg-surface)", border: "1px solid var(--color-border)", borderRadius: "var(--radius-lg)", padding: "var(--space-8)", borderTop: "3px solid var(--color-red)", transition: "var(--transition-base)", cursor: "pointer", height: "100%", boxSizing: "border-box", opacity: unlock.pillar1 ? 1 : 0.7 }}>
           <h3 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-h3)", color: "var(--color-text-primary)", marginBottom: "var(--space-3)" }}>{p1.tileTitle}</h3>
           <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-body)", color: "var(--color-text-secondary)", lineHeight: "var(--leading-relaxed)" }}>{p1.tileBlurb}</p>
+          {!unlock.pillar1 && <LockBadge layer={3} />}
         </div>
       </Link>
 
       <Link href="/media-diet" style={{ textDecoration: "none", display: "block", height: "100%" }}>
-        <div style={{ backgroundColor: "var(--color-bg-surface)", border: "1px solid var(--color-border)", borderRadius: "var(--radius-lg)", padding: "var(--space-8)", borderTop: "3px solid var(--color-white-warm)", transition: "var(--transition-base)", cursor: "pointer", height: "100%", boxSizing: "border-box" }}>
+        <div style={{ backgroundColor: "var(--color-bg-surface)", border: "1px solid var(--color-border)", borderRadius: "var(--radius-lg)", padding: "var(--space-8)", borderTop: "3px solid var(--color-white-warm)", transition: "var(--transition-base)", cursor: "pointer", height: "100%", boxSizing: "border-box", opacity: unlock.mediaDiet ? 1 : 0.7 }}>
           <h3 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-h3)", color: "var(--color-text-primary)", marginBottom: "var(--space-3)" }}>Your Media Diet</h3>
           <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-body)", color: "var(--color-text-secondary)", lineHeight: "var(--leading-relaxed)" }}>Curated journalism that deepens, expands, and challenges.</p>
+          {!unlock.mediaDiet && <LockBadge layer={2} />}
         </div>
       </Link>
 
       <Link href="/conversations" style={{ textDecoration: "none", display: "block", height: "100%" }}>
-        <div style={{ backgroundColor: "var(--color-bg-surface)", border: "1px solid var(--color-border)", borderRadius: "var(--radius-lg)", padding: "var(--space-8)", borderTop: "3px solid var(--color-blue-accent)", transition: "var(--transition-base)", cursor: "pointer", height: "100%", boxSizing: "border-box" }}>
+        <div style={{ backgroundColor: "var(--color-bg-surface)", border: "1px solid var(--color-border)", borderRadius: "var(--radius-lg)", padding: "var(--space-8)", borderTop: "3px solid var(--color-blue-accent)", transition: "var(--transition-base)", cursor: "pointer", height: "100%", boxSizing: "border-box", opacity: unlock.conversations ? 1 : 0.7 }}>
           <h3 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-h3)", color: "var(--color-text-primary)", marginBottom: "var(--space-3)" }}>Your Conversations</h3>
           <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-body)", color: "var(--color-text-secondary)", lineHeight: "var(--leading-relaxed)" }}>Claude-powered prep for difficult conversations across difference.</p>
+          {!unlock.conversations && <LockBadge layer={1} />}
         </div>
       </Link>
 
       <Link href="/beyond-your-ballot" style={{ textDecoration: "none", display: "block", height: "100%" }}>
-        <div style={{ backgroundColor: "var(--color-bg-surface)", border: "1px solid var(--color-border)", borderRadius: "var(--radius-lg)", padding: "var(--space-8)", borderTop: "3px solid var(--color-rose)", transition: "var(--transition-base)", cursor: "pointer", height: "100%", boxSizing: "border-box" }}>
+        <div style={{ backgroundColor: "var(--color-bg-surface)", border: "1px solid var(--color-border)", borderRadius: "var(--radius-lg)", padding: "var(--space-8)", borderTop: "3px solid var(--color-rose)", transition: "var(--transition-base)", cursor: "pointer", height: "100%", boxSizing: "border-box", opacity: unlock.beyondYourBallot ? 1 : 0.7 }}>
           <h3 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-h3)", color: "var(--color-text-primary)", marginBottom: "var(--space-3)" }}>Beyond Your Ballot</h3>
           <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-body)", color: "var(--color-text-secondary)", lineHeight: "var(--leading-relaxed)" }}>Candidates you can&apos;t vote for, but whose presence in Congress would shape the country.</p>
+          {!unlock.beyondYourBallot && <LockBadge layer={3} />}
         </div>
       </Link>
     </div>
@@ -56,6 +71,9 @@ function PublicHome({ pillarOneMode }: { pillarOneMode: PillarOneMode }) {
   return (
     <>
       <HeroSlider />
+
+      {/* Homepage teaser — ghost constellation (SPEC §5) */}
+      <HomeTeaser />
 
       {/* Civic Mantle teaser */}
       <section style={{ backgroundColor: "var(--color-bg-section)", padding: "var(--space-20) var(--space-6)" }}>
@@ -145,6 +163,7 @@ function ReturningHome({ pillarOneMode }: { pillarOneMode: PillarOneMode }) {
   const major = result ? mantleFor(result.primaryType) : null;
   const profile = result?.profile as DimensionalProfile | undefined;
   const radarScores = profile ? profileToRadar(profile) : undefined;
+  const layersCompleted = session?.completedLayers?.length ?? 0;
 
   // Top traits: the user's flagged top dimensions, labeled by pole
   const topTraits = (result?.topDimensions ?? []).slice(0, 3).map((dim) => {
@@ -182,7 +201,7 @@ function ReturningHome({ pillarOneMode }: { pillarOneMode: PillarOneMode }) {
               Everything built on your civic mantle.
             </h2>
           </div>
-          <PillarCards pillarOneMode={pillarOneMode} />
+          <PillarCards pillarOneMode={pillarOneMode} layersCompleted={layersCompleted} />
         </div>
         <style>{`
           .pillar-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 1fr; gap: var(--space-6); max-width: 760px; margin: 0 auto; }

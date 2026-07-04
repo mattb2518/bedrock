@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useQuizStore } from '@/store/quizStore'
+import { getUnlockState } from '@/lib/quiz/unlockState'
 import MantleReveal from '@/components/quiz/MantleReveal'
 import ProfileDetails from '@/components/quiz/ProfileDetails'
 import { useCallback, useState } from 'react'
@@ -76,13 +77,16 @@ function QuizLinks({ quizComplete }: { quizComplete: boolean }) {
 }
 
 function ResultsNext({ quizComplete }: { quizComplete: boolean }) {
+  const session = useQuizStore((s) => s.session)
+  const layersCompleted = session?.completedLayers?.length ?? 0
+  const unlock = getUnlockState(layersCompleted)
   const pillarOneMode = usePillarOneMode()
   const p1 = PILLAR_ONE[pillarOneMode]
   const PILLARS = [
-    { href: '/your-ballot', title: p1.tileTitle, blurb: p1.tileBlurb, accent: 'var(--color-red)' },
-    { href: '/media-diet', title: 'Your Media Diet', blurb: "Independent journalism matched to how you actually think.", accent: 'var(--color-white-warm)' },
-    { href: '/conversations', title: 'Your Conversations', blurb: "Claude-powered prep for hard conversations across difference.", accent: 'var(--color-blue-accent)' },
-    { href: '/beyond-your-ballot', title: 'Beyond Your Ballot', blurb: "Candidates you can't vote for, but who'd shape the country.", accent: 'var(--color-rose)' },
+    { href: '/your-ballot', title: p1.tileTitle, blurb: p1.tileBlurb, accent: 'var(--color-red)', locked: !unlock.pillar1, unlockLayer: 3 },
+    { href: '/media-diet', title: 'Your Media Diet', blurb: "Independent journalism matched to how you actually think.", accent: 'var(--color-white-warm)', locked: !unlock.mediaDiet, unlockLayer: 2 },
+    { href: '/conversations', title: 'Your Conversations', blurb: "Claude-powered prep for hard conversations across difference.", accent: 'var(--color-blue-accent)', locked: !unlock.conversations, unlockLayer: 1 },
+    { href: '/beyond-your-ballot', title: 'Beyond Your Ballot', blurb: "Candidates you can't vote for, but who'd shape the country.", accent: 'var(--color-rose)', locked: !unlock.beyondYourBallot, unlockLayer: 3 },
   ]
   return (
     <div id="put-it-to-work" style={{ maxWidth: 'var(--max-width-wide)', margin: '0 auto', padding: 'var(--space-8) var(--space-6) var(--space-20)', scrollMarginTop: 'var(--nav-height)' }}>
@@ -104,9 +108,14 @@ function ResultsNext({ quizComplete }: { quizComplete: boolean }) {
         <div className="results-pillars">
           {PILLARS.map((p) => (
             <Link key={p.href} href={p.href} style={{ textDecoration: 'none', display: 'block', height: '100%' }}>
-              <div style={{ backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-6)', borderTop: `3px solid ${p.accent}`, height: '100%', boxSizing: 'border-box' }}>
+              <div style={{ backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-6)', borderTop: `3px solid ${p.accent}`, height: '100%', boxSizing: 'border-box', opacity: p.locked ? 0.7 : 1 }}>
                 <h3 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-h3)', color: 'var(--color-text-primary)', marginBottom: 'var(--space-2)' }}>{p.title}</h3>
                 <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)' }}>{p.blurb}</p>
+                {p.locked && (
+                  <p style={{ fontFamily: 'var(--font-body)', fontSize: '11px', color: 'var(--color-text-muted)', marginTop: 'var(--space-2)' }}>
+                    🔒 Unlocks after Layer {p.unlockLayer}
+                  </p>
+                )}
               </div>
             </Link>
           ))}

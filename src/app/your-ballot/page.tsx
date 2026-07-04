@@ -5,6 +5,8 @@ import { useQuizStore, savePendingAddress } from '@/store/quizStore'
 import AddressAutocomplete from '@/components/ui/AddressAutocomplete'
 import { PILLAR_ONE } from '@/lib/config/pillarOne'
 import { usePillarOneMode } from '@/components/providers/PillarOneModeProvider'
+import LockedPillarGate from '@/components/ui/LockedPillarGate'
+import { getUnlockState } from '@/lib/quiz/unlockState'
 import { matchRace, ALL_DIMENSIONS } from '@/lib/engine/match'
 import { buildMatchKey } from '@/lib/engine/buildMatchKey'
 import { resolveDistrict } from '@/lib/civic/resolveDistrict'
@@ -1157,11 +1159,14 @@ function YourBallotHoldingState({
 
 export default function YourBallotPage() {
   const session = useQuizStore((s) => s.session)
+  const layersCompleted = session?.completedLayers?.length ?? 0
+  const unlock = getUnlockState(layersCompleted)
   const hasProfile = Boolean(session?.result)
   const completionPercent = session?.result?.completionPercent ?? 0
   const userId = session?.userId ?? null
 
   const pillarOneMode = usePillarOneMode()
+  const p1 = PILLAR_ONE[pillarOneMode]
 
   const [savedAddress, setSavedAddress] = useState<string | null>(null)
   const [showAddressInput, setShowAddressInput] = useState(false)
@@ -1297,6 +1302,18 @@ export default function YourBallotPage() {
         setAddressError('Could not look up that address. Try including your city, state, and ZIP code.')
       }
     })
+  }
+
+  // ── Unlock gate (SPEC §2 Unlock Ladder) — wraps outside season routing ───────
+  if (!unlock.pillar1) {
+    return (
+      <LockedPillarGate
+        pillarName={p1.tileTitle}
+        description={`${p1.tileBlurb} Unlocks after Layer 3 of the quiz.`}
+        unlocksAfterLayer={3}
+        accentColor="var(--color-red)"
+      />
+    )
   }
 
   // ── Season routing — driven by site_config.pillar_one_mode, not a hardcoded flag ──────────

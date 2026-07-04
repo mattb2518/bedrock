@@ -8,6 +8,8 @@ import { matchMedia, isBelowThresholdException } from '@/lib/engine/mediaMatch'
 import { buildMediaMatchKey } from '@/lib/engine/buildMediaMatchKey'
 import { mantleFor } from '@/lib/quiz/mantles'
 import { MANTLE_TIER_BLURBS } from '@/data/media-blurbs'
+import LockedPillarGate from '@/components/ui/LockedPillarGate'
+import { getUnlockState } from '@/lib/quiz/unlockState'
 import type { MediaMatchResult, ScoredMediaSource, MediaTier } from '@/lib/engine/mediaMatch'
 import type { MediaSource } from '@/lib/engine/mediaMatch'
 import type { CivicType } from '@/types/quiz'
@@ -562,6 +564,8 @@ export default function MediaDietPage() {
   // In preview modes the synthetic result overrides the real session result.
   const effectiveResult = mode !== 'myself' ? previewResult : (session?.result ?? null)
 
+  const layersCompleted = session?.completedLayers?.length ?? 0
+  const unlock = getUnlockState(mode !== 'myself' ? 4 : layersCompleted)
   const hasProfile = Boolean(effectiveResult)
   const isAnonymous = hasProfile && !session?.userId && mode === 'myself'
   const mantleType   = effectiveResult?.primaryType ?? null
@@ -610,28 +614,16 @@ export default function MediaDietPage() {
     )
   }
 
-  // ── No profile — soft gate ────────────────────────────────────────────────
+  // ── Unlock gate (SPEC §2 Unlock Ladder) — supersedes old soft gate ────────
 
-  if (!hasProfile) {
+  if (!unlock.mediaDiet) {
     return (
-      <main style={{ maxWidth: 1100, margin: '0 auto', padding: 'var(--space-8) var(--space-4)' }}>
-        <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-muted)', letterSpacing: 'var(--tracking-wider)', textTransform: 'uppercase', marginBottom: 'var(--space-5)' }}>
-          Your Media Diet
-        </p>
-        <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-h1)', color: 'var(--color-text-primary)', marginBottom: 'var(--space-5)', lineHeight: 'var(--leading-tight)' }}>
-          Independent journalism, matched to how you think.
-        </h1>
-        <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', marginBottom: 'var(--space-4)' }}>
-          Independent journalism matched to how you actually think — in three tiers: sources that deepen what you know, sources that expand how you think, and sources that challenge you where it counts.
-        </p>
-        <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', marginBottom: 'var(--space-6)' }}>
-          Take the quiz to get your personalized recommendations. We match your eight-dimension values profile against a curated catalog of independent journalists, Substacks, and podcasts.
-        </p>
-        <a href="/quiz"
-          style={{ display: 'inline-block', fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', fontWeight: 'var(--weight-semibold)', padding: 'var(--space-3) var(--space-5)', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--color-blue-accent)', color: '#fff', textDecoration: 'none' }}>
-          Take the quiz / Create an account →
-        </a>
-      </main>
+      <LockedPillarGate
+        pillarName="Your Media Diet"
+        description="Independent journalism matched to how you actually think — in three tiers: sources that deepen what you know, sources that expand how you think, and sources that challenge you where it counts. Unlocks after Layer 2 of the quiz."
+        unlocksAfterLayer={2}
+        accentColor="var(--color-white-warm)"
+      />
     )
   }
 
@@ -687,7 +679,7 @@ export default function MediaDietPage() {
           lineHeight: 'var(--leading-relaxed)',
           marginBottom: 'var(--space-4)',
         }}>
-          Your recommendations are built on your eight-dimension values profile — matched against a curated catalog of independent journalists, Substacks, and podcasts. Three tiers, by design: sources that reinforce your foundation, sources that broaden your view, and sources that push back where it matters.
+          Here&apos;s a set of outlets picked for how you actually think — not for a party you don&apos;t belong to. Some you&apos;ll jibe with immediately. Some will stretch you. A few will challenge you on purpose. That&apos;s the point — and that&apos;s the diet.
         </p>
 
         <p style={{

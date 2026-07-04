@@ -18,6 +18,9 @@ export interface Mantle {
   // /your-mantle both read this — single source of truth).
   figure: { name: string; why: string }
   profile: DimensionalProfile
+  // Forebear portrait framing overrides (SPEC §4 Forebear Imagery).
+  // Defaults: back "50% 20%", front "50% 15%"
+  portraitPosition?: { back?: string; front?: string }
 }
 
 export const MANTLES: Mantle[] = [

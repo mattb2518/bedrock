@@ -20,6 +20,7 @@ import {
   GEOGRAPHIES,
   REGIONS,
   DEMOGRAPHIC_OTHER_PROMPT,
+  MEDIA_SOURCES_PROMPT,
 } from '@/lib/quiz/demographics'
 import { buildResult } from '@/lib/quiz/scoring'
 import { DIMENSIONS } from '@/lib/quiz/dimensions'
@@ -27,6 +28,8 @@ import { IT_DEPENDS, type Demographics, type Dimension, type QuizLayer, type Qui
 import MantleReveal from '@/components/quiz/MantleReveal'
 import AddressAutocomplete from '@/components/ui/AddressAutocomplete'
 import { savePendingAddress } from '@/store/quizStore'
+import InterlayerUnlockScreen from '@/components/quiz/InterlayerUnlockScreen'
+import { usePillarOneMode } from '@/components/providers/PillarOneModeProvider'
 
 // Fire a Plausible custom event if the cookieless script is present. No-ops in
 // dev / when the script hasn't loaded. Used to learn whether users actually read
@@ -42,8 +45,10 @@ type Phase =
   | 'layerIntro'
   | 'quiz'
   | 'interstitial'
+  | 'reflection'
   | 'importance'
   | 'reveal'
+  | 'unlockScreen'
   | 'outro'
   | 'dealbreakers'
   | 'demographics'
@@ -87,6 +92,7 @@ const DEMO_STEPS: DemoStepDef[] = [
   { key: 'region', type: 'pills', prompt: 'Your region', options: REGIONS },
   { key: 'regionGrewUp', type: 'pills', prompt: 'Region you grew up in', options: REGIONS },
   { key: 'note', type: 'text', prompt: DEMOGRAPHIC_OTHER_PROMPT },
+  { key: 'mediaSources', type: 'text', prompt: MEDIA_SOURCES_PROMPT },
 ]
 
 function nextDemoStep(step: number, d: Demographics): number {
@@ -197,6 +203,7 @@ export default function QuizFlow() {
     resetQuiz,
   } = useQuizStore()
   const router = useRouter()
+  const pillarOneMode = usePillarOneMode()
   const [phase, setPhase] = useState<Phase>('intro')
 
   // Transient per-question UI state
@@ -213,6 +220,11 @@ export default function QuizFlow() {
   // "skip the rest" button, which appears once they're past the second egg.
   const [eggsSeen, setEggsSeen] = useState(0)
 
+  // AI reflect-back for "It depends" open text (SPEC §5)
+  const [aiReflection, setAiReflection] = useState<string | null>(null)
+  // Pending transition info for reflection phase
+  const [pendingTransition, setPendingTransition] = useState<{ wasLast: boolean; layerAtAnswer: QuizLayer } | null>(null)
+
   // Post-quiz demographic module (all optional)
   const [demo, setDemo] = useState<Demographics>({})
 
@@ -225,6 +237,29 @@ export default function QuizFlow() {
   function clearTransient() {
     setPendingOption(null)
     setFollowText('')
+    setAiReflection(null)
+    setPendingTransition(null)
+  }
+
+  // Fetch AI reflect-back for open-text It-depends answers (SPEC §5)
+  async function fetchReflection(text: string): Promise<string | null> {
+    if (!text.trim()) return null
+    try {
+      const controller = new AbortController()
+      const t = setTimeout(() => controller.abort(), 2500)
+      const res = await fetch('/api/quiz/reflect', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text }),
+        signal: controller.signal,
+      })
+      clearTimeout(t)
+      if (!res.ok) return null
+      const data = await res.json() as { reflection: string | null }
+      return data.reflection ?? null
+    } catch {
+      return null
+    }
   }
 
   // Has the user already answered the question now on screen? If so we're
@@ -356,6 +391,7 @@ export default function QuizFlow() {
 
     const wasLast = index + 1 >= questions.length
     const layerAtAnswer = layer
+    const hasOpenText = (isDepends || !!opt?.followUpPrompt) && text.trim().length > 0
     clearTransient()
 
     if (question.easterEgg && !session?.skipEasterEggs) {
@@ -364,6 +400,18 @@ export default function QuizFlow() {
       track('Easter Egg Shown', { layer: layerAtAnswer, n: seen })
       setInterstitial({ egg: question.easterEgg, wasLast, layerAtAnswer })
       setPhase('interstitial')
+    } else if (hasOpenText) {
+      // Fetch AI reflect-back; show reflection screen on success, fall through on timeout
+      setPendingTransition({ wasLast, layerAtAnswer })
+      fetchReflection(text).then((reflection) => {
+        if (reflection) {
+          setAiReflection(reflection)
+          setPhase('reflection')
+        } else {
+          setPendingTransition(null)
+          runTransition(wasLast, layerAtAnswer)
+        }
+      })
     } else {
       runTransition(wasLast, layerAtAnswer)
     }
@@ -563,10 +611,16 @@ export default function QuizFlow() {
         <LayerSubtitle>{LAYER_SUBTITLES[1]}</LayerSubtitle>
         <H1>Define your bedrock. Find your civic mantle.</H1>
         <Body>
-          Most civic tools ask where you stand on the issues. We’re asking something different — and harder. We want to know how you <em>think</em>: the underlying values that drive your positions.
+          Most civic tools ask where you stand on the issues. We’re asking something different — and harder. We want to know how you <em>think</em>. Not which party you agree with, not which policies you support — but the underlying values that drive those positions. The stuff that’s been true about you for twenty years.
         </Body>
         <Body>
-          Fourteen questions. About ten minutes. No wrong answers — only honest ones. Every question has an “It depends” option — it’s not a cop-out, it’s often the most accurate answer. Your nuance is the point.
+          Fifteen questions. About ten minutes. That alone earns your Civic Mantle and your constellation — and unlocks your first tool.
+        </Body>
+        <Body>
+          Three optional layers after that sharpen everything: another 15–20 minutes total, whenever you want them. Each one unlocks something new.
+        </Body>
+        <Body>
+          One thing: every question has an &ldquo;It depends&rdquo; option. It&apos;s not a cop-out — it&apos;s often the most accurate answer. If you pick it, we&apos;ll ask one quick follow-up. Your nuance is the point.
         </Body>
         <div style={{ marginTop: 'var(--space-8)' }}>
           <button style={primaryBtn} onClick={begin}>
@@ -624,8 +678,8 @@ export default function QuizFlow() {
         <MantleReveal
           result={session.result}
           headerCta={
-            <button style={primaryBtn} onClick={() => setPhase('layerIntro')}>
-              Continue to Layer 2 →
+            <button style={primaryBtn} onClick={() => setPhase('unlockScreen')}>
+              Continue →
             </button>
           }
         />
@@ -638,8 +692,8 @@ export default function QuizFlow() {
               {LAYER_OUTRO[1].teaser}
             </p>
             <div style={{ textAlign: 'center' }}>
-              <button style={primaryBtn} onClick={() => setPhase('layerIntro')}>
-                Continue to Layer 2 →
+              <button style={primaryBtn} onClick={() => setPhase('unlockScreen')}>
+                Continue →
               </button>
             </div>
           </div>
@@ -648,9 +702,43 @@ export default function QuizFlow() {
     )
   }
 
-  // ── OUTRO (after Layers 2 & 3) ────────────────────────────────────────────
+  // ── UNLOCK SCREEN (after each layer) ────────────────────────────────────────
+  if (phase === 'unlockScreen' && session?.result) {
+    // Determine which layer just completed
+    const completedCount = session.completedLayers?.length ?? 0
+    const justCompleted = (completedCount > 0 ? session.completedLayers[completedCount - 1] : 1) as 1 | 2 | 3
+    const safeLayer = (justCompleted >= 1 && justCompleted <= 3 ? justCompleted : 1) as 1 | 2 | 3
+    const layer2Count = session.answers.filter(a => {
+      // approximate: count answers in the L2 range
+      return a.questionId.startsWith('P') || a.questionId.startsWith('L2')
+    }).length || 9
+
+    const unlockDestinations: Record<1 | 2 | 3, string> = {
+      1: '/conversations',
+      2: '/media-diet',
+      3: '/your-ballot',
+    }
+
+    return (
+      <InterlayerUnlockScreen
+        layer={safeLayer}
+        profile={session.result.profile}
+        layer2Count={layer2Count}
+        pillarOneMode={pillarOneMode}
+        onKeepGoing={() => setPhase('layerIntro')}
+        onExploreUnlocked={() => router.push(unlockDestinations[safeLayer])}
+      />
+    )
+  }
+
+  // ── OUTRO (after Layers 2 & 3) — routes through unlock screen ────────────
   if (phase === 'outro') {
-    const justDone = (layer - 1) as QuizLayer // completeLayer already advanced currentLayer
+    // Skip directly to unlock screen if we have a result; else show brief outro
+    if (session?.result) {
+      setPhase('unlockScreen')
+      return null
+    }
+    const justDone = (layer - 1) as QuizLayer
     const outro = LAYER_OUTRO[justDone] ?? LAYER_OUTRO[2]
     return (
       <Shell>
@@ -988,6 +1076,26 @@ export default function QuizFlow() {
               Skip the rest of the “Did You Know” moments and focus on the quiz →
             </button>
           )}
+        </div>
+      </Shell>
+    )
+  }
+
+  // ── REFLECTION (AI reflect-back for open-text It depends) ───────────────
+  if (phase === 'reflection' && aiReflection && pendingTransition) {
+    const { wasLast, layerAtAnswer } = pendingTransition
+    return (
+      <Shell>
+        <div
+          onClick={() => { clearTransient(); runTransition(wasLast, layerAtAnswer) }}
+          style={{ cursor: 'pointer', padding: 'var(--space-8) 0', textAlign: 'center' }}
+        >
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body-lg)', color: 'var(--color-gold)', fontStyle: 'italic', lineHeight: 'var(--leading-relaxed)', maxWidth: 520, margin: '0 auto var(--space-6)' }}>
+            {aiReflection}
+          </p>
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)' }}>
+            Tap to continue →
+          </p>
         </div>
       </Shell>
     )
