@@ -174,3 +174,27 @@ Revisit in Claude Project sessions when ready to build.
 **Grammar-shaping:** Deterministic (no model call). Topic chip → connective "about"; posture chip → connective "and the hard part is that". Free-typed input classified by leading-pronoun / stance-verb heuristic.
 
 **Rollback:** Single commit touching only `src/app/conversations/page.tsx`, `SPEC.md`, and `DECISIONS.md`. Cleanly revertable via `git revert <sha>` with zero side effects on output rendering, §18.6b chat loop, or §18.7 profile injection.
+
+---
+
+## 2026-07-03 — Challenging tier floor recalibrated: 0.60 → 0.40 (tension_on_held)
+
+**Decision:** Challenging tier floor recalibrated: 0.60 → 0.40 (tension_on_held); reliability/good_faith/independence restored to original values.
+
+**Why:** The 2026-07-02 relaxation loosened the wrong variable. Running computeTensionOnHeld against all 25 quality-clearing sources (SQL-verified: all 62 approved with real 8-axis placements) across all 10 Mantle profiles showed zero sources clearing 0.60 or 0.55 for any Mantle. 0.40 is the first threshold where every Mantle clears the §24.7 three-source minimum. Known gap: Long Gamer and Steward get 2 natural matches each; accepted per founder decision, covered by topUp; revisit with targeted catalog additions.
+
+---
+
+## 2026-07-03 — Your Officials specced as §22b
+
+**Decision:** Your Officials specced as §22b — reuses Your Ballot route and the candidate classification pipeline verbatim.
+
+**Why:** No new classification code: getOrClassifyCandidate treats sitting officials like candidates (record 3:1 over rhetoric). New code limited to fetchCurrentOfficials (congress.gov current members + Open States + governor lookup) and mode rendering on /your-ballot. Display: constellation overlay + per-dimension notes + dealbreaker flags (ported from RankedCandidateCard), confidence caveat for thin records. Scope: 2 senators, House rep, governor, 2 state legislators.
+
+---
+
+## 2026-07-03 — resolveDistrict migrated off the dead Google Civic Representatives endpoint
+
+**Decision:** resolveDistrict migrated off the dead Google Civic Representatives endpoint to divisionsByAddress.
+
+**Why:** Representatives API turned down 2025-04-30; resolveDistrict.ts was still calling it — masked by /your-ballot's HOLDING_STATE, caught during the officials build. Same divisions-keyed response shape; normalizedInput handled defensively (falls back to raw input string). Also fixed operationally: GOOGLE_CIVIC_API_KEY existed only in .env.local, never in Vercel — add to Production alongside new GOOGLE_PLACES_API_KEY.

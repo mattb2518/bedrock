@@ -1,16 +1,16 @@
 'use server'
 
-// Address → OCD-ID resolver using the Google Civic divisionByAddress endpoint.
+// Address → OCD-ID resolver using the Google Civic divisionsByAddress endpoint.
 // Returns the list of OCD-IDs the address falls within (federal + state).
-// Used by Beyond Your Ballot (Stage 5) and Your Ballot (Stage 7+).
+// Used by Beyond Your Ballot (Stage 5) and Your Ballot / Your Officials (Stage 7+).
 //
 // Google Civic API docs:
 // https://developers.google.com/civic-information/docs/v2/divisions/search
-// Endpoint: GET https://civicinfo.googleapis.com/civicinfo/v2/representatives
+// Endpoint: GET https://www.googleapis.com/civicinfo/v2/divisionsByAddress
 //   ?address=<url-encoded>&key=<GOOGLE_CIVIC_API_KEY>
 //
-// We use the Representatives endpoint (NOT the deprecated representativeInfoByDivision).
-// The response includes `divisions` keyed by OCD-ID.
+// The Representatives endpoint was shut down 2025-04-30 — see SPEC.md deprecated-APIs list.
+// The response includes `divisions` keyed by OCD-ID. normalizedInput is a string (may be absent).
 
 import { parseDistrictInfo } from './districtUtils'
 
@@ -33,10 +33,9 @@ export async function resolveDistrict(address: string): Promise<ResolveDistrictR
     throw new Error('GOOGLE_CIVIC_API_KEY is not set')
   }
 
-  const url = new URL('https://civicinfo.googleapis.com/civicinfo/v2/representatives')
+  const url = new URL('https://www.googleapis.com/civicinfo/v2/divisionsByAddress')
   url.searchParams.set('address', address)
   url.searchParams.set('key', apiKey)
-  url.searchParams.set('includeOffices', 'false')
 
   const res = await fetch(url.toString(), { next: { revalidate: 86400 } }) // cache 24h
   if (!res.ok) {
@@ -47,16 +46,8 @@ export async function resolveDistrict(address: string): Promise<ResolveDistrictR
   const data = await res.json()
 
   const ocdIds = Object.keys(data.divisions ?? {})
-  const normalizedAddress = data.normalizedInput
-    ? [
-        data.normalizedInput.line1,
-        data.normalizedInput.city,
-        data.normalizedInput.state,
-        data.normalizedInput.zip,
-      ]
-        .filter(Boolean)
-        .join(', ')
-    : null
+  // normalizedInput is a plain string in divisionsByAddress (may be absent); fall back to raw input.
+  const normalizedAddress = typeof data.normalizedInput === 'string' ? data.normalizedInput : address
 
   const { state, congressionalDistrict, stateSenateDistrict, stateHouseDistrict } = parseDistrictInfo(ocdIds)
 

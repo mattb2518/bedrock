@@ -2919,6 +2919,33 @@ A dismissible inline banner above the CTA: "Your results are temporary. Create a
 
 ---
 
+## 22b. Your Officials
+
+### 22b.1 Page behavior — same route as Your Ballot
+
+No new page or URL. /your-ballot gains a mode. Out of season (default): officials mode — eyebrow "YOUR OFFICIALS", H1 "Every office, matched to your values — right now.", fetches current officeholders. In season: existing Your Ballot behavior unchanged. (Mode source: originally a data-availability check; superseded by the §22c admin flag in Batch 2 — data availability remains only as a per-district guard inside ballot mode.)
+
+### 22b.2 Scope — six officials per user
+
+2 U.S. Senators, 1 U.S. House Representative, 1 Governor, 2 State Legislators (upper + lower chamber). Local officials out of scope.
+
+### 22b.3 Data flow — reuse, don't rebuild
+
+1. resolveDistrict(address) — existing (post-amendment: divisionsByAddress).
+2. New fetchCurrentOfficials(state, cd, sldu, sldl) in src/lib/civic/currentOfficials.ts — parallel to fetchFederalCandidates, sourcing congress.gov current-member endpoint + Open States current officeholders + governor lookup (verify per-state coverage; treat uncovered states as "not yet available"). Outputs ClassificationQueueEntry-shaped entities.
+3. Each result → getOrClassifyCandidate(), unchanged. Incumbents classify like candidates: public record, 3:1 record-over-rhetoric.
+4. matchRace()/buildMatchKey() — unchanged.
+
+### 22b.4 Display — constellation overlay, not a single score
+
+No aggregate percentage. Per official: (a) overlay radar — user's constellation + official's placement as a second series (extend Constellation.tsx with optional overlaySeries prop); (b) per-dimension convergence/divergence notes — port topAlignedAxes/topDivergentAxes derivation from RankedCandidateCard in beyond-your-ballot; (c) dealbreaker flags — port crossedDealbreakers/unknownDealbreakers rendering verbatim; flags only, never exclusion; (d) confidence disclosure — if classification landed pending_review (fewer than 4 axes at confidence > 0.6): "Limited voting record available — this comparison may be less precise than for other officials."
+
+### 22b.5 Framing note
+
+Methodology line: "This shows how your values compare to your representatives' actual public record — not a rating or grade."
+
+---
+
 ## 23. Beyond Your Ballot
 
 ### 23.1 Page intro copy
@@ -3073,7 +3100,9 @@ Your recommendations are built on your eight-dimension values profile — matche
 
 - **Confirming — "deepen what you know":** `agreement >= 0.65`, `tension_on_held <= 0.3`, `reliability >= 60`
 - **Expanding — "expand how you think":** `agreement >= 0.4`, `tension_on_held <= 0.4`, `novel_coverage >= 0.5`, `reliability >= 60`, not already in confirming
-- **Challenging — "challenge you where it counts":** `tension_on_held >= 0.6`, `reliability >= 75`, `good_faith === 'high'`, `independence >= 50`
+- **Challenging — "challenge you where it counts":** `tension_on_held >= 0.40`, `reliability >= 75`, `good_faith === 'high'`, `independence >= 50`
+
+Rationale (2026-07-03): the 0.60 floor (and the 0.55 emergency floor from 2026-07-02) were never reachable against a catalog curated for independence and good faith — running the actual computeTensionOnHeld logic against all 25 quality-clearing sources across all 10 Mantle profiles showed zero sources clearing 0.60 or 0.55 for any Mantle. 0.40 is the first threshold where every Mantle clears the §24.7 minimum-3 fallback. Reliability/good_faith/independence floors restored to original values.
 
 Each tier displays with:
 - A dynamic personalized blurb (see §24.2a)
@@ -3133,6 +3162,8 @@ Enforce format mix (not all podcasts), topic spread, and in the challenging tier
 
 For each of the ten Mantle types, a hand-picked seed list per tier (minimum 3 per tier per Mantle). If geometry over the catalog produces thin or lopsided tiers, fall back to the seed list. Guarantees every user gets a credible diet on day one even with a small catalog.
 
+Known catalog gap (2026-07-03): at the 0.40 floor, The Long Gamer and The Steward each naturally match only 2 sources in Challenging (their held-dimension profiles — stability_change, rules_outcomes, trust_skepticism — find thin lean-right representation in the Challenging-eligible pool). Accepted per founder decision; topUp/editorial-seed-fallback covers the gap to the 3-minimum. Revisit with targeted catalog additions, not a blanket floor drop.
+
 ### 24.8 Launch catalog
 
 `src/data/media-catalog.csv` — 62 sources, manually curated (60 committed June 29; National Review and The Ben Shapiro Show added 2026-07-02). This is a v1 placeholder intended to be replaced by the Ad Fontes API feed (primary) once licensing is confirmed. AllSides CSV secondary if PBC non-commercial eligibility is confirmed. The catalog is a living document — add sources, remove on change, respond to suggestions and feedback.
@@ -3140,6 +3171,8 @@ For each of the ten Mantle types, a hand-picked seed list per tier (minimum 3 pe
 Catalog additions (2026-07-02): National Review (Right / traditional conservative; independence Low; policy_depth 4) and The Ben Shapiro Show (Right / populist conservative; independence Medium; policy_depth 3), added to strengthen conservative and populist-right representation per the July 2026 bias audit. Reliability in the current engine is derived from policy_depth_score; a dedicated reliability signal fed by external ratings, with color-coded display, is a separate planned item and is not part of this change.
 
 Below-threshold exception (v1, temporary): a host allowlist (`isBelowThresholdException` in `mediaMatch.ts`) admits independently-owned, widely-read sources into the Confirming tier for same-lean users despite missing the reliability floor. Currently The Ben Shapiro Show (dailywire.com, reliability 42). It surfaces only in Confirming — it fails the Challenging reliability/independence gates on its own — always with a disclosure footnote on the card. National Review needs no exception; the loosened Challenging gate already admits it. Remove this exception when the v2 reliability signal ships.
+
+The Confirming-tier reliability exception (dailywire.com / The Ben Shapiro Show) is unrelated to the Challenging tension floor and is NOT touched by the 2026-07-03 change.
 
 Two catalog flags:
 - `[P]` **Partisan Lean:** a clearly identifiable editorial direction. Does not mean unreliable. Disclosed so users know what they're reading.
