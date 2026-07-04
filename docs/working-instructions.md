@@ -47,7 +47,7 @@ Unresolved design decisions live in Section 16. Claude Code must flag these and 
 
 ### Model-tier sessions
 1. ~~Recommendation engine logic~~ — **done (2026-06-29):** specced in a heavyweight session. See SPEC.md §19.
-2. **Full bias and competitive landscape check** — still to run. Run the complete quiz set — plus methodology copy, media-catalog Partisan Lean flags, and the Beyond Your Ballot governance filter — through Opus ("what would a sophisticated critic from the left say, and from the right?"). Use Opus 4.8 Max / Deep Thinking.
+2. ~~**Full bias and competitive landscape check**~~ — **COMPLETE (2026-07-03).** Ran the complete quiz set + methodology copy + media-catalog Partisan Lean flags + governance filter through Opus. Two revisions adopted (dealbreaker exception in scorecard FAQ; data-honesty hedge in officials coverage note). Tracked in §21.9 checklist.
 
 ---
 
@@ -79,7 +79,7 @@ Where we are (June 2026, updated 2026-06-29):
 - Supabase persistence: **approved** (`docs/supabase-persistence-plan.md`) — ready to build
 
 What's next (in order):
-1. **Bias + competitive landscape check** — the one remaining heavyweight session (Opus 4.8 Max). Run the full quiz set + methodology copy + media-catalog flags + governance filter through "what would a sophisticated critic from the left/right say?"
+1. ~~**Bias + competitive landscape check**~~ — **COMPLETE (2026-07-03).** See §21.9.
 2. **Long-lead outreach (start now):** Ballotpedia licensing (data@ballotpedia.org), Ad Fontes pricing (info@adfontesmedia.com), AllSides non-commercial eligibility (partnerships@allsides.com). See `docs/api-setup.md`.
 3. **Build** — everything else is specced; hand to Claude Code in the build order in that session's prompt below.
 

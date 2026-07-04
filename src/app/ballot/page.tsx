@@ -1,5 +1,5 @@
-import { redirect } from 'next/navigation'
+import { permanentRedirect } from 'next/navigation'
 
 export default function BallotRedirect() {
-  redirect('/your-ballot')
+  permanentRedirect('/your-ballot')
 }

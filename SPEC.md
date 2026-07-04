@@ -1155,7 +1155,7 @@ If you could move the needle on exactly one issue in American public life — on
 
 **REMINDER FOR MATT — model-tier sessions:**
 - ~~Recommendation engine logic~~ — **done (2026-06-29):** matching formula specced in a heavyweight session. See §19.
-- **Full bias and competitive landscape check (still to run):** run the complete quiz question set — plus methodology copy, media-catalog Partisan Lean flags, and the governance filter — through Opus asking "what would a sophisticated critic from the left say, and from the right?" Fresh eyes on the whole instrument at once. Use Opus 4.8 Max / Deep Thinking.
+- ~~**Full bias and competitive landscape check**~~ — **COMPLETE (2026-07-03).** Ran the complete quiz question set + methodology copy + media-catalog Partisan Lean flags + governance filter through Opus. Two revisions adopted (dealbreaker exception in scorecard FAQ; data-honesty hedge in officials coverage note). Tracked in §21.9 checklist.
 ---
 
 ## 17. Environment Variables
@@ -2712,10 +2712,10 @@ Not raw numbers — an actionable summary requiring human judgment.
 
 ### 21.9 Pre-launch checklist (persistent banner in the admin dashboard)
 
-- [ ] Run a bias check on all quiz questions (both passes: left critic, right critic) — extends to methodology copy, media-catalog Partisan Lean flag consistency, and Beyond Your Ballot governance-filter criteria
-- [ ] Run a Partisan Lean flag consistency check across the media catalog (same threshold applied left and right)
-- [ ] Run a bias check on all methodology and FAQ copy
-- [ ] Run a bias check on the Beyond Your Ballot governance-filter criteria
+- [x] Run a bias check on all quiz questions (both passes: left critic, right critic) — extends to methodology copy, media-catalog Partisan Lean flag consistency, and Beyond Your Ballot governance-filter criteria — **COMPLETE 2026-07-03**
+- [x] Run a Partisan Lean flag consistency check across the media catalog (same threshold applied left and right) — **COMPLETE 2026-07-03**
+- [x] Run a bias check on all methodology and FAQ copy — **COMPLETE 2026-07-03**
+- [x] Run a bias check on the Beyond Your Ballot governance-filter criteria — **COMPLETE 2026-07-03**
 - [ ] Confirm AllSides non-commercial eligibility in writing (email drafted, pending send to partnerships@allsides.com)
 - [ ] Confirm Ad Fontes Data Platform pricing and access (email drafted, pending send to info@adfontesmedia.com)
 - [ ] Initiate the Ballotpedia licensing conversation (email drafted, pending send to data@ballotpedia.org)
