@@ -663,6 +663,14 @@ function YourOfficialsMode({
   const [officials, setOfficials] = useState<CurrentOfficialsBallot | null>(null)
   const [fetchError, setFetchError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
+  const [loadingLong, setLoadingLong] = useState(false)
+
+  // After ~9s of pending, show the extended loading message
+  useEffect(() => {
+    if (!isPending) { setLoadingLong(false); return }
+    const t = setTimeout(() => setLoadingLong(true), 9000)
+    return () => clearTimeout(t)
+  }, [isPending])
 
   // Load saved address from profile on mount; auto-fetch officials if found
   useEffect(() => {
@@ -833,11 +841,23 @@ function YourOfficialsMode({
           {/* Loading state */}
           {isPending && (
             <div style={{ padding: 'var(--space-6)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-lg)', backgroundColor: 'var(--color-bg-surface)' }}>
-              <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-primary)' }}>
-                Looking up your officials…
-              </p>
-              <p style={{ margin: 'var(--space-2) 0 0', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)' }}>
-                Fetching your representatives and comparing them to your values profile.
+              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-2)' }}>
+                <span style={{
+                  display: 'inline-block', width: 18, height: 18, borderRadius: '50%',
+                  border: '2px solid var(--color-border)',
+                  borderTopColor: 'var(--color-blue-accent)',
+                  animation: 'spin 0.8s linear infinite',
+                  flexShrink: 0,
+                }} aria-hidden />
+                <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
+                <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-primary)' }}>
+                  Looking up your officials…
+                </p>
+              </div>
+              <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)' }}>
+                {loadingLong
+                  ? 'This can take up to a minute — we\'re reading their public record, not just their press releases.'
+                  : 'Fetching your representatives and comparing them to your values profile.'}
               </p>
             </div>
           )}

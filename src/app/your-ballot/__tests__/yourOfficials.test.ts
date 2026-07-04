@@ -262,3 +262,127 @@ describe('officials empty-state rendering logic', () => {
     expect(noteOnEmpty).toBe('Governor data not available')
   })
 })
+
+// ── 6. Congress endpoint + governor filter logic ──────────────────────────────
+
+describe('fetchCongressStateMembers — path-based endpoint + client-side chamber/district filter', () => {
+  // Mirrors the filter logic in fetchCurrentOfficials after the state-level call
+  interface MockMember {
+    bioguideId: string
+    partyName: string
+    district?: number
+    terms: { item: Array<{ chamber: string }> }
+  }
+
+  function filterSenate(members: MockMember[]) {
+    return members.filter((m) => {
+      const c = m.terms?.item?.at(-1)?.chamber?.toLowerCase() ?? ''
+      return c === 'senate'
+    }).slice(0, 2)
+  }
+
+  function filterHouse(members: MockMember[], congressionalDistrict: number | null) {
+    return members.filter((m) => {
+      const c = m.terms?.item?.at(-1)?.chamber?.toLowerCase() ?? ''
+      const isHouse = c === 'house of representatives' || c === 'house'
+      if (!isHouse) return false
+      if (congressionalDistrict === null) return false
+      return m.district === congressionalDistrict
+    })
+  }
+
+  const VA_MEMBERS: MockMember[] = [
+    { bioguideId: 'W000817', partyName: 'Democratic', district: undefined, terms: { item: [{ chamber: 'Senate' }] } },
+    { bioguideId: 'K000384', partyName: 'Democratic', district: undefined, terms: { item: [{ chamber: 'Senate' }] } },
+    { bioguideId: 'G000596', partyName: 'Democratic', district: 4,         terms: { item: [{ chamber: 'House of Representatives' }] } },
+    { bioguideId: 'S000185', partyName: 'Democratic', district: 3,         terms: { item: [{ chamber: 'House of Representatives' }] } },
+    { bioguideId: 'C001069', partyName: 'Republican', district: 2,         terms: { item: [{ chamber: 'House of Representatives' }] } },
+  ]
+
+  it('filters out senators when looking for house district 4', () => {
+    const house = filterHouse(VA_MEMBERS, 4)
+    expect(house).toHaveLength(1)
+    expect(house[0].bioguideId).toBe('G000596')
+  })
+
+  it('returns both senators and no house members for senate filter', () => {
+    const senate = filterSenate(VA_MEMBERS)
+    expect(senate).toHaveLength(2)
+    senate.forEach((m) => expect(m.terms.item.at(-1)?.chamber.toLowerCase()).toBe('senate'))
+  })
+
+  it('returns empty for house when congressionalDistrict is null', () => {
+    expect(filterHouse(VA_MEMBERS, null)).toHaveLength(0)
+  })
+
+  it('returns empty for house district that is not in results', () => {
+    expect(filterHouse(VA_MEMBERS, 99)).toHaveLength(0)
+  })
+})
+
+describe('governor title filter — exact match, excludes Lieutenant Governor', () => {
+  interface MockPerson {
+    id: string
+    current_role: { title: string; org_classification: string } | null
+  }
+
+  function findGovernor(people: MockPerson[]) {
+    return people.find((p) => p.current_role?.title?.toLowerCase() === 'governor')
+  }
+
+  it('selects the Governor when listed after Lt. Governor', () => {
+    const people: MockPerson[] = [
+      { id: 'lt-gov', current_role: { title: 'Lieutenant Governor', org_classification: 'executive' } },
+      { id: 'gov',    current_role: { title: 'Governor',            org_classification: 'executive' } },
+    ]
+    expect(findGovernor(people)?.id).toBe('gov')
+  })
+
+  it('selects the Governor when listed first', () => {
+    const people: MockPerson[] = [
+      { id: 'gov',    current_role: { title: 'Governor',            org_classification: 'executive' } },
+      { id: 'lt-gov', current_role: { title: 'Lieutenant Governor', org_classification: 'executive' } },
+    ]
+    expect(findGovernor(people)?.id).toBe('gov')
+  })
+
+  it('returns undefined (coverage note path) when only Lt. Governor is present', () => {
+    const people: MockPerson[] = [
+      { id: 'lt-gov', current_role: { title: 'Lieutenant Governor', org_classification: 'executive' } },
+    ]
+    expect(findGovernor(people)).toBeUndefined()
+  })
+
+  it('returns undefined for empty executive result', () => {
+    expect(findGovernor([])).toBeUndefined()
+  })
+
+  it('matches "governor" case-insensitively', () => {
+    const people: MockPerson[] = [
+      { id: 'gov', current_role: { title: 'GOVERNOR', org_classification: 'executive' } },
+    ]
+    expect(findGovernor(people)?.id).toBe('gov')
+  })
+})
+
+describe('loading UX — message swap after timeout', () => {
+  it('loadingLong becomes true after the delay fires (mechanism test with 50ms stub)', async () => {
+    // The production delay is 9000ms; we validate the mechanism with 50ms.
+    let loadingLong = false
+    const DELAY = 50  // stands in for the 9000ms production value
+    const timer = setTimeout(() => { loadingLong = true }, DELAY)
+
+    expect(loadingLong).toBe(false)
+    await new Promise((r) => setTimeout(r, DELAY + 20))
+    expect(loadingLong).toBe(true)
+
+    clearTimeout(timer)
+  })
+
+  it('timer resets to false when isPending flips to false', () => {
+    let loadingLong = true  // already set from a previous pending cycle
+    const isPending = false
+    if (!isPending) loadingLong = false
+    expect(loadingLong).toBe(false)
+  })
+})

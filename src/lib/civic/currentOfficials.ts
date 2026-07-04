@@ -25,7 +25,7 @@ interface CongressMember {
   name: string
   state: string
   district?: number
-  party: string
+  partyName: string  // congress.gov API field (NOT 'party')
   terms: {
     item: Array<{ chamber: string; startYear?: number; endYear?: number }>
   }
@@ -95,25 +95,34 @@ function highConfidenceAxes(axisPlacement: Partial<Record<Dimension, AxisPlaceme
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// congress.gov — current members
+// congress.gov — current members (path-based, genuinely filtered by state)
 // ─────────────────────────────────────────────────────────────────────────────
 
-async function fetchCongressCurrentMembers(
+// 119th Congress: Jan 3 2025 – Jan 3 2027. TODO: bump to 120 on Jan 3, 2027.
+const CURRENT_CONGRESS = 119
+
+async function fetchCongressStateMembers(
   state: string,
-  chamber: 'senate' | 'house',
-  district?: number
 ): Promise<CongressMember[]> {
   const apiKey = process.env.CONGRESS_GOV_API_KEY
   if (!apiKey) throw new Error('CONGRESS_GOV_API_KEY is not set')
 
-  const url = new URL(`${CONGRESS_BASE}/member`)
-  url.searchParams.set('stateCode', state.toUpperCase())
-  url.searchParams.set('currentMember', 'true')
-  url.searchParams.set('limit', '10')
-  url.searchParams.set('api_key', apiKey)
-  if (chamber === 'house' && district !== undefined) {
-    url.searchParams.set('district', String(district))
+  // Warn at runtime if the congress number may have rolled over.
+  if (new Date().getFullYear() >= 2027) {
+    console.warn(
+      `currentOfficials: CURRENT_CONGRESS=${CURRENT_CONGRESS} may be stale — ` +
+      'verify at api.congress.gov and bump the constant in currentOfficials.ts.'
+    )
   }
+
+  // Path-based endpoint: /v3/member/congress/{congress}/{stateCode}
+  // Returns all current members for the state (both chambers); filter client-side.
+  // The list-level /v3/member endpoint silently ignores stateCode/district params.
+  const url = new URL(`${CONGRESS_BASE}/member/congress/${CURRENT_CONGRESS}/${state.toUpperCase()}`)
+  url.searchParams.set('currentMember', 'true')
+  url.searchParams.set('limit', '50')  // states have at most ~50 house seats + 2 senators
+  url.searchParams.set('format', 'json')
+  url.searchParams.set('api_key', apiKey)
 
   const res = await fetch(url.toString(), { next: { revalidate: 3600 } })
   if (!res.ok) {
@@ -122,16 +131,7 @@ async function fetchCongressCurrentMembers(
   }
 
   const data = await res.json()
-  const members: CongressMember[] = data.members ?? []
-
-  return members.filter((m) => {
-    const latestTerm = m.terms?.item?.at(-1)
-    if (!latestTerm) return false
-    const c = latestTerm.chamber.toLowerCase()
-    return chamber === 'senate'
-      ? c === 'senate'
-      : c === 'house of representatives' || c === 'house'
-  })
+  return data.members ?? []
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -185,7 +185,7 @@ async function buildAndClassifyFederal(
     office,
     officeType,
     district,
-    party: partyDisplay(member.party),
+    party: partyDisplay(member.partyName),
     coverageTier: 'federal' as const,
     sourcedFrom: ['congress.gov'],
   }
@@ -332,16 +332,12 @@ export async function fetchCurrentOfficials(
   type StateResult = { people: OpenStatesPerson[]; error: SourceError | null }
 
   const [federalResult, stateResult, governorResult] = await Promise.all([
-    // Federal: senate + house together so one sourceError covers both
+    // Federal: one path-based state call returns all current members (both chambers).
+    // Client-side filters by chamber and, for house, by district number.
     (async (): Promise<FederalResult> => {
       try {
-        const [senate, house] = await Promise.all([
-          fetchCongressCurrentMembers(stateUpper, 'senate'),
-          congressionalDistrict !== null
-            ? fetchCongressCurrentMembers(stateUpper, 'house', congressionalDistrict)
-            : Promise.resolve([] as CongressMember[]),
-        ])
-        return { members: [...senate, ...house], error: null }
+        const members = await fetchCongressStateMembers(stateUpper)
+        return { members, error: null }
       } catch (e) {
         return { members: [], error: { source: 'federal', message: e instanceof Error ? e.message : String(e) } }
       }
@@ -386,7 +382,11 @@ export async function fetchCurrentOfficials(
   }).slice(0, 2)
   const houseMembers = federalResult.members.filter((m) => {
     const c = m.terms?.item?.at(-1)?.chamber?.toLowerCase() ?? ''
-    return c === 'house of representatives' || c === 'house'
+    const isHouse = c === 'house of representatives' || c === 'house'
+    if (!isHouse) return false
+    // Filter to the user's specific congressional district
+    if (congressionalDistrict === null) return false
+    return m.district === congressionalDistrict
   })
 
   const stateUpperPeople = stateResult.people.filter((p) => {
@@ -394,7 +394,13 @@ export async function fetchCurrentOfficials(
     return org === 'upper' || org === 'legislature'
   })
   const stateLowerPeople = stateResult.people.filter((p) => p.current_role?.org_classification === 'lower')
-  const governorPeople = governorResult.people
+
+  // Filter executive results to exactly "Governor" — Open States returns all statewide
+  // executive officers (Governor, Lieutenant Governor, etc.) and lists them in arbitrary
+  // order. A naive [0] pick or .includes('governor') check matches Lt. Governor.
+  const governorPerson = governorResult.people.find(
+    (p) => p.current_role?.title?.toLowerCase() === 'governor'
+  )
 
   // Classify all in parallel
   const senateOcdId = `ocd-division/country:us/state:${stateUpper.toLowerCase()}`
@@ -429,15 +435,16 @@ export async function fetchCurrentOfficials(
     !isUnicameral && stateLowerPeople[0] && stateHouseDistrict !== null
       ? buildAndClassifyStateLeg(stateLowerPeople[0], state, 'lower', stateHouseDistrict).catch(() => null)
       : Promise.resolve(null),
-    governorPeople[0]
-      ? buildAndClassifyGovernor(governorPeople[0], state).catch(() => null)
+    governorPerson
+      ? buildAndClassifyGovernor(governorPerson, state).catch(() => null)
       : Promise.resolve(null),
   ])
 
-  // Governor coverage note: only when the fetch SUCCEEDED but returned no person.
-  // If the fetch errored, it's already in sourceErrors — not a coverage claim.
+  // Governor coverage note: only when the fetch SUCCEEDED but no "Governor"-titled
+  // person was found. Covers both genuinely missing data and states where Open States
+  // returns only non-Governor executive officers.
   const governorCoverageNote =
-    !governorResult.error && governorPeople.length === 0
+    !governorResult.error && governorPerson === undefined
       ? 'Governor data not available for this state via Open States. Check your state\'s official website.'
       : undefined
 
