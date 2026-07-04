@@ -5,7 +5,7 @@ import { useQuizStore, savePendingAddress } from '@/store/quizStore'
 import AddressAutocomplete from '@/components/ui/AddressAutocomplete'
 import { PILLAR_ONE } from '@/lib/config/pillarOne'
 import { usePillarOneMode } from '@/components/providers/PillarOneModeProvider'
-import LockedPillarGate from '@/components/ui/LockedPillarGate'
+import UnlockBanner from '@/components/ui/UnlockBanner'
 import { getUnlockState } from '@/lib/quiz/unlockState'
 import { matchRace, ALL_DIMENSIONS } from '@/lib/engine/match'
 import { buildMatchKey } from '@/lib/engine/buildMatchKey'
@@ -1030,10 +1030,12 @@ function YourBallotHoldingState({
   completionPercent,
   userId,
   hasProfile,
+  unlockPillar1 = true,
 }: {
   completionPercent: number
   userId: string | null
   hasProfile: boolean
+  unlockPillar1?: boolean
 }) {
   const [userEmail, setUserEmail] = useState<string | null>(null)
   const [savedAddress, setSavedAddress] = useState<string | null>(null)
@@ -1063,6 +1065,10 @@ function YourBallotHoldingState({
 
   return (
     <main style={{ maxWidth: 860, margin: '0 auto', padding: 'var(--space-8) var(--space-4)' }}>
+
+      {!unlockPillar1 && (
+        <UnlockBanner pillarName="candidates" />
+      )}
 
       {/* Page header */}
       <div style={{ marginBottom: 'var(--space-10)' }}>
@@ -1304,29 +1310,19 @@ export default function YourBallotPage() {
     })
   }
 
-  // ── Season routing — MUST run before the Unlock Ladder (SPEC §22b.1) ────────
-  // Officials mode is exempt from the §2 Unlock Ladder: Public Lookup Mode is
-  // explicitly designed to work with zero quiz data, so "unlocked" (= enough
-  // data to match values) doesn't apply here.
-  // Ballot mode keeps the existing Layer-3 requirement.
+  // ── Season routing ────────────────────────────────────────────────────────────
+  // Officials mode is always accessible — Public Lookup Mode (§22b.6) is designed
+  // to work with zero quiz data. The unlock banner is not shown in officials mode
+  // because the hasProfile fork inside YourOfficialsMode already handles the
+  // unclassified vs. classified split.
   if (pillarOneMode === 'officials') {
     return <YourOfficialsMode completionPercent={completionPercent} userId={userId} hasProfile={hasProfile} />
   }
 
-  // ── Unlock gate (SPEC §2 Unlock Ladder) — ballot mode only ───────────────────
-  if (!unlock.pillar1) {
-    return (
-      <LockedPillarGate
-        pillarName={p1.tileTitle}
-        description={`${p1.tileBlurb} Unlocks after Layer 3 of the quiz.`}
-        unlocksAfterLayer={3}
-        accentColor="var(--color-red)"
-      />
-    )
-  }
-
+  // ── Ballot mode — lock is never a wall (SPEC §2 Unlock Ladder, Pillar 1 exception) ──
+  // Below Layer 3: show public lookup path + unlock banner. Never a hard gate.
   if (!BALLOT_DATA_READY) {
-    return <YourBallotHoldingState completionPercent={completionPercent} userId={userId} hasProfile={hasProfile} />
+    return <YourBallotHoldingState completionPercent={completionPercent} userId={userId} hasProfile={hasProfile} unlockPillar1={unlock.pillar1} />
   }
 
   return (
@@ -1380,8 +1376,11 @@ export default function YourBallotPage() {
         )}
       </div>
 
-      {/* ── §22b.6 — Public Lookup (no profile) vs. full classified view (has profile) ── */}
-      {!hasProfile ? (
+      {/* ── §22b.6 + §2 Unlock Ladder: public lookup for no-profile OR pre-Layer-3 ── */}
+      {!unlock.pillar1 && (
+        <UnlockBanner pillarName="candidates" />
+      )}
+      {(!hasProfile || !unlock.pillar1) ? (
         <PublicLookupGate mode="ballot" />
       ) : (
         <>

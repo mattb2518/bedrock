@@ -74,7 +74,8 @@ Each layer completion unlocks a pillar. This is the reward architecture: complet
 | Layer 4 | No new pillar — sharpens Pillar 1 with dealbreaker exclusions | Framed as "give it its edge" |
 
 **Gating rules:**
-- Pillar routes check the user's layer completion. A locked pillar page renders a locked state: one-paragraph description of the pillar, which layer unlocks it, and a "Resume the quiz" CTA deep-linking to their exact position. No pillar content is rendered behind the lock.
+- Pillar routes check the user's layer completion. For Conversations, Media Diet, and Beyond Your Ballot, a locked pillar page renders a locked state: one-paragraph description, which layer unlocks it, and a "Resume the quiz" CTA deep-linking to their exact position — no pillar content behind the lock.
+- **Pillar 1 exception — the lock is never a wall.** Public Lookup Mode (§22b.6) takes precedence: any visitor below Layer 3, anonymous or signed in, gets the public lookup experience (basic officials/candidate records for their address, zero classification calls) with a persistent unlock banner: "Complete Layer 3 of the quiz to see how they match your values." The values-matched experience — classification, constellation overlay, convergence notes, dealbreaker flags — unlocks at Layer 3. This tightens §22b.6's cost boundary: classification is now bounded to Layer-3 completers rather than all profile-holders.
 - Pillar 1's locked state reads all labels/blurbs from PILLAR_ONE[mode] (§22c) — a season flip touches zero unlock copy.
 - This ladder supersedes prior per-page soft-gate thresholds (§22.3 quiz gate, Media Diet no-profile gate) where they conflict. Those in-page mechanics are unified into the ladder's locked state; post-unlock depth prompts (e.g., "complete Layer 4 to sharpen with dealbreakers") remain.
 - Homepage and /results pillar cards show a small lock badge + "Unlocks after Layer N" on locked pillars, and an "Unlocked" treatment on available ones.
@@ -3058,6 +3059,8 @@ Both Your Officials and Your Ballot (when BALLOT_DATA_READY) show an address ent
 This is a genuine cost/abuse control: classification triggers live LLM calls per official on first lookup. Gating that behind "has a quiz profile" keeps anonymous, high-volume, or bot traffic from becoming an unbounded cost surface, while still giving real value (the factual lookup) to everyone.
 
 The address-entry + basic-list + single-CTA pattern is built ONCE as a shared `PublicLookupGate` (`src/components/civic/PublicLookupGate.tsx`) reused by both modes. Ballot mode's gate is dormant until `BALLOT_DATA_READY` flips true in `currentOfficials.ts`.
+
+Gating interaction (§2 Unlock Ladder): the classified experience requires Layer 3 complete. All visitors below that threshold — including profile-holders at Layers 1–2 — receive the unclassified public-lookup view with an unlock banner. The lookup itself is never gated.
 
 **LOCKED copy (§22b.6):**
 - Officials intro: "Find out who represents you — right now, no account needed."
