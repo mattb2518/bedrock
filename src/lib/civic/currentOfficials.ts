@@ -419,10 +419,14 @@ export async function fetchCurrentOfficialsUnclassified(
   const stateUpper = state.toUpperCase()
   const isUnicameral = UNICAMERAL_STATES.has(stateUpper)
 
-  // DIAGNOSTIC — Batch 8: log exact key names Vercel injects at runtime (no values). Remove after fix.
+  // DIAGNOSTIC — Batch 8/10: log key names + CONGRESS key length (no values). Remove after fix.
   console.log(
     '[env diag] all process.env keys containing CONGRESS or FEC or OPENSTATES:',
     Object.keys(process.env).filter(k => /congress|fec|openstates/i.test(k))
+  )
+  console.log(
+    '[env diag] CONGRESS_GOV_API_KEY length:',
+    process.env.CONGRESS_GOV_API_KEY?.length ?? 'undefined'
   )
 
   const missingKeys: string[] = []
@@ -547,10 +551,14 @@ export async function fetchCurrentOfficials(
   const isUnicameral = UNICAMERAL_STATES.has(stateUpper)
 
   // Warn loudly if keys are missing — missing key ≠ empty district.
-  // DIAGNOSTIC — Batch 8/9: log exact key names Vercel injects at runtime (no values). Remove after fix.
+  // DIAGNOSTIC — Batch 8/9/10: log key names + CONGRESS key length (no values). Remove after fix.
   console.log(
     '[env diag] all process.env keys containing CONGRESS or FEC or OPENSTATES:',
     Object.keys(process.env).filter(k => /congress|fec|openstates/i.test(k))
+  )
+  console.log(
+    '[env diag] CONGRESS_GOV_API_KEY length:',
+    process.env.CONGRESS_GOV_API_KEY?.length ?? 'undefined'
   )
   const missingKeys: string[] = []
   if (!process.env.CONGRESS_GOV_API_KEY) missingKeys.push('CONGRESS_GOV_API_KEY')
