@@ -3,6 +3,8 @@ import { Libre_Baskerville, DM_Sans } from "next/font/google";
 import Script from "next/script";
 import Nav from "@/components/layout/Nav";
 import Footer from "@/components/layout/Footer";
+import { getPillarOneMode } from "@/lib/config/siteConfig";
+import { PillarOneModeProvider } from "@/components/providers/PillarOneModeProvider";
 import SyncProvider from "@/components/providers/SyncProvider";
 import PreviewBar from "@/components/admin/PreviewBar";
 import AccountBanner from "@/components/layout/AccountBanner";
@@ -42,11 +44,12 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const pillarOneMode = await getPillarOneMode()
   return (
     <html
       lang="en"
@@ -72,11 +75,13 @@ export default function RootLayout({
         }}
       >
         <SyncProvider>
-          <PreviewBar />
-          <Nav />
-          <AccountBanner />
-          <main style={{ flex: 1 }}>{children}</main>
-          <Footer />
+          <PillarOneModeProvider mode={pillarOneMode}>
+            <PreviewBar />
+            <Nav pillarOneMode={pillarOneMode} />
+            <AccountBanner />
+            <main style={{ flex: 1 }}>{children}</main>
+            <Footer />
+          </PillarOneModeProvider>
         </SyncProvider>
       </body>
     </html>

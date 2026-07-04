@@ -6,9 +6,11 @@
 // the quiz. Mirrors the in-quiz demographic module's controls. Renders content
 // only; the accordion supplies the tile/title.
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useQuizStore } from '@/store/quizStore'
+import AddressAutocomplete from '@/components/ui/AddressAutocomplete'
+import { createClient } from '@/lib/supabase/client'
 import {
   PARTY_RELATIONSHIP,
   CURRENT_REGISTRATION,
@@ -106,20 +108,42 @@ export default function DemographicsBody() {
 
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState<Demographics>({})
+  const [formattedAddress, setFormattedAddress] = useState<string | null>(null)
+  const [userId, setUserId] = useState<string | null>(null)
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data }) => {
+      const uid = data.user?.id ?? null
+      setUserId(uid)
+      if (uid) {
+        supabase.from('quiz_profiles').select('formatted_address').eq('user_id', uid).maybeSingle().then(({ data: row }) => {
+          if (row?.formatted_address) setFormattedAddress(row.formatted_address)
+        })
+      }
+    })
+  }, [])
+
+  async function handleAddressSelect(addr: string) {
+    setFormattedAddress(addr)
+    if (userId) {
+      await createClient().from('quiz_profiles').upsert({ user_id: userId, formatted_address: addr }, { onConflict: 'user_id' })
+    }
+  }
 
   const demo = session?.demographics
   const hasAny = !!(
-    demo &&
-    (demo.zipCode ||
-      demo.partyRelationship ||
-      demo.currentRegistration ||
-      demo.upbringing ||
-      demo.lineage ||
-      demo.ageRange ||
-      demo.geography ||
-      demo.region ||
-      demo.regionGrewUp ||
-      demo.note)
+    formattedAddress ||
+    (demo &&
+      (demo.partyRelationship ||
+        demo.currentRegistration ||
+        demo.upbringing ||
+        demo.lineage ||
+        demo.ageRange ||
+        demo.geography ||
+        demo.region ||
+        demo.regionGrewUp ||
+        demo.note))
   )
 
   function startEdit() {
@@ -148,26 +172,18 @@ export default function DemographicsBody() {
   if (editing) {
     return (
       <div>
-        {/* ZIP code — functional field for ballot matching, shown first */}
+        {/* Address — §22d: autocomplete, shown first */}
         <div style={{ marginBottom: 'var(--space-6)', paddingBottom: 'var(--space-6)', borderBottom: '1px solid var(--color-border)' }}>
           <label style={{ display: 'block', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-primary)', marginBottom: 'var(--space-1)' }}>
-            ZIP Code
+            Address
             <span style={{ fontWeight: 'normal', color: 'var(--color-text-muted)', marginLeft: 'var(--space-2)' }}>optional</span>
           </label>
           <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', marginBottom: 'var(--space-2)', lineHeight: 'var(--leading-relaxed)' }}>
-            For U.S. voters — lets us match you to the races on your actual ballot and flag national candidates whose views align with yours. Leave it blank and those pillars still work; they just won't filter by your district.
+            For U.S. voters — lets us match you to your actual districts. We only use this to find your districts.
           </p>
-          <input
-            type="text"
-            inputMode="numeric"
-            maxLength={5}
-            placeholder="e.g. 10001"
-            value={draft.zipCode ?? ''}
-            onChange={(e) => {
-              const val = e.target.value.replace(/\D/g, '').slice(0, 5)
-              setDraft((d) => ({ ...d, zipCode: val || undefined }))
-            }}
-            style={{ width: 140, backgroundColor: 'var(--color-bg-input)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md, 8px)', padding: 'var(--space-3) var(--space-4)', fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-primary)', boxSizing: 'border-box' }}
+          <AddressAutocomplete
+            initialValue={formattedAddress ?? ''}
+            onSelect={handleAddressSelect}
           />
         </div>
 
@@ -257,7 +273,7 @@ export default function DemographicsBody() {
       </div>
       {hasAny ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-          {demo?.zipCode && <Row label="ZIP Code" value={demo.zipCode} />}
+          {formattedAddress && <Row label="Address" value={formattedAddress} />}
           <Row label="Relationship to parties" value={demo?.partyRelationship} />
           <Row label="Registered today as" value={demo?.currentRegistration} />
           <Row label="Grew up around" value={demo?.upbringing} />

@@ -3,6 +3,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { getCurrentUserRole } from '@/lib/auth/getRole'
 import ChecklistUI from './ChecklistUI'
 import SeedCatalogButton from './SeedCatalogButton'
+import SeasonToggle from './SeasonToggle'
 
 const CHECKLIST_ITEMS: Array<{ id: string; label: string }> = [
   { id: 'bias_check_quiz',           label: 'Run a bias check on all quiz questions (both passes: left critic, right critic) — extends to methodology copy, media-catalog Partisan Lean flag consistency, and Beyond Your Ballot governance-filter criteria' },
@@ -26,14 +27,18 @@ export default async function AdminOverviewPage() {
   const admin = createAdminClient()
   const role = await getCurrentUserRole()
 
-  const [{ count: pendingCandidates }, { count: pendingSources }, { count: auditTotal }, { count: lowConfidencePending }, { data: checklistRows }] =
+  const [{ count: pendingCandidates }, { count: pendingSources }, { count: auditTotal }, { count: lowConfidencePending }, { data: checklistRows }, { data: siteConfigRow }] =
     await Promise.all([
       admin.from('classified_candidates').select('*', { count: 'exact', head: true }).eq('status', 'pending_review'),
       admin.from('classified_sources').select('*', { count: 'exact', head: true }).eq('status', 'pending_review'),
       admin.from('classification_audit_log').select('*', { count: 'exact', head: true }),
       admin.from('classified_candidates').select('*', { count: 'exact', head: true }).eq('status', 'pending_review').eq('attribution', 'auto_classify'),
       admin.from('admin_checklist').select('item_id, checked'),
+      admin.from('site_config').select('value, updated_at, updated_by').eq('key', 'pillar_one_mode').maybeSingle(),
     ])
+  const currentMode = (siteConfigRow?.value ?? 'officials') as 'ballot' | 'officials'
+  const lastFlipped = siteConfigRow?.updated_at ?? null
+  const lastFlippedBy = siteConfigRow?.updated_by ?? null
 
   const checkedSet = new Set((checklistRows ?? []).filter((r) => r.checked).map((r) => r.item_id))
   const doneCount = checkedSet.size
@@ -67,6 +72,9 @@ export default async function AdminOverviewPage() {
           </Link>
         ))}
       </div>
+
+      {/* Pillar 1 season toggle — §22c */}
+      <SeasonToggle currentMode={currentMode} lastFlipped={lastFlipped} lastFlippedBy={lastFlippedBy} />
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-4)' }}>
         <h2 style={{ fontSize: 'var(--text-body)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-primary)' }}>

@@ -6,6 +6,8 @@ import { useQuizStore } from '@/store/quizStore'
 import MantleReveal from '@/components/quiz/MantleReveal'
 import ProfileDetails from '@/components/quiz/ProfileDetails'
 import { useCallback, useState } from 'react'
+import { PILLAR_ONE } from '@/lib/config/pillarOne'
+import { usePillarOneMode } from '@/components/providers/PillarOneModeProvider'
 
 export default function ResultsPage() {
   const session = useQuizStore((s) => s.session)
@@ -73,14 +75,15 @@ function QuizLinks({ quizComplete }: { quizComplete: boolean }) {
   )
 }
 
-const PILLARS = [
-  { href: '/your-ballot', title: 'Your Ballot', blurb: "Every race matched to your values — president to school board.", accent: 'var(--color-red)' },
-  { href: '/media-diet', title: 'Your Media Diet', blurb: "Independent journalism matched to how you actually think.", accent: 'var(--color-white-warm)' },
-  { href: '/conversations', title: 'Your Conversations', blurb: "Claude-powered prep for hard conversations across difference.", accent: 'var(--color-blue-accent)' },
-  { href: '/beyond-your-ballot', title: 'Beyond Your Ballot', blurb: "Candidates you can't vote for, but who'd shape the country.", accent: 'var(--color-rose)' },
-]
-
 function ResultsNext({ quizComplete }: { quizComplete: boolean }) {
+  const pillarOneMode = usePillarOneMode()
+  const p1 = PILLAR_ONE[pillarOneMode]
+  const PILLARS = [
+    { href: '/your-ballot', title: p1.tileTitle, blurb: p1.tileBlurb, accent: 'var(--color-red)' },
+    { href: '/media-diet', title: 'Your Media Diet', blurb: "Independent journalism matched to how you actually think.", accent: 'var(--color-white-warm)' },
+    { href: '/conversations', title: 'Your Conversations', blurb: "Claude-powered prep for hard conversations across difference.", accent: 'var(--color-blue-accent)' },
+    { href: '/beyond-your-ballot', title: 'Beyond Your Ballot', blurb: "Candidates you can't vote for, but who'd shape the country.", accent: 'var(--color-rose)' },
+  ]
   return (
     <div id="put-it-to-work" style={{ maxWidth: 'var(--max-width-wide)', margin: '0 auto', padding: 'var(--space-8) var(--space-6) var(--space-20)', scrollMarginTop: 'var(--nav-height)' }}>
       <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: 'var(--space-12)' }}>

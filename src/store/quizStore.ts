@@ -52,23 +52,24 @@ interface QuizStore {
   setSessionFromCloud: (partial: Partial<QuizSession>) => void
 }
 
-const PENDING_ZIP_KEY = 'bedrock_pending_zip'
+// §22d: pendingAddress replaces pendingZip. Stores the formatted address string
+// for signed-out users; written to quiz_profiles at account creation.
+const PENDING_ADDRESS_KEY = 'bedrock_pending_address'
 
-export function savePendingZip(zip: string) {
-  try { localStorage.setItem(PENDING_ZIP_KEY, zip) } catch { /* ignore */ }
+export function savePendingAddress(formattedAddress: string) {
+  try { localStorage.setItem(PENDING_ADDRESS_KEY, formattedAddress) } catch { /* ignore */ }
 }
 
-function consumePendingZip(): string | null {
+export function consumePendingAddress(): string | null {
   try {
-    const zip = localStorage.getItem(PENDING_ZIP_KEY)
-    if (zip) localStorage.removeItem(PENDING_ZIP_KEY)
-    return zip
+    const addr = localStorage.getItem(PENDING_ADDRESS_KEY)
+    if (addr) localStorage.removeItem(PENDING_ADDRESS_KEY)
+    return addr
   } catch { return null }
 }
 
 function newSession(): QuizSession {
   const now = new Date().toISOString()
-  const pendingZip = consumePendingZip()
   return {
     id: crypto.randomUUID(),
     currentLayer: 1,
@@ -79,7 +80,6 @@ function newSession(): QuizSession {
     completedLayers: [],
     startedAt: now,
     updatedAt: now,
-    ...(pendingZip ? { demographics: { zipCode: pendingZip } } : {}),
   }
 }
 
@@ -208,13 +208,6 @@ export const useQuizStore = create<QuizStore>()(
             updatedAt: partial.updatedAt ?? new Date().toISOString(),
           }
           const merged = { ...base, ...partial }
-          // Apply any pending ZIP that was saved before a session existed
-          if (!merged.demographics?.zipCode) {
-            const pendingZip = consumePendingZip()
-            if (pendingZip) {
-              merged.demographics = { ...merged.demographics, zipCode: pendingZip }
-            }
-          }
           return { session: merged }
         }),
 

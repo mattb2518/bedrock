@@ -7,17 +7,12 @@ import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useQuizStore } from "@/store/quizStore";
 import type { User } from "@supabase/supabase-js";
+import { PILLAR_ONE, type PillarOneMode } from "@/lib/config/pillarOne";
 
 const topNavLinks = [
   { label: "Civic Mantle", href: "/civic-mantle" },
 ];
-
-const actionsLinks = [
-  { label: "Your Ballot", href: "/your-ballot" },
-  { label: "Beyond Your Ballot", href: "/beyond-your-ballot" },
-  { label: "Your Media Diet", href: "/media-diet" },
-  { label: "Your Conversations", href: "/conversations" },
-];
+// actionsLinks built dynamically inside Nav component (reads pillarOneMode prop)
 
 const aboutLinks = [
   { label: "About Bedrock", href: "/about" },
@@ -41,7 +36,14 @@ function LogoMark() {
   );
 }
 
-export default function Nav() {
+export default function Nav({ pillarOneMode = 'officials' }: { pillarOneMode?: PillarOneMode }) {
+  const pillar1Label = PILLAR_ONE[pillarOneMode].navLabel
+  const actionsLinks = [
+    { label: pillar1Label, href: "/your-ballot" },
+    { label: "Beyond Your Ballot", href: "/beyond-your-ballot" },
+    { label: "Your Media Diet", href: "/media-diet" },
+    { label: "Your Conversations", href: "/conversations" },
+  ]
   const [menuOpen, setMenuOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
   const [actionsOpen, setActionsOpen] = useState(false);

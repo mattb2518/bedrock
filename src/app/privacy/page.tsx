@@ -23,7 +23,8 @@ export default function PrivacyPage() {
         <section>
           <h2 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-h3)", color: "var(--color-text-primary)", marginBottom: "var(--space-4)" }}>What we use it for.</h2>
           {[
-            ["Powering your experience", "Your quiz results are used to build Your Ballot, Your Media Diet, and Your Conversations. That's the whole point."],
+            ["Powering your experience", "Your quiz results are used to build Your Ballot & Your Officials, Your Media Diet, and Your Conversations. That's the whole point."],
+            ["Finding your districts", "Your address is used to find your congressional and state legislative districts, then stored in your profile so you don't have to re-enter it. It is never sold, shared, or used for anything outside district lookup."],
             ["Your conversations", "Your Mantle, your issue positions, and your voting priorities give Claude context about where you're coming from. Your age, your location, and your region are never used — the tool treats you as a thinking person, not a demographic."],
             ["Improving the platform", "Aggregate, anonymous patterns help us improve questions, scoring, and recommendations. Individual profiles are never used for this."],
             ["Contacting you", "Only for account-related communication (password reset, significant platform changes). No marketing email without your explicit opt-in."],

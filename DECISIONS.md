@@ -198,3 +198,15 @@ Revisit in Claude Project sessions when ready to build.
 **Decision:** resolveDistrict migrated off the dead Google Civic Representatives endpoint to divisionsByAddress.
 
 **Why:** Representatives API turned down 2025-04-30; resolveDistrict.ts was still calling it — masked by /your-ballot's HOLDING_STATE, caught during the officials build. Same divisions-keyed response shape; normalizedInput handled defensively (falls back to raw input string). Also fixed operationally: GOOGLE_CIVIC_API_KEY existed only in .env.local, never in Vercel — add to Production alongside new GOOGLE_PLACES_API_KEY.
+
+## 2026-07-03 — Pillar 1 is seasonal: Your Ballot (in season) / Your Officials (off season)
+
+**Decision:** One pillar, two seasonal faces — not a fifth pillar. Season controlled by an admin flag (`site_config.pillar_one_mode`, default `'officials'`), not auto-detection.
+
+**Why:** Five pillars breaks every 2×2 grid and the Beyond Your Ballot naming anchor. Auto-detection rejected: primaries are state-by-state and homepage/nav render before any address exists — season is an editorial judgment via /admin. Three-tier copy system; flipping touches zero copy files. New copy passed a two-critic bias check 2026-07-03; two revisions adopted (dealbreaker exception in scorecard FAQ; data-honesty hedge in officials coverage note).
+
+## 2026-07-03 — ZIP removed as an input everywhere; one canonical address with Google Places Autocomplete (New), Details-free
+
+**Decision:** ZIP removed from quiz, Your Ballot, and Beyond Your Ballot. Shared `AddressAutocomplete` component (server-proxied key, 300 ms debounce, manual fallback) in quiz + both pillar pages; districts stored as promoted scalars in `quiz_profiles`; pages read profile first and show stored address.
+
+**Why:** ZIP can't resolve districts (straddles CD/SLDU/SLDL lines) and Beyond Your Ballot was double-capturing (ZIP banner + address form). No Place Details calls ever — suggestion text feeds `divisionsByAddress`; billing stays in Autocomplete Requests SKU (10 K free/mo, ~$2.83/1 K). Privacy page gains explicit address row. Legacy `zipCode` left in demographics jsonb, read by nothing.

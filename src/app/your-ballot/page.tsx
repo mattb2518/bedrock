@@ -1,7 +1,10 @@
 'use client'
 
 import { useState, useTransition, useMemo, useEffect } from 'react'
-import { useQuizStore, savePendingZip } from '@/store/quizStore'
+import { useQuizStore, savePendingAddress } from '@/store/quizStore'
+import AddressAutocomplete from '@/components/ui/AddressAutocomplete'
+import { PILLAR_ONE } from '@/lib/config/pillarOne'
+import { usePillarOneMode } from '@/components/providers/PillarOneModeProvider'
 import { matchRace, ALL_DIMENSIONS } from '@/lib/engine/match'
 import { buildMatchKey } from '@/lib/engine/buildMatchKey'
 import { resolveDistrict } from '@/lib/civic/resolveDistrict'
@@ -653,6 +656,8 @@ function YourOfficialsMode({
   hasProfile: boolean
 }) {
   const session = useQuizStore((s) => s.session)
+  const pillarOneMode = usePillarOneMode()
+  const p1 = PILLAR_ONE[pillarOneMode]
   const [address, setAddress] = useState('')
   const [resolvedAddress, setResolvedAddress] = useState<string | null>(null)
   const [officials, setOfficials] = useState<CurrentOfficialsBallot | null>(null)
@@ -726,15 +731,15 @@ function YourOfficialsMode({
   return (
     <main style={{ maxWidth: 720, margin: '0 auto', padding: 'var(--space-8) var(--space-4)' }}>
 
-      {/* Eyebrow + headline (§22b.1) */}
+      {/* Eyebrow + headline (reads PILLAR_ONE[mode] per §22c Tier A) */}
       <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-red)', letterSpacing: 'var(--tracking-wider)', textTransform: 'uppercase', marginBottom: 'var(--space-4)' }}>
-        Your Officials
+        {p1.eyebrow}
       </p>
       <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-h1)', color: 'var(--color-text-primary)', lineHeight: 'var(--leading-tight)', marginBottom: 'var(--space-5)' }}>
-        Every office, matched to your values — right now.
+        {p1.h1}
       </h1>
       <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', marginBottom: 'var(--space-6)' }}>
-        Your ballot candidates aren&apos;t finalized yet. In the meantime, see how your currently-serving officials line up against your civic values — using the exact same matching model.
+        {p1.coverageNote}
       </p>
 
       {/* Quiz gate */}
@@ -1044,21 +1049,31 @@ function YourBallotHoldingState({
   userId: string | null
   hasProfile: boolean
 }) {
-  const session = useQuizStore((s) => s.session)
-  const setDemographics = useQuizStore((s) => s.setDemographics)
   const [userEmail, setUserEmail] = useState<string | null>(null)
-  const [zipInput, setZipInput] = useState('')
-  const [zipSaved, setZipSaved] = useState(false)
+  const [savedAddress, setSavedAddress] = useState<string | null>(null)
+  const [showAddressInput, setShowAddressInput] = useState(false)
 
   useEffect(() => {
     if (!userId) return
-    createClient().auth.getUser().then(({ data }) => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data }) => {
       setUserEmail(data.user?.email ?? null)
+    })
+    supabase.from('quiz_profiles').select('formatted_address').eq('user_id', userId).maybeSingle().then(({ data }) => {
+      if (data?.formatted_address) setSavedAddress(data.formatted_address)
     })
   }, [userId])
 
   const isRegistered = Boolean(userId)
-  const hasZip = Boolean(session?.demographics?.zipCode)
+
+  async function handleAddressSelect(formattedAddress: string) {
+    setSavedAddress(formattedAddress)
+    setShowAddressInput(false)
+    savePendingAddress(formattedAddress)
+    if (userId) {
+      await createClient().from('quiz_profiles').upsert({ user_id: userId, formatted_address: formattedAddress }, { onConflict: 'user_id' })
+    }
+  }
 
   return (
     <main style={{ maxWidth: 860, margin: '0 auto', padding: 'var(--space-8) var(--space-4)' }}>
@@ -1082,60 +1097,24 @@ function YourBallotHoldingState({
         </p>
       </div>
 
-      {/* ZIP code — always shown, top of page before sample cards */}
+      {/* Address — §22d: autocomplete or stored-address read path */}
       <div style={{ marginBottom: 'var(--space-8)', padding: 'var(--space-4)', backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-lg)' }}>
-        {hasZip && !zipSaved ? (
+        {savedAddress && !showAddressInput ? (
           <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)' }}>
-            Personalized for ZIP <strong style={{ color: 'var(--color-text-primary)' }}>{session?.demographics?.zipCode}</strong>.{' '}
-            <button onClick={() => { setZipSaved(false); setZipInput('') }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-blue-accent)', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', padding: 0 }}>Change</button>
-          </p>
-        ) : zipSaved && !hasProfile ? (
-          // No session — ZIP is in localStorage, nudge them to sign up or take the quiz
-          <div>
-            <p style={{ margin: '0 0 var(--space-3)', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)' }}>
-              ZIP {zipInput} noted. To get notified when your ballot is ready,{' '}
-              <a href="/signup" style={{ color: 'var(--color-blue-accent)', fontWeight: 'var(--weight-semibold)', textDecoration: 'none' }}>create a free account</a>
-              {' '}with your email — we&apos;ll send you a link the moment your races are live. Or{' '}
-              <a href="/quiz" style={{ color: 'var(--color-blue-accent)', fontWeight: 'var(--weight-semibold)', textDecoration: 'none' }}>take the quiz</a>
-              {' '}to build your full profile and get matched recommendations.
-            </p>
-          </div>
-        ) : zipSaved ? (
-          <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)' }}>
-            ZIP {zipInput} saved. ✓
+            Matched to <strong style={{ color: 'var(--color-text-primary)' }}>{savedAddress}</strong>{' · '}
+            <button onClick={() => setShowAddressInput(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-blue-accent)', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', padding: 0 }}>Change</button>
           </p>
         ) : (
           <>
             <p style={{ margin: '0 0 var(--space-3)', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)' }}>
               {hasProfile
-                ? 'Add your ZIP code so we can personalize your ballot when it\'s ready.'
-                : 'Add your ZIP code to personalize your ballot. Then create an account so we can email you when your races go live.'}
+                ? 'Add your address so we can personalize your ballot when it\'s ready.'
+                : 'Add your address to personalize your ballot. Then create an account so we can email you when your races go live.'}
             </p>
-            <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
-              <input
-                type="text"
-                inputMode="numeric"
-                maxLength={5}
-                placeholder="ZIP code"
-                value={zipInput}
-                onChange={(e) => setZipInput(e.target.value.replace(/\D/g, '').slice(0, 5))}
-                style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', padding: 'var(--space-2) var(--space-3)', backgroundColor: 'var(--color-bg-deep, #0f1f33)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', color: 'var(--color-text-primary)', outline: 'none', width: 120 }}
-              />
-              <button
-                disabled={zipInput.length !== 5}
-                onClick={() => {
-                  if (session) {
-                    setDemographics({ ...session.demographics, zipCode: zipInput })
-                  } else {
-                    savePendingZip(zipInput)
-                  }
-                  setZipSaved(true)
-                }}
-                style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: '#fff', backgroundColor: zipInput.length === 5 ? 'var(--color-blue-accent)' : 'var(--color-border)', border: 'none', borderRadius: 'var(--radius-md)', padding: 'var(--space-2) var(--space-4)', cursor: zipInput.length === 5 ? 'pointer' : 'not-allowed' }}
-              >
-                Save
-              </button>
-            </div>
+            <AddressAutocomplete
+              placeholder="Start typing your street address…"
+              onSelect={handleAddressSelect}
+            />
           </>
         )}
       </div>

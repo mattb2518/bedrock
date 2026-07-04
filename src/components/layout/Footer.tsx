@@ -1,32 +1,36 @@
 import Link from "next/link";
 import Image from "next/image";
+import { getPillarOneMode } from "@/lib/config/siteConfig";
+import { PILLAR_ONE } from "@/lib/config/pillarOne";
 
-const columns = [
-  {
-    heading: "Features",
-    links: [
-      { label: "Take the Quiz", href: "/quiz" },
-      { label: "Your Ballot", href: "/your-ballot" },
-      { label: "Beyond Your Ballot", href: "/beyond-your-ballot" },
-      { label: "Your Media Diet", href: "/media-diet" },
-      { label: "Your Conversations", href: "/conversations" },
-      { label: "My Profile", href: "/profile" },
-    ],
-  },
-  {
-    heading: "About",
-    links: [
-      { label: "About Bedrock", href: "/about" },
-      { label: "Civic Mantle", href: "/civic-mantle" },
-      { label: "How It Works", href: "/how-it-works" },
-      { label: "Trust & Methodology", href: "/methodology" },
-      { label: "FAQ", href: "/faq" },
-      { label: "Privacy & Data", href: "/privacy" },
-    ],
-  },
-];
+export default async function Footer() {
+  const mode = await getPillarOneMode()
+  const pillar1Label = PILLAR_ONE[mode].navLabel
 
-export default function Footer() {
+  const columns = [
+    {
+      heading: "Features",
+      links: [
+        { label: "Take the Quiz", href: "/quiz" },
+        { label: pillar1Label, href: "/your-ballot" },
+        { label: "Beyond Your Ballot", href: "/beyond-your-ballot" },
+        { label: "Your Media Diet", href: "/media-diet" },
+        { label: "Your Conversations", href: "/conversations" },
+        { label: "My Profile", href: "/profile" },
+      ],
+    },
+    {
+      heading: "About",
+      links: [
+        { label: "About Bedrock", href: "/about" },
+        { label: "Civic Mantle", href: "/civic-mantle" },
+        { label: "How It Works", href: "/how-it-works" },
+        { label: "Trust & Methodology", href: "/methodology" },
+        { label: "FAQ", href: "/faq" },
+        { label: "Privacy & Data", href: "/privacy" },
+      ],
+    },
+  ]
   const year = new Date().getFullYear();
 
   return (

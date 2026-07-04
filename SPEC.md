@@ -2946,6 +2946,68 @@ Methodology line: "This shows how your values compare to your representatives' a
 
 ---
 
+## 22c. Pillar 1 Seasonal System
+
+### 22c.1 Concept
+
+One pillar, two seasonal faces. Between elections the pillar is **Your Officials** (off-season default). When the general-election field is set, it becomes **Your Ballot** (in-season). Four pillars total is locked; nothing about the four-pillar grid changes.
+
+### 22c.2 Season flag
+
+`site_config` table, key `pillar_one_mode`, values `'officials'` | `'ballot'`. Default seed: `'officials'`. RLS: anon-readable, service-role-writable. Read via `getPillarOneMode()` (`src/lib/config/siteConfig.ts`) — `unstable_cache`, 60 s TTL, falls back to `'officials'` on any error, never throws.
+
+### 22c.3 PILLAR_ONE constant (`src/lib/config/pillarOne.ts`) — locked copy
+
+Reads from `PILLAR_ONE (§22c)` — see `src/lib/config/pillarOne.ts` for the canonical, locked TypeScript definition.
+
+### 22c.4 Copy tiers
+
+- **Tier A — computed labels** (nav, footer, home tiles, onboarding tour ballot slide, /your-ballot eyebrow/H1/coverage note): read from `PILLAR_ONE[mode]`. Flipping the season touches zero copy files.
+- **Tier B — evergreen prose** (how-it-works, FAQ, methodology): written once, valid for both faces.
+- **Tier C — permanent entries** (FAQ Your Officials items, methodology between-elections paragraph): always visible.
+
+### 22c.5 Admin toggle
+
+`/admin` shows a "Pillar 1 season" card with a flip button and last-flipped audit display. Upserts `site_config` via service-role client. Behind `requireAdminRole`.
+
+### 22c.6 Route notes
+
+`/ballot` and `/beyond-ballot` redirect permanently to `/your-ballot` and `/beyond-your-ballot`. `/your-officials` redirects permanently to `/your-ballot`.
+
+---
+
+## 22d. Canonical Address & District Resolution
+
+### 22d.1 One capture point
+
+`AddressAutocomplete` (`src/components/ui/AddressAutocomplete.tsx`) is the only address entry across the product — quiz demographic step (replaces ZIP), Your Ballot/Officials, Beyond Your Ballot. All ZIP inputs, the `zipCode` write path, and `savePendingZip` are removed. Methodology's "regardless of zip code" prose stays (idiom, not a data field reference). `demographics.zipCode` remains on the TypeScript type as deprecated-legacy; legacy stored values are left in place and read by nothing going forward.
+
+### 22d.2 Autocomplete
+
+Google Places Autocomplete (New), POST `https://places.googleapis.com/v1/places:autocomplete`, US-restricted (`includedRegionCodes`), address-type predictions. Server proxy route `/api/address-autocomplete` keeps `GOOGLE_PLACES_API_KEY` server-side. Client: 300 ms debounce, min 3 chars. Take only `suggestion.placePrediction.text.text` — never call Place Details (stays in the Autocomplete Requests SKU: 10 K free/month, ~$2.83/1 K after). Manual-entry fallback: on proxy error/empty, degrade to plain text input with "Use this address" — Google being down never blocks resolution.
+
+### 22d.3 Resolution & storage
+
+On selection or manual submit: `resolveDistrict(formattedText)` server-side → persist to `quiz_profiles` promoted scalars: `formatted_address text`, `district_state text`, `district_cd smallint`, `district_sldu smallint`, `district_sldl smallint`, `districts_resolved_at timestamptz` (migration `20260703000001`).
+
+### 22d.4 Read path
+
+Pages read profile first; if `formatted_address` present, skip the form and render "Matched to \<formatted_address\> · Change". Signed-out: `savePendingAddress` / `consumePendingAddress` (localStorage, key `bedrock_pending_address`) replaces `savePendingZip`; written to profile at account creation.
+
+### 22d.5 Quiz demographic step — locked copy
+
+- Prompt: "What's your address?"
+- Helper: "For U.S. voters — lets us match you to your actual districts: the people on your ballot, and the officials already representing you. Optional."
+- Placeholder: "Start typing your street address…"
+- Reassurance: "We only use this to find your districts. Stored in your profile so you never have to retype it — edit or delete it anytime."
+- Skip behavior: unchanged.
+
+### 22d.6 Environment / keys
+
+`GOOGLE_PLACES_API_KEY` (server-only, API-restricted to Places API (New)) — set in Vercel scoped to Production and in `.env.local`. The Civic API key remains separate, restricted to the Civic Information API.
+
+---
+
 ## 23. Beyond Your Ballot
 
 ### 23.1 Page intro copy

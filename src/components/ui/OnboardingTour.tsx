@@ -2,61 +2,11 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
+import { PILLAR_ONE, type PillarOneMode } from '@/lib/config/pillarOne'
 
 const TOUR_KEY = 'bedrock_tour_seen'
 
-// ── Slide content ─────────────────────────────────────────────────────────────
-
-const SLIDES = [
-  {
-    id: 'mission',
-    headline: "You're not red. You're not blue.",
-    subhead: "You're more complicated than that — and so is your vote.",
-    body: "Bedrock is a civic identity platform for independent-minded voters. One values quiz. Four tools to help you understand what you actually believe, vote it, read it, talk about it, and fund it.",
-    accent: 'var(--color-blue)',
-    pill: 'Welcome to Bedrock.guide',
-  },
-  {
-    id: 'quiz',
-    headline: "It starts with how you think — not where you stand.",
-    subhead: "Most civic tools ask about issues. We ask about values.",
-    body: "14 questions. About 12 minutes. No wrong answers — only honest ones.",
-    accent: 'var(--color-gold)',
-    hasQuizCard: true,
-  },
-  {
-    id: 'ballot',
-    headline: "Your Ballot",
-    subhead: "Every race. Matched to your values.",
-    body: "Personalized ballot recommendations from president to school board — including the downballot races that shape your daily life and are hardest to research on your own. Candidate data is actively maintained and growing — coverage expands as we approach each election.",
-    accent: 'var(--color-red)',
-    pill: 'Action 1',
-  },
-  {
-    id: 'byb',
-    headline: "Beyond Your Ballot",
-    subhead: "Your values, applied beyond your district.",
-    body: "Find candidates outside your own district who match your values and are running in races where your support could actually shift the balance of power. Donate. Get involved. Think nationally.",
-    accent: 'var(--color-rose)',
-    pill: 'Action 2',
-  },
-  {
-    id: 'media',
-    headline: "Your Media Diet",
-    subhead: "Independent journalism, matched to how you think.",
-    body: "Not an echo chamber. Not a fire hose. A curated shortlist of journalists, Substacks, and podcasts — in three tiers: what confirms your thinking, what expands it, and what challenges it. Every source matched against your eight-dimension civic profile.",
-    accent: 'var(--color-blue)',
-    pill: 'Action 3',
-  },
-  {
-    id: 'conversations',
-    headline: "Your Conversations",
-    subhead: "Talk across difference without losing your mind.",
-    body: "A Claude-powered tool for preparing and navigating hard civic conversations — with family, colleagues, anyone. Uses your actual profile as context. Not a debate coach. A thinking partner.",
-    accent: 'var(--color-gold)',
-    pill: 'Action 4',
-  },
-]
+// Slide content is built dynamically inside OnboardingTour (reads pillarOneMode prop)
 
 // ── Quiz card (slide 2 only) ──────────────────────────────────────────────────
 
@@ -151,7 +101,58 @@ const variants = {
 
 // ── Main component ────────────────────────────────────────────────────────────
 
-export default function OnboardingTour() {
+export default function OnboardingTour({ pillarOneMode = 'officials' }: { pillarOneMode?: PillarOneMode }) {
+  const p1 = PILLAR_ONE[pillarOneMode]
+  const SLIDES = [
+    {
+      id: 'mission',
+      headline: "You're not red. You're not blue.",
+      subhead: "You're more complicated than that — and so is your vote.",
+      body: "Bedrock is a civic identity platform for independent-minded voters. One values quiz. Four tools to help you understand what you actually believe, vote it, read it, talk about it, and fund it.",
+      accent: 'var(--color-blue)',
+      pill: 'Welcome to Bedrock.guide',
+    },
+    {
+      id: 'quiz',
+      headline: "It starts with how you think — not where you stand.",
+      subhead: "Most civic tools ask about issues. We ask about values.",
+      body: "14 questions. About 12 minutes. No wrong answers — only honest ones.",
+      accent: 'var(--color-gold)',
+      hasQuizCard: true,
+    },
+    {
+      id: 'ballot',
+      headline: p1.tileTitle,
+      subhead: p1.tourSubhead,
+      body: p1.tourBody,
+      accent: 'var(--color-red)',
+      pill: 'Action 1',
+    },
+    {
+      id: 'byb',
+      headline: "Beyond Your Ballot",
+      subhead: "Your values, applied beyond your district.",
+      body: "Find candidates outside your own district who match your values and are running in races where your support could actually shift the balance of power. Donate. Get involved. Think nationally.",
+      accent: 'var(--color-rose)',
+      pill: 'Action 2',
+    },
+    {
+      id: 'media',
+      headline: "Your Media Diet",
+      subhead: "Independent journalism, matched to how you think.",
+      body: "Not an echo chamber. Not a fire hose. A curated shortlist of journalists, Substacks, and podcasts — in three tiers: what confirms your thinking, what expands it, and what challenges it. Every source matched against your eight-dimension civic profile.",
+      accent: 'var(--color-blue)',
+      pill: 'Action 3',
+    },
+    {
+      id: 'conversations',
+      headline: "Your Conversations",
+      subhead: "Talk across difference without losing your mind.",
+      body: "A Claude-powered tool for preparing and navigating hard civic conversations — with family, colleagues, anyone. Uses your actual profile as context. Not a debate coach. A thinking partner.",
+      accent: 'var(--color-gold)',
+      pill: 'Action 4',
+    },
+  ]
   const [visible, setVisible] = useState(false)
   const [index, setIndex] = useState(0)
   const [direction, setDirection] = useState(1)

@@ -13,6 +13,8 @@ import { usePreviewStore } from '@/store/previewStore'
 import Constellation from '@/components/ui/Constellation'
 import { MANTLES, mantleFor, type Mantle } from '@/lib/quiz/mantles'
 import { profileToRadar, isCentered } from '@/lib/quiz/dimensions'
+import { PILLAR_ONE } from '@/lib/config/pillarOne'
+import { usePillarOneMode } from '@/components/providers/PillarOneModeProvider'
 
 function FlipCard({ mantle, large = false, flipped, onFlip }: { mantle: Mantle; large?: boolean; flipped: boolean; onFlip: () => void }) {
   const pad = large ? 'var(--space-8)' : 'var(--space-5)'
@@ -58,6 +60,8 @@ export default function YourMantlePage() {
   const session = useQuizStore((s) => s.session)
   const { mode, previewResult } = usePreviewStore()
   const result = mode !== 'myself' ? previewResult : (session?.result ?? null)
+  const pillarOneMode = usePillarOneMode()
+  const p1 = PILLAR_ONE[pillarOneMode]
 
   const major = result ? mantleFor(result.primaryType) : null
   const minors = (result?.secondaryTypes ?? []).slice(0, 2).map(mantleFor)
@@ -162,7 +166,7 @@ export default function YourMantlePage() {
         </div>
         <div className="ym-pillars">
           {[
-            { href: '/your-ballot', title: 'Your Ballot', blurb: 'Every race matched to your values — president to school board.', accent: 'var(--color-red)' },
+            { href: '/your-ballot', title: p1.tileTitle, blurb: p1.tileBlurb, accent: 'var(--color-red)' },
             { href: '/media-diet', title: 'Your Media Diet', blurb: 'Independent journalism matched to how you actually think.', accent: 'var(--color-white-warm)' },
             { href: '/conversations', title: 'Your Conversations', blurb: 'Claude-powered prep for hard conversations across difference.', accent: 'var(--color-blue-accent)' },
             { href: '/beyond-your-ballot', title: 'Beyond Your Ballot', blurb: "Candidates you can't vote for, but who'd shape the country.", accent: 'var(--color-rose)' },
