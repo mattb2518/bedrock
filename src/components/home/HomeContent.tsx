@@ -10,16 +10,19 @@ import { useQuizStore } from "@/store/quizStore";
 import { mantleFor } from "@/lib/quiz/mantles";
 import { profileToRadar, DIMENSIONS, poleLabel } from "@/lib/quiz/dimensions";
 import type { DimensionalProfile } from "@/types/quiz";
+import { PILLAR_ONE, type PillarOneMode } from "@/lib/config/pillarOne";
+import { usePreviewStore } from "@/store/previewStore";
 
 // ── Shared pillar cards ───────────────────────────────────────────────────────
 
-function PillarCards() {
+function PillarCards({ pillarOneMode }: { pillarOneMode: PillarOneMode }) {
+  const p1 = PILLAR_ONE[pillarOneMode]
   return (
     <div className="pillar-grid">
       <Link href="/your-ballot" style={{ textDecoration: "none", display: "block", height: "100%" }}>
         <div style={{ backgroundColor: "var(--color-bg-surface)", border: "1px solid var(--color-border)", borderRadius: "var(--radius-lg)", padding: "var(--space-8)", borderTop: "3px solid var(--color-red)", transition: "var(--transition-base)", cursor: "pointer", height: "100%", boxSizing: "border-box" }}>
-          <h3 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-h3)", color: "var(--color-text-primary)", marginBottom: "var(--space-3)" }}>Your Ballot</h3>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-body)", color: "var(--color-text-secondary)", lineHeight: "var(--leading-relaxed)" }}>Every race, matched to your values. From president to school board.</p>
+          <h3 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-h3)", color: "var(--color-text-primary)", marginBottom: "var(--space-3)" }}>{p1.tileTitle}</h3>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-body)", color: "var(--color-text-secondary)", lineHeight: "var(--leading-relaxed)" }}>{p1.tileBlurb}</p>
         </div>
       </Link>
 
@@ -49,7 +52,7 @@ function PillarCards() {
 
 // ── Public homepage layout ────────────────────────────────────────────────────
 
-function PublicHome() {
+function PublicHome({ pillarOneMode }: { pillarOneMode: PillarOneMode }) {
   return (
     <>
       <HeroSlider />
@@ -123,7 +126,7 @@ function PublicHome() {
               Your Civic Mantle isn&apos;t just a label — it&apos;s the engine. Everything below is built on top of it.
             </p>
           </div>
-          <PillarCards />
+          <PillarCards pillarOneMode={pillarOneMode} />
         </div>
         <style>{`
           .pillar-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 1fr; gap: var(--space-6); max-width: 760px; margin: 0 auto; }
@@ -136,7 +139,7 @@ function PublicHome() {
 
 // ── Returning-user homepage layout ────────────────────────────────────────────
 
-function ReturningHome() {
+function ReturningHome({ pillarOneMode }: { pillarOneMode: PillarOneMode }) {
   const session = useQuizStore((s) => s.session);
   const result = session?.result;
   const major = result ? mantleFor(result.primaryType) : null;
@@ -179,7 +182,7 @@ function ReturningHome() {
               Everything built on your civic mantle.
             </h2>
           </div>
-          <PillarCards />
+          <PillarCards pillarOneMode={pillarOneMode} />
         </div>
         <style>{`
           .pillar-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 1fr; gap: var(--space-6); max-width: 760px; margin: 0 auto; }
@@ -236,12 +239,16 @@ function ReturningHome() {
 
 // ── Root export ───────────────────────────────────────────────────────────────
 
-export default function HomeContent() {
+export default function HomeContent({ pillarOneMode = 'officials' }: { pillarOneMode?: PillarOneMode }) {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   const hasResult = useQuizStore((s) => !!s.session?.result);
+  const { mode } = usePreviewStore();
 
   // Before mount: render public layout to avoid hydration mismatch
-  if (!mounted || !hasResult) return <PublicHome />;
-  return <ReturningHome />;
+  if (!mounted) return <PublicHome pillarOneMode={pillarOneMode} />;
+  // Preview overrides: new_user forces public layout, mantle forces returning layout
+  if (mode === 'new_user') return <PublicHome pillarOneMode={pillarOneMode} />;
+  if (!hasResult) return <PublicHome pillarOneMode={pillarOneMode} />;
+  return <ReturningHome pillarOneMode={pillarOneMode} />;
 }
