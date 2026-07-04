@@ -864,7 +864,12 @@ function YourOfficialsMode({
                   Note: {officials.governorCoverageNote}
                 </p>
               )}
-              {officialsToShow.length === 0 && (
+              {officialsToShow.length === 0 && officials.sourceErrors.length > 0 && (
+                <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)' }}>
+                  We hit a problem loading your officials — this one&apos;s on us. Try again shortly.
+                </p>
+              )}
+              {officialsToShow.length === 0 && officials.sourceErrors.length === 0 && (
                 <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)' }}>
                   No officials found for this address. Check back later.
                 </p>

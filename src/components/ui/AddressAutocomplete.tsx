@@ -35,6 +35,7 @@ export default function AddressAutocomplete({
   const [open, setOpen] = useState(false)
   const [activeIndex, setActiveIndex] = useState(-1)
   const [manualMode, setManualMode] = useState(false)
+  const [proxyDown, setProxyDown] = useState(false)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const listboxId = useId()
   const inputRef = useRef<HTMLInputElement>(null)
@@ -48,6 +49,13 @@ export default function AddressAutocomplete({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ input: query }),
       })
+      if (!res.ok) {
+        setSuggestions([])
+        setOpen(false)
+        setManualMode(true)
+        setProxyDown(true)
+        return
+      }
       const data = await res.json()
       const texts: string[] = (data.suggestions ?? [])
         .map((s: Suggestion) => s.placePrediction?.text?.text ?? '')
@@ -60,6 +68,7 @@ export default function AddressAutocomplete({
       setSuggestions([])
       setOpen(false)
       setManualMode(true)
+      setProxyDown(true)
     }
   }, [])
 
@@ -68,6 +77,7 @@ export default function AddressAutocomplete({
     setInput(val)
     setActiveIndex(-1)
     setManualMode(false)
+    setProxyDown(false)
     if (debounceRef.current) clearTimeout(debounceRef.current)
     debounceRef.current = setTimeout(() => fetchSuggestions(val), DEBOUNCE_MS)
   }
@@ -147,9 +157,14 @@ export default function AddressAutocomplete({
         }}
       />
 
-      {/* Manual fallback: "Use this address" when no suggestions returned */}
+      {/* Manual fallback: "Use this address" when no suggestions returned or proxy down */}
       {manualMode && input.trim().length >= 3 && (
         <div style={{ marginTop: 'var(--space-2)' }}>
+          {proxyDown && (
+            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', marginBottom: 'var(--space-2)', lineHeight: 'var(--leading-relaxed)' }}>
+              Address suggestions are unavailable right now — type your full address and press Enter.
+            </p>
+          )}
           <button
             type="button"
             onClick={() => onSelect(input.trim())}

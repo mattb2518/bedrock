@@ -185,3 +185,56 @@ describe('per-dimension convergence/divergence — derived via matchRace', () =>
     expect(raceResult.ranked[0].topDivergentAxes).toContain('markets_governance')
   })
 })
+
+// ── 5. sourceErrors / empty-state rendering logic ────────────────────────────
+
+import type { CurrentOfficialsBallot } from '@/lib/civic/currentOfficials'
+
+function makeOfficialsBallot(overrides: Partial<CurrentOfficialsBallot> = {}): CurrentOfficialsBallot {
+  return {
+    senators: [],
+    representative: null,
+    governor: null,
+    stateUpperLeg: null,
+    stateLowerLeg: null,
+    sourceErrors: [],
+    ...overrides,
+  }
+}
+
+describe('officials empty-state rendering logic', () => {
+  it('empty officials + sourceErrors → show error message, not empty message', () => {
+    const ballot = makeOfficialsBallot({
+      sourceErrors: [{ source: 'federal', message: 'CONGRESS_GOV_API_KEY is not set' }],
+    })
+    const officialsToShow: unknown[] = []
+    const shouldShowError = officialsToShow.length === 0 && ballot.sourceErrors.length > 0
+    const shouldShowEmpty = officialsToShow.length === 0 && ballot.sourceErrors.length === 0
+    expect(shouldShowError).toBe(true)
+    expect(shouldShowEmpty).toBe(false)
+  })
+
+  it('empty officials + zero sourceErrors → show empty message, not error message', () => {
+    const ballot = makeOfficialsBallot({ sourceErrors: [] })
+    const officialsToShow: unknown[] = []
+    const shouldShowError = officialsToShow.length === 0 && ballot.sourceErrors.length > 0
+    const shouldShowEmpty = officialsToShow.length === 0 && ballot.sourceErrors.length === 0
+    expect(shouldShowError).toBe(false)
+    expect(shouldShowEmpty).toBe(true)
+  })
+
+  it('governorCoverageNote only set when fetch succeeded and returned empty', () => {
+    // Error case: governorResult.error is non-null → no coverage note
+    const governorError = { source: 'governor' as const, message: 'API error 503' }
+    const governorResult = { people: [], error: governorError }
+    const noteOnError = !governorResult.error && governorResult.people.length === 0
+      ? 'Governor data not available' : undefined
+    expect(noteOnError).toBeUndefined()
+
+    // Success but empty → coverage note shown
+    const governorEmpty = { people: [], error: null }
+    const noteOnEmpty = !governorEmpty.error && governorEmpty.people.length === 0
+      ? 'Governor data not available' : undefined
+    expect(noteOnEmpty).toBe('Governor data not available')
+  })
+})

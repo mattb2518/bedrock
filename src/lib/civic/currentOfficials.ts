@@ -52,14 +52,21 @@ export interface CurrentOfficial extends CandidateRecord {
   lowConfidence: boolean
 }
 
+export interface SourceError {
+  source: 'federal' | 'stateLeg' | 'governor'
+  message: string
+}
+
 export interface CurrentOfficialsBallot {
   senators: CurrentOfficial[]        // up to 2 US Senators
   representative: CurrentOfficial | null  // 1 US House rep
   governor: CurrentOfficial | null
   stateUpperLeg: CurrentOfficial | null  // State Senate
   stateLowerLeg: CurrentOfficial | null  // State House/Assembly
-  /** Set when governor lookup could not return a result for this state. */
+  /** Set when governor lookup SUCCEEDED but returned no person for this state. */
   governorCoverageNote?: string
+  /** Non-empty when one or more upstream fetches threw (vs. genuinely empty district). */
+  sourceErrors: SourceError[]
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -309,26 +316,85 @@ export async function fetchCurrentOfficials(
   const stateUpper = state.toUpperCase()
   const isUnicameral = UNICAMERAL_STATES.has(stateUpper)
 
-  // Fetch raw official data in parallel
-  const [
-    senateMembers,
-    houseMembers,
-    stateUpperPeople,
-    stateLowerPeople,
-    governorPeople,
-  ] = await Promise.all([
-    fetchCongressCurrentMembers(stateUpper, 'senate').catch(() => [] as CongressMember[]),
-    congressionalDistrict !== null
-      ? fetchCongressCurrentMembers(stateUpper, 'house', congressionalDistrict).catch(() => [] as CongressMember[])
-      : Promise.resolve([] as CongressMember[]),
-    stateSenateDistrict !== null
-      ? fetchOpenStatesCurrentOfficials(state, isUnicameral ? 'legislature' : 'upper', stateSenateDistrict).catch(() => [] as OpenStatesPerson[])
-      : Promise.resolve([] as OpenStatesPerson[]),
-    !isUnicameral && stateHouseDistrict !== null
-      ? fetchOpenStatesCurrentOfficials(state, 'lower', stateHouseDistrict).catch(() => [] as OpenStatesPerson[])
-      : Promise.resolve([] as OpenStatesPerson[]),
-    fetchOpenStatesCurrentOfficials(state, 'executive').catch(() => [] as OpenStatesPerson[]),
+  // Warn loudly if keys are missing — missing key ≠ empty district.
+  const missingKeys: string[] = []
+  if (!process.env.CONGRESS_GOV_API_KEY) missingKeys.push('CONGRESS_GOV_API_KEY')
+  if (!process.env.OPENSTATES_API_KEY) missingKeys.push('OPENSTATES_API_KEY')
+  if (missingKeys.length > 0) {
+    console.error('fetchCurrentOfficials: missing required env var(s):', missingKeys.join(', '))
+  }
+
+  const sourceErrors: SourceError[] = []
+
+  // ── Fetch raw official data in parallel, tracking per-source errors ──────────
+
+  type FederalResult = { members: CongressMember[]; error: SourceError | null }
+  type StateResult = { people: OpenStatesPerson[]; error: SourceError | null }
+
+  const [federalResult, stateResult, governorResult] = await Promise.all([
+    // Federal: senate + house together so one sourceError covers both
+    (async (): Promise<FederalResult> => {
+      try {
+        const [senate, house] = await Promise.all([
+          fetchCongressCurrentMembers(stateUpper, 'senate'),
+          congressionalDistrict !== null
+            ? fetchCongressCurrentMembers(stateUpper, 'house', congressionalDistrict)
+            : Promise.resolve([] as CongressMember[]),
+        ])
+        return { members: [...senate, ...house], error: null }
+      } catch (e) {
+        return { members: [], error: { source: 'federal', message: e instanceof Error ? e.message : String(e) } }
+      }
+    })(),
+
+    // State leg: upper + lower together
+    (async (): Promise<StateResult> => {
+      try {
+        const [upper, lower] = await Promise.all([
+          stateSenateDistrict !== null
+            ? fetchOpenStatesCurrentOfficials(state, isUnicameral ? 'legislature' : 'upper', stateSenateDistrict)
+            : Promise.resolve([] as OpenStatesPerson[]),
+          !isUnicameral && stateHouseDistrict !== null
+            ? fetchOpenStatesCurrentOfficials(state, 'lower', stateHouseDistrict)
+            : Promise.resolve([] as OpenStatesPerson[]),
+        ])
+        return { people: [...upper, ...lower], error: null }
+      } catch (e) {
+        return { people: [], error: { source: 'stateLeg', message: e instanceof Error ? e.message : String(e) } }
+      }
+    })(),
+
+    // Governor: separate so success-but-empty can be a coverage note, not an error
+    (async (): Promise<{ people: OpenStatesPerson[]; error: SourceError | null }> => {
+      try {
+        const people = await fetchOpenStatesCurrentOfficials(state, 'executive')
+        return { people, error: null }
+      } catch (e) {
+        return { people: [], error: { source: 'governor', message: e instanceof Error ? e.message : String(e) } }
+      }
+    })(),
   ])
+
+  if (federalResult.error) sourceErrors.push(federalResult.error)
+  if (stateResult.error) sourceErrors.push(stateResult.error)
+  if (governorResult.error) sourceErrors.push(governorResult.error)
+
+  // Unpack raw members/people from federal and state results
+  const senateMembers = federalResult.members.filter((m) => {
+    const c = m.terms?.item?.at(-1)?.chamber?.toLowerCase() ?? ''
+    return c === 'senate'
+  }).slice(0, 2)
+  const houseMembers = federalResult.members.filter((m) => {
+    const c = m.terms?.item?.at(-1)?.chamber?.toLowerCase() ?? ''
+    return c === 'house of representatives' || c === 'house'
+  })
+
+  const stateUpperPeople = stateResult.people.filter((p) => {
+    const org = p.current_role?.org_classification
+    return org === 'upper' || org === 'legislature'
+  })
+  const stateLowerPeople = stateResult.people.filter((p) => p.current_role?.org_classification === 'lower')
+  const governorPeople = governorResult.people
 
   // Classify all in parallel
   const senateOcdId = `ocd-division/country:us/state:${stateUpper.toLowerCase()}`
@@ -344,7 +410,7 @@ export async function fetchCurrentOfficials(
     classifiedGovernor,
   ] = await Promise.all([
     Promise.all(
-      senateMembers.slice(0, 2).map((m) =>
+      senateMembers.map((m) =>
         buildAndClassifyFederal(m, `US Senate — ${stateUpper}`, senateOcdId)
       )
     ),
@@ -368,10 +434,10 @@ export async function fetchCurrentOfficials(
       : Promise.resolve(null),
   ])
 
-  // Governor coverage note: if Open States returned no executive-role person for this state,
-  // we note the gap rather than silently showing nothing.
+  // Governor coverage note: only when the fetch SUCCEEDED but returned no person.
+  // If the fetch errored, it's already in sourceErrors — not a coverage claim.
   const governorCoverageNote =
-    governorPeople.length === 0
+    !governorResult.error && governorPeople.length === 0
       ? 'Governor data not available for this state via Open States. Check your state\'s official website.'
       : undefined
 
@@ -382,5 +448,6 @@ export async function fetchCurrentOfficials(
     stateUpperLeg: classifiedUpperLeg,
     stateLowerLeg: classifiedLowerLeg,
     governorCoverageNote,
+    sourceErrors,
   }
 }

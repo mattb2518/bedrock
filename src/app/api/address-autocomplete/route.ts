@@ -24,12 +24,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ suggestions: [] })
   }
 
-  // VERIFY parameter names against Places API (New) docs before deploying:
-  // https://developers.google.com/maps/documentation/places/web-service/place-autocomplete
   const body = {
     input,
     includedRegionCodes: ['us'],
-    includedPrimaryTypes: ['address'],
+    includedPrimaryTypes: ['street_address', 'premise', 'subpremise'],
   }
 
   try {
@@ -46,13 +44,13 @@ export async function POST(req: NextRequest) {
     if (!res.ok) {
       const err = await res.text()
       console.error('Places API error', res.status, err)
-      return NextResponse.json({ suggestions: [] }, { status: 200 })
+      return NextResponse.json({ error: 'upstream', status: res.status }, { status: 502 })
     }
 
     const data = await res.json()
     return NextResponse.json({ suggestions: data.suggestions ?? [] })
   } catch (err) {
     console.error('Places API fetch error', err)
-    return NextResponse.json({ suggestions: [] }, { status: 200 })
+    return NextResponse.json({ error: 'upstream', status: 500 }, { status: 502 })
   }
 }
