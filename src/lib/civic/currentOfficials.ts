@@ -214,6 +214,7 @@ async function buildAndClassifyFederal(
     party: partyDisplay(member.partyName),
     coverageTier: 'federal' as const,
     sourcedFrom: ['congress.gov'],
+    bioguideId: member.bioguideId,
   }
 
   const classified = await getOrClassifyCandidate(entry)
@@ -260,6 +261,8 @@ async function buildAndClassifyStateLeg(
     party: person.party ?? 'Unknown',
     coverageTier: 'state_legislative' as const,
     sourcedFrom: ['openstates'],
+    openStatesId: person.id,
+    stateCode: state,
   }
 
   const classified = await getOrClassifyCandidate(entry)
@@ -300,6 +303,7 @@ async function buildAndClassifyGovernor(
     party: person.party ?? 'Unknown',
     coverageTier: 'statewide' as const,
     sourcedFrom: ['openstates'],
+    // No openStatesId on purpose: governors are rhetoric-only in v1 (no executive-record API).
   }
 
   const classified = await getOrClassifyCandidate(entry)

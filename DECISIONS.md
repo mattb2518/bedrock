@@ -43,6 +43,7 @@ just-in-time, when we start building that pillar.
 | 2026-06-29 | **Admin tool competitive scope: deliberate v1 decisions.** | Evaluated against best-in-class admin tools. Cohort analysis and time-series trending deferred to v2. Field-level audit trail, API access to admin functions, bulk operations, and Perplexity verification included in v1. |
 | 2026-06-29 | **Beyond Your Ballot governance filter: description not named orgs.** | Criteria describe what qualifies (cross-partisan organization with members from both parties) with examples (Problem Solvers Caucus, Unite America). No Labels excluded due to political baggage from the 2024 third-party effort. |
 | 2026-06-29 | **Eternal Optimist Mantle: confirmed not left-coded.** | Walt Whitman exemplar. Reagan also fits the type. Closed. |
+| 2026-07-04 | **Evidence pipeline v1 shipped — resolves the known gap logged earlier today.** | Federal sponsorship/cosponsorship via congress.gov per-member endpoints; state legislator sponsorships via Open States; web search enabled in classification for dealbreaker verification (max 5 searches, §19.4 evidence standard restated in prompt). Roll-call votes deferred to v2 (per-vote API shape requires bulk ingestion). Governors rhetoric-only v1. METHODOLOGY_VERSION bumped to 1.1; version mismatch treats cached classifications as stale, forcing reclassification with real evidence. Prompt field renamed votingRecord → legislativeRecord for honesty. Methodology copy reverted to specific 3:1 language. |
 
 ---
 

@@ -317,6 +317,7 @@ export async function fetchFederalCandidates(
           party:       c.party ?? 'Unknown',
           coverageTier: c.coverageTier,
           sourcedFrom: c.sourcedFrom,
+          bioguideId:  c.bioguideId,
         })
         if (!classified) return c
         return {

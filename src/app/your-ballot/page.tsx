@@ -1,5 +1,10 @@
 'use client'
 
+// Server actions invoked from this page (fetchCurrentOfficials → up to 6 parallel
+// classifications, each using web search) can run 30-60s+ per candidate. The
+// Vercel default function timeout would kill them mid-flight.
+export const maxDuration = 300
+
 import { useState, useTransition, useMemo, useEffect } from 'react'
 import { useQuizStore, savePendingAddress } from '@/store/quizStore'
 import AddressAutocomplete from '@/components/ui/AddressAutocomplete'

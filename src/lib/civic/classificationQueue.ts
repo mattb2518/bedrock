@@ -2,9 +2,11 @@
  * On-demand candidate classification with caching.
  *
  * getOrClassifyCandidate() replaces the old fire-and-forget stub pattern:
- *   1. Cache hit (approved + has data + < 30 days old)  → return stored result instantly
- *   2. Cache miss / stale / pending-with-no-placement   → run classifyCandidate(), store, return
- *   3. Classification fails for any reason              → return null (engine produces no_call)
+ *   1. Cache hit (approved + has data + < 30 days old + current methodology version)
+ *      → return stored result instantly
+ *   2. Cache miss / stale / version mismatch / pending-with-no-placement
+ *      → gather legislative evidence (§20.2a), run classifyCandidate(), store, return
+ *   3. Classification fails for any reason → return null (engine produces no_call)
  *
  * Auto-approve threshold: if classification yields ≥ 4 axes with confidence > 0.6,
  * the result is stored with status='approved' (safe to show users without human review).
@@ -12,7 +14,9 @@
  */
 
 import { createAdminClient } from '@/lib/supabase/admin'
-import { classifyCandidate } from '@/lib/classification/classifyCandidates'
+import { classifyCandidate, METHODOLOGY_VERSION } from '@/lib/classification/classifyCandidates'
+import { gatherFederalEvidence } from '@/lib/civic/evidence/federalRecord'
+import { gatherStateEvidence } from '@/lib/civic/evidence/stateRecord'
 import type { CandidateRecord, AxisPlacement, Dimension } from '@/lib/engine/match'
 import Anthropic from '@anthropic-ai/sdk'
 
@@ -37,6 +41,11 @@ export interface ClassificationQueueEntry {
   party: string
   coverageTier: CandidateRecord['coverageTier']
   sourcedFrom: string[]
+  // Evidence-pipeline identifiers (§20.2a) — when present, sponsored/cosponsored
+  // legislation is gathered and passed to the classifier as legislativeRecord.
+  bioguideId?: string | null
+  openStatesId?: string | null
+  stateCode?: string
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -104,13 +113,28 @@ export async function getOrClassifyCandidate(
       const approved = existing.status === 'approved'
       // Use classified_at if present, fall back to last_reviewed for older rows
       const fresh = !isStale(existing.classified_at ?? existing.last_reviewed)
+      // Methodology version mismatch = stale: forces reclassification of rows
+      // produced before the evidence pipeline (§20.2a) existed.
+      const currentMethodology = existing.methodology_version === METHODOLOGY_VERSION
 
-      if (approved && hasPlacement && fresh) {
+      if (approved && hasPlacement && fresh && currentMethodology) {
         return rowToRecord(existing)
       }
     }
 
-    // ── 2. Classify ─────────────────────────────────────────────────────────
+    // ── 2. Gather legislative evidence (§20.2a) ─────────────────────────────
+    let legislativeRecord: string[] = []
+    try {
+      if (candidate.bioguideId) {
+        legislativeRecord = await gatherFederalEvidence(candidate.bioguideId)
+      } else if (candidate.openStatesId && candidate.stateCode) {
+        legislativeRecord = await gatherStateEvidence(candidate.openStatesId, candidate.stateCode)
+      }
+    } catch {
+      legislativeRecord = []
+    }
+
+    // ── 3. Classify ─────────────────────────────────────────────────────────
     const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
     const result = await classifyCandidate(
@@ -123,6 +147,7 @@ export async function getOrClassifyCandidate(
         party: candidate.party,
         coverageTier: candidate.coverageTier,
         sourcedFrom: candidate.sourcedFrom,
+        legislativeRecord,
         taggedBy: 'auto_classify',
       },
       anthropic
@@ -133,7 +158,7 @@ export async function getOrClassifyCandidate(
     const autoApproved = meetsAutoApproveThreshold(axisPlacement)
     const today = new Date().toISOString().slice(0, 10)
 
-    // ── 3. Store / update cache ─────────────────────────────────────────────
+    // ── 4. Store / update cache ─────────────────────────────────────────────
     await admin.from('classified_candidates').upsert(
       {
         candidate_id:         candidate.id,

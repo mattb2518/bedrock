@@ -26,7 +26,7 @@ export interface CandidateClassificationInput {
   coverageTier: CandidateRecord['coverageTier']
   sourcedFrom: string[]
   // Public record — everything available
-  votingRecord?: string[]      // list of vote descriptions or URLs
+  legislativeRecord?: string[] // sponsored/cosponsored legislation lines (§20.2a) and vote descriptions or URLs
   floorSpeeches?: string[]     // excerpts or URLs
   campaignPlatform?: string    // text or URL
   committePositions?: string[] // committee roles and stated positions
@@ -94,7 +94,9 @@ function buildDealbreakerList(): string {
 }
 
 const DEALBREAKER_LIST = buildDealbreakerList()
-const METHODOLOGY_VERSION = '1.0'
+// Bumping this invalidates every cached classification (classificationQueue
+// treats a version mismatch as stale), forcing reclassification with current evidence.
+export const METHODOLOGY_VERSION = '1.1'
 
 const AXIS_DESCRIPTIONS: Record<Dimension, string> = {
   stability_change:      'Stability ↔ Change (0 = strongly favors stability/tradition; 100 = strongly favors change/reform)',
@@ -112,11 +114,11 @@ const AXIS_DESCRIPTIONS: Record<Dimension, string> = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 function buildCandidatePrompt(input: CandidateClassificationInput): string {
-  const hasRecord = (input.votingRecord?.length ?? 0) > 0
+  const hasRecord = (input.legislativeRecord?.length ?? 0) > 0
 
   const recordSection = hasRecord
-    ? `VOTING RECORD (weight: 75%):\n${input.votingRecord!.map((v, i) => `  ${i + 1}. ${v}`).join('\n')}`
-    : 'VOTING RECORD: None available (challenger/no legislative history)'
+    ? `LEGISLATIVE RECORD (weight: 75%) — sponsored and cosponsored legislation and recorded votes where available:\n${input.legislativeRecord!.map((v, i) => `  ${i + 1}. ${v}`).join('\n')}`
+    : 'LEGISLATIVE RECORD: None available'
 
   const statementsSection = [
     input.campaignPlatform ? `Campaign platform: ${input.campaignPlatform}` : null,
@@ -139,8 +141,10 @@ STATED POSITIONS (weight: ${hasRecord ? '25%' : '100%'}):
 ${statementsSection || '(none provided)'}
 
 ${hasRecord
-  ? 'WEIGHTING RULE: When a candidate has a voting record, weight it 75% and stated positions 25%. Votes speak louder than words — when they conflict, the voting record wins. Reflect this in your confidence levels and rationale.'
-  : 'WEIGHTING RULE: No voting record exists. Use stated positions only. ALL axis confidence scores must be capped at 0.50 regardless of how clear the stated position is — we cannot know follow-through.'}
+  ? 'WEIGHTING RULE: When a candidate has a legislative record, weight it 75% and stated positions 25%. Votes speak louder than words — when they conflict, the legislative record wins. Reflect this in your confidence levels and rationale.'
+  : 'WEIGHTING RULE: No legislative record exists. Use stated positions only. ALL axis confidence scores must be capped at 0.50 regardless of how clear the stated position is — we cannot know follow-through.'}
+
+You have web search available. Use it (max 5 searches) to: (1) verify dealbreaker items against the evidence standard below, (2) find recent public statements where the legislative record is silent on an axis. The evidence standard is unchanged: 'crosses' requires a public documented statement, a recorded vote/official action, or credible reporting from 2+ independent named journalists at high-reliability outlets. Prefer marking 'unknown' over inferring from party or vibe. Cite URLs in evidence fields.
 
 SCORING FRAMEWORK — 8 dimensions, 0–100:
 ${axisLines}
@@ -196,18 +200,39 @@ export async function classifyCandidate(
 
   const response = await anthropic.messages.create({
     model: 'claude-sonnet-4-6',
-    max_tokens: 3000,
+    max_tokens: 5000,
+    tools: [{ type: 'web_search_20250305', name: 'web_search' }],
     messages: [{ role: 'user', content: prompt }],
   })
 
-  const rawText = response.content[0]?.type === 'text' ? response.content[0].text : ''
-  const jsonText = rawText.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '').trim()
+  // With web search enabled, response.content interleaves text blocks with
+  // server_tool_use / web_search_tool_result blocks. The final JSON lives in
+  // the LAST text block.
+  const textBlocks = response.content.filter(
+    (b): b is Extract<typeof b, { type: 'text' }> => b.type === 'text'
+  )
+  const stripFences = (s: string) =>
+    s.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '').trim()
+
+  const rawText = textBlocks.at(-1)?.text ?? ''
+  const jsonText = stripFences(rawText)
 
   let parsed: ClaudeCandidateClassification
   try {
     parsed = JSON.parse(jsonText)
   } catch {
-    throw new Error(`classifyCandidate: failed to parse Claude response for ${input.candidateId}`)
+    // Fallback: join all text blocks and extract the outermost {...}
+    const joined = stripFences(textBlocks.map((b) => b.text).join('\n'))
+    const first = joined.indexOf('{')
+    const last = joined.lastIndexOf('}')
+    if (first === -1 || last <= first) {
+      throw new Error(`classifyCandidate: failed to parse Claude response for ${input.candidateId}`)
+    }
+    try {
+      parsed = JSON.parse(joined.slice(first, last + 1))
+    } catch {
+      throw new Error(`classifyCandidate: failed to parse Claude response for ${input.candidateId}`)
+    }
   }
 
   const hasRecord = parsed.has_voting_record ?? false

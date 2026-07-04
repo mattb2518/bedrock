@@ -59,13 +59,18 @@ vi.mock('@/lib/supabase/admin', () => ({
 }))
 
 const mockClassify = vi.fn().mockResolvedValue(MOCK_CLASSIFICATION)
-vi.mock('@/lib/classification/classifyCandidates', () => ({
-  classifyCandidate: (...args: unknown[]) => mockClassify(...args),
-}))
+vi.mock('@/lib/classification/classifyCandidates', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/classification/classifyCandidates')>()
+  return {
+    METHODOLOGY_VERSION: actual.METHODOLOGY_VERSION,
+    classifyCandidate: (...args: unknown[]) => mockClassify(...args),
+  }
+})
 
 vi.mock('anthropic', () => ({ default: vi.fn().mockImplementation(() => ({})) }))
 
 import { getOrClassifyCandidate } from '../classificationQueue'
+import { METHODOLOGY_VERSION } from '@/lib/classification/classifyCandidates'
 
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -79,7 +84,7 @@ describe('cache hit — approved + fresh + has placement', () => {
         coverage_tier: 'federal', sourced_from: ['congress.gov'],
         axis_placement: HIGH_CONF_PLACEMENT, dealbreakers: {},
         status: 'approved', classified_at: TODAY, last_reviewed: TODAY,
-        rhetorical_only: false,
+        rhetorical_only: false, methodology_version: METHODOLOGY_VERSION,
       },
       error: null,
     })
@@ -152,7 +157,7 @@ describe('stale cache — approved but > 30 days old', () => {
         coverage_tier: 'federal', sourced_from: ['congress.gov'],
         axis_placement: HIGH_CONF_PLACEMENT, dealbreakers: {},
         status: 'approved', classified_at: STALE, last_reviewed: STALE,
-        rhetorical_only: false,
+        rhetorical_only: false, methodology_version: METHODOLOGY_VERSION,
       },
       error: null,
     })
@@ -168,6 +173,36 @@ describe('stale cache — approved but > 30 days old', () => {
     await getOrClassifyCandidate(ENTRY)
     const stored = mockUpsert.mock.calls[0][0]
     expect(stored.classified_at).toBe(TODAY)
+  })
+})
+
+describe('stale cache — methodology version mismatch', () => {
+  beforeEach(() => {
+    mockClassify.mockClear()
+    mockUpsert.mockClear()
+    mockSingle.mockResolvedValue({
+      data: {
+        candidate_id: ENTRY.id, name: ENTRY.name, office: ENTRY.office,
+        office_type: 'ideological', district: ENTRY.district, party: 'Democrat',
+        coverage_tier: 'federal', sourced_from: ['congress.gov'],
+        axis_placement: HIGH_CONF_PLACEMENT, dealbreakers: {},
+        status: 'approved', classified_at: TODAY, last_reviewed: TODAY,
+        rhetorical_only: false, methodology_version: '1.0',
+      },
+      error: null,
+    })
+    mockClassify.mockResolvedValue(MOCK_CLASSIFICATION)
+  })
+
+  it('re-classifies a fresh approved row classified under an older methodology', async () => {
+    await getOrClassifyCandidate(ENTRY)
+    expect(mockClassify).toHaveBeenCalledTimes(1)
+  })
+
+  it('stores the current methodology version on re-classification', async () => {
+    await getOrClassifyCandidate(ENTRY)
+    const stored = mockUpsert.mock.calls[0][0]
+    expect(stored.methodology_version).toBe(MOCK_CLASSIFICATION.methodologyVersion)
   })
 })
 

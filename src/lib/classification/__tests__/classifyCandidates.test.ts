@@ -22,7 +22,7 @@ const INCUMBENT_INPUT: CandidateClassificationInput = {
   party: 'Independent',
   coverageTier: 'federal',
   sourcedFrom: ['congress.gov'],
-  votingRecord: [
+  legislativeRecord: [
     'Voted YES on bipartisan infrastructure bill 2021',
     'Voted NO on federal abortion restrictions 2022',
   ],
@@ -39,7 +39,7 @@ const CHALLENGER_INPUT: CandidateClassificationInput = {
   party: 'Independent',
   coverageTier: 'federal',
   sourcedFrom: ['campaign-website.com'],
-  // No votingRecord — rhetoric only
+  // No legislativeRecord — rhetoric only
   campaignPlatform: 'Fiscal responsibility, climate action, electoral reform.',
   taggedBy: 'admin-1',
 }
