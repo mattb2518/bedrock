@@ -252,9 +252,13 @@ Communicated via progress bar design, not explicit question numbering. Gives loc
 
 ### Interlayer Unlock Screens
 
-After each layer's final question (after the Mantle reveal in Layer 1's case), an unlock screen renders three stacked elements:
+After each layer's final question (after the Mantle reveal in Layer 1's case), an unlock screen renders three stacked elements, in this order:
 
-1. **Unlock card.** "Unlocked: [Pillar name]" with pillar icon and a one-line payoff description. Layer 1's screen carries two unlocks visually: the Mantle/constellation (revealed above) and Your Conversations. Layer 3's unlock card names Pillar 1 via PILLAR_ONE[mode]. The Layer 3 unlock card is season-aware: in ballot season it names Your Ballot via PILLAR_ONE. In officials season — where Your Officials is already available (§22b.1) — the card credits Beyond Your Ballot as the headline unlock, and a secondary line teases the seasonal face: "And when election season arrives, Your Ballot switches on here too — same engine, pointed at the people asking for your vote."
+1. **Templated "what we've learned" summary** — rendered as plain prose, no quotation marks around it.
+2. **Unlock card(s).**
+3. **Forward tease.**
+
+1. **Unlock card.** "Unlocked: [Pillar name]" with pillar icon and a one-line payoff description. Layer 1's screen carries two unlocks visually: the Mantle/constellation (revealed above) and Your Conversations. Layer 3's unlock card names Pillar 1 via PILLAR_ONE[mode]. The Layer 3 unlock card is season-aware: in ballot season it names Your Ballot via PILLAR_ONE. In officials season — where Your Officials is already available (§22b.1) — the card credits Beyond Your Ballot as the headline unlock, and a secondary line teases the seasonal face: "And when election season arrives, Your Ballot switches on here too — same engine, pointed at the people asking for your vote." Each unlock card is itself a link to its pillar (opens the pillar route), with a visible affordance: a "Try it now →" line inside the card. Below the cards, the existing buttons remain — "Keep going" (primary) and "Explore what you've unlocked" (secondary). The Layer 3 seasonal tease line in officials season is not a link (nothing to open yet).
 2. **Templated "what we've learned" summary.** Deterministic, from stored scores — no API call.
    - After L1: take the two dimensions with the largest deviation from 50. Template: *"So far: you lean [pole] over [pole], and [pole] over [pole]. That combination is rarer than you'd think — and it shapes every recommendation from here."* If fewer than two dimensions deviate more than 10 points, centered variant: *"So far: you sit closer to the middle than most — which is itself a signature. The next layer is where it sharpens."*
    - After L2: *"Your values now have positions attached — [n] issues mapped. Your matches just got sharper."*
@@ -315,6 +319,8 @@ When a user answers "It depends" (or any option carrying a followUpPrompt) and t
 - System prompt requirements: one sentence, warm, nonpartisan; reflect the tension or condition the user named; never evaluate correctness; never name parties or politicians; never give advice. Max ~40 output tokens.
 - Timeout 2.5s; on timeout, error, or empty text, fall back silently to the static micro-reaction.
 - Applies wherever open-text follow-ups exist, all layers. Not in the homepage teaser.
+
+Rendering: the reflection appears inline, chat-style, directly below the user's open-text input on the same question card — like a conversational reply — not on a separate screen. While the reflection is pending (up to the 2.5s timeout), the card waits with a subtle typing/thinking indicator; on success the reflection fades in below the text box; on timeout or error the static micro-reaction renders in the same inline position instead. After the reflection (or fallback) renders, advancing is user-initiated: tap/Enter/a "Next →" affordance moves to the next question. No separate reflection phase or screen.
 
 ### Layer 2 Persistent Micro-Label
 

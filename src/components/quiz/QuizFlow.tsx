@@ -45,7 +45,6 @@ type Phase =
   | 'layerIntro'
   | 'quiz'
   | 'interstitial'
-  | 'reflection'
   | 'importance'
   | 'reveal'
   | 'unlockScreen'
@@ -220,10 +219,18 @@ export default function QuizFlow() {
   // "skip the rest" button, which appears once they're past the second egg.
   const [eggsSeen, setEggsSeen] = useState(0)
 
-  // AI reflect-back for "It depends" open text (SPEC §5)
-  const [aiReflection, setAiReflection] = useState<string | null>(null)
-  // Pending transition info for reflection phase
-  const [pendingTransition, setPendingTransition] = useState<{ wasLast: boolean; layerAtAnswer: QuizLayer } | null>(null)
+  // AI reflect-back for "It depends" open text (SPEC §5) — inline, no separate phase.
+  // Snapshot freezes question card state while we wait for the reflection.
+  const [inlineReflection, setInlineReflection] = useState<{
+    questionText: string
+    selectedOptionText: string
+    userText: string
+    followPrompt: string
+    status: 'pending' | 'ready'
+    text: string | null        // null while pending
+    wasLast: boolean
+    layerAtAnswer: QuizLayer
+  } | null>(null)
 
   // Post-quiz demographic module (all optional)
   const [demo, setDemo] = useState<Demographics>({})
@@ -237,8 +244,7 @@ export default function QuizFlow() {
   function clearTransient() {
     setPendingOption(null)
     setFollowText('')
-    setAiReflection(null)
-    setPendingTransition(null)
+    setInlineReflection(null)
   }
 
   // Fetch AI reflect-back for open-text It-depends answers (SPEC §5)
@@ -401,16 +407,20 @@ export default function QuizFlow() {
       setInterstitial({ egg: question.easterEgg, wasLast, layerAtAnswer })
       setPhase('interstitial')
     } else if (hasOpenText) {
-      // Fetch AI reflect-back; show reflection screen on success, fall through on timeout
-      setPendingTransition({ wasLast, layerAtAnswer })
+      // Fetch AI reflect-back; render inline below the textarea — no separate phase.
+      const snapshot = {
+        questionText: question.text,
+        selectedOptionText: pickedOption?.text ?? (isDepends ? 'It depends…' : ''),
+        userText: text,
+        followPrompt: pickedOption?.followUpPrompt ?? question.dependsFollowUp.prompt,
+        wasLast,
+        layerAtAnswer,
+      }
+      setInlineReflection({ ...snapshot, status: 'pending', text: null })
       fetchReflection(text).then((reflection) => {
-        if (reflection) {
-          setAiReflection(reflection)
-          setPhase('reflection')
-        } else {
-          setPendingTransition(null)
-          runTransition(wasLast, layerAtAnswer)
-        }
+        // Fallback: micro-reaction on the selected option, else the It-depends option reaction
+        const fallback = opt?.microReaction ?? null
+        setInlineReflection({ ...snapshot, status: 'ready', text: reflection ?? fallback })
       })
     } else {
       runTransition(wasLast, layerAtAnswer)
@@ -1081,22 +1091,57 @@ export default function QuizFlow() {
     )
   }
 
-  // ── REFLECTION (AI reflect-back for open-text It depends) ───────────────
-  if (phase === 'reflection' && aiReflection && pendingTransition) {
-    const { wasLast, layerAtAnswer } = pendingTransition
+  // ── INLINE REFLECTION — intercepts quiz render while awaiting / displaying reflect-back ──
+  if (inlineReflection) {
+    const { questionText, selectedOptionText, userText, followPrompt: fPrompt, status, text: reflText, wasLast, layerAtAnswer } = inlineReflection
+    const advance = () => { clearTransient(); runTransition(wasLast, layerAtAnswer) }
     return (
       <Shell>
-        <div
-          onClick={() => { clearTransient(); runTransition(wasLast, layerAtAnswer) }}
-          style={{ cursor: 'pointer', padding: 'var(--space-8) 0', textAlign: 'center' }}
-        >
-          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body-lg)', color: 'var(--color-gold)', fontStyle: 'italic', lineHeight: 'var(--leading-relaxed)', maxWidth: 520, margin: '0 auto var(--space-6)' }}>
-            {aiReflection}
-          </p>
-          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)' }}>
-            Tap to continue →
-          </p>
+        {/* Frozen question */}
+        <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-h3, var(--text-body-lg))', color: 'var(--color-text-primary)', lineHeight: 'var(--leading-snug, 1.4)', marginBottom: 'var(--space-6)' }}>
+          {questionText}
+        </h2>
+        {/* Selected answer chip */}
+        <div style={{ ...card, borderColor: 'var(--color-blue-accent)', backgroundColor: 'rgba(107,159,234,0.08)', marginBottom: 'var(--space-4)', pointerEvents: 'none' }}>
+          {selectedOptionText}
         </div>
+        {/* Follow-up prompt + frozen user text */}
+        <div style={{ marginTop: 'var(--space-2)' }}>
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', marginBottom: 'var(--space-3)' }}>
+            {fPrompt}
+          </p>
+          <div style={{ ...textarea as React.CSSProperties, opacity: 0.7, whiteSpace: 'pre-wrap', minHeight: 72, pointerEvents: 'none' }}>
+            {userText}
+          </div>
+        </div>
+        {/* Inline reflection — pending or ready */}
+        <div style={{ marginTop: 'var(--space-4)', paddingLeft: 'var(--space-4)', borderLeft: '2px solid var(--color-gold)' }}>
+          {status === 'pending' ? (
+            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', fontStyle: 'italic' }}>
+              <span style={{ display: 'inline-block', animation: 'pulse 1.2s ease-in-out infinite' }}>·</span>
+              <span style={{ display: 'inline-block', animation: 'pulse 1.2s ease-in-out infinite', animationDelay: '0.3s' }}>·</span>
+              <span style={{ display: 'inline-block', animation: 'pulse 1.2s ease-in-out infinite', animationDelay: '0.6s' }}>·</span>
+              <style>{`@keyframes pulse { 0%,100%{opacity:.2} 50%{opacity:1} }`}</style>
+            </p>
+          ) : (
+            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-gold)', fontStyle: 'italic', lineHeight: 'var(--leading-relaxed)', margin: 0, animation: 'fadeIn 0.4s ease-in', animationFillMode: 'both' }}>
+              <style>{`@keyframes fadeIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:none} }`}</style>
+              {reflText}
+            </p>
+          )}
+        </div>
+        {/* Advance — only shown once reflection is ready */}
+        {status === 'ready' && (
+          <div style={{ marginTop: 'var(--space-6)', textAlign: 'right' }}>
+            <button
+              onClick={advance}
+              onKeyDown={(e) => { if (e.key === 'Enter') advance() }}
+              style={primaryBtn}
+            >
+              {wasLast ? 'Continue →' : 'Next →'}
+            </button>
+          </div>
+        )}
       </Shell>
     )
   }

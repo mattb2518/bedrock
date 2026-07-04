@@ -3,12 +3,13 @@
 // Interlayer unlock screen — shown after each layer's final question.
 // SPEC §5 Interlayer Unlock Screens.
 //
-// Three stacked elements:
-//   1. Unlock card: "Unlocked: [Pillar]" with payoff line
-//   2. Templated "what we've learned" summary (pure function of scores, no API)
+// Three stacked elements (in order per spec):
+//   1. Templated "what we've learned" summary — plain prose, no quotes
+//   2. Unlock card(s) — each links to its pillar route
 //   3. Forward tease with Keep going / Explore buttons
 
 import { useMemo } from 'react'
+import Link from 'next/link'
 import type { DimensionalProfile } from '@/types/quiz'
 import { DIMENSIONS } from '@/lib/quiz/dimensions'
 import type { PillarOneMode } from '@/lib/config/pillarOne'
@@ -61,39 +62,40 @@ interface UnlockCardDef {
   pillarName: string
   payoff: string
   accentColor: string
-}
-
-interface UnlockCardDefExtended extends UnlockCardDef {
+  route: string
   secondaryLine?: string
+  secondaryIsLink?: boolean
 }
 
-function buildL3Cards(p1: { tileTitle: string; tileBlurb: string }, pillarOneMode: PillarOneMode): UnlockCardDefExtended[] {
+function buildL3Cards(p1: { tileTitle: string; tileBlurb: string }, pillarOneMode: PillarOneMode): UnlockCardDef[] {
   if (pillarOneMode === 'officials') {
     // Officials face is ladder-exempt (§22b.1) — headline unlock is Beyond Your Ballot;
-    // secondary line teases the ballot face when it arrives.
+    // secondary line teases the ballot face when it arrives (not a link).
     return [
       {
         pillarName: 'Beyond Your Ballot',
         payoff: 'Candidates outside your district matched to your values.',
         accentColor: 'var(--color-rose)',
+        route: '/beyond-your-ballot',
         secondaryLine: "And when election season arrives, Your Ballot switches on here too — same engine, pointed at the people asking for your vote.",
+        secondaryIsLink: false,
       },
     ]
   }
   // Ballot season: Pillar 1 (Your Ballot) headlines, Beyond Your Ballot second.
   return [
-    { pillarName: p1.tileTitle, payoff: p1.tileBlurb, accentColor: 'var(--color-red)' },
-    { pillarName: 'Beyond Your Ballot', payoff: 'Candidates outside your district matched to your values.', accentColor: 'var(--color-rose)' },
+    { pillarName: p1.tileTitle, payoff: p1.tileBlurb, accentColor: 'var(--color-red)', route: '/your-ballot' },
+    { pillarName: 'Beyond Your Ballot', payoff: 'Candidates outside your district matched to your values.', accentColor: 'var(--color-rose)', route: '/beyond-your-ballot' },
   ]
 }
 
-const UNLOCK_CARDS_STATIC: Record<1 | 2, () => UnlockCardDefExtended[]> = {
+const UNLOCK_CARDS_STATIC: Record<1 | 2, () => UnlockCardDef[]> = {
   1: () => [
-    { pillarName: 'Your Civic Mantle', payoff: 'Your named identity + constellation — the fingerprint of how you think.', accentColor: 'var(--color-gold)' },
-    { pillarName: 'Your Conversations', payoff: 'Claude-powered prep for difficult conversations across difference.', accentColor: 'var(--color-blue-accent)' },
+    { pillarName: 'Your Civic Mantle', payoff: 'Your named identity + constellation — the fingerprint of how you think.', accentColor: 'var(--color-gold)', route: '/your-mantle' },
+    { pillarName: 'Your Conversations', payoff: 'Claude-powered prep for difficult conversations across difference.', accentColor: 'var(--color-blue-accent)', route: '/conversations' },
   ],
   2: () => [
-    { pillarName: 'Your Media Diet', payoff: 'Independent journalism matched to how you actually think — in three tiers.', accentColor: 'var(--color-white-warm)' },
+    { pillarName: 'Your Media Diet', payoff: 'Independent journalism matched to how you actually think — in three tiers.', accentColor: 'var(--color-white-warm)', route: '/media-diet' },
   ],
 }
 
@@ -127,23 +129,38 @@ export default function InterlayerUnlockScreen({ layer, profile, layer2Count = 9
     gap: 'var(--space-6)',
   }
 
-  const card: React.CSSProperties = {
+  const cardBase: React.CSSProperties = {
     backgroundColor: 'var(--color-bg-surface)',
     border: '1px solid var(--color-border)',
     borderRadius: 'var(--radius-lg)',
     padding: 'var(--space-5)',
+    textDecoration: 'none',
+    display: 'block',
+    color: 'inherit',
+    transition: 'border-color 0.15s, background-color 0.15s',
   }
 
   return (
     <div style={shell}>
-      {/* 1. Unlock cards */}
+      {/* 1. What we've learned — plain prose, no quotation marks */}
+      <div style={{ backgroundColor: 'var(--color-bg-deep, #0f1f33)', border: '1px solid transparent', borderRadius: 'var(--radius-lg)', padding: 'var(--space-5)' }}>
+        <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', fontStyle: 'italic', margin: 0 }}>
+          {summary}
+        </p>
+      </div>
+
+      {/* 2. Unlock cards — each links to its pillar */}
       <div>
         <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-gold)', letterSpacing: 'var(--tracking-wider)', textTransform: 'uppercase', marginBottom: 'var(--space-4)', textAlign: 'center' }}>
-          {cards.length > 1 ? 'Unlocked' : 'Unlocked'}
+          Unlocked
         </p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
           {cards.map((c) => (
-            <div key={c.pillarName} style={{ ...card, borderLeft: `3px solid ${c.accentColor}` }}>
+            <Link
+              key={c.pillarName}
+              href={c.route}
+              style={{ ...cardBase, borderLeft: `3px solid ${c.accentColor}` }}
+            >
               <p style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-body-lg)', color: 'var(--color-text-primary)', marginBottom: 'var(--space-1)' }}>
                 {c.pillarName}
               </p>
@@ -155,16 +172,12 @@ export default function InterlayerUnlockScreen({ layer, profile, layer2Count = 9
                   {c.secondaryLine}
                 </p>
               )}
-            </div>
+              <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-blue-accent)', margin: 'var(--space-3) 0 0' }}>
+                Try it now →
+              </p>
+            </Link>
           ))}
         </div>
-      </div>
-
-      {/* 2. What we've learned */}
-      <div style={{ ...card, backgroundColor: 'var(--color-bg-deep, #0f1f33)', borderColor: 'transparent' }}>
-        <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', fontStyle: 'italic', margin: 0 }}>
-          &ldquo;{summary}&rdquo;
-        </p>
       </div>
 
       {/* 3. Forward tease */}
@@ -183,7 +196,7 @@ export default function InterlayerUnlockScreen({ layer, profile, layer2Count = 9
             onClick={onExploreUnlocked}
             style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--weight-medium)', fontSize: 'var(--text-body)', padding: 'var(--space-3) var(--space-6)', borderRadius: 'var(--btn-radius)', backgroundColor: 'transparent', color: 'var(--color-text-secondary)', border: '1px solid var(--color-border)', cursor: 'pointer' }}
           >
-            Explore what you've unlocked
+            Explore what you&apos;ve unlocked
           </button>
         </div>
       </div>
