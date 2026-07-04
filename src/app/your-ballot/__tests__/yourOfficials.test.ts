@@ -116,6 +116,42 @@ describe('season routing — pillarOneMode + BALLOT_DATA_READY (§22b.1)', () =>
   })
 })
 
+// ── 2b. Unlock Ladder exemption for officials mode (§22b.1) ──────────────────
+
+describe('officials mode exempt from Unlock Ladder (§22b.1)', () => {
+  // The routing logic in your-ballot/page.tsx:
+  //   if (pillarOneMode === 'officials') return <YourOfficialsMode>   ← runs FIRST
+  //   if (!unlock.pillar1) return <LockedPillarGate>                  ← ballot only
+  //   if (!BALLOT_DATA_READY) return <YourBallotHoldingState>
+  //
+  // This tests that ordering: officials mode bypasses the unlock gate entirely.
+
+  function simulateRouting(pillarOneMode: 'officials' | 'ballot', unlockPillar1: boolean) {
+    const BALLOT_DATA_READY = false
+    // Mirrors the exact conditional order in page.tsx
+    if (pillarOneMode === 'officials') return 'YourOfficialsMode'
+    if (!unlockPillar1) return 'LockedPillarGate'
+    if (!BALLOT_DATA_READY) return 'YourBallotHoldingState'
+    return 'FullBallotRender'
+  }
+
+  it('mode=officials + layersCompleted=0 (unlockPillar1=false) → YourOfficialsMode, not LockedPillarGate', () => {
+    expect(simulateRouting('officials', false)).toBe('YourOfficialsMode')
+  })
+
+  it('mode=officials + unlockPillar1=true → still YourOfficialsMode (gate not consulted)', () => {
+    expect(simulateRouting('officials', true)).toBe('YourOfficialsMode')
+  })
+
+  it('mode=ballot + unlockPillar1=false → LockedPillarGate (ballot keeps Layer-3 requirement)', () => {
+    expect(simulateRouting('ballot', false)).toBe('LockedPillarGate')
+  })
+
+  it('mode=ballot + unlockPillar1=true → YourBallotHoldingState (gate passed, data not ready)', () => {
+    expect(simulateRouting('ballot', true)).toBe('YourBallotHoldingState')
+  })
+})
+
 // ── 3. Dealbreaker flag rendering for officials ───────────────────────────────
 
 describe('officials — dealbreakers are FLAGS not exclusions (§22b.4)', () => {

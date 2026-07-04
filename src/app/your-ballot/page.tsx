@@ -1304,7 +1304,16 @@ export default function YourBallotPage() {
     })
   }
 
-  // ── Unlock gate (SPEC §2 Unlock Ladder) — wraps outside season routing ───────
+  // ── Season routing — MUST run before the Unlock Ladder (SPEC §22b.1) ────────
+  // Officials mode is exempt from the §2 Unlock Ladder: Public Lookup Mode is
+  // explicitly designed to work with zero quiz data, so "unlocked" (= enough
+  // data to match values) doesn't apply here.
+  // Ballot mode keeps the existing Layer-3 requirement.
+  if (pillarOneMode === 'officials') {
+    return <YourOfficialsMode completionPercent={completionPercent} userId={userId} hasProfile={hasProfile} />
+  }
+
+  // ── Unlock gate (SPEC §2 Unlock Ladder) — ballot mode only ───────────────────
   if (!unlock.pillar1) {
     return (
       <LockedPillarGate
@@ -1314,15 +1323,6 @@ export default function YourBallotPage() {
         accentColor="var(--color-red)"
       />
     )
-  }
-
-  // ── Season routing — driven by site_config.pillar_one_mode, not a hardcoded flag ──────────
-  // Officials mode: always renders YourOfficialsMode.
-  // Ballot mode + no data yet: renders YourBallotHoldingState (explicit "coming soon").
-  // Ballot mode + data ready: falls through to full ballot render below.
-  // Never silently overrides the admin's season choice.
-  if (pillarOneMode === 'officials') {
-    return <YourOfficialsMode completionPercent={completionPercent} userId={userId} hasProfile={hasProfile} />
   }
 
   if (!BALLOT_DATA_READY) {

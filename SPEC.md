@@ -3027,6 +3027,8 @@ A dismissible inline banner above the CTA: "Your results are temporary. Create a
 
 No new page or URL. /your-ballot gains a mode. Out of season (default): officials mode — eyebrow "YOUR OFFICIALS", H1 "Every office, matched to your values — right now.", fetches current officeholders. In season: existing Your Ballot behavior unchanged. (Mode source: originally a data-availability check; superseded by the §22c admin flag in Batch 2 — data availability remains only as a per-district guard inside ballot mode.)
 
+**Your Officials is EXEMPT from the §2 Unlock Ladder.** Unlocking a pillar means "enough quiz data exists to match values against" — that concept doesn't apply to Public Lookup Mode (§22b.6), which is explicitly designed to work with zero quiz data. The officials/ballot season-routing check (§22c) must run BEFORE the Unlock Ladder gate, not after, so that `pillarOneMode === 'officials'` always renders YourOfficialsMode regardless of quiz-layer completion. Ballot mode keeps the existing Layer-3 requirement unchanged.
+
 ### 22b.2 Scope — six officials per user
 
 2 U.S. Senators, 1 U.S. House Representative, 1 Governor, 2 State Legislators (upper + lower chamber). Local officials out of scope.

@@ -217,6 +217,8 @@ Revisit in Claude Project sessions when ready to build.
 
 **Why:** Factual representation data (who is your senator, who is your governor) is already live infrastructure — blocking anonymous visitors from seeing it provides no product benefit and destroys first-session value. The values-match layer (axis scores, constellation, dealbreaker flags) is the actual product and remains gated. `fetchCurrentOfficialsUnclassified` calls the same congress.gov/Open States endpoints as the classified path but skips `getOrClassifyCandidate` entirely — cost surface is bounded by the API rate limits themselves, not LLM usage.
 
+**2026-07-04** — **Your Officials is exempt from the pre-existing SPEC §2 Unlock Ladder; Ballot mode keeps it.** Batch 6's Public Lookup Mode was scoped to give real value to fully anonymous, zero-quiz-progress visitors, but the pre-existing Layer-3 Unlock Ladder gate ran before the officials/ballot season-routing check, silently blocking every anonymous visitor from ever reaching it — caught via real incognito testing. Fixed by moving the officials-mode routing check above the Unlock Ladder gate. Rationale: "unlocked" has always meant "enough data to match values," which doesn't apply to a feature explicitly designed to work with zero quiz data.
+
 **2026-07-04** — Incumbent values-matching stays as shipped in §22b; broader "match me to any sitting official nationwide" (external suggestion) deferred — Your Officials covers the user's own six officeholders only. Revisit post-launch.
 
 **2026-07-04** — No full-site imagery. Stark design is brand. Only approved imagery: forebear portraits on mantle cards (back portrait + front corner teaser).
