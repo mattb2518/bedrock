@@ -4,7 +4,7 @@
 export interface UnlockState {
   conversations: boolean        // requires L1
   mediaDiet: boolean            // requires L2
-  pillar1: boolean              // requires L3 (your-ballot / your-officials)
+  pillar1: boolean              // requires L3 for ballot face only; officials face is ladder-exempt (§22b.1)
   beyondYourBallot: boolean     // requires L3
 }
 

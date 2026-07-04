@@ -30,7 +30,7 @@ function poleLabel(dim: string, score: number): string {
 }
 
 // Templated "what we've learned" summary (pure function of profile)
-function buildSummary(layer: 1 | 2 | 3, profile: DimensionalProfile, layer2Count: number, tileTitle: string): string {
+function buildSummary(layer: 1 | 2 | 3, profile: DimensionalProfile, layer2Count: number, tileTitle: string, pillarOneMode?: PillarOneMode): string {
   if (layer === 1) {
     const deviations = DIMENSIONS.map(d => ({
       key: d.key,
@@ -50,7 +50,10 @@ function buildSummary(layer: 1 | 2 | 3, profile: DimensionalProfile, layer2Count
     return `Your values now have positions attached — ${layer2Count} issues mapped. Your matches just got sharper.`
   }
 
-  // layer === 3
+  // layer === 3 — mode-aware
+  if (pillarOneMode === 'officials') {
+    return "We now know not just what you believe, but what actually moves your vote. Beyond Your Ballot is live."
+  }
   return `We now know not just what you believe, but what actually moves your vote. ${tileTitle} is live.`
 }
 
@@ -60,17 +63,37 @@ interface UnlockCardDef {
   accentColor: string
 }
 
-const UNLOCK_CARDS: Record<1 | 2 | 3, (p1: { tileTitle: string; tileBlurb: string; navLabel: string; eyebrow: string; h1: string }) => UnlockCardDef[]> = {
+interface UnlockCardDefExtended extends UnlockCardDef {
+  secondaryLine?: string
+}
+
+function buildL3Cards(p1: { tileTitle: string; tileBlurb: string }, pillarOneMode: PillarOneMode): UnlockCardDefExtended[] {
+  if (pillarOneMode === 'officials') {
+    // Officials face is ladder-exempt (§22b.1) — headline unlock is Beyond Your Ballot;
+    // secondary line teases the ballot face when it arrives.
+    return [
+      {
+        pillarName: 'Beyond Your Ballot',
+        payoff: 'Candidates outside your district matched to your values.',
+        accentColor: 'var(--color-rose)',
+        secondaryLine: "And when election season arrives, Your Ballot switches on here too — same engine, pointed at the people asking for your vote.",
+      },
+    ]
+  }
+  // Ballot season: Pillar 1 (Your Ballot) headlines, Beyond Your Ballot second.
+  return [
+    { pillarName: p1.tileTitle, payoff: p1.tileBlurb, accentColor: 'var(--color-red)' },
+    { pillarName: 'Beyond Your Ballot', payoff: 'Candidates outside your district matched to your values.', accentColor: 'var(--color-rose)' },
+  ]
+}
+
+const UNLOCK_CARDS_STATIC: Record<1 | 2, () => UnlockCardDefExtended[]> = {
   1: () => [
     { pillarName: 'Your Civic Mantle', payoff: 'Your named identity + constellation — the fingerprint of how you think.', accentColor: 'var(--color-gold)' },
     { pillarName: 'Your Conversations', payoff: 'Claude-powered prep for difficult conversations across difference.', accentColor: 'var(--color-blue-accent)' },
   ],
   2: () => [
     { pillarName: 'Your Media Diet', payoff: 'Independent journalism matched to how you actually think — in three tiers.', accentColor: 'var(--color-white-warm)' },
-  ],
-  3: (p1) => [
-    { pillarName: p1.tileTitle, payoff: p1.tileBlurb, accentColor: 'var(--color-red)' },
-    { pillarName: 'Beyond Your Ballot', payoff: 'Candidates outside your district matched to your values.', accentColor: 'var(--color-rose)' },
   ],
 }
 
@@ -82,8 +105,14 @@ const FORWARD_TEASE: Record<1 | 2 | 3, (tileTitle: string, completionPct: number
 
 export default function InterlayerUnlockScreen({ layer, profile, layer2Count = 9, pillarOneMode, onKeepGoing, onExploreUnlocked }: Props) {
   const p1 = PILLAR_ONE[pillarOneMode]
-  const cards = useMemo(() => UNLOCK_CARDS[layer](p1), [layer, p1])
-  const summary = useMemo(() => buildSummary(layer, profile, layer2Count, p1.tileTitle), [layer, profile, layer2Count, p1.tileTitle])
+  const cards = useMemo(
+    () => layer === 3 ? buildL3Cards(p1, pillarOneMode) : UNLOCK_CARDS_STATIC[layer](),
+    [layer, p1, pillarOneMode],
+  )
+  const summary = useMemo(
+    () => buildSummary(layer, profile, layer2Count, p1.tileTitle, pillarOneMode),
+    [layer, profile, layer2Count, p1.tileTitle, pillarOneMode],
+  )
 
   // completionPercent by layer
   const pct = layer === 1 ? 40 : layer === 2 ? 65 : 85
@@ -121,6 +150,11 @@ export default function InterlayerUnlockScreen({ layer, profile, layer2Count = 9
               <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', margin: 0 }}>
                 {c.payoff}
               </p>
+              {c.secondaryLine && (
+                <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', lineHeight: 'var(--leading-relaxed)', margin: 'var(--space-2) 0 0', fontStyle: 'italic' }}>
+                  {c.secondaryLine}
+                </p>
+              )}
             </div>
           ))}
         </div>
