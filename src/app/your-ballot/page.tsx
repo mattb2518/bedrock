@@ -18,6 +18,7 @@ import type { StateLegBallot } from '@/lib/civic/stateLegCandidates'
 import type { CurrentOfficial, CurrentOfficialsBallot } from '@/lib/civic/currentOfficials'
 import { isStateLegCandidate, type BallotCandidate } from '@/lib/civic/ballotTypes'
 import Constellation from '@/components/ui/Constellation'
+import PublicLookupGate from '@/components/civic/PublicLookupGate'
 
 // ── Quiz completion → display percent ─────────────────────────────────────────
 
@@ -776,38 +777,9 @@ function YourOfficialsMode({
         {p1.coverageNote}
       </p>
 
-      {/* Quiz gate */}
+      {/* §22b.6 — Public Lookup (no profile) vs. full classified view (has profile) */}
       {!hasProfile ? (
-        <div style={{
-          border: '1px solid var(--color-border)',
-          borderRadius: 'var(--radius-lg)',
-          padding: 'var(--space-8)',
-          textAlign: 'center',
-          backgroundColor: 'var(--color-bg-surface)',
-        }}>
-          <p style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-heading)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-primary)', marginBottom: 'var(--space-3)' }}>
-            Start with the quiz
-          </p>
-          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', marginBottom: 'var(--space-5)', maxWidth: 480, margin: '0 auto var(--space-5)' }}>
-            Your Officials matches your representatives to your specific values. Without a profile, there&apos;s nothing to match against.
-          </p>
-          <a
-            href="/quiz"
-            style={{
-              display: 'inline-block',
-              fontFamily: 'var(--font-body)',
-              fontSize: 'var(--text-body)',
-              fontWeight: 'var(--weight-semibold)',
-              color: '#fff',
-              backgroundColor: 'var(--color-blue-accent)',
-              textDecoration: 'none',
-              padding: 'var(--space-3) var(--space-6)',
-              borderRadius: 'var(--radius-sm)',
-            }}
-          >
-            Take the quiz →
-          </a>
-        </div>
+        <PublicLookupGate mode="officials" />
       ) : (
         <>
           {/* Address — §22d: AddressAutocomplete or stored-address read path */}
@@ -1391,40 +1363,9 @@ export default function YourBallotPage() {
         )}
       </div>
 
-      {/* ── Quiz gate (§22.3) ───────────────────────────────────────────────── */}
+      {/* ── §22b.6 — Public Lookup (no profile) vs. full classified view (has profile) ── */}
       {!hasProfile ? (
-        // No quiz at all → no address field, just CTA
-        <div style={{
-          border: '1px solid var(--color-border)',
-          borderRadius: 'var(--radius-lg)',
-          padding: 'var(--space-8)',
-          textAlign: 'center',
-          backgroundColor: 'var(--color-bg-surface)',
-        }}>
-          <p style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-heading)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-primary)', marginBottom: 'var(--space-3)' }}>
-            Start with the quiz
-          </p>
-          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', marginBottom: 'var(--space-5)', maxWidth: 480, margin: '0 auto var(--space-5)' }}>
-            Your Ballot matches candidates to your specific values — not your party. Without a profile,
-            there&apos;s nothing to match against. Generic ballots aren&apos;t a feature.
-          </p>
-          <a
-            href="/quiz"
-            style={{
-              display: 'inline-block',
-              fontFamily: 'var(--font-body)',
-              fontSize: 'var(--text-body)',
-              fontWeight: 'var(--weight-semibold)',
-              color: '#fff',
-              backgroundColor: 'var(--color-blue-accent)',
-              textDecoration: 'none',
-              padding: 'var(--space-3) var(--space-6)',
-              borderRadius: 'var(--radius-sm)',
-            }}
-          >
-            Take the quiz →
-          </a>
-        </div>
+        <PublicLookupGate mode="ballot" />
       ) : (
         <>
           {/* ── Address — §22d: AddressAutocomplete or stored-address read path ── */}

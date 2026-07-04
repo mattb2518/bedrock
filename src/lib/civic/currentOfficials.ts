@@ -26,6 +26,7 @@ interface CongressMember {
   state: string
   district?: number
   partyName: string  // congress.gov API field (NOT 'party')
+  depiction?: { imageUrl?: string }
   terms: {
     item: Array<{ chamber: string; startYear?: number; endYear?: number }>
   }
@@ -36,6 +37,7 @@ interface OpenStatesPerson {
   id: string
   name: string
   party: string
+  image?: string | null
   current_role: {
     title: string
     org_classification: 'upper' | 'lower' | 'legislature' | 'executive'
@@ -66,6 +68,30 @@ export interface CurrentOfficialsBallot {
   /** Set when governor lookup SUCCEEDED but returned no person for this state. */
   governorCoverageNote?: string
   /** Non-empty when one or more upstream fetches threw (vs. genuinely empty district). */
+  sourceErrors: SourceError[]
+}
+
+// §22b.6 — Unclassified lookup: name/office/party/photo only, zero LLM calls.
+// Shown to visitors without a quiz profile; gating classification behind "has a
+// profile" bounds cost for anonymous/bot traffic.
+export interface UnclassifiedOfficial {
+  id: string
+  name: string
+  office: string
+  party: string
+  district: string
+  photoUrl: string | null
+  bioguideId: string | null
+  openStatesId: string | null
+}
+
+export interface UnclassifiedOfficialsBallot {
+  senators: UnclassifiedOfficial[]
+  representative: UnclassifiedOfficial | null
+  governor: UnclassifiedOfficial | null
+  stateUpperLeg: UnclassifiedOfficial | null
+  stateLowerLeg: UnclassifiedOfficial | null
+  governorCoverageNote?: string
   sourceErrors: SourceError[]
 }
 
@@ -295,6 +321,185 @@ async function buildAndClassifyGovernor(
     bioguideId: null,
     openStatesId: person.id,
     lowConfidence: highConfidenceAxes(axisPlacement) < 4,
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Unclassified build helpers (§22b.6 — no getOrClassifyCandidate calls)
+// ─────────────────────────────────────────────────────────────────────────────
+
+function buildUnclassifiedFederal(
+  member: CongressMember,
+  office: string,
+  district: string
+): UnclassifiedOfficial {
+  return {
+    id: member.bioguideId,
+    name: member.name,
+    office,
+    party: partyDisplay(member.partyName),
+    district,
+    photoUrl: member.depiction?.imageUrl ?? null,
+    bioguideId: member.bioguideId,
+    openStatesId: null,
+  }
+}
+
+function buildUnclassifiedStateLeg(
+  person: OpenStatesPerson,
+  state: string,
+  chamber: 'upper' | 'lower' | 'legislature',
+  district: number
+): UnclassifiedOfficial {
+  const stUp = state.toUpperCase()
+  const distStr = String(district).padStart(2, '0')
+  const isUpper = chamber === 'upper' || chamber === 'legislature'
+  const office = isUpper ? `State Senate — ${stUp}-${distStr}` : `State House — ${stUp}-${distStr}`
+  const seg = isUpper ? 'sldu' : 'sldl'
+  return {
+    id: person.id,
+    name: person.name,
+    office,
+    party: person.party ?? 'Unknown',
+    district: `ocd-division/country:us/state:${state.toLowerCase()}/${seg}:${district}`,
+    photoUrl: person.image ?? null,
+    bioguideId: null,
+    openStatesId: person.id,
+  }
+}
+
+function buildUnclassifiedGovernor(
+  person: OpenStatesPerson,
+  state: string
+): UnclassifiedOfficial {
+  const stUp = state.toUpperCase()
+  return {
+    id: person.id,
+    name: person.name,
+    office: `Governor — ${stUp}`,
+    party: person.party ?? 'Unknown',
+    district: `ocd-division/country:us/state:${state.toLowerCase()}`,
+    photoUrl: person.image ?? null,
+    bioguideId: null,
+    openStatesId: person.id,
+  }
+}
+
+/**
+ * §22b.6 — Fetch officials without classification (no LLM calls).
+ * Returns name/office/party/district/photo only. Used for visitors without a
+ * quiz profile. The existing fetchCurrentOfficials (full classified) is
+ * unchanged and still used for authenticated users with a profile.
+ */
+export async function fetchCurrentOfficialsUnclassified(
+  state: string,
+  congressionalDistrict: number | null,
+  stateSenateDistrict: number | null,
+  stateHouseDistrict: number | null
+): Promise<UnclassifiedOfficialsBallot> {
+  const stateUpper = state.toUpperCase()
+  const isUnicameral = UNICAMERAL_STATES.has(stateUpper)
+
+  const missingKeys: string[] = []
+  if (!process.env.CONGRESS_GOV_API_KEY) missingKeys.push('CONGRESS_GOV_API_KEY')
+  if (!process.env.OPENSTATES_API_KEY) missingKeys.push('OPENSTATES_API_KEY')
+  if (missingKeys.length > 0) {
+    console.error('fetchCurrentOfficialsUnclassified: missing required env var(s):', missingKeys.join(', '))
+  }
+
+  const sourceErrors: SourceError[] = []
+
+  type FederalResult = { members: CongressMember[]; error: SourceError | null }
+  type StateResult = { people: OpenStatesPerson[]; error: SourceError | null }
+
+  const [federalResult, stateResult, governorResult] = await Promise.all([
+    (async (): Promise<FederalResult> => {
+      try {
+        return { members: await fetchCongressStateMembers(stateUpper), error: null }
+      } catch (e) {
+        return { members: [], error: { source: 'federal', message: e instanceof Error ? e.message : String(e) } }
+      }
+    })(),
+    (async (): Promise<StateResult> => {
+      try {
+        const [upper, lower] = await Promise.all([
+          stateSenateDistrict !== null
+            ? fetchOpenStatesCurrentOfficials(state, isUnicameral ? 'legislature' : 'upper', stateSenateDistrict)
+            : Promise.resolve([] as OpenStatesPerson[]),
+          !isUnicameral && stateHouseDistrict !== null
+            ? fetchOpenStatesCurrentOfficials(state, 'lower', stateHouseDistrict)
+            : Promise.resolve([] as OpenStatesPerson[]),
+        ])
+        return { people: [...upper, ...lower], error: null }
+      } catch (e) {
+        return { people: [], error: { source: 'stateLeg', message: e instanceof Error ? e.message : String(e) } }
+      }
+    })(),
+    (async (): Promise<{ people: OpenStatesPerson[]; error: SourceError | null }> => {
+      try {
+        return { people: await fetchOpenStatesCurrentOfficials(state, 'executive'), error: null }
+      } catch (e) {
+        return { people: [], error: { source: 'governor', message: e instanceof Error ? e.message : String(e) } }
+      }
+    })(),
+  ])
+
+  if (federalResult.error) sourceErrors.push(federalResult.error)
+  if (stateResult.error) sourceErrors.push(stateResult.error)
+  if (governorResult.error) sourceErrors.push(governorResult.error)
+
+  const senateOcdId = `ocd-division/country:us/state:${stateUpper.toLowerCase()}`
+  const houseOcdId = congressionalDistrict !== null
+    ? `ocd-division/country:us/state:${stateUpper.toLowerCase()}/cd:${congressionalDistrict}`
+    : senateOcdId
+
+  const senateMembers = federalResult.members.filter((m) => {
+    const c = m.terms?.item?.at(-1)?.chamber?.toLowerCase() ?? ''
+    return c === 'senate'
+  }).slice(0, 2)
+
+  const houseMembers = federalResult.members.filter((m) => {
+    const c = m.terms?.item?.at(-1)?.chamber?.toLowerCase() ?? ''
+    const isHouse = c === 'house of representatives' || c === 'house'
+    if (!isHouse) return false
+    if (congressionalDistrict === null) return false
+    return m.district === congressionalDistrict
+  })
+
+  const stateUpperPeople = stateResult.people.filter((p) => {
+    const org = p.current_role?.org_classification
+    return org === 'upper' || org === 'legislature'
+  })
+  const stateLowerPeople = stateResult.people.filter((p) => p.current_role?.org_classification === 'lower')
+  const governorPerson = governorResult.people.find(
+    (p) => p.current_role?.title?.toLowerCase() === 'governor'
+  )
+
+  const governorCoverageNote =
+    !governorResult.error && governorPerson === undefined
+      ? 'Governor data not available for this state via Open States. Check your state\'s official website.'
+      : undefined
+
+  return {
+    senators: senateMembers.map((m) => buildUnclassifiedFederal(m, `US Senate — ${stateUpper}`, senateOcdId)),
+    representative: houseMembers[0]
+      ? buildUnclassifiedFederal(
+          houseMembers[0],
+          congressionalDistrict !== null
+            ? `US House — ${stateUpper}-${String(congressionalDistrict).padStart(2, '0')}`
+            : `US House — ${stateUpper}`,
+          houseOcdId
+        )
+      : null,
+    governor: governorPerson ? buildUnclassifiedGovernor(governorPerson, state) : null,
+    stateUpperLeg: stateUpperPeople[0] && stateSenateDistrict !== null
+      ? buildUnclassifiedStateLeg(stateUpperPeople[0], state, isUnicameral ? 'legislature' : 'upper', stateSenateDistrict)
+      : null,
+    stateLowerLeg: !isUnicameral && stateLowerPeople[0] && stateHouseDistrict !== null
+      ? buildUnclassifiedStateLeg(stateLowerPeople[0], state, 'lower', stateHouseDistrict)
+      : null,
+    governorCoverageNote,
+    sourceErrors,
   }
 }
 

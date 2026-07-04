@@ -2944,6 +2944,23 @@ No aggregate percentage. Per official: (a) overlay radar — user's constellatio
 
 Methodology line: "This shows how your values compare to your representatives' actual public record — not a rating or grade."
 
+### 22b.6 Public Lookup Mode (no profile required)
+
+Both Your Officials and Your Ballot (when BALLOT_DATA_READY) show an address entry to ANY visitor, signed in or not, with or without a quiz profile. Behavior forks after address resolution:
+
+- **WITHOUT a profile:** officials/candidates are fetched WITHOUT classification — no `getOrClassifyCandidate` call, no Claude API usage. Display: name, party, office/title, photo (if the source API provides one), district. No axis scores, no constellation, no dealbreaker flags — there's no values profile to compare against. One CTA below the list: "See how your values compare to the officials above — take the 5-minute quiz →" (officials) or "See how your values compare to the candidates above — take the 5-minute quiz →" (ballot), linking to /quiz. Address is saved via the existing pendingAddress session mechanism (NOT written to quiz_profiles — there's no profile row to attach to for a true anonymous visitor) so it carries over automatically if they take the quiz next.
+- **WITH a profile:** unchanged — full classification, constellation overlay, convergence notes, dealbreaker flags.
+
+This is a genuine cost/abuse control: classification triggers live LLM calls per official on first lookup. Gating that behind "has a quiz profile" keeps anonymous, high-volume, or bot traffic from becoming an unbounded cost surface, while still giving real value (the factual lookup) to everyone.
+
+The address-entry + basic-list + single-CTA pattern is built ONCE as a shared `PublicLookupGate` (`src/components/civic/PublicLookupGate.tsx`) reused by both modes. Ballot mode's gate is dormant until `BALLOT_DATA_READY` flips true in `currentOfficials.ts`.
+
+**LOCKED copy (§22b.6):**
+- Officials intro: "Find out who represents you — right now, no account needed."
+- Officials CTA: "See how your values compare to the officials above — take the 5-minute quiz →"
+- Ballot intro: "Find out who's on your ballot — right now, no account needed."
+- Ballot CTA: "See how your values compare to the candidates above — take the 5-minute quiz →"
+
 ---
 
 ## 22c. Pillar 1 Seasonal System
