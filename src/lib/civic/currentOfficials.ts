@@ -150,33 +150,14 @@ async function fetchCongressStateMembers(
   url.searchParams.set('format', 'json')
   url.searchParams.set('api_key', apiKey)
 
-  // DIAGNOSTIC — Batch 7: log real API shape before filtering. Remove after fix confirmed.
-  const redactedUrl = url.toString().replace(apiKey, 'REDACTED')
-  console.log('[congress.gov diag] GET', redactedUrl)
-
-  const res = await fetch(url.toString(), { next: { revalidate: 0 } })  // no-cache during diagnosis
-
-  console.log('[congress.gov diag] status:', res.status)
+  const res = await fetch(url.toString(), { next: { revalidate: 3600 } })
   if (!res.ok) {
     const body = await res.text()
-    console.log('[congress.gov diag] error body:', body.slice(0, 500))
     throw new Error(`congress.gov API error ${res.status}: ${body}`)
   }
 
   const data = await res.json()
-  const members: CongressMember[] = data.members ?? []
-  console.log('[congress.gov diag] top-level keys:', Object.keys(data))
-  console.log('[congress.gov diag] members.length:', members.length)
-  console.log('[congress.gov diag] first 3 members:', JSON.stringify(
-    members.slice(0, 3).map((m) => ({
-      name: m.name,
-      state: m.state,
-      district: m.district,
-      lastTermChamber: m.terms?.item?.at(-1)?.chamber,
-    })),
-    null, 2
-  ))
-  return members
+  return data.members ?? []
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
