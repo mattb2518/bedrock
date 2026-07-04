@@ -419,6 +419,12 @@ export async function fetchCurrentOfficialsUnclassified(
   const stateUpper = state.toUpperCase()
   const isUnicameral = UNICAMERAL_STATES.has(stateUpper)
 
+  // DIAGNOSTIC — Batch 8: log exact key names Vercel injects at runtime (no values). Remove after fix.
+  console.log(
+    '[env diag] all process.env keys containing CONGRESS or FEC or OPENSTATES:',
+    Object.keys(process.env).filter(k => /congress|fec|openstates/i.test(k))
+  )
+
   const missingKeys: string[] = []
   if (!process.env.CONGRESS_GOV_API_KEY) missingKeys.push('CONGRESS_GOV_API_KEY')
   if (!process.env.OPENSTATES_API_KEY) missingKeys.push('OPENSTATES_API_KEY')
