@@ -130,6 +130,11 @@ const CURRENT_CONGRESS = 119
 async function fetchCongressStateMembers(
   state: string,
 ): Promise<CongressMember[]> {
+  // DIAGNOSTIC — Batch 11: log length before the throw so it fires even when key is missing/empty.
+  console.log(
+    '[env diag] CONGRESS_GOV_API_KEY length (fetchCongressStateMembers):',
+    process.env.CONGRESS_GOV_API_KEY?.length ?? 'undefined'
+  )
   const apiKey = process.env.CONGRESS_GOV_API_KEY
   if (!apiKey) throw new Error('CONGRESS_GOV_API_KEY is not set')
 
