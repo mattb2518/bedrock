@@ -20,7 +20,7 @@ export const LAYER3_QUESTIONS: QuizQuestion[] = [
       { id: 'L3-Q1-b', text: 'Policy mostly wins — I’m electing someone to do a job, not be a role model. If the record is strong and the alternative is worse, I can hold my nose.', microReaction: 'FDR had a famously complicated personal life. LBJ was legendarily cruel to his staff. Nixon opened China while keeping an enemies list. Personal flaws and consequential records have coexisted in plenty of presidents.', scores: {} },
       { id: 'L3-Q1-c', text: 'Depends on whether the character issue is relevant to the job — financial fraud tells you something about how someone will handle public money. A messy divorce probably doesn’t.', microReaction: 'Not all character flaws are created equal.', scores: {} },
     ],
-    dependsFollowUp: { type: 'open_text', prompt: 'What would push you to “disqualifying” — the type of conduct, how recent, the volume of incidents, whether they’ve acknowledged it?' },
+    dependsFollowUp: { prompt: 'What would push you to “disqualifying”?', chips: ['The type of conduct', 'How recent it is', 'The volume of incidents', 'Whether they’ve acknowledged it'] },
   },
   {
     id: 'L3-Q2',
@@ -32,7 +32,7 @@ export const LAYER3_QUESTIONS: QuizQuestion[] = [
       { id: 'L3-Q2-b', text: 'A candidate who seems genuinely unfit — not someone I disagree with, but someone who lacks the basic competence, temperament, or integrity the job requires.', microReaction: 'Policy disagreements are normal. A candidate who can’t tell the truth, manage a team, or handle pressure is a different category of problem.', scores: {} },
       { id: 'L3-Q2-c', text: 'An exceptionally strong candidate on the other side — someone whose record, character, and judgment are compelling enough to vote for regardless of the party label.', microReaction: 'Ticket-splitting used to be common. It declined as parties sorted. The instinct — vote for the person, not the jersey — is still alive in a lot of voters.', scores: {} },
     ],
-    dependsFollowUp: { type: 'open_text', prompt: 'Is there a specific combination of factors that would flip your vote?' },
+    dependsFollowUp: { prompt: 'Is there a combination of factors that would flip your vote?', chips: ['A mix of policy and character concerns', 'The stakes of that particular race', 'How weak my own party’s candidate is', 'The strength of the alternative'] },
   },
   {
     id: 'L3-Q3',
@@ -44,7 +44,7 @@ export const LAYER3_QUESTIONS: QuizQuestion[] = [
       { id: 'L3-Q3-b', text: 'Vote for who can win — a candidate who loses the general helps nobody, and winning is the prerequisite for everything else.', microReaction: 'The perfect candidate who loses has zero influence on policy. The imperfect candidate who wins has enormous influence.', scores: {} },
       { id: 'L3-Q3-c', text: 'Depends on how big the electability gap is — if my preferred candidate is slightly less electable, I vote my conscience. If they’re genuinely unelectable, the math changes.', microReaction: 'There’s a difference between “harder to elect” and “unelectable.” The first is worth accepting for a candidate you believe in.', scores: {} },
     ],
-    dependsFollowUp: { type: 'open_text', prompt: 'What factors shape your thinking — how important the office is, how different the candidates are on policy, how reliable the electability polling tends to be?' },
+    dependsFollowUp: { prompt: 'What shapes your thinking?', chips: ['How important the office is', 'How different the candidates are on policy', 'How reliable electability polling tends to be'] },
   },
   {
     id: 'L3-Q4',
@@ -56,7 +56,7 @@ export const LAYER3_QUESTIONS: QuizQuestion[] = [
       { id: 'L3-Q4-b', text: 'I vote the top of the ticket and do my best on the rest — I follow the major races closely but don’t have time to research every downballot race thoroughly.', microReaction: 'Most voters are here. The information environment for downballot races is genuinely poor — local journalism has collapsed and candidate websites are sparse.', scores: {} },
       { id: 'L3-Q4-c', text: 'I focus on ballot measures and skip races where I don’t know enough — I’d rather leave a race blank than vote uninformed.', microReaction: 'An uninformed vote isn’t necessarily better than no vote. Leaving a race blank is a defensible choice — one the instructions on most ballots explicitly permit.', scores: {} },
     ],
-    dependsFollowUp: { type: 'open_text', prompt: 'What shapes how much you engage — the office, whether it’s contested, whether you can find good information?' },
+    dependsFollowUp: { prompt: 'What shapes how much you engage?', chips: ['The office itself', 'Whether the race is contested', 'Whether good information is available'] },
     easterEgg: 'The average American voter faces 15 to 30 separate decisions on a general election ballot. In California in 2016, voters decided 17 statewide propositions alone — covering marijuana legalization, death penalty repeal, and workplace rules for adult film actors. That was before the candidates. A fully engaged California voter in a presidential year can face 40 or more distinct choices. Most voters research about three of them thoroughly.',
   },
   {
@@ -69,7 +69,7 @@ export const LAYER3_QUESTIONS: QuizQuestion[] = [
       { id: 'L3-Q5-b', text: 'Mild disadvantage — incumbents accumulate obligations and the habits of power over time. Fresh perspective is harder to maintain the longer someone has been in office.', microReaction: 'The longer someone holds office, the more relationships, obligations, and institutional habits accumulate.', scores: {} },
       { id: 'L3-Q5-c', text: 'Entirely depends on the record — incumbency itself is neutral. A strong record deserves reelection. A weak one deserves a challenger.', microReaction: 'Incumbency is neither a credential nor a scarlet letter. The question is always the same: did they do the job well?', scores: {} },
     ],
-    dependsFollowUp: { type: 'open_text', prompt: 'What shapes how you think about incumbents — the office, how long they’ve served, what they did with the time?' },
+    dependsFollowUp: { prompt: 'What shapes your view of incumbents?', chips: ['The office', 'How long they’ve served', 'What they did with the time'] },
     easterEgg: '“Throw out the bums — but not my bums.” Congressional reelection rates have been above 90% in every cycle since 1996. Public approval of Congress over the same period has averaged 20%. Americans don’t want to throw their bums out — just everyone else’s.',
   },
   {
@@ -82,7 +82,7 @@ export const LAYER3_QUESTIONS: QuizQuestion[] = [
       { id: 'L3-Q6-b', text: 'Vote the candidate — democracy works better when voters reward quality and punish mediocrity regardless of party.', microReaction: 'The sorting of Congress into two rigid teams where quality is irrelevant has produced exactly the Congress you’d expect.', scores: {} },
       { id: 'L3-Q6-c', text: 'Depends on the stakes — in a year when chamber control is on the line, the structural argument wins. In a safe year, voting for the better candidate costs nothing and signals something.', microReaction: 'Principles are easier to act on when the stakes are low.', scores: {} },
     ],
-    dependsFollowUp: { type: 'open_text', prompt: 'What would push you toward the better candidate — how impressive they are, how mediocre your usual party’s candidate is, how safe the seat is?' },
+    dependsFollowUp: { prompt: 'What would push you toward the better candidate?', chips: ['How impressive they are', 'How weak my usual party’s candidate is', 'How safe the seat is'] },
   },
   {
     id: 'L3-Q7',
@@ -94,7 +94,7 @@ export const LAYER3_QUESTIONS: QuizQuestion[] = [
       { id: 'L3-Q7-b', text: 'The long term — the most consequential decisions government makes — judicial appointments, infrastructure, constitutional norms — play out over decades, not years.', microReaction: 'The senators who confirmed Supreme Court justices in the 1980s shaped American law for forty years. Long-term thinking is how durable things get built.', scores: {} },
       { id: 'L3-Q7-c', text: 'Both, weighted by the office — presidential and judicial elections demand long-term thinking. Congressional and local elections often demand near-term accountability.', microReaction: 'A Supreme Court justice serves for life. A city council member serves two years. Your time horizon should match the time horizon of the office.', scores: {} },
     ],
-    dependsFollowUp: { type: 'open_text', prompt: 'What shapes your time horizon — the specific issues, who’s most affected, the office being filled?' },
+    dependsFollowUp: { prompt: 'What shapes your time horizon?', chips: ['The specific issues at stake', 'Who’s most affected', 'The office being filled'] },
     easterEgg: 'The Constitution was written in 1787 by delegates whose average age was 42. Benjamin Franklin was 81 and had to be carried into the convention hall. Gouverneur Morris, who wrote the final draft, was 35. The document they produced in four months of a Philadelphia summer has outlasted every other national constitution written in the same century. Whatever they were doing in that room, the time horizon was definitely not “next election cycle.”',
   },
   {
@@ -108,8 +108,8 @@ export const LAYER3_QUESTIONS: QuizQuestion[] = [
       { id: 'L3-Q8-c', text: 'National unity and civic health — the polarization and distrust that makes every other problem harder to solve.', scores: {} },
       { id: 'L3-Q8-d', text: 'Something else entirely — and it matters enough that I want to name it myself.', scores: {}, followUpPrompt: 'What’s the one issue you’d move if you could — in your own words. This becomes part of your Bedrock profile and helps us find the candidates and media that match what actually matters to you.' },
     ],
-    // Capstone has no "It depends" — D serves that role. Prompt kept for type
-    // completeness but the flow hides the It-depends choice for this question.
-    dependsFollowUp: { type: 'open_text', prompt: '' },
+    // Capstone has no "It depends" — D serves that role. Empty prompt is the
+    // sentinel the flow uses to hide the It-depends choice for this question.
+    dependsFollowUp: { prompt: '', chips: [] },
   },
 ]

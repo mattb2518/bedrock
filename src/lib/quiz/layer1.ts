@@ -49,9 +49,8 @@ export const LAYER1_QUESTIONS: QuizQuestion[] = [
       },
     ],
     dependsFollowUp: {
-      type: 'open_text',
-      prompt:
-        'What shapes your answer — the stakes, who’s affected, the track record of change in that area?',
+      prompt: 'What shapes your answer?',
+      chips: ['The stakes involved', 'Who’s affected', 'The track record of change in that area'],
     },
     // No easterEgg on A1 by design: the first question must auto-advance straight
     // to Q2 so the very first interaction proves the quiz moves fast, rather than
@@ -86,9 +85,8 @@ export const LAYER1_QUESTIONS: QuizQuestion[] = [
       },
     ],
     dependsFollowUp: {
-      type: 'multiple_choice',
       prompt: 'What tips the balance?',
-      choices: [
+      chips: [
         'Whether the problem crosses state lines',
         'Whether local governments have already tried and failed',
         'Whether equal treatment across states matters for this issue',
@@ -126,9 +124,8 @@ export const LAYER1_QUESTIONS: QuizQuestion[] = [
       },
     ],
     dependsFollowUp: {
-      type: 'multiple_choice',
       prompt: 'What tips the balance?',
-      choices: [
+      chips: [
         'The type of issue — trade, security, and humanitarian crises feel different',
         'The cost to Americans',
         'Whether other nations are sharing the burden',
@@ -164,9 +161,8 @@ export const LAYER1_QUESTIONS: QuizQuestion[] = [
       },
     ],
     dependsFollowUp: {
-      type: 'multiple_choice',
       prompt: 'What shapes your answer?',
-      choices: [
+      chips: [
         'How severe the injustice is',
         'How realistic near-term legislative change is',
         'Whether the harm is ongoing',
@@ -202,9 +198,8 @@ export const LAYER1_QUESTIONS: QuizQuestion[] = [
       },
     ],
     dependsFollowUp: {
-      type: 'multiple_choice',
       prompt: 'What shapes your answer?',
-      choices: [
+      chips: [
         'Whether the market has actually failed or just needs better rules',
         'Whether costs fall on people outside the transaction',
         'Whether government has a good track record on this specific problem',
@@ -240,9 +235,12 @@ export const LAYER1_QUESTIONS: QuizQuestion[] = [
       },
     ],
     dependsFollowUp: {
-      type: 'open_text',
-      prompt:
-        'What shapes your answer — whether the moment is politically ripe, how much harm is accumulating, whether a partial win forecloses the fuller one?',
+      prompt: 'What shapes your answer?',
+      chips: [
+        'Whether the moment is politically ripe',
+        'How much harm is accumulating',
+        'Whether a partial win forecloses the fuller one',
+      ],
     },
     easterEgg:
       "In 1849 Thoreau went to jail rather than pay a tax funding the Mexican-American War. Emerson visited and asked 'Henry, what are you doing in there?' Thoreau replied: 'Waldo, what are you doing out there?' The essay he wrote — Civil Disobedience — later influenced Gandhi and Martin Luther King Jr.",
@@ -275,9 +273,8 @@ export const LAYER1_QUESTIONS: QuizQuestion[] = [
       },
     ],
     dependsFollowUp: {
-      type: 'multiple_choice',
       prompt: 'What shapes your answer?',
-      choices: [
+      chips: [
         'How serious the cost to others is',
         'Whether the community norm is itself fair',
         'Whether government or community is doing the asking',
@@ -315,9 +312,12 @@ export const LAYER1_QUESTIONS: QuizQuestion[] = [
       },
     ],
     dependsFollowUp: {
-      type: 'open_text',
-      prompt:
-        'What shapes how much trust you extend — the type of institution, whether you can see their reasoning, whether they have a stake in the outcome?',
+      prompt: 'What shapes how much trust you extend?',
+      chips: [
+        'The type of institution',
+        'Whether you can see their reasoning',
+        'Whether they have a stake in the outcome',
+      ],
     },
     easterEgg:
       'Gallup has tracked American confidence in major institutions since the 1970s. Confidence in the US military has roughly doubled over that period. Confidence in Congress has fallen by about three-quarters. Same country, same Americans — two federal institutions on opposite trajectories.',
@@ -353,9 +353,8 @@ export const LAYER1_QUESTIONS: QuizQuestion[] = [
       },
     ],
     dependsFollowUp: {
-      type: 'multiple_choice',
       prompt: 'What shapes your view?',
-      choices: [
+      chips: [
         'Whether the private sector has already tried and failed',
         'Whether the benefits are genuinely broad',
         'Whether there’s a credible implementation plan',
@@ -392,9 +391,8 @@ export const LAYER1_QUESTIONS: QuizQuestion[] = [
       },
     ],
     dependsFollowUp: {
-      type: 'multiple_choice',
       prompt: 'What shapes your answer?',
-      choices: [
+      chips: [
         'Whether the shortage affects people outside the community',
         'Whether the community created the problem through exclusionary zoning',
         'Whether the state is offering resources alongside the mandate',
@@ -429,9 +427,8 @@ export const LAYER1_QUESTIONS: QuizQuestion[] = [
       },
     ],
     dependsFollowUp: {
-      type: 'multiple_choice',
       prompt: 'What shapes your answer?',
-      choices: [
+      chips: [
         'Whether the problem can’t be solved unilaterally',
         'Whether the agreement has real enforcement',
         'Whether other major powers are genuinely committed',
@@ -469,9 +466,12 @@ export const LAYER1_QUESTIONS: QuizQuestion[] = [
       },
     ],
     dependsFollowUp: {
-      type: 'open_text',
-      prompt:
-        'What would determine whether you’d support them — the specific issue, how much they’re softening, something about the candidate?',
+      prompt: 'What would determine whether you’d support them?',
+      chips: [
+        'The specific issue',
+        'How much they’re softening',
+        'Something about the candidate themselves',
+      ],
     },
     easterEgg:
       "In 1964 LBJ told aides that signing the Civil Rights Act would cost Democrats the South 'for a generation.' He signed it. Twenty-two years later Reagan struck a sweeping tax reform deal with Democratic leadership that cut rates and closed loopholes conservatives had argued about for decades. Both got their landmark bills because they could count votes. The legislation of idealists is usually written by pragmatists who got elected.",
@@ -506,9 +506,12 @@ export const LAYER1_QUESTIONS: QuizQuestion[] = [
       },
     ],
     dependsFollowUp: {
-      type: "open_text",
-      prompt:
-        "What would determine how much executive emergency authority you’d support — the nature of the threat, the specific powers, the track record of the president?",
+      prompt: 'What would determine how much executive emergency authority you’d support?',
+      chips: [
+        'The nature of the threat',
+        'The specific powers',
+        'The track record of the president',
+      ],
     },
     easterEgg:
       "The federal income tax was introduced in 1861 as a temporary Civil War measure. Repealed in 1872. Back in 1894. Struck down by the Supreme Court. Back via constitutional amendment in 1913. The United States has been arguing about a tax that was supposed to last four years for over 160 years. ‘Temporary’ is doing a lot of work in American governance.",
@@ -542,9 +545,13 @@ export const LAYER1_QUESTIONS: QuizQuestion[] = [
       },
     ],
     dependsFollowUp: {
-      type: 'open_text',
-      prompt:
-        'What would have made the response feel more legitimate — different policies, more honest communication, more local control, clearer expiration dates?',
+      prompt: 'What would have made the response feel more legitimate?',
+      chips: [
+        'Different policies',
+        'More honest communication',
+        'More local control',
+        'Clearer expiration dates',
+      ],
     },
     easterEgg:
       'The 1918 influenza pandemic killed an estimated 675,000 Americans — more than every U.S. war of the twentieth century combined. There was no national policy; every city decided for itself, and the country argued bitterly over masks, closures, and quarantines, just as it would a century later. Within a generation it had largely faded from public memory.',

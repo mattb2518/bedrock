@@ -88,15 +88,14 @@ Each layer completion unlocks a pillar. This is the reward architecture: complet
 - No option should be the obviously "correct" answer — all three must be genuinely defensible
 - Option C must have teeth — a real position with real consequences, not a bridge between A and B
 - **"It depends"** is a first-class answer, never a cop-out
-- Two follow-up mechanics for "It depends":
-  - **Open text:** "Tell us more — what shapes your answer?" Used when nuance is personal and hard to pre-enumerate
-  - **Choice follow-up (select all that apply):** 3-4 specific sub-cases. Used when sub-cases are predictable
-- Each question gets one follow-up mechanic, decided at write time
+- **Unified "It depends" follow-up (chips + open text):** Every "It depends" answer leads to one follow-up screen: the question's follow-up prompt, an open text field, and a collapsed disclosure labeled *"Need a starting point?"* Opening it reveals 3–5 suggestion chips specific to that question. Clicking a chip appends its phrase to the text field (separator "; " when text is already present); multiple chips stack; all appended text remains editable; free typing always available. AI reflect-back fires on the final combined text. Chips are authored at write time — static, per-question, never AI-generated at runtime — and pass the same bias check as options. This supersedes the former open-text/multiple-choice split: former MC choices convert to chips verbatim; former OT prompt hint-enumerations split into chips and the prompt trims to its lead clause.
 - **Dimension importance rating:** Single question at the end of Layer 1 — after all 14 questions, before the constellation reveal. Shows all eight dimensions as selectable tiles; user picks up to 3 that feel most central to their civic identity. Framing: *"You've just mapped how you think. Before we show you your constellation — which of these feel most central to who you are as a voter?"* Output feeds the recommendation engine as a weighting signal. Pushes Layer 1 to 15 items total.
 - **"Add context" on every question:** Small, subtle gray "+ add context" link below each answer. Expands an inline text field on click. No label saying "optional" — unobtrusiveness communicates that. Applies to all layers.
 - **Micro-reactions** after each answer: brief, warm, occasionally surprising, never partisan, occasionally humorous. User must tap, click, or press Enter to advance — no auto-advance. Click target should be the full screen or answer area, not a labeled button.
 - **Easter eggs:** American only — historical nuggets, serious trivia, or humor. Woven in naturally, roughly 1 per question. Mix of serious historical and lighter Americana.
 - **Bias check rule:** All questions reviewed for political lean before finalizing. Micro-reactions and examples must be balanced — no option should feel like the "wrong" answer
+- **Length guideline (not a hard cap):** Target ≤ 20 words for stems and ≤ 20 words for options (one position clause + at most one short supporting clause). Exceeding the target is a review trigger, not an auto-reject. Binding symmetry rule: within a question, options must carry comparable length and rhetorical weight — never trim one option's justification while leaving a sibling's intact. Bias re-check required after any trim pass.
+- **Persistent fit hint:** Small gray one-liner under every question stem, all layers: *"Pick the closest fit — perfect isn't required."*
 
 ### Account and Save/Return
 
@@ -368,7 +367,7 @@ Fifteen questions. About ten minutes. That alone earns your Civic Mantle and you
 
 Three optional layers after that sharpen everything: another 15–20 minutes total, whenever you want them. Each one unlocks something new.
 
-One thing: every question has an "It depends" option. It's not a cop-out — it's often the most accurate answer. If you pick it, we'll ask one quick follow-up. Your nuance is the point.
+One thing: pick the answer that most closely aligns with your views — it doesn't have to be a perfect fit. Every question also has an "It depends" option for when that's genuinely how you think. If you pick it, we'll ask one quick follow-up. Your nuance is the point.
 
 Ready? Let's find your bedrock.
 

@@ -24,7 +24,7 @@ export const LAYER2_QUESTIONS: QuizQuestion[] = [
       { id: "L2-Q1-d", text: "Move toward single-payer or Medicare-for-All — every other wealthy democracy covers everyone for less per capita, and the patchwork of private insurance is what makes American healthcare uniquely expensive.", microReaction: "The simplifying answer. Administrative overhead consumes about 30 cents of every American healthcare dollar — a cost most other systems don’t carry.", scores: {} },
       { id: "L2-Q1-e", text: "Put patients in control of the dollars — expand health savings accounts and direct-pay primary care, allow insurance to be bought across state lines, and let price-sensitive patients, not third-party payers, discipline costs. The reason healthcare has no real prices is that almost no one spends their own money on it.", microReaction: "Cosmetic surgery and LASIK aren’t covered by insurance — and their prices have fallen for decades while everything insurance touches has risen. Make people the buyers and prices start behaving.", scores: {} },
     ],
-    dependsFollowUp: { type: "open_text", prompt: "What do you think is the most broken part — costs, access, quality, insurance complexity?" },
+    dependsFollowUp: { prompt: "What do you think is the most broken part?", chips: ["Costs", "Access", "Quality", "Insurance complexity"] },
     easterEgg: "American healthcare spends roughly $1 trillion a year on administrative costs alone — more than the entire GDP of Sweden or Switzerland. A 2021 federal rule required hospitals to publish their prices. Most still haven\’t.",
   },
   {
@@ -38,7 +38,7 @@ export const LAYER2_QUESTIONS: QuizQuestion[] = [
       { id: 'L2-Q2-c', text: 'Win the technology race — the country that leads on solar, battery storage, and next-generation nuclear wins both the climate and the economic competition.', microReaction: 'Solar cost $75 per watt in 1977. It costs less than $0.20 today. That’s the learning curve. The question is how fast we want to accelerate it.', scores: {} },
       { id: "L2-Q2-d", text: "Go slower and prioritize affordability and reliability — let the transition follow cost and proven technology rather than mandated deadlines, keep energy cheap and the grid stable, and don\’t lock in expensive bets before they pencil out. The costs of moving too fast fall hardest on working families and energy-intensive regions.", microReaction: "The cost-benefit caution. Energy transitions are real, but so is the price of getting them wrong — and the people paying that price aren\’t usually the people making the decisions.", scores: {} },
     ],
-    dependsFollowUp: { type: "multiple_choice", prompt: "What shapes your view?", choices: ["How fast you think the transition needs to happen", "How much you trust government to pick the right technologies", "Whether international competitiveness matters as much as domestic emissions", "How you weigh costs on current energy users against future generations"] },
+    dependsFollowUp: { prompt: "What shapes your view?", chips: ["How fast you think the transition needs to happen", "How much you trust government to pick the right technologies", "Whether international competitiveness matters as much as domestic emissions", "How you weigh costs on current energy users against future generations"] },
     easterEgg: "The United States has more wind energy capacity than any country except China — enough to power about 46 million homes. Texas alone generates more wind power than most countries. The state that built its economy on oil is now one of the largest wind energy producers in the world.",
   },
   {
@@ -53,7 +53,7 @@ export const LAYER2_QUESTIONS: QuizQuestion[] = [
       { id: 'L2-Q3-d', text: 'Pass major new restrictions — universal background checks, a federal permit-to-purchase requirement, restrictions on military-style weapons, and stricter limits on who can carry where.', microReaction: 'The structural-change answer. Most other wealthy democracies treat firearms more like vehicles — licensed, regulated, and limited by type — and have dramatically lower gun violence rates.', scores: {} },
       { id: 'L2-Q3-e', text: 'Protect and expand gun rights — the problem is criminals, not lawful owners. Enforce existing laws against violent offenders, enact national concealed-carry reciprocity, and roll back restrictions that burden law-abiding owners without measurably reducing crime.', microReaction: 'The rights-first answer. The premise: an armed, law-abiding citizenry is a constitutional baseline, and policy aimed at lawful owners tends to miss where violence actually concentrates.', scores: {} },
     ],
-    dependsFollowUp: { type: 'multiple_choice', prompt: 'What shapes your view?', choices: ['Whether you think more laws would actually be enforced', 'Whether the focus should be on handguns or military-style rifles', 'Whether mental health is more central than access'] },
+    dependsFollowUp: { prompt: 'What shapes your view?', chips: ['Whether you think more laws would actually be enforced', 'Whether the focus should be on handguns or military-style rifles', 'Whether mental health is more central than access'] },
     easterEgg: "The Second Amendment is twenty-seven words long and has produced some of the most contested litigation in American history — yet for most of that history it was barely litigated at all. The modern body of individual-rights jurisprudence is only about fifty years old. Americans have been arguing about those twenty-seven words for far longer than the courts have.",
   },
   {
@@ -67,7 +67,7 @@ export const LAYER2_QUESTIONS: QuizQuestion[] = [
       { id: 'L2-Q4-c', text: 'Invest in early childhood — dollar for dollar, pre-K investment produces better long-term outcomes than almost any other education spending.', microReaction: 'By the time a child enters kindergarten, the gaps that will define their educational trajectory are already forming.', scores: {} },
       { id: 'L2-Q4-d', text: 'Expand school choice broadly — vouchers, education savings accounts, and tax credits that let public funds follow students to the school their parents choose, public or private, secular or religious.', microReaction: 'The parent-power answer. The premise: parents allocate education resources better than school districts do, and competition raises quality across the board.', scores: {} },
     ],
-    dependsFollowUp: { type: 'multiple_choice', prompt: 'What shapes your view?', choices: ['Whether your concern is primarily equity or quality', 'Whether you distinguish between charter schools and private vouchers', 'Whether you think the problem starts before kindergarten'] },
+    dependsFollowUp: { prompt: 'What shapes your view?', chips: ['Whether your concern is primarily equity or quality', 'Whether you distinguish between charter schools and private vouchers', 'Whether you think the problem starts before kindergarten'] },
   },
   {
     id: "L2-Q5",
@@ -80,7 +80,7 @@ export const LAYER2_QUESTIONS: QuizQuestion[] = [
       { id: 'L2-Q5-c', text: 'Significantly raise the overall numbers — the United States has an aging population, a below-replacement birth rate, and industries that can’t find enough workers.', microReaction: 'Japan chose restriction and is now managing a shrinking, aging population with severe labor shortages. The United States has a different option — but the window may be narrower than most people realize.', scores: {} },
       { id: 'L2-Q5-d', text: 'Reduce overall numbers — current levels exceed what the labor market, public services, and assimilation infrastructure can absorb. Lower numbers would raise wages for existing workers and ease pressure on housing.', microReaction: 'The level-the-curve answer. Labor unions and environmentalists have historically held versions of this position alongside restrictionist conservatives — the coalition is older and stranger than it looks.', scores: {} },
     ],
-    dependsFollowUp: { type: 'multiple_choice', prompt: 'What shapes your view?', choices: ['Whether you prioritize economic contribution or family unity', 'Whether current overall levels are too high, too low, or about right', 'Whether immigration levels affect wages for existing workers'] },
+    dependsFollowUp: { prompt: 'What shapes your view?', chips: ['Whether you prioritize economic contribution or family unity', 'Whether current overall levels are too high, too low, or about right', 'Whether immigration levels affect wages for existing workers'] },
     easterEgg: 'In 1977 ABC aired a Schoolhouse Rock segment called "The Great American Melting Pot" — a three-minute animated song about immigration that ended with the Statue of Liberty serving soup. Watched by roughly every American child of that generation.',
   },
   {
@@ -93,7 +93,7 @@ export const LAYER2_QUESTIONS: QuizQuestion[] = [
       { id: 'L2-Q6-b', text: 'Raise revenue — the United States collects less in taxes as a share of the economy than most comparable wealthy countries.', microReaction: 'American federal tax revenue as a share of GDP is lower than Germany, France, Canada, the UK, and Japan. The gap isn’t just a spending problem.', scores: {} },
       { id: 'L2-Q6-c', text: 'A bipartisan grand bargain that takes both seriously — every serious deficit reduction plan in American history has required both revenue increases and spending cuts.', microReaction: 'The deficit is the gap between revenue and spending. Every commission that has studied this seriously — Simpson-Bowles, Domenici-Rivlin — has reached the same conclusion: you need both.', scores: {} },
     ],
-    dependsFollowUp: { type: 'multiple_choice', prompt: 'What shapes your view?', choices: ['Whether you think the debt is an immediate crisis or a long-term problem', 'Whether tax increases or spending cuts should lead', 'Whether you think the political system is capable of a grand bargain'] },
+    dependsFollowUp: { prompt: 'What shapes your view?', chips: ['Whether you think the debt is an immediate crisis or a long-term problem', 'Whether tax increases or spending cuts should lead', 'Whether you think the political system is capable of a grand bargain'] },
   },
   {
     id: "L2-Q7",
@@ -105,7 +105,7 @@ export const LAYER2_QUESTIONS: QuizQuestion[] = [
       { id: 'L2-Q7-b', text: 'Demand more from partners and less from our treasury — allies who can afford to spend more on their own defense should.', microReaction: 'Most NATO members still don’t meet the 2% of GDP spending target they committed to in 2006. American taxpayers have been subsidizing European security for decades.', scores: {} },
       { id: 'L2-Q7-c', text: 'Rebalance toward economic and diplomatic tools — military superiority hasn’t produced the outcomes in Afghanistan, Iraq, or Libya that justified the investment.', microReaction: 'The United States has the most powerful military in human history and has fought four major wars since 1950 with mixed results. At some point the question isn’t whether we can win militarily — it’s whether winning militarily solves the problem.', scores: {} },
     ],
-    dependsFollowUp: { type: 'multiple_choice', prompt: 'What shapes your view?', choices: ['Whether great-power competition with China changes the calculus', 'Whether military strength deters conflict or invites it', 'Whether domestic investment should take priority'] },
+    dependsFollowUp: { prompt: 'What shapes your view?', chips: ['Whether great-power competition with China changes the calculus', 'Whether military strength deters conflict or invites it', 'Whether domestic investment should take priority'] },
   },
   {
     id: "L2-Q8",
@@ -118,7 +118,7 @@ export const LAYER2_QUESTIONS: QuizQuestion[] = [
       { id: "L2-Q8-c", text: "Pass a national legislative framework — rights that vary by zip code aren’t really rights, and a functioning democracy should try to reach a durable compromise rather than leaving it to the courts or the swing of state legislatures: access in early pregnancy, restrictions later.", microReaction: "Polling tends to find more support for access early and limits later than either party’s base holds — though what counts as a fair compromise here varies enormously, and for some it isn’t a question that admits one.", scores: {} },
       { id: 'L2-Q8-d', text: 'Codify federal protection with no gestational limits — abortion access as a constitutional right of bodily autonomy, no state restrictions, public funding for those who can’t afford it.', microReaction: 'The bodily-autonomy answer. The position that government’s proper role in pregnancy decisions is, ultimately, none.', scores: {} },
     ],
-    dependsFollowUp: { type: 'open_text', prompt: 'What factors matter most — stage of pregnancy, specific circumstances, role of religious belief, federal vs. state authority, whether to focus on the narrower contraception and IVF protections that command broader consensus?' },
+    dependsFollowUp: { prompt: 'What factors matter most?', chips: ['Stage of pregnancy', 'Specific circumstances', 'Role of religious belief', 'Federal vs. state authority', 'Focusing on contraception and IVF protections that command broader consensus'] },
   },
   {
     id: "L2-Q9",
@@ -131,7 +131,7 @@ export const LAYER2_QUESTIONS: QuizQuestion[] = [
       { id: 'L2-Q9-c', text: 'Regulate the algorithms, not the data — the harm isn’t that companies collect information, it’s that they use it to maximize engagement in ways that damage mental health, spread misinformation, and polarize the electorate.', microReaction: 'Facebook’s own research showed its algorithms made users angrier and more polarized — and it deployed them anyway because engagement drove revenue.', scores: {} },
       { id: 'L2-Q9-d', text: 'Trust competition and exit — new platforms emerge when old ones overreach, and government tools tend to entrench whoever’s already large. Microsoft was supposed to be unstoppable in 1998; TikTok displaced Facebook for a generation; Bluesky and Mastodon are responses to Twitter.', microReaction: 'The market-correcting answer. Big Tech criticism is bipartisan, but so is concern that letting Washington pick winners and losers in technology has a worse track record than the problem it’s trying to fix.', scores: {} },
     ],
-    dependsFollowUp: { type: 'multiple_choice', prompt: 'What shapes your view?', choices: ['Whether competition or regulation is the more effective tool', 'Whether you’re more concerned about privacy or algorithmic harm', 'Whether American tech dominance is a national security asset worth protecting'] },
+    dependsFollowUp: { prompt: 'What shapes your view?', chips: ['Whether competition or regulation is the more effective tool', 'Whether you’re more concerned about privacy or algorithmic harm', 'Whether American tech dominance is a national security asset worth protecting'] },
     easterEgg: 'The United States has comprehensive federal privacy laws for video rental records, children’s online activity, and educational records. There is no comprehensive federal privacy law for anything else. The Video Privacy Protection Act of 1988 was passed specifically because a reporter got Robert Bork’s Blockbuster rental history during his Supreme Court confirmation. Your Blockbuster history has been federally protected for 35 years. Your location data has not.',
   },
 ]

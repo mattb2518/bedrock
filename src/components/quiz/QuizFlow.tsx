@@ -208,6 +208,11 @@ export default function QuizFlow() {
   // Transient per-question UI state
   const [pendingOption, setPendingOption] = useState<string | null>(null)
   const [followText, setFollowText] = useState('')
+  // "Need a starting point?" disclosure for the It-depends follow-up (SPEC §5).
+  // Chips are clickable once each — clicking appends to the textarea, and the
+  // user edits the combined text directly (no toggle-remove).
+  const [chipsOpen, setChipsOpen] = useState(false)
+  const [addedChips, setAddedChips] = useState<string[]>([])
   const [interstitial, setInterstitial] = useState<Interstitial | null>(null)
   const [picks, setPicks] = useState<Dimension[]>([])
   const [dbPicks, setDbPicks] = useState<string[]>([])
@@ -244,6 +249,8 @@ export default function QuizFlow() {
   function clearTransient() {
     setPendingOption(null)
     setFollowText('')
+    setChipsOpen(false)
+    setAddedChips([])
     setInlineReflection(null)
   }
 
@@ -284,6 +291,8 @@ export default function QuizFlow() {
       setPendingOption(null)
       setFollowText('')
     }
+    setChipsOpen(false)
+    setAddedChips([])
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [question?.id, phase])
 
@@ -455,14 +464,30 @@ export default function QuizFlow() {
   // revisit. Only options with their own follow-up field wait for input.
   function selectOption(optId: string) {
     const opt = question?.options.find((o) => o.id === optId)
-    if (pendingOption !== optId) setFollowText('')
+    if (pendingOption !== optId) {
+      setFollowText('')
+      setChipsOpen(false)
+      setAddedChips([])
+    }
     setPendingOption(optId)
     if (!opt?.followUpPrompt) finalizeAnswer(optId, '')
   }
 
   function selectItDepends() {
-    if (pendingOption !== IT_DEPENDS) setFollowText('')
+    if (pendingOption !== IT_DEPENDS) {
+      setFollowText('')
+      setChipsOpen(false)
+      setAddedChips([])
+    }
     setPendingOption(IT_DEPENDS)
+  }
+
+  // Append a suggestion chip's phrase to the follow-up text ("; "-separated
+  // when text is already present). The chip then reads as added and goes inert;
+  // the user edits the combined text freely.
+  function appendChip(chip: string) {
+    setFollowText((prev) => (prev.trim().length > 0 ? `${prev}; ${chip}` : chip))
+    setAddedChips((prev) => [...prev, chip])
   }
 
   function finishImportance() {
@@ -630,7 +655,7 @@ export default function QuizFlow() {
           Three optional layers after that sharpen everything: another 15–20 minutes total, whenever you want them. Each one unlocks something new.
         </Body>
         <Body>
-          One thing: every question has an &ldquo;It depends&rdquo; option. It&apos;s not a cop-out — it&apos;s often the most accurate answer. If you pick it, we&apos;ll ask one quick follow-up. Your nuance is the point.
+          One thing: pick the answer that most closely aligns with your views — it doesn&apos;t have to be a perfect fit. Every question also has an &ldquo;It depends&rdquo; option for when that&apos;s genuinely how you think. If you pick it, we&apos;ll ask one quick follow-up. Your nuance is the point.
         </Body>
         <div style={{ marginTop: 'var(--space-8)' }}>
           <button style={primaryBtn} onClick={begin}>
@@ -1152,14 +1177,13 @@ export default function QuizFlow() {
   const picked = pendingOption
   const pickedOption = question.options.find((o) => o.id === picked)
   const isDepends = picked === IT_DEPENDS
-  // "It depends" always opens a free-text box now; an option may also carry its
-  // own follow-up field. Either way we collect text, never multiple-choice chips.
+  // "It depends" always opens a free-text box; an option may also carry its
+  // own follow-up field. Both collect text — but only the It-depends path
+  // offers the authored suggestion chips (SPEC §5 unified follow-up).
   const needsFollowText = isDepends || !!pickedOption?.followUpPrompt
   const followReady = !needsFollowText || followText.trim().length > 0
   const followPrompt = pickedOption?.followUpPrompt ?? question.dependsFollowUp.prompt
-  // Authored prompt themes (formerly chips) become optional example hints under
-  // the box — they help the user know what to write without forcing a choice.
-  const followExamples = isDepends ? question.dependsFollowUp.choices ?? [] : []
+  const followChips = isDepends ? question.dependsFollowUp.chips : []
 
   return (
     <Shell>
@@ -1184,9 +1208,13 @@ export default function QuizFlow() {
         <div style={{ height: '100%', width: `${(index / questions.length) * 100}%`, backgroundColor: 'var(--color-gold)', borderRadius: 'var(--radius-full)', transition: 'width 0.3s' }} />
       </div>
 
-      <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-h3, var(--text-body-lg))', color: 'var(--color-text-primary)', lineHeight: 'var(--leading-snug, 1.4)', marginBottom: 'var(--space-6)' }}>
+      <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-h3, var(--text-body-lg))', color: 'var(--color-text-primary)', lineHeight: 'var(--leading-snug, 1.4)', marginBottom: 'var(--space-2)' }}>
         {question.text}
       </h2>
+      {/* Persistent fit hint — every question, all layers (SPEC §5) */}
+      <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', margin: '0 0 var(--space-6)' }}>
+        Pick the closest fit — perfect isn&apos;t required.
+      </p>
 
       {shuffled.map((opt) => {
         const selected = picked === opt.id
@@ -1213,14 +1241,9 @@ export default function QuizFlow() {
           You can always say it in your own words. */}
       {needsFollowText && (
         <div style={{ marginTop: 'var(--space-4)' }}>
-          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', marginBottom: followExamples.length ? 'var(--space-2)' : 'var(--space-3)' }}>
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', marginBottom: 'var(--space-3)' }}>
             {followPrompt}
           </p>
-          {followExamples.length > 0 && (
-            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-micro)', color: 'var(--color-text-muted)', fontStyle: 'italic', marginBottom: 'var(--space-3)', lineHeight: 'var(--leading-relaxed)' }}>
-              For instance: {followExamples.join(' · ')}
-            </p>
-          )}
           <textarea
             value={followText}
             onChange={(e) => setFollowText(e.target.value)}
@@ -1238,6 +1261,52 @@ export default function QuizFlow() {
           <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-micro)', color: 'var(--color-text-muted)', marginTop: 'var(--space-2)' }}>
             Press Enter to continue · Shift+Enter for a new line
           </p>
+          {/* "Need a starting point?" — collapsed disclosure revealing the
+              question's authored suggestion chips. Same visual gesture as the
+              Conversations Mad Libs picker chips. */}
+          {followChips.length > 0 && (
+            <div style={{ marginTop: 'var(--space-3)' }}>
+              <button
+                onClick={() => setChipsOpen((o) => !o)}
+                style={{ ...mutedLinkBtn, display: 'inline-flex', alignItems: 'center', gap: 6 }}
+                aria-expanded={chipsOpen}
+              >
+                <span aria-hidden="true" style={{ display: 'inline-block', fontSize: 10, transform: chipsOpen ? 'rotate(90deg)' : 'none', transition: 'transform 0.15s' }}>
+                  ▸
+                </span>
+                Need a starting point?
+              </button>
+              {chipsOpen && (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)', marginTop: 'var(--space-3)' }}>
+                  {followChips.map((chip) => {
+                    const added = addedChips.includes(chip)
+                    return (
+                      <button
+                        key={chip}
+                        onClick={() => appendChip(chip)}
+                        disabled={added}
+                        style={{
+                          fontFamily: 'var(--font-body)',
+                          fontSize: 'var(--text-small)',
+                          padding: '4px 12px',
+                          borderRadius: 'var(--radius-full)',
+                          border: '1px solid var(--color-border)',
+                          backgroundColor: 'transparent',
+                          color: added ? 'var(--color-text-muted)' : 'var(--color-text-secondary)',
+                          opacity: added ? 0.6 : 1,
+                          cursor: added ? 'default' : 'pointer',
+                          transition: 'all 0.15s',
+                          textAlign: 'left',
+                        }}
+                      >
+                        {added ? `✓ ${chip}` : chip}
+                      </button>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       )}
 

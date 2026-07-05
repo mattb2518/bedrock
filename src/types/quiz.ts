@@ -12,9 +12,6 @@ export type Dimension =
 // Which layer of the quiz
 export type QuizLayer = 1 | 2 | 3 | 4
 
-// Follow-up shown after the "It depends" choice
-export type FollowUpType = 'open_text' | 'multiple_choice'
-
 // One substantive answer option.
 //
 // `id` is STABLE and scoring keys off it — never off display order — because
@@ -40,9 +37,8 @@ export interface QuizQuestion {
   dimensions: Dimension[] // axes this question informs
   options: AnswerOption[] // 3–4 substantive options
   dependsFollowUp: {
-    type: FollowUpType
-    prompt: string
-    choices?: string[] // present only for multiple_choice
+    prompt: string // '' means the question has no It-depends path (e.g. the L3 capstone)
+    chips: string[] // authored "Need a starting point?" suggestions — static, never AI-generated
   }
   easterEgg?: string // shown to ALL users after they answer (SPEC [EE])
   note?: string // authoring note (e.g. A1's fourth-option rationale)
@@ -55,8 +51,11 @@ export const IT_DEPENDS = 'it_depends' as const
 export interface QuizAnswer {
   questionId: string
   optionId: string // a real option id, or IT_DEPENDS
-  dependsText?: string // open-text follow-up response
-  dependsChoices?: string[] // selected multiple-choice follow-up items
+  dependsText?: string // open-text follow-up response (chip clicks append into this)
+  // DEPRECATED — from the former multiple-choice follow-up. Kept so previously
+  // stored answers still deserialize; nothing writes it anymore. Readers treat
+  // it as equivalent to dependsText, joined with "; ", when dependsText is empty.
+  dependsChoices?: string[]
 }
 
 // Scores on all eight dimensions — each value 0–100
