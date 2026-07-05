@@ -170,7 +170,7 @@ function evaluateDealbreakers(
   for (const pred of userDealbreakers) {
     const idx = dealbreakerIndex(pred.itemId)
     const eval_ = candidate.dealbreakers[idx]
-    if (!eval_) continue  // no data for this item on this candidate → treat as unknown
+    if (!eval_) { unknownIds.push(pred.itemId); continue }  // missing entry → must surface as unknown, not silent clear (§19.4)
     if (eval_.status === 'crosses') return { excluded: true, unknownIds: [] }
     if (eval_.status === 'unknown') unknownIds.push(pred.itemId)
   }

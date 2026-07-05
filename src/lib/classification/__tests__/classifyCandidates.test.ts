@@ -135,7 +135,27 @@ describe('classifyCandidate — dealbreaker evaluation', () => {
   })
 })
 
-// ── 4. Parse failure ─────────────────────────────────────────────────────────
+// ── 4. Dealbreaker backfill ──────────────────────────────────────────────────
+
+describe('classifyCandidate — dealbreaker backfill', () => {
+  it('backfills missing dealbreaker indices as unknown/Not evaluated', async () => {
+    // INCUMBENT_RESPONSE only has DB-1, DB-2, DB-5. All others should be backfilled.
+    const result = await classifyCandidate(INCUMBENT_INPUT, mockClient(INCUMBENT_RESPONSE))
+    // Pick an index that is in LAYER4_SECTIONS but absent from INCUMBENT_RESPONSE (e.g. DB-6 → 6)
+    const backfilled = result.candidateData.dealbreakers[6]
+    expect(backfilled).toBeDefined()
+    expect(backfilled?.status).toBe('unknown')
+    expect((backfilled as { status: 'unknown'; note: string }).note).toBe('Not evaluated by classifier')
+  })
+
+  it('does not overwrite an entry the classifier already returned', async () => {
+    const result = await classifyCandidate(INCUMBENT_INPUT, mockClient(INCUMBENT_RESPONSE))
+    // DB-1 was returned as 'clear' — backfill must not overwrite it
+    expect(result.candidateData.dealbreakers[1]).toEqual({ status: 'clear' })
+  })
+})
+
+// ── 5. Parse failure ─────────────────────────────────────────────────────────
 
 describe('classifyCandidate — parse failure', () => {
   it('throws on non-JSON response', async () => {

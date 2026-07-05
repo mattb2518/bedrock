@@ -24,6 +24,7 @@ import type { FederalCandidate, FederalBallot } from '@/lib/civic/federalCandida
 import type { StateLegBallot } from '@/lib/civic/stateLegCandidates'
 import type { CurrentOfficial, CurrentOfficialsBallot } from '@/lib/civic/currentOfficials'
 import { isStateLegCandidate, type BallotCandidate } from '@/lib/civic/ballotTypes'
+import { DEALBREAKER_TEXT } from '@/lib/quiz/layer4'
 import Constellation from '@/components/ui/Constellation'
 import PublicLookupGate from '@/components/civic/PublicLookupGate'
 
@@ -248,10 +249,24 @@ function CandidateCard({
           borderRadius: 'var(--radius-sm)',
           padding: 'var(--space-2) var(--space-3)',
         }}>
-          <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)' }}>
-            <strong style={{ color: 'var(--color-text-primary)' }}>Couldn&apos;t verify:</strong>{' '}
-            {unknownDealbreakers.join(', ')} — research this yourself before deciding.
-          </p>
+          {unknownDealbreakers.length <= 2 ? (
+            <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)' }}>
+              <strong style={{ color: 'var(--color-text-primary)' }}>Couldn&apos;t verify:</strong>{' '}
+              {unknownDealbreakers.map((id) => DEALBREAKER_TEXT[id] ?? id).join(', ')} — research this yourself before deciding.
+            </p>
+          ) : (
+            <>
+              <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)' }}>
+                <strong style={{ color: 'var(--color-text-primary)' }}>Couldn&apos;t verify:</strong>
+              </p>
+              <ul style={{ margin: 'var(--space-1) 0 0 var(--space-4)', padding: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)' }}>
+                {unknownDealbreakers.map((id) => (
+                  <li key={id}>{DEALBREAKER_TEXT[id] ?? id}</li>
+                ))}
+                <li style={{ listStyle: 'none', marginTop: 2 }}>Research these yourself before deciding.</li>
+              </ul>
+            </>
+          )}
         </div>
       )}
 
@@ -370,7 +385,7 @@ function CandidateCard({
                 </p>
                 <ul style={{ margin: 'var(--space-1) 0 0 var(--space-4)', padding: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: '#92400e' }}>
                   {unknownDealbreakers.map((id) => (
-                    <li key={id}>{id}</li>
+                    <li key={id}>{DEALBREAKER_TEXT[id] ?? id}</li>
                   ))}
                 </ul>
               </div>
@@ -620,9 +635,17 @@ function OfficialCard({
             <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: '#92400e' }}>
               Crosses one of your dealbreakers — you decide
             </p>
-            <p style={{ margin: '2px 0 0', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: '#92400e' }}>
-              {crossedDealbreakers.join(', ')}
-            </p>
+            {crossedDealbreakers.length <= 2 ? (
+              <p style={{ margin: '2px 0 0', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: '#92400e' }}>
+                {crossedDealbreakers.map((id) => DEALBREAKER_TEXT[id] ?? id).join(', ')}
+              </p>
+            ) : (
+              <ul style={{ margin: 'var(--space-1) 0 0 var(--space-4)', padding: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: '#92400e' }}>
+                {crossedDealbreakers.map((id) => (
+                  <li key={id}>{DEALBREAKER_TEXT[id] ?? id}</li>
+                ))}
+              </ul>
+            )}
           </div>
         </div>
       )}
@@ -635,10 +658,24 @@ function OfficialCard({
           borderRadius: 'var(--radius-sm)',
           padding: 'var(--space-2) var(--space-3)',
         }}>
-          <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)' }}>
-            <strong style={{ color: 'var(--color-text-primary)' }}>Couldn&apos;t verify:</strong>{' '}
-            {unknownDealbreakers.join(', ')} — research this yourself before deciding.
-          </p>
+          {unknownDealbreakers.length <= 2 ? (
+            <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)' }}>
+              <strong style={{ color: 'var(--color-text-primary)' }}>Couldn&apos;t verify:</strong>{' '}
+              {unknownDealbreakers.map((id) => DEALBREAKER_TEXT[id] ?? id).join(', ')} — research this yourself before deciding.
+            </p>
+          ) : (
+            <>
+              <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)' }}>
+                <strong style={{ color: 'var(--color-text-primary)' }}>Couldn&apos;t verify:</strong>
+              </p>
+              <ul style={{ margin: 'var(--space-1) 0 0 var(--space-4)', padding: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)' }}>
+                {unknownDealbreakers.map((id) => (
+                  <li key={id}>{DEALBREAKER_TEXT[id] ?? id}</li>
+                ))}
+                <li style={{ listStyle: 'none', marginTop: 2 }}>Research these yourself before deciding.</li>
+              </ul>
+            </>
+          )}
         </div>
       )}
 
@@ -684,21 +721,48 @@ function YourOfficialsMode({
   useEffect(() => {
     if (!userId) return
     const supabase = createClient()
-    void supabase.from('quiz_profiles').select('formatted_address').eq('user_id', userId).maybeSingle().then(({ data }) => {
-      const addr = data?.formatted_address
-      if (addr) {
+    void supabase
+      .from('quiz_profiles')
+      .select('formatted_address, district_state, district_cd, district_sldu, district_sldl')
+      .eq('user_id', userId)
+      .maybeSingle()
+      .then(({ data }) => {
+        const addr = data?.formatted_address
+        if (!addr) return
         setSavedAddress(addr)
         startTransition(async () => {
           try {
-            const { state, congressionalDistrict, stateSenateDistrict, stateHouseDistrict } = await resolveDistrict(addr)
-            if (!state) return
-            const result = await fetchCurrentOfficials(state, congressionalDistrict, stateSenateDistrict, stateHouseDistrict)
-            setOfficials(result)
+            if (data.district_state) {
+              // District already resolved — skip geocode roundtrip
+              const result = await fetchCurrentOfficials(
+                data.district_state,
+                data.district_cd ?? null,
+                data.district_sldu ?? null,
+                data.district_sldl ?? null,
+              )
+              setOfficials(result)
+            } else {
+              const { state, congressionalDistrict, stateSenateDistrict, stateHouseDistrict } = await resolveDistrict(addr)
+              if (!state) return
+              const { error: upsertErr } = await supabase.from('quiz_profiles').upsert(
+                {
+                  user_id: userId,
+                  district_state: state,
+                  district_cd: congressionalDistrict,
+                  district_sldu: stateSenateDistrict,
+                  district_sldl: stateHouseDistrict,
+                  districts_resolved_at: new Date().toISOString(),
+                },
+                { onConflict: 'user_id' }
+              )
+              if (upsertErr) console.error('YourOfficialsMode mount: failed to persist district scalars', upsertErr)
+              const result = await fetchCurrentOfficials(state, congressionalDistrict, stateSenateDistrict, stateHouseDistrict)
+              setOfficials(result)
+            }
           } catch { /* user can retry via Change */ }
         })
-      }
-    })
-  }, [userId]) // eslint-disable-line react-hooks/exhaustive-deps
+      })
+  }, [userId])
 
   async function handleAddressSelect(formattedAddress: string) {
     setSavedAddress(formattedAddress)
@@ -707,10 +771,14 @@ function YourOfficialsMode({
     setFetchError(null)
     savePendingAddress(formattedAddress)
     if (userId) {
-      await createClient().from('quiz_profiles').upsert(
+      const { error: addrErr } = await createClient().from('quiz_profiles').upsert(
         { user_id: userId, formatted_address: formattedAddress },
         { onConflict: 'user_id' }
       )
+      if (addrErr) {
+        console.error('YourOfficialsMode: failed to save address', addrErr)
+        setFetchError("Couldn't save your address — it may not persist across visits.")
+      }
     }
     startTransition(async () => {
       try {
@@ -718,6 +786,24 @@ function YourOfficialsMode({
         if (!state) {
           setFetchError('Could not determine your state from that address. Try including your city and state.')
           return
+        }
+        if (userId) {
+          const { error: districtErr } = await createClient().from('quiz_profiles').upsert(
+            {
+              user_id: userId,
+              formatted_address: formattedAddress,
+              district_state: state,
+              district_cd: congressionalDistrict,
+              district_sldu: stateSenateDistrict,
+              district_sldl: stateHouseDistrict,
+              districts_resolved_at: new Date().toISOString(),
+            },
+            { onConflict: 'user_id' }
+          )
+          if (districtErr) {
+            console.error('YourOfficialsMode: failed to save district scalars', districtErr)
+            setFetchError("Couldn't save your address — it may not persist across visits.")
+          }
         }
         const result = await fetchCurrentOfficials(state, congressionalDistrict, stateSenateDistrict, stateHouseDistrict)
         setOfficials(result)
@@ -1045,6 +1131,7 @@ function YourBallotHoldingState({
   const [userEmail, setUserEmail] = useState<string | null>(null)
   const [savedAddress, setSavedAddress] = useState<string | null>(null)
   const [showAddressInput, setShowAddressInput] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
 
   useEffect(() => {
     if (!userId) return
@@ -1062,9 +1149,17 @@ function YourBallotHoldingState({
   async function handleAddressSelect(formattedAddress: string) {
     setSavedAddress(formattedAddress)
     setShowAddressInput(false)
+    setSaveError(null)
     savePendingAddress(formattedAddress)
     if (userId) {
-      await createClient().from('quiz_profiles').upsert({ user_id: userId, formatted_address: formattedAddress }, { onConflict: 'user_id' })
+      const { error: addrErr } = await createClient().from('quiz_profiles').upsert(
+        { user_id: userId, formatted_address: formattedAddress },
+        { onConflict: 'user_id' }
+      )
+      if (addrErr) {
+        console.error('YourBallotHoldingState: failed to save address', addrErr)
+        setSaveError("Couldn't save your address — it may not persist across visits.")
+      }
     }
   }
 
@@ -1113,6 +1208,11 @@ function YourBallotHoldingState({
               onSelect={handleAddressSelect}
             />
           </>
+        )}
+        {saveError && (
+          <p style={{ margin: 'var(--space-2) 0 0', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-red)' }}>
+            {saveError}
+          </p>
         )}
       </div>
 
@@ -1193,28 +1293,59 @@ export default function YourBallotPage() {
   useEffect(() => {
     if (!userId) return
     const supabase = createClient()
-    void supabase.from('quiz_profiles').select('formatted_address').eq('user_id', userId).maybeSingle().then(({ data }) => {
-      const addr = data?.formatted_address
-      if (addr) {
+    void supabase
+      .from('quiz_profiles')
+      .select('formatted_address, district_state, district_cd, district_sldu, district_sldl')
+      .eq('user_id', userId)
+      .maybeSingle()
+      .then(({ data }) => {
+        const addr = data?.formatted_address
+        if (!addr) return
         setSavedAddress(addr)
         if (BALLOT_DATA_READY) {
           startTransition(async () => {
             try {
-              const { normalizedAddress, state, congressionalDistrict, stateSenateDistrict, stateHouseDistrict } = await resolveDistrict(addr)
-              if (!state) return
-              const [federalBallot, stateLeg] = await Promise.all([
-                fetchFederalCandidates(state, congressionalDistrict),
-                fetchStateLegCandidates(state, stateSenateDistrict, stateHouseDistrict).catch(() => null),
-              ])
-              setBallot(federalBallot)
-              setStateLegBallot(stateLeg)
-              setResolvedAddress(normalizedAddress ?? addr)
+              if (data.district_state) {
+                // District already resolved — skip geocode roundtrip
+                const state = data.district_state
+                const congressionalDistrict = data.district_cd ?? null
+                const stateSenateDistrict = data.district_sldu ?? null
+                const stateHouseDistrict = data.district_sldl ?? null
+                const [federalBallot, stateLeg] = await Promise.all([
+                  fetchFederalCandidates(state, congressionalDistrict),
+                  fetchStateLegCandidates(state, stateSenateDistrict, stateHouseDistrict).catch(() => null),
+                ])
+                setBallot(federalBallot)
+                setStateLegBallot(stateLeg)
+                setResolvedAddress(addr)
+              } else {
+                const { normalizedAddress, state, congressionalDistrict, stateSenateDistrict, stateHouseDistrict } = await resolveDistrict(addr)
+                if (!state) return
+                const { error: upsertErr } = await supabase.from('quiz_profiles').upsert(
+                  {
+                    user_id: userId,
+                    district_state: state,
+                    district_cd: congressionalDistrict,
+                    district_sldu: stateSenateDistrict,
+                    district_sldl: stateHouseDistrict,
+                    districts_resolved_at: new Date().toISOString(),
+                  },
+                  { onConflict: 'user_id' }
+                )
+                if (upsertErr) console.error('YourBallotPage mount: failed to persist district scalars', upsertErr)
+                const [federalBallot, stateLeg] = await Promise.all([
+                  fetchFederalCandidates(state, congressionalDistrict),
+                  fetchStateLegCandidates(state, stateSenateDistrict, stateHouseDistrict).catch(() => null),
+                ])
+                setBallot(federalBallot)
+                setStateLegBallot(stateLeg)
+                setResolvedAddress(normalizedAddress ?? addr)
+              }
             } catch { /* user can retry via Change */ }
           })
         }
-      }
-    })
-  }, [userId]) // eslint-disable-line react-hooks/exhaustive-deps
+      })
+  }, [userId])
 
   // Build MatchKey once per session
   const matchKey = useMemo(() => {
@@ -1290,10 +1421,14 @@ export default function YourBallotPage() {
     setAddressError(null)
     savePendingAddress(formattedAddress)
     if (userId) {
-      await createClient().from('quiz_profiles').upsert(
+      const { error: addrErr } = await createClient().from('quiz_profiles').upsert(
         { user_id: userId, formatted_address: formattedAddress },
         { onConflict: 'user_id' }
       )
+      if (addrErr) {
+        console.error('YourBallotPage: failed to save address', addrErr)
+        setAddressError("Couldn't save your address — it may not persist across visits.")
+      }
     }
     startTransition(async () => {
       try {
@@ -1301,6 +1436,24 @@ export default function YourBallotPage() {
         if (!state) {
           setAddressError('Could not determine your state from that address. Try including your city and state.')
           return
+        }
+        if (userId) {
+          const { error: districtErr } = await createClient().from('quiz_profiles').upsert(
+            {
+              user_id: userId,
+              formatted_address: formattedAddress,
+              district_state: state,
+              district_cd: congressionalDistrict,
+              district_sldu: stateSenateDistrict,
+              district_sldl: stateHouseDistrict,
+              districts_resolved_at: new Date().toISOString(),
+            },
+            { onConflict: 'user_id' }
+          )
+          if (districtErr) {
+            console.error('YourBallotPage: failed to save district scalars', districtErr)
+            setAddressError("Couldn't save your address — it may not persist across visits.")
+          }
         }
         const [federalBallot, stateLeg] = await Promise.all([
           fetchFederalCandidates(state, congressionalDistrict),

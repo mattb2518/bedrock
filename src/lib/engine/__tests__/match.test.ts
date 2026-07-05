@@ -94,6 +94,20 @@ describe('matchRace — dealbreaker unknown', () => {
     dealbreakers: [{ itemId: 'DB-2' }],
   }
 
+  it('surfaces missing dealbreaker entry (no key in candidate.dealbreakers) as unknown, not clear', () => {
+    // DB-1 is not in CANDIDATE_SPARSE.dealbreakers → should appear in unknownIds
+    const keySelectingDB1: MatchKey = {
+      ...MATCH_KEY_FULL,
+      dealbreakers: [{ itemId: 'DB-1' }],
+    }
+    const result = matchRace({
+      raceId: 'race-db-missing',
+      candidates: [CANDIDATE_SPARSE],  // CANDIDATE_SPARSE has dealbreakers: {}
+      key: keySelectingDB1,
+    })
+    expect(result.ranked[0].unknownDealbreakers).toContain('DB-1')
+  })
+
   it('does NOT exclude candidate with unknown dealbreaker status', () => {
     const result = matchRace({
       raceId: 'race-db-unknown',

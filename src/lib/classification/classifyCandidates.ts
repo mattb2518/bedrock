@@ -94,6 +94,26 @@ function buildDealbreakerList(): string {
 }
 
 const DEALBREAKER_LIST = buildDealbreakerList()
+
+// Flat list of all dealbreaker numeric indices (e.g. DB-1 → 1) from the prompt.
+// Used to backfill missing entries after parse with status:'unknown'.
+const ALL_DEALBREAKER_INDICES: number[] = (() => {
+  const indices: number[] = []
+  for (const section of LAYER4_SECTIONS) {
+    section.items?.forEach((it) => {
+      const m = it.id.match(/^DB-(\d+)$/)
+      if (m) indices.push(parseInt(m[1], 10))
+    })
+    section.pairs?.forEach((p) => {
+      const ml = p.left.id.match(/^DB-(\d+)$/)
+      const mr = p.right.id.match(/^DB-(\d+)$/)
+      if (ml) indices.push(parseInt(ml[1], 10))
+      if (mr) indices.push(parseInt(mr[1], 10))
+    })
+  }
+  return indices
+})()
+
 // Bumping this invalidates every cached classification (classificationQueue
 // treats a version mismatch as stale), forcing reclassification with current evidence.
 export const METHODOLOGY_VERSION = '1.1'
@@ -281,6 +301,14 @@ export async function classifyCandidate(
       }
     } else {
       dealbreakers[idx] = { status: 'clear' }
+    }
+  }
+
+  // Backfill any dealbreaker the classifier omitted — §19.4 requires that
+  // missing data surfaces as "unknown", not as an implicit all-clear.
+  for (const idx of ALL_DEALBREAKER_INDICES) {
+    if (!(idx in dealbreakers)) {
+      dealbreakers[idx] = { status: 'unknown', note: 'Not evaluated by classifier' }
     }
   }
 
