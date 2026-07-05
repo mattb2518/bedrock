@@ -252,3 +252,11 @@ Revisit in Claude Project sessions when ready to build.
 (A) All three catch blocks around fetchCurrentOfficials calls in your-ballot/page.tsx now log the error via console.error and call setFetchError with a user-visible retry message. Previously they swallowed the error silently, leaving officials=null with no feedback and no way to diagnose the cause.
 
 (B) API key guards in currentOfficials.ts changed from !apiKey (falsy) to !apiKey || apiKey.length === 0 (empty-string-safe). The Vercel dashboard shows an empty-string env var as 'set', but it is functionally absent — this is the fifth occurrence of this trap in the project history. Top-level env checks in both fetchCurrentOfficials and fetchCurrentOfficialsUnclassified updated to use optional-chain .length for the same reason.
+
+## 2026-07-05 — Officials timeout fix: per-call AbortController, removed outer blanket timeout
+
+**Decision:** Move the timeout from the aggregate wrapper to each individual upstream fetch.
+
+**Root cause:** fetchCurrentOfficials fans out to 3–4 upstream calls in Promise.all with per-source try/catch. The outer withTimeout(fetchCurrentOfficials(...), 12000) discards all results — including already-succeeded congress.gov results — when Open States (slow free tier, called up to 3× for state-level chambers) is the laggard.
+
+**Fix:** Added an 8-second AbortController to fetchCongressStateMembers and fetchOpenStatesCurrentOfficials in currentOfficials.ts. A timed-out source throws its own error, which the existing try/catch in the Promise.all catches as a sourceError — the batch continues and partial results render. Removed the outer withTimeout wrapper and its dead helper function from your-ballot/page.tsx entirely. Partial-result rendering was already implemented (officials.sourceErrors path, lines ~987-996).

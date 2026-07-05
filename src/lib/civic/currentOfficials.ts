@@ -150,7 +150,15 @@ async function fetchCongressStateMembers(
   url.searchParams.set('format', 'json')
   url.searchParams.set('api_key', apiKey)
 
-  const res = await fetch(url.toString(), { next: { revalidate: 3600 } })
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), 8000)
+  const res = await fetch(url.toString(), { next: { revalidate: 3600 }, signal: controller.signal })
+    .catch((err: unknown) => {
+      clearTimeout(timer)
+      throw new Error((err instanceof Error && err.name === 'AbortError') ? 'congress.gov timeout' : String(err))
+    })
+  clearTimeout(timer)
+
   if (!res.ok) {
     const body = await res.text()
     throw new Error(`congress.gov API error ${res.status}: ${body}`)
@@ -181,10 +189,17 @@ async function fetchOpenStatesCurrentOfficials(
   url.searchParams.set('per_page', '5')
   url.searchParams.set('include', 'links')
 
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), 8000)
   const res = await fetch(url.toString(), {
     headers: { 'X-API-KEY': apiKey },
     next: { revalidate: 3600 },
+    signal: controller.signal,
+  }).catch((err: unknown) => {
+    clearTimeout(timer)
+    throw new Error((err instanceof Error && err.name === 'AbortError') ? 'Open States timeout' : String(err))
   })
+  clearTimeout(timer)
 
   if (!res.ok) {
     const body = await res.text()

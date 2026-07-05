@@ -695,10 +695,6 @@ function OfficialCard({
   )
 }
 
-// Hard timeout wrapper — rejects after `ms` milliseconds.
-function withTimeout<T>(p: Promise<T>, ms: number): Promise<T> {
-  return Promise.race([p, new Promise<never>((_, r) => setTimeout(() => r(new Error('timeout')), ms))])
-}
 
 // ── YourOfficialsMode ─────────────────────────────────────────────────────────
 
@@ -740,10 +736,7 @@ function YourOfficialsMode({
         try {
           const { state, congressionalDistrict, stateSenateDistrict, stateHouseDistrict } = await resolveDistrict(pending)
           if (!state) return
-          const result = await withTimeout(
-            fetchCurrentOfficials(state, congressionalDistrict, stateSenateDistrict, stateHouseDistrict),
-            12000,
-          )
+          const result = await fetchCurrentOfficials(state, congressionalDistrict, stateSenateDistrict, stateHouseDistrict)
           setOfficials(result)
         } catch (e) {
           console.error('officials lookup failed:', e)
@@ -767,14 +760,11 @@ function YourOfficialsMode({
           try {
             if (data.district_state) {
               // District already resolved — skip geocode roundtrip
-              const result = await withTimeout(
-                fetchCurrentOfficials(
-                  data.district_state,
-                  data.district_cd ?? null,
-                  data.district_sldu ?? null,
-                  data.district_sldl ?? null,
-                ),
-                12000,
+              const result = await fetchCurrentOfficials(
+                data.district_state,
+                data.district_cd ?? null,
+                data.district_sldu ?? null,
+                data.district_sldl ?? null,
               )
               setOfficials(result)
             } else {
@@ -792,10 +782,7 @@ function YourOfficialsMode({
                 { onConflict: 'user_id' }
               )
               if (upsertErr) console.error('YourOfficialsMode mount: failed to persist district scalars', upsertErr)
-              const result = await withTimeout(
-                fetchCurrentOfficials(state, congressionalDistrict, stateSenateDistrict, stateHouseDistrict),
-                12000,
-              )
+              const result = await fetchCurrentOfficials(state, congressionalDistrict, stateSenateDistrict, stateHouseDistrict)
               setOfficials(result)
             }
           } catch (e) {
@@ -848,10 +835,7 @@ function YourOfficialsMode({
             setFetchError("Couldn't save your address — it may not persist across visits.")
           }
         }
-        const result = await withTimeout(
-          fetchCurrentOfficials(state, congressionalDistrict, stateSenateDistrict, stateHouseDistrict),
-          12000,
-        )
+        const result = await fetchCurrentOfficials(state, congressionalDistrict, stateSenateDistrict, stateHouseDistrict)
         setOfficials(result)
       } catch (e) {
         console.error('officials lookup failed:', e)
