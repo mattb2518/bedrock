@@ -21,3 +21,11 @@ Before any work that touches external data integration, candidate/race/media sch
 # Committing instruction files
 
 Exception to the auto-commit rule above: after a substantial block of edits to `CLAUDE.md` or `AGENTS.md`, stop and prompt the user to commit, including a ready-to-use commit message. Do not commit these files without the user's explicit go-ahead.
+
+# Supabase migrations
+
+Whenever a session adds a new file to `supabase/migrations/`, include a migration-status check before the final commit:
+
+1. Run `supabase migration list` (requires CLI linked via `supabase link`). If it reports the new migration as pending, note this in the commit message.
+2. If the CLI is not linked (`LegacyProjectNotLinkedError`), flag the pending migration explicitly in the session summary so Matt can apply it via the Supabase dashboard SQL editor or by running `supabase migration repair --status applied <timestamp>` after linking.
+3. Never assume a migration is applied just because the file exists in the repo — always check. A missing migration silently breaks the live app.
