@@ -349,7 +349,7 @@ export default function CivicMantlePage() {
               Ready to find yours?
             </h2>
             <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-body-lg)", color: "var(--color-text-secondary)", marginBottom: "var(--space-8)" }}>
-              Fifteen questions. Your constellation. One mantle — and the affinities that come with it.
+              Fourteen questions. Your constellation. One mantle — and the affinities that come with it.
             </p>
             <Link href="/quiz" style={{ display: "inline-block", backgroundColor: "var(--color-red)", color: "#fff", fontFamily: "var(--font-body)", fontWeight: "var(--weight-semibold)", fontSize: "var(--text-body)", padding: "var(--space-4) var(--space-8)", borderRadius: "var(--btn-radius)", textDecoration: "none" }}>
               Find your Civic Mantle →

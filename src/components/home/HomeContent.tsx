@@ -18,7 +18,7 @@ import { usePreviewStore } from "@/store/previewStore";
 
 function LockBadge({ layer }: { layer: number }) {
   return (
-    <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", fontSize: "11px", fontFamily: "var(--font-body)", color: "var(--color-text-secondary)", marginTop: "var(--space-3)" }}>
+    <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", fontSize: "11px", fontFamily: "var(--font-body)", color: "var(--color-text-primary)", marginTop: "var(--space-3)" }}>
       🔒 Unlocks after Layer {layer}
     </span>
   );
@@ -40,7 +40,7 @@ function PillarCards({ pillarOneMode, layersCompleted = 0 }: { pillarOneMode: Pi
       <Link href="/media-diet" style={{ textDecoration: "none", display: "block", height: "100%" }}>
         <div style={{ backgroundColor: "var(--color-bg-surface)", border: "1px solid var(--color-border)", borderRadius: "var(--radius-lg)", padding: "var(--space-8)", borderTop: "3px solid var(--color-white-warm)", transition: "var(--transition-base)", cursor: "pointer", height: "100%", boxSizing: "border-box", opacity: unlock.mediaDiet ? 1 : 0.7 }}>
           <h3 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-h3)", color: "var(--color-text-primary)", marginBottom: "var(--space-3)" }}>Your Media Diet</h3>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-body)", color: "var(--color-text-secondary)", lineHeight: "var(--leading-relaxed)" }}>Independent journalism matched to how you actually think — in three tiers.</p>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-body)", color: "var(--color-text-secondary)", lineHeight: "var(--leading-relaxed)" }}>Curated, independent, reliable journalism that deepens, expands, and challenges your thinking.</p>
           {!unlock.mediaDiet && <LockBadge layer={2} />}
         </div>
       </Link>

@@ -135,7 +135,8 @@ export default function DemographicsBody() {
   const hasAny = !!(
     formattedAddress ||
     (demo &&
-      (demo.partyRelationship ||
+      (demo.firstName ||
+        demo.partyRelationship ||
         demo.currentRegistration ||
         demo.upbringing ||
         demo.lineage ||
@@ -172,7 +173,22 @@ export default function DemographicsBody() {
   if (editing) {
     return (
       <div>
-        {/* Address — §22d: autocomplete, shown first */}
+        {/* First name — optional, used for home page greeting */}
+        <div style={{ marginBottom: 'var(--space-6)', paddingBottom: 'var(--space-6)', borderBottom: '1px solid var(--color-border)' }}>
+          <label style={{ display: 'block', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-primary)', marginBottom: 'var(--space-1)' }}>
+            What should we call you?
+            <span style={{ fontWeight: 'normal', color: 'var(--color-text-muted)', marginLeft: 'var(--space-2)' }}>optional</span>
+          </label>
+          <input
+            type="text"
+            value={draft.firstName ?? ''}
+            onChange={(e) => setDraft((d) => ({ ...d, firstName: e.target.value || undefined }))}
+            placeholder="First name…"
+            style={{ width: '100%', backgroundColor: 'var(--color-bg-input)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md, 8px)', padding: 'var(--space-3)', fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-primary)', boxSizing: 'border-box' }}
+          />
+        </div>
+
+        {/* Address — §22d: autocomplete */}
         <div style={{ marginBottom: 'var(--space-6)', paddingBottom: 'var(--space-6)', borderBottom: '1px solid var(--color-border)' }}>
           <label style={{ display: 'block', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-primary)', marginBottom: 'var(--space-1)' }}>
             Address
@@ -273,6 +289,7 @@ export default function DemographicsBody() {
       </div>
       {hasAny ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+          {demo?.firstName && <Row label="Name" value={demo.firstName} />}
           {formattedAddress && <Row label="Address" value={formattedAddress} />}
           <Row label="Relationship to parties" value={demo?.partyRelationship} />
           <Row label="Registered today as" value={demo?.currentRegistration} />

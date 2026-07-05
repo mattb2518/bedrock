@@ -276,7 +276,7 @@ The public homepage front door is a question, not a description. Four quick ques
 
 **Format:** Same interaction pattern as the quiz (3 options + "It depends," randomized order, "It depends" pinned last), but NO follow-up mechanic, NO add-context link, NO Easter eggs. One micro-reaction per question (same for all answers), tap/Enter to advance.
 
-**Ghost constellation reveal:** Existing radar component with a ghost variant — 4 of 8 axes populated, dashed stroke, ~40% opacity fill; unmapped axes as empty gridlines with grayed labels. Caption: *"A sketch, not a reading."* Below: *"Your full constellation — and your Civic Mantle — takes fifteen questions and about ten minutes."* Primary CTA: "Finish your constellation →" (→ /quiz). Secondary: "How this works" (→ /methodology).
+**Ghost constellation reveal:** Existing radar component with a ghost variant — 4 of 8 axes populated, dashed stroke, ~40% opacity fill; unmapped axes as empty gridlines with grayed labels. Caption: *"A sketch, not a reading."* Below: *"Your full constellation — and your Civic Mantle — takes fourteen questions and about ten minutes."* Primary CTA: "Finish your constellation →" (→ /quiz). Secondary: "How this works" (→ /methodology).
 
 **Scoring** (axis scale 0 = first pole, 100 = second pole, matching existing dimension convention). Teaser answers stored as `teaser_responses` (session; persisted to profile if authenticated) for analytics only — they do NOT feed the engine and do NOT pre-fill Layer 1.
 
@@ -1412,7 +1412,7 @@ Read the full methodology →
 The quiz builds in four stages — each one going deeper than the last.
 
 *Layer 1 — Your values foundation.*
-Fifteen questions about what you believe at the level of principle. Closes with one question: of the eight dimensions, which feel most central to who you are as a voter? Then — before you move on — your constellation appears for the first time. A radar chart unique to you across all eight dimensions. The shape is yours. No one else's will look exactly like it.
+Fourteen questions about what you believe at the level of principle. Closes with one question: of the eight dimensions, which feel most central to who you are as a voter? Then — before you move on — your constellation appears for the first time. A radar chart unique to you across all eight dimensions. The shape is yours. No one else's will look exactly like it.
 
 *Layer 2 — Your real-world positions.*
 Nine questions on actual policy debates and real events — chosen specifically because they produce cross-partisan discomfort. This is where stated values meet actual positions. Sometimes they align. Sometimes they don't. Both are useful.
@@ -1975,7 +1975,7 @@ Civic identity is the overarching layer — not a pillar itself. Section eyebrow
 
 Four pillars in order, each with tri-color accent bar:
 - Your ballot (red accent) — "Every race, matched to your values. From president to school board."
-- Your media diet (white accent) — "Independent journalism matched to how you actually think — in three tiers."
+- Your media diet (white accent) — "Curated, independent, reliable journalism that deepens, expands, and challenges your thinking."
 - Your conversations (blue accent) — "Claude-powered prep for difficult conversations across difference."
 - Beyond your ballot (gold accent) — "Federal candidates outside your district worth supporting — because Congress is a team sport."
 
