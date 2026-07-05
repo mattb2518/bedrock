@@ -131,7 +131,7 @@ async function fetchCongressStateMembers(
   state: string,
 ): Promise<CongressMember[]> {
   const apiKey = process.env.CONGRESS_GOV_API_KEY
-  if (!apiKey) throw new Error('CONGRESS_GOV_API_KEY is not set')
+  if (!apiKey || apiKey.length === 0) throw new Error('CONGRESS_GOV_API_KEY is missing or empty')
 
   // Warn at runtime if the congress number may have rolled over.
   if (new Date().getFullYear() >= 2027) {
@@ -170,7 +170,7 @@ async function fetchOpenStatesCurrentOfficials(
   district?: number
 ): Promise<OpenStatesPerson[]> {
   const apiKey = process.env.OPENSTATES_API_KEY
-  if (!apiKey) throw new Error('OPENSTATES_API_KEY is not set')
+  if (!apiKey || apiKey.length === 0) throw new Error('OPENSTATES_API_KEY is missing or empty')
 
   const url = new URL(`${OPENSTATES_BASE}/people`)
   url.searchParams.set('jurisdiction', state.toLowerCase())
@@ -405,10 +405,10 @@ export async function fetchCurrentOfficialsUnclassified(
   const isUnicameral = UNICAMERAL_STATES.has(stateUpper)
 
   const missingKeys: string[] = []
-  if (!process.env.CONGRESS_GOV_API_KEY) missingKeys.push('CONGRESS_GOV_API_KEY')
-  if (!process.env.OPENSTATES_API_KEY) missingKeys.push('OPENSTATES_API_KEY')
+  if (!process.env.CONGRESS_GOV_API_KEY?.length) missingKeys.push('CONGRESS_GOV_API_KEY')
+  if (!process.env.OPENSTATES_API_KEY?.length) missingKeys.push('OPENSTATES_API_KEY')
   if (missingKeys.length > 0) {
-    console.error('fetchCurrentOfficialsUnclassified: missing required env var(s):', missingKeys.join(', '))
+    console.error('fetchCurrentOfficialsUnclassified: missing or empty env var(s):', missingKeys.join(', '))
   }
 
   const sourceErrors: SourceError[] = []
@@ -525,12 +525,12 @@ export async function fetchCurrentOfficials(
   const stateUpper = state.toUpperCase()
   const isUnicameral = UNICAMERAL_STATES.has(stateUpper)
 
-  // Warn loudly if keys are missing — missing key ≠ empty district.
+  // Warn loudly if keys are missing or empty (empty string is as bad as absent).
   const missingKeys: string[] = []
-  if (!process.env.CONGRESS_GOV_API_KEY) missingKeys.push('CONGRESS_GOV_API_KEY')
-  if (!process.env.OPENSTATES_API_KEY) missingKeys.push('OPENSTATES_API_KEY')
+  if (!process.env.CONGRESS_GOV_API_KEY?.length) missingKeys.push('CONGRESS_GOV_API_KEY')
+  if (!process.env.OPENSTATES_API_KEY?.length) missingKeys.push('OPENSTATES_API_KEY')
   if (missingKeys.length > 0) {
-    console.error('fetchCurrentOfficials: missing required env var(s):', missingKeys.join(', '))
+    console.error('fetchCurrentOfficials: missing or empty env var(s):', missingKeys.join(', '))
   }
 
   const sourceErrors: SourceError[] = []

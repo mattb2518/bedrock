@@ -244,3 +244,11 @@ Revisit in Claude Project sessions when ready to build.
 **Decision:** HomeContent's greeting slot now reads the Supabase auth session (same pattern as Nav). Three states: undefined (resolving — slot hidden), null (anonymous — shows 'Your mantle.' + 'Create an account to save your results.' link), User (signed in — shows 'Welcome back, name.'). The returning-user layout (mantle summary, pillar cards) remains keyed on session.result and is still visible to anonymous completers.
 
 **Why:** An anonymous quiz-completer saw 'Welcome back.' alongside a nav showing 'Create an account' — direct contradiction that implied an account existed. Layout and greeting are now separate concerns: layout is store-gated (useful with zero auth), greeting is auth-gated (only warm users who actually have an account).
+
+## 2026-07-05 — Officials blank-screen bug: surface errors, tighten key validation
+
+**Decision:** Two hardening changes to the officials fetch path.
+
+(A) All three catch blocks around fetchCurrentOfficials calls in your-ballot/page.tsx now log the error via console.error and call setFetchError with a user-visible retry message. Previously they swallowed the error silently, leaving officials=null with no feedback and no way to diagnose the cause.
+
+(B) API key guards in currentOfficials.ts changed from !apiKey (falsy) to !apiKey || apiKey.length === 0 (empty-string-safe). The Vercel dashboard shows an empty-string env var as 'set', but it is functionally absent — this is the fifth occurrence of this trap in the project history. Top-level env checks in both fetchCurrentOfficials and fetchCurrentOfficialsUnclassified updated to use optional-chain .length for the same reason.

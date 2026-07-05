@@ -745,7 +745,10 @@ function YourOfficialsMode({
             12000,
           )
           setOfficials(result)
-        } catch { /* user can retry via Change */ }
+        } catch (e) {
+          console.error('officials lookup failed:', e)
+          setFetchError("We couldn't load your officials right now. This one's on us — try Change to retry.")
+        }
       })().finally(() => setIsPending(false))
       return
     }
@@ -795,7 +798,10 @@ function YourOfficialsMode({
               )
               setOfficials(result)
             }
-          } catch { /* user can retry via Change */ }
+          } catch (e) {
+            console.error('officials lookup failed:', e)
+            setFetchError("We couldn't load your officials right now. This one's on us — try Change to retry.")
+          }
         })().finally(() => setIsPending(false))
       })
   }, [userId])
@@ -847,7 +853,8 @@ function YourOfficialsMode({
           12000,
         )
         setOfficials(result)
-      } catch {
+      } catch (e) {
+        console.error('officials lookup failed:', e)
         setFetchError('Could not look up that address. Try including your city, state, and ZIP code.')
       }
     })().finally(() => setIsPending(false))
