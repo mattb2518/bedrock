@@ -228,3 +228,9 @@ Revisit in Claude Project sessions when ready to build.
 **2026-07-04** — Incumbent values-matching stays as shipped in §22b; broader "match me to any sitting official nationwide" (external suggestion) deferred — Your Officials covers the user's own six officeholders only. Revisit post-launch.
 
 **2026-07-04** — No full-site imagery. Stark design is brand. Only approved imagery: forebear portraits on mantle cards (back portrait + front corner teaser).
+
+## 2026-07-05 — Nav signed-out auth CTA: 'Create an account' + 'Sign in' pair
+
+**Decision:** The single 'Sign in' text link is replaced by a two-element pair — an outlined 'Create an account' button (→ /signup) and a lower-contrast 'Sign in' text link (→ /signin). Both show simultaneously when signed out; both disappear when signed in. No single button that flips label based on some guess about returning-user status.
+
+**Why:** A signed-out visitor is anonymous — we cannot distinguish a first-time user from a returning one before they authenticate. Showing only 'Sign in' loses new visitors who don't know to click it; showing only 'Create an account' loses returning users who are confused. The pair serves both audiences without guessing. Applies to both desktop nav and mobile hamburger.

@@ -590,30 +590,54 @@ export default function Nav({ pillarOneMode = 'officials' }: { pillarOneMode?: P
             </Link>
           )}
 
-          {/* Auth: signed out → Sign in link; signed in → avatar + sign out */}
+          {/* Auth: signed out → Create account + sign in link; signed in → avatar + sign out */}
           {user === null ? (
-            <Link
-              href="/signin"
-              style={{
-                fontFamily: "var(--font-body)",
-                fontSize: "var(--text-small)",
-                fontWeight: "var(--weight-medium)",
-                color: "var(--color-text-secondary)",
-                textDecoration: "none",
-                whiteSpace: "nowrap",
-                borderBottom: "2px solid transparent",
-                paddingBottom: "2px",
-                transition: "var(--transition-fast)",
-              }}
-              onMouseEnter={(e) =>
-                (e.currentTarget.style.color = "var(--color-text-primary)")
-              }
-              onMouseLeave={(e) =>
-                (e.currentTarget.style.color = "var(--color-text-secondary)")
-              }
-            >
-              Sign in
-            </Link>
+            <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}>
+              <Link
+                href="/signup"
+                style={{
+                  backgroundColor: "var(--color-bg-surface)",
+                  border: "1px solid var(--color-border-strong)",
+                  color: "var(--color-text-primary)",
+                  fontFamily: "var(--font-body)",
+                  fontSize: "var(--text-small)",
+                  fontWeight: "var(--weight-semibold)",
+                  padding: "var(--btn-padding-y-sm) var(--btn-padding-x-sm)",
+                  borderRadius: "var(--btn-radius)",
+                  textDecoration: "none",
+                  whiteSpace: "nowrap",
+                  transition: "var(--transition-fast)",
+                }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.backgroundColor = "rgba(232,228,218,0.08)")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.backgroundColor = "var(--color-bg-surface)")
+                }
+              >
+                Create an account
+              </Link>
+              <Link
+                href="/signin"
+                style={{
+                  fontFamily: "var(--font-body)",
+                  fontSize: "var(--text-small)",
+                  fontWeight: "var(--weight-medium)",
+                  color: "var(--color-text-muted)",
+                  textDecoration: "none",
+                  whiteSpace: "nowrap",
+                  transition: "var(--transition-fast)",
+                }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.color = "var(--color-text-secondary)")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.color = "var(--color-text-muted)")
+                }
+              >
+                Sign in
+              </Link>
+            </div>
           ) : (
             <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}>
               <Link
@@ -873,19 +897,40 @@ export default function Nav({ pillarOneMode = 'officials' }: { pillarOneMode?: P
           {/* Mobile auth */}
           <div style={{ borderTop: "1px solid var(--color-border)", paddingTop: "var(--space-3)" }}>
             {user === null ? (
-              <Link
-                href="/signin"
-                onClick={() => setMenuOpen(false)}
-                style={{
-                  fontFamily: "var(--font-body)",
-                  fontSize: "var(--text-body)",
-                  fontWeight: "var(--weight-medium)",
-                  color: "var(--color-text-secondary)",
-                  textDecoration: "none",
-                }}
-              >
-                Sign in
-              </Link>
+              <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
+                <Link
+                  href="/signup"
+                  onClick={() => setMenuOpen(false)}
+                  style={{
+                    backgroundColor: "var(--color-bg-surface)",
+                    border: "1px solid var(--color-border-strong)",
+                    color: "var(--color-text-primary)",
+                    fontFamily: "var(--font-body)",
+                    fontSize: "var(--text-body)",
+                    fontWeight: "var(--weight-semibold)",
+                    padding: "var(--btn-padding-y-sm) var(--btn-padding-x-sm)",
+                    borderRadius: "var(--btn-radius)",
+                    textDecoration: "none",
+                    textAlign: "center",
+                  }}
+                >
+                  Create an account
+                </Link>
+                <Link
+                  href="/signin"
+                  onClick={() => setMenuOpen(false)}
+                  style={{
+                    fontFamily: "var(--font-body)",
+                    fontSize: "var(--text-body)",
+                    fontWeight: "var(--weight-medium)",
+                    color: "var(--color-text-muted)",
+                    textDecoration: "none",
+                    textAlign: "center",
+                  }}
+                >
+                  Sign in
+                </Link>
+              </div>
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
                 <Link

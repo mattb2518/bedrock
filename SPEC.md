@@ -1985,10 +1985,12 @@ Attribution: "From the *Country Over Self* podcast." (*Country Over Self* italic
 
 ### Nav Links — Two States
 
-**Public nav (pre-login):**
-Mark + wordmark · Civic Mantle · How It Works · About · Take the Quiz (primary CTA button)
+**Public nav (signed out):**
+Mark + wordmark · Civic Mantle · About ▾ · [Quiz CTA — three states] · "Create an account" (outlined button → /signup) · "Sign in" (small text link → /signin)
 
-**App nav (post-login):**
+The auth pair always shows both: "Create an account" is the primary CTA for new visitors; "Sign in" is a lower-contrast text link beside it for returning users. Never flip a single button between the two labels — show both simultaneously. Both disappear once signed in.
+
+**App nav (signed in):**
 Mark + wordmark · Civic Mantle · Your Mantle ▾ (dropdown: Overview → /your-mantle, In-Depth Results → /results; only shown once user has a quiz result) · Your Actions ▾ (dropdown: Your Ballot, Beyond Your Ballot, Your Media Diet, Your Conversations) · About ▾ · [avatar + sign out]
 
 URLs: Your Ballot → `/your-ballot`, Beyond Your Ballot → `/beyond-your-ballot`, Your Media Diet → `/media-diet`.
