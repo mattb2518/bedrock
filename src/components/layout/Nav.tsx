@@ -69,6 +69,7 @@ export default function Nav({ pillarOneMode = 'officials' }: { pillarOneMode?: P
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   const hasResult = useQuizStore((s) => !!s.session?.result);
+  const quizInProgress = useQuizStore((s) => !s.session?.result && (s.session?.answers?.length ?? 0) > 0);
   const attachUser = useQuizStore((s) => s.attachUser);
   const navLinks = topNavLinks;
   const isMantleActive = pathname === "/your-mantle" || pathname === "/results";
@@ -562,10 +563,10 @@ export default function Nav({ pillarOneMode = 'officials' }: { pillarOneMode?: P
             </Link>
           )}
 
-          {/* Take the Quiz CTA — hidden once signed in (app nav state) */}
-          {(!mounted || !user) && (
+          {/* Quiz CTA — three states: Take / Continue / My Quiz */}
+          {mounted && (
             <Link
-              href="/quiz"
+              href={hasResult ? '/results' : '/quiz'}
               style={{
                 backgroundColor: "var(--color-red)",
                 color: "#ffffff",
@@ -579,14 +580,13 @@ export default function Nav({ pillarOneMode = 'officials' }: { pillarOneMode?: P
                 whiteSpace: "nowrap",
               }}
               onMouseEnter={(e) =>
-                (e.currentTarget.style.backgroundColor =
-                  "var(--color-red-light)")
+                (e.currentTarget.style.backgroundColor = "var(--color-red-light)")
               }
               onMouseLeave={(e) =>
                 (e.currentTarget.style.backgroundColor = "var(--color-red)")
               }
             >
-              Take the Quiz
+              {hasResult ? 'My Quiz' : quizInProgress ? 'Continue Quiz' : 'Take the Quiz'}
             </Link>
           )}
 
@@ -830,9 +830,9 @@ export default function Nav({ pillarOneMode = 'officials' }: { pillarOneMode?: P
               </Link>
             ))}
           </div>
-          {(!mounted || !user) && (
+          {mounted && (
             <Link
-              href="/quiz"
+              href={hasResult ? '/results' : '/quiz'}
               onClick={() => setMenuOpen(false)}
               style={{
                 backgroundColor: "var(--color-red)",
@@ -847,7 +847,7 @@ export default function Nav({ pillarOneMode = 'officials' }: { pillarOneMode?: P
                 marginTop: "var(--space-2)",
               }}
             >
-              Take the Quiz
+              {hasResult ? 'My Quiz' : quizInProgress ? 'Continue Quiz' : 'Take the Quiz'}
             </Link>
           )}
 

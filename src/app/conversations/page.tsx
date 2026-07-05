@@ -869,9 +869,7 @@ export default function ConversationsPage() {
   const layersCompleted = session?.completedLayers?.length ?? 0
   const unlock = getUnlockState(layersCompleted)
   const hasProfile = Boolean(session?.result)
-  const isAnonymous = hasProfile && !session?.userId
   const mantleName = session?.result?.primaryType ? mantleFor(session.result.primaryType).name : null
-  const [convBannerDismissed, setConvBannerDismissed] = useState(false)
 
   const [activeMode, setActiveMode] = useState<Mode | null>(null)
 
@@ -1147,14 +1145,6 @@ export default function ConversationsPage() {
       <style>{ANIMATIONS}</style>
       {showGuardrails && <GuardrailsModal onClose={() => setShowGuardrails(false)} />}
 
-      {isAnonymous && !convBannerDismissed && (
-        <div style={{ backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border)', borderLeft: '3px solid var(--color-gold)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-4)', marginBottom: 'var(--space-6)', display: 'flex', alignItems: 'center', gap: 'var(--space-4)', flexWrap: 'wrap' }}>
-          <p style={{ flex: 1, margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)' }}>
-            Your results are temporary. <a href="/signup" style={{ color: 'var(--color-blue-accent)', textDecoration: 'none', fontWeight: 'var(--weight-semibold)' }}>Create a free account</a> to save them.
-          </p>
-          <button onClick={() => setConvBannerDismissed(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', padding: 0, flexShrink: 0 }}>Dismiss</button>
-        </div>
-      )}
 
       <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-blue-accent)', letterSpacing: 'var(--tracking-wider)', textTransform: 'uppercase', marginBottom: 'var(--space-5)' }}>
         Your Conversations

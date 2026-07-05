@@ -6,7 +6,8 @@
 // ten-mantle map. Figures come from mantles.ts (single source of truth, shared
 // with /civic-mantle).
 
-import { useState } from 'react'
+import React, { useState } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useQuizStore } from '@/store/quizStore'
 import { usePreviewStore } from '@/store/previewStore'
@@ -16,10 +17,41 @@ import { profileToRadar, isCentered } from '@/lib/quiz/dimensions'
 import { PILLAR_ONE } from '@/lib/config/pillarOne'
 import { usePillarOneMode } from '@/components/providers/PillarOneModeProvider'
 
+function SilhouetteSVG({ size = 32, style }: { size?: number; style?: React.CSSProperties }) {
+  return (
+    <svg viewBox="0 0 100 100" fill="currentColor"
+      style={{ width: size, height: size, color: 'var(--color-text-muted)', ...style }}>
+      <circle cx="50" cy="35" r="18"/>
+      <path d="M15,90 Q15,65 50,65 Q85,65 85,90 Z"/>
+    </svg>
+  )
+}
+
+function ForebearThumb({ mantle, size = 32 }: { mantle: Mantle; size?: number }) {
+  const [failed, setFailed] = useState(false)
+  const frontPos = mantle.portraitPosition?.front ?? '50% 15%'
+  if (failed) {
+    return (
+      <div style={{ width: size, height: size, borderRadius: '50%', overflow: 'hidden', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border)', flexShrink: 0 }}>
+        <SilhouetteSVG size={size * 0.7} />
+      </div>
+    )
+  }
+  return (
+    <div style={{ width: size, height: size, borderRadius: '50%', overflow: 'hidden', position: 'relative', display: 'inline-block', flexShrink: 0 }}>
+      <Image src={`/forebears/${mantle.type}.jpg`} alt={mantle.figure.name} fill
+        style={{ objectFit: 'cover', objectPosition: frontPos, filter: 'grayscale(100%)' }}
+        onError={() => setFailed(true)} sizes={`${size}px`} />
+    </div>
+  )
+}
+
 function FlipCard({ mantle, large = false, flipped, onFlip }: { mantle: Mantle; large?: boolean; flipped: boolean; onFlip: () => void }) {
+  const [backImgFailed, setBackImgFailed] = useState(false)
   const pad = large ? 'var(--space-8)' : 'var(--space-5)'
   const nameSize = large ? 'var(--text-h2)' : 'var(--text-h4)'
   const height = large ? 260 : 200
+  const backPos = mantle.portraitPosition?.back ?? '50% 20%'
   const face: React.CSSProperties = {
     position: 'absolute',
     inset: 0,
@@ -39,17 +71,27 @@ function FlipCard({ mantle, large = false, flipped, onFlip }: { mantle: Mantle; 
         <div style={{ ...face, backgroundColor: 'var(--color-bg-surface)' }}>
           <p style={{ fontFamily: 'var(--font-display)', fontSize: nameSize, color: 'var(--color-text-primary)', lineHeight: 'var(--leading-tight)', margin: 0 }}>{mantle.name}</p>
           <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', margin: 0 }}>{mantle.workingName}</p>
-          <p style={{ fontFamily: 'var(--font-body)', fontSize: large ? 'var(--text-body-lg)' : 'var(--text-body)', color: 'var(--color-gold)', fontStyle: 'italic', lineHeight: 'var(--leading-relaxed)', margin: 0, flex: 1 }}>“{mantle.oneLiner}.”</p>
-          <p style={{ fontFamily: 'var(--font-body)', fontSize: '11px', color: 'var(--color-text-muted)', margin: 0, textAlign: 'right', opacity: 0.6 }}>flip to meet your forebear →</p>
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: large ? 'var(--text-body-lg)' : 'var(--text-body)', color: 'var(--color-gold)', fontStyle: 'italic', lineHeight: 'var(--leading-relaxed)', margin: 0, flex: 1 }}>&ldquo;{mantle.oneLiner}.&rdquo;</p>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 'var(--space-2)' }}>
+            <p style={{ fontFamily: 'var(--font-body)', fontSize: '11px', color: 'var(--color-text-muted)', margin: 0, opacity: 0.6 }}>flip to meet your forebear →</p>
+            <ForebearThumb mantle={mantle} size={32} />
+          </div>
         </div>
-        {/* Back — the figure */}
-        <div style={{ ...face, backgroundColor: 'var(--color-bg-deep, #0f1f33)', transform: 'rotateY(180deg)' }}>
-          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-micro)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-muted)', letterSpacing: 'var(--tracking-wider)', textTransform: 'uppercase', margin: 0 }}>
-            An early {mantle.name.replace(/^The /, '')}
-          </p>
-          <p style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: nameSize, color: 'var(--color-text-primary)', margin: 0, lineHeight: 'var(--leading-tight)' }}>{mantle.figure.name}</p>
-          <p style={{ fontFamily: 'var(--font-body)', fontSize: large ? 'var(--text-body)' : 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', margin: 0, flex: 1 }}>{mantle.figure.why}</p>
-          <p style={{ fontFamily: 'var(--font-body)', fontSize: '11px', color: 'var(--color-text-muted)', margin: 0, textAlign: 'right', opacity: 0.6 }}>← flip back</p>
+        {/* Back — the figure with full-bleed portrait */}
+        <div style={{ position: 'absolute', inset: 0, backfaceVisibility: 'hidden', borderRadius: 'var(--radius-lg)', border: '1px solid var(--color-border)', transform: 'rotateY(180deg)', overflow: 'hidden', backgroundColor: 'var(--color-bg-deep, #0f1f33)' }}>
+          {!backImgFailed && (
+            <Image src={`/forebears/${mantle.type}.jpg`} alt={mantle.figure.name} fill
+              style={{ objectFit: 'cover', objectPosition: backPos, filter: 'grayscale(100%)' }}
+              onError={() => setBackImgFailed(true)} sizes={`${height}px`} />
+          )}
+          <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', backgroundColor: backImgFailed ? 'transparent' : 'rgba(0,0,0,0.55)', padding: pad, boxSizing: 'border-box' }}>
+            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-micro)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-muted)', letterSpacing: 'var(--tracking-wider)', textTransform: 'uppercase', margin: 0 }}>
+              An early {mantle.name.replace(/^The /, '')}
+            </p>
+            <p style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: nameSize, color: 'var(--color-text-primary)', margin: 0, lineHeight: 'var(--leading-tight)' }}>{mantle.figure.name}</p>
+            <p style={{ fontFamily: 'var(--font-body)', fontSize: large ? 'var(--text-body)' : 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: 'var(--leading-relaxed)', margin: 0, flex: 1 }}>{mantle.figure.why}</p>
+            <p style={{ fontFamily: 'var(--font-body)', fontSize: '11px', color: 'var(--color-text-muted)', margin: 0, textAlign: 'right', opacity: 0.6 }}>← flip back</p>
+          </div>
         </div>
       </div>
     </div>

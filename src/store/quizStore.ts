@@ -60,6 +60,10 @@ export function savePendingAddress(formattedAddress: string) {
   try { localStorage.setItem(PENDING_ADDRESS_KEY, formattedAddress) } catch { /* ignore */ }
 }
 
+export function getPendingAddress(): string | null {
+  try { return localStorage.getItem(PENDING_ADDRESS_KEY) } catch { return null }
+}
+
 export function consumePendingAddress(): string | null {
   try {
     const addr = localStorage.getItem(PENDING_ADDRESS_KEY)

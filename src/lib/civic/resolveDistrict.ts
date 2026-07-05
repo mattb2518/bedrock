@@ -37,7 +37,14 @@ export async function resolveDistrict(address: string): Promise<ResolveDistrictR
   url.searchParams.set('address', address)
   url.searchParams.set('key', apiKey)
 
-  const res = await fetch(url.toString(), { next: { revalidate: 86400 } }) // cache 24h
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), 8000)
+  let res: Response
+  try {
+    res = await fetch(url.toString(), { next: { revalidate: 86400 }, signal: controller.signal })
+  } finally {
+    clearTimeout(timer)
+  }
   if (!res.ok) {
     const body = await res.text()
     throw new Error(`Google Civic API error ${res.status}: ${body}`)

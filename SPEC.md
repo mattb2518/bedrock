@@ -251,7 +251,7 @@ Communicated via progress bar design, not explicit question numbering. Gives loc
 
 ### Interlayer Unlock Screens
 
-After each layer's final question (after the Mantle reveal in Layer 1's case), an unlock screen renders three stacked elements, in this order:
+After each layer's final question, an unlock screen renders. For Layer 1, the Mantle reveal (MantleReveal component) and the unlock screen (InterlayerUnlockScreen) render together on a single page — not as two separate navigation steps. The unlock screen renders three stacked elements, in this order:
 
 1. **Templated "what we've learned" summary** — rendered as plain prose, no quotation marks around it.
 2. **Unlock card(s).**
@@ -319,6 +319,8 @@ When a user answers "It depends" (or any option carrying a followUpPrompt) and t
 - Timeout 2.5s; on timeout, error, or empty text, fall back silently to the static micro-reaction.
 - Applies wherever open-text follow-ups exist, all layers. Not in the homepage teaser.
 
+**"It depends" with no open text:** When a user selects "It depends" but submits without typing any follow-up text, the AI reflect-back is skipped entirely and a static acknowledgment renders inline: *"Fair — that's a real tension, and it's noted."* The user can still advance without typing anything.
+
 Rendering: the reflection appears inline, chat-style, directly below the user's open-text input on the same question card — like a conversational reply — not on a separate screen. While the reflection is pending (up to the 2.5s timeout), the card waits with a subtle typing/thinking indicator; on success the reflection fades in below the text box; on timeout or error the static micro-reaction renders in the same inline position instead. After the reflection (or fallback) renders, advancing is user-initiated: tap/Enter/a "Next →" affordance moves to the next question. No separate reflection phase or screen.
 
 ### Layer 2 Persistent Micro-Label
@@ -363,9 +365,9 @@ Most civic tools ask where you stand on the issues. We're asking something diffe
 
 We want to know how you think. Not which party you agree with, not which policies you support — but the underlying values that drive those positions. The stuff that's been true about you for twenty years.
 
-Fifteen questions. About ten minutes. That alone earns your Civic Mantle and your constellation — and unlocks your first tool.
+Fourteen questions. About ten minutes. That alone earns your Civic Mantle and your constellation — and unlocks your first civic action.
 
-Three optional layers after that sharpen everything: another 15–20 minutes total, whenever you want them. Each one unlocks something new.
+Three optional layers after that sharpen everything: another 15–20 minutes total, whenever you want them. Each one unlocks another civic action.
 
 One thing: pick the answer that most closely aligns with your views — it doesn't have to be a perfect fit. Every question also has an "It depends" option for when that's genuinely how you think. If you pick it, we'll ask one quick follow-up. Your nuance is the point.
 
@@ -1580,7 +1582,7 @@ We're not going to claim the result is perfect. Bias-checking is a practice, not
 **How the quiz is structured.**
 Four layers, each going deeper than the last. Full description in How It Works →
 
-*Layer 1 — Values foundation:* Fifteen questions across three tiers — eight anchor questions establishing your baseline on each dimension, four crossover questions loading on two dimensions simultaneously, and two synthesis questions loading on three or more at once. Closes with a dimension importance rating, then your first constellation reveal.
+*Layer 1 — Values foundation:* Fourteen questions across three tiers — eight anchor questions establishing your baseline on each dimension, four crossover questions loading on two dimensions simultaneously, and two synthesis questions loading on three or more at once. Closes with a dimension importance rating, then your first constellation reveal.
 
 *Layer 2 — Reality check:* Nine questions — real policy debates and actual events chosen specifically because they produce cross-partisan discomfort.
 
@@ -1890,6 +1892,11 @@ hello@bedrock.guide. A human reads it.
 - Entire module is optional — users can skip entirely
 - Political lineage labels (Question 2) are deliberately specific and historically grounded — they signal that Bedrock understands the actual diversity within parties, not just party labels
 
+### Question 0 — First name (optional, shown first)
+"What should we call you? (optional)"
+
+Single-line text input. Stored as `firstName` on the demographics profile. Used only to personalize the home page greeting ("Welcome back, [name].") on subsequent visits. Skippable with a "Skip" button alongside the "Next" button.
+
 ### Intro Copy
 "Last question — a little context helps us calibrate. How would you describe your political background?"
 
@@ -1957,18 +1964,18 @@ The homepage has four sections in order:
 Mark (mountain/strata SVG) + wordmark (BEDROCK.guide) + nav links (Civic Mantle / How It Works / About) + "Take the quiz" CTA button
 
 **2. Hero**
-Rotating headline system — three slides, auto-advances every 5 seconds, dot indicators, manual click resets timer, buttons always visible below slides.
+Rotating headline system — three slides, auto-advances every 7 seconds, dot indicators, manual click resets timer, buttons always visible below slides.
 
-Slide 1: Eyebrow "Not red. Not blue." / Headline "All of it." (tri-color: red/white/blue, DM Sans 700 68px) / Subhead: full platform overview
+Slide 1: Eyebrow "Not red. Not blue. Red, white, and blue." / Headline "Your values. Ready to act on." / Subhead: full platform overview
 Slide 2: Eyebrow "There's got to be a better way." / Headline "Find what you *actually* believe." (Libre Baskerville, gold italic on "actually") / Subhead: values quiz focus
 Slide 3: Eyebrow "For the voters who haven't given up." / Headline "There's got to be a better way." (DM Sans 46px) / Subhead: "Built for the voters who don't vote the straight ticket — and the ones who suspect they shouldn't be."
 
 **3. Civic Mantle + Four Pillars**
-Civic identity is the overarching layer — not a pillar itself. Needs visual design treatment to make the hierarchy clear (above or surrounding the four pillars). Copy: "Your Civic Mantle — one of ten named types, with a constellation unique to you. Everything below is built on top of it. Not a label. A mantle. Something to claim."
+Civic identity is the overarching layer — not a pillar itself. Section eyebrow: "One quiz. Eight dimensions." Section headline: "Define your bedrock. Find your Civic Mantle." Section body: "Not a label — a mantle, something you claim. The quiz maps your values across eight dimensions and surfaces the civic identity that's already yours — each one a constellation traced across those dimensions, like the ten below."
 
 Four pillars in order, each with tri-color accent bar:
 - Your ballot (red accent) — "Every race, matched to your values. From president to school board."
-- Your media diet (white accent) — "Independent journalism matched to how you actually think."
+- Your media diet (white accent) — "Independent journalism matched to how you actually think — in three tiers."
 - Your conversations (blue accent) — "Claude-powered prep for difficult conversations across difference."
 - Beyond your ballot (gold accent) — "Federal candidates outside your district worth supporting — because Congress is a team sport."
 
@@ -3646,19 +3653,13 @@ A 6-slide modal carousel shown automatically to first-time visitors. Designed to
 **Slide 1 — Mission**
 - Headline: You are not red. You are not blue.
 - Subhead: You are more complicated than that — and so is your vote.
-- Body: Bedrock is a civic identity platform for independent-minded voters. One values quiz. Four tools to help you understand what you actually believe — then vote it, read it, talk about it, and fund it.
+- Body: Bedrock is a civic identity platform for independent-minded voters. One values quiz. Four tools to help you understand what you actually believe — then vote it, read it, talk about it, and support it.
 
 **Slide 2 — The Quiz**
 - Headline: It starts with how you think — not where you stand.
 - Subhead: Most civic tools ask about issues. We ask about values.
-- Illustrative (non-interactive) question card showing Dimension 5 (Markets vs. Governance):
-  - Question: When government and markets point in different directions, your instinct is to:
-  - Option A: Let markets work — intervention usually makes things worse
-  - Option B: Intervene when the stakes are high enough — markets have blind spots
-  - Option C: Depends on the domain — I don't apply one rule everywhere
-- Body: 14 questions. About 12 minutes. No wrong answers — only honest ones.
-- Transition line (large font, below card): Then your identity map drives four civic actions.
-- Quiz card styled as clearly illustrative — muted answer options, Example question label, cursor:default enforced visually
+- Body: Fourteen questions across eight civic dimensions. About ten minutes. No issue polls — only values questions. Each answer builds your civic fingerprint: the unique constellation that drives every recommendation from here.
+- No illustrative quiz card (removed).
 
 **Slide 3 — Action 1: Your Ballot**
 - Label: Action 1
@@ -3670,12 +3671,12 @@ A 6-slide modal carousel shown automatically to first-time visitors. Designed to
 - Label: Action 2
 - Headline: Beyond Your Ballot
 - Subhead: Your values, applied beyond your district.
-- Body: Find candidates outside your own district who match your values and are running in races where your support could actually shift the balance of power. Donate. Get involved. Think nationally.
+- Body: Find candidates outside your own district who match your values and are running in races where your support could actually shift the balance of power. Get involved. Donate. Think nationally.
 
 **Slide 5 — Action 3: Your Media Diet**
 - Label: Action 3
 - Headline: Your Media Diet
-- Subhead: Independent journalism, matched to how you think.
+- Subhead: Independent, reliable journalism — matched to how you think.
 - Body: Not an echo chamber. Not a fire hose. A curated shortlist of journalists, Substacks, and podcasts — in three tiers: what confirms your thinking, what expands it, and what challenges it. Every source matched against your eight-dimension civic profile.
 
 **Slide 6 — Action 4: Your Conversations**
@@ -3688,8 +3689,7 @@ A 6-slide modal carousel shown automatically to first-time visitors. Designed to
 
 - Action slides (3-6) use parallel structure intentionally — rhythm helps them scan fast on mobile
 - Action label (Action 1 through Action 4) appears as eyebrow/pill above each headline — no Pillar language used anywhere
-- Slide 2 uses Dimension 5 (Markets vs. Governance) — most accessible of the eight, not partisan, all three options genuinely defensible
-- Quiz card on slide 2 is clearly illustrative — not interactive; styled with muted options, Example question label, cursor:default
+- Slide 2 is text-only — no illustrative quiz card
 - Tour is informational only — no interactions, no quiz answers captured
 
 ---

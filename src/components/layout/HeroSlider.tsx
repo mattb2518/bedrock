@@ -5,7 +5,7 @@ import Link from "next/link";
 
 const slides = [
   {
-    eyebrow: "Not red. Not blue.",
+    eyebrow: "Not red. Not blue. Red, white, and blue.",
     headline: (
       <>
         <span style={{ color: "var(--color-red)" }}>Your values.</span> Ready to act on.
@@ -41,7 +41,7 @@ export default function HeroSlider({ compact = false }: { compact?: boolean }) {
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrent((c) => (c + 1) % slides.length);
-    }, 5000);
+    }, 7000);
     return () => clearInterval(timer);
   }, []);
 

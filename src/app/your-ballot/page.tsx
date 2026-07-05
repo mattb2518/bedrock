@@ -5,8 +5,8 @@
 // Vercel default function timeout would kill them mid-flight.
 export const maxDuration = 300
 
-import { useState, useTransition, useMemo, useEffect } from 'react'
-import { useQuizStore, savePendingAddress } from '@/store/quizStore'
+import { useState, useMemo, useEffect } from 'react'
+import { useQuizStore, savePendingAddress, getPendingAddress } from '@/store/quizStore'
 import AddressAutocomplete from '@/components/ui/AddressAutocomplete'
 import { PILLAR_ONE } from '@/lib/config/pillarOne'
 import { usePillarOneMode } from '@/components/providers/PillarOneModeProvider'
@@ -695,6 +695,11 @@ function OfficialCard({
   )
 }
 
+// Hard timeout wrapper — rejects after `ms` milliseconds.
+function withTimeout<T>(p: Promise<T>, ms: number): Promise<T> {
+  return Promise.race([p, new Promise<never>((_, r) => setTimeout(() => r(new Error('timeout')), ms))])
+}
+
 // ── YourOfficialsMode ─────────────────────────────────────────────────────────
 
 function YourOfficialsMode({
@@ -713,7 +718,7 @@ function YourOfficialsMode({
   const [showAddressInput, setShowAddressInput] = useState(false)
   const [officials, setOfficials] = useState<CurrentOfficialsBallot | null>(null)
   const [fetchError, setFetchError] = useState<string | null>(null)
-  const [isPending, startTransition] = useTransition()
+  const [isPending, setIsPending] = useState(false)
   const [loadingLong, setLoadingLong] = useState(false)
 
   // After ~9s of pending, show the extended loading message
@@ -723,9 +728,27 @@ function YourOfficialsMode({
     return () => clearTimeout(t)
   }, [isPending])
 
-  // Load saved address from profile on mount; auto-fetch officials if found
+  // Load saved address from profile on mount; auto-fetch officials if found.
+  // Anonymous path: read pending address from localStorage without consuming it.
   useEffect(() => {
-    if (!userId) return
+    if (!userId) {
+      const pending = getPendingAddress()
+      if (!pending) return
+      setSavedAddress(pending)
+      setIsPending(true);
+      (async () => {
+        try {
+          const { state, congressionalDistrict, stateSenateDistrict, stateHouseDistrict } = await resolveDistrict(pending)
+          if (!state) return
+          const result = await withTimeout(
+            fetchCurrentOfficials(state, congressionalDistrict, stateSenateDistrict, stateHouseDistrict),
+            12000,
+          )
+          setOfficials(result)
+        } catch { /* user can retry via Change */ }
+      })().finally(() => setIsPending(false))
+      return
+    }
     const supabase = createClient()
     void supabase
       .from('quiz_profiles')
@@ -736,15 +759,19 @@ function YourOfficialsMode({
         const addr = data?.formatted_address
         if (!addr) return
         setSavedAddress(addr)
-        startTransition(async () => {
+        setIsPending(true);
+        (async () => {
           try {
             if (data.district_state) {
               // District already resolved — skip geocode roundtrip
-              const result = await fetchCurrentOfficials(
-                data.district_state,
-                data.district_cd ?? null,
-                data.district_sldu ?? null,
-                data.district_sldl ?? null,
+              const result = await withTimeout(
+                fetchCurrentOfficials(
+                  data.district_state,
+                  data.district_cd ?? null,
+                  data.district_sldu ?? null,
+                  data.district_sldl ?? null,
+                ),
+                12000,
               )
               setOfficials(result)
             } else {
@@ -762,11 +789,14 @@ function YourOfficialsMode({
                 { onConflict: 'user_id' }
               )
               if (upsertErr) console.error('YourOfficialsMode mount: failed to persist district scalars', upsertErr)
-              const result = await fetchCurrentOfficials(state, congressionalDistrict, stateSenateDistrict, stateHouseDistrict)
+              const result = await withTimeout(
+                fetchCurrentOfficials(state, congressionalDistrict, stateSenateDistrict, stateHouseDistrict),
+                12000,
+              )
               setOfficials(result)
             }
           } catch { /* user can retry via Change */ }
-        })
+        })().finally(() => setIsPending(false))
       })
   }, [userId])
 
@@ -786,7 +816,8 @@ function YourOfficialsMode({
         setFetchError("Couldn't save your address — it may not persist across visits.")
       }
     }
-    startTransition(async () => {
+    setIsPending(true);
+    (async () => {
       try {
         const { state, congressionalDistrict, stateSenateDistrict, stateHouseDistrict } = await resolveDistrict(formattedAddress)
         if (!state) {
@@ -811,12 +842,15 @@ function YourOfficialsMode({
             setFetchError("Couldn't save your address — it may not persist across visits.")
           }
         }
-        const result = await fetchCurrentOfficials(state, congressionalDistrict, stateSenateDistrict, stateHouseDistrict)
+        const result = await withTimeout(
+          fetchCurrentOfficials(state, congressionalDistrict, stateSenateDistrict, stateHouseDistrict),
+          12000,
+        )
         setOfficials(result)
       } catch {
         setFetchError('Could not look up that address. Try including your city, state, and ZIP code.')
       }
-    })
+    })().finally(() => setIsPending(false))
   }
 
   const matchKey = useMemo(() => {
@@ -1294,7 +1328,7 @@ export default function YourBallotPage() {
   const [ballot, setBallot] = useState<FederalBallot | null>(null)
   const [stateLegBallot, setStateLegBallot] = useState<StateLegBallot | null>(null)
   const [addressError, setAddressError] = useState<string | null>(null)
-  const [isPending, startTransition] = useTransition()
+  const [isPending, setIsPending] = useState(false)
 
   const [showHowItWorks, setShowHowItWorks] = useState(false)
 
@@ -1312,7 +1346,8 @@ export default function YourBallotPage() {
         if (!addr) return
         setSavedAddress(addr)
         if (BALLOT_DATA_READY) {
-          startTransition(async () => {
+          setIsPending(true)
+          void (async () => {
             try {
               if (data.district_state) {
                 // District already resolved — skip geocode roundtrip
@@ -1351,7 +1386,7 @@ export default function YourBallotPage() {
                 setResolvedAddress(normalizedAddress ?? addr)
               }
             } catch { /* user can retry via Change */ }
-          })
+          })().finally(() => setIsPending(false))
         }
       })
   }, [userId])
@@ -1441,7 +1476,8 @@ export default function YourBallotPage() {
         setAddressError("Couldn't save your address — it may not persist across visits.")
       }
     }
-    startTransition(async () => {
+    setIsPending(true)
+    void (async () => {
       try {
         const { normalizedAddress, state, congressionalDistrict, stateSenateDistrict, stateHouseDistrict } = await resolveDistrict(formattedAddress)
         if (!state) {
@@ -1476,7 +1512,7 @@ export default function YourBallotPage() {
       } catch {
         setAddressError('Could not look up that address. Try including your city, state, and ZIP code.')
       }
-    })
+    })().finally(() => setIsPending(false))
   }
 
   // ── Season routing ────────────────────────────────────────────────────────────

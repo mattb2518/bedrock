@@ -1,6 +1,7 @@
-"use client";
+﻿"use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import Constellation from "@/components/ui/Constellation";
 import { useQuizStore } from "@/store/quizStore";
@@ -20,6 +21,7 @@ const dimensions = [
 
 const types = [
   {
+    type: "honest_broker",
     label: "The Honest Broker",
     workingName: "Pragmatic Constitutionalist",
     oneLiner: "The rules are the freedom.",
@@ -27,6 +29,7 @@ const types = [
     figure: { name: "George Washington", why: "Set the rules by following them — precedent, restraint, and a peaceful handoff of power." },
   },
   {
+    type: "system_fixer",
     label: "The System Fixer",
     workingName: "Independent Architect",
     oneLiner: "Not left or right — building better machinery.",
@@ -34,6 +37,7 @@ const types = [
     figure: { name: "Theodore Roosevelt", why: "Busted the trusts and bolted his own party; broken machinery was there to be fixed." },
   },
   {
+    type: "long_gamer",
     label: "The Long Gamer",
     workingName: "Principled Globalist",
     oneLiner: "Thinks in decades and across borders.",
@@ -41,6 +45,7 @@ const types = [
     figure: { name: "Benjamin Franklin", why: "Diplomat and institution-builder who thought in generations and across an ocean." },
   },
   {
+    type: "good_neighbor",
     label: "The Good Neighbor",
     workingName: "Rooted Pragmatist",
     oneLiner: "Believes the best solutions start closest to home.",
@@ -48,6 +53,7 @@ const types = [
     figure: { name: "Jane Addams", why: "Built Hull House block by block — change starts closest to home." },
   },
   {
+    type: "missourian",
     label: "The Missourian",
     workingName: "Constructive Skeptic",
     oneLiner: "You'll believe it when you see it — and you're usually right.",
@@ -55,6 +61,7 @@ const types = [
     figure: { name: "Harry S. Truman", why: "The Show-Me State's own: plain-spoken, skeptical, \"the buck stops here.\"" },
   },
   {
+    type: "eternal_optimist",
     label: "The Eternal Optimist",
     workingName: "Civic Optimist",
     oneLiner: "Democracy is messy and you're here for all of it.",
@@ -62,6 +69,7 @@ const types = [
     figure: { name: "Walt Whitman", why: "Sang the sprawling, messy democracy and loved every contradiction of it." },
   },
   {
+    type: "steward",
     label: "The Steward",
     workingName: "Steady Steward",
     oneLiner: "Knows what's worth conserving — and what isn't.",
@@ -69,6 +77,7 @@ const types = [
     figure: { name: "Dwight D. Eisenhower", why: "Steady hands on what worked; guarded the center and warned against overreach." },
   },
   {
+    type: "free_agent",
     label: "The Free Agent",
     workingName: "Sovereign Independent",
     oneLiner: "Never fit a box and stopped trying.",
@@ -76,6 +85,7 @@ const types = [
     figure: { name: "Mark Twain", why: "Never fit a box, skewered every institution, and answered to no party." },
   },
   {
+    type: "standard_bearer",
     label: "The Standard Bearer",
     workingName: "Principled Institutionalist",
     oneLiner: "The institutions are imperfect — and worth defending.",
@@ -83,6 +93,7 @@ const types = [
     figure: { name: "Abraham Lincoln", why: "Held the Union and its institutions together when they were all that was left." },
   },
   {
+    type: "pioneer",
     label: "The Pioneer",
     workingName: "Growth-First Independent",
     oneLiner: "Progress is possible, and you know how to build it.",
@@ -90,6 +101,45 @@ const types = [
     figure: { name: "Alexander Hamilton", why: "Built the machinery of a national economy from scratch — progress you can engineer." },
   },
 ];
+
+// ── Portrait helpers ─────────────────────────────────────────────────────────
+function SilhouetteSVG({ size = 32, style }: { size?: number; style?: React.CSSProperties }) {
+  return (
+    <svg viewBox="0 0 100 100" fill="currentColor"
+      style={{ width: size, height: size, color: 'var(--color-text-muted)', ...style }}>
+      <circle cx="50" cy="35" r="18"/>
+      <path d="M15,90 Q15,65 50,65 Q85,65 85,90 Z"/>
+    </svg>
+  )
+}
+
+function ForebearThumb({ type, name, size = 32 }: { type: string; name: string; size?: number }) {
+  const [failed, setFailed] = useState(false)
+  if (failed) {
+    return (
+      <div style={{ width: size, height: size, borderRadius: '50%', overflow: 'hidden', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border)', flexShrink: 0 }}>
+        <SilhouetteSVG size={size * 0.7} />
+      </div>
+    )
+  }
+  return (
+    <div style={{ width: size, height: size, borderRadius: '50%', overflow: 'hidden', position: 'relative', display: 'inline-block', flexShrink: 0 }}>
+      <Image src={`/forebears/${type}.jpg`} alt={name} fill
+        style={{ objectFit: 'cover', objectPosition: '50% 15%', filter: 'grayscale(100%)' }}
+        onError={() => setFailed(true)} sizes={`${size}px`} />
+    </div>
+  )
+}
+
+function BackPortrait({ type, name }: { type: string; name: string }) {
+  const [failed, setFailed] = useState(false)
+  if (failed) return null
+  return (
+    <Image src={`/forebears/${type}.jpg`} alt={name} fill
+      style={{ objectFit: 'cover', objectPosition: '50% 20%', filter: 'grayscale(100%)' }}
+      onError={() => setFailed(true)} sizes="300px" />
+  )
+}
 
 // ── Card component with flip ─────────────────────────────────────────────────
 function TypeCard({ type, flipped, onToggle }: { type: typeof types[0]; flipped: boolean; onToggle: () => void }) {
@@ -140,9 +190,10 @@ function TypeCard({ type, flipped, onToggle }: { type: typeof types[0]; flipped:
               }}>{d}</span>
             ))}
           </div>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: "10px", color: "var(--color-text-muted)", margin: 0, textAlign: "right", opacity: 0.5 }}>
-            flip →
-          </p>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: "var(--space-2)" }}>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: "10px", color: "var(--color-text-muted)", margin: 0, opacity: 0.5 }}>flip →</p>
+            <ForebearThumb type={type.type} name={type.figure.name} size={28} />
+          </div>
         </div>
 
         {/* Back */}
@@ -152,23 +203,23 @@ function TypeCard({ type, flipped, onToggle }: { type: typeof types[0]; flipped:
           backgroundColor: "var(--color-bg-deep, #0f1f33)",
           border: "1px solid var(--color-border)",
           borderRadius: "var(--radius-lg)",
-          padding: "var(--space-5)",
-          display: "flex", flexDirection: "column", gap: "var(--space-3)",
+          overflow: "hidden",
         }}>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-micro)", fontWeight: "var(--weight-semibold)", color: "var(--color-text-muted)", letterSpacing: "var(--tracking-wider)", textTransform: "uppercase", margin: 0 }}>
-            An Early {type.label.replace(/^The /, "")}
-          </p>
-          <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-2)", flex: 1 }}>
+          <BackPortrait type={type.type} name={type.figure.name} />
+          <div style={{ position: "absolute", inset: 0, backgroundColor: "rgba(0,0,0,0.55)", padding: "var(--space-5)", display: "flex", flexDirection: "column", gap: "var(--space-2)", boxSizing: "border-box" }}>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-micro)", fontWeight: "var(--weight-semibold)", color: "var(--color-text-muted)", letterSpacing: "var(--tracking-wider)", textTransform: "uppercase", margin: 0 }}>
+              An Early {type.label.replace(/^The /, "")}
+            </p>
             <p style={{ fontFamily: "var(--font-display)", fontWeight: "700", fontSize: "var(--text-h4)", color: "var(--color-text-primary)", margin: 0, lineHeight: "var(--leading-tight)" }}>
               {type.figure.name}
             </p>
-            <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-small)", color: "var(--color-text-secondary)", margin: 0, lineHeight: "var(--leading-relaxed)" }}>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-small)", color: "var(--color-text-secondary)", margin: 0, lineHeight: "var(--leading-relaxed)", flex: 1 }}>
               {type.figure.why}
             </p>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: "10px", color: "var(--color-text-muted)", margin: 0, textAlign: "right", opacity: 0.5 }}>
+              ← flip back
+            </p>
           </div>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: "10px", color: "var(--color-text-muted)", margin: 0, textAlign: "right", opacity: 0.5 }}>
-            ← flip back
-          </p>
         </div>
 
       </div>

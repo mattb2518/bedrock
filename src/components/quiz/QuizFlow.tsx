@@ -81,6 +81,7 @@ interface DemoStepDef {
 }
 
 const DEMO_STEPS: DemoStepDef[] = [
+  { key: 'firstName', type: 'text', prompt: 'What should we call you? (optional)' },
   { key: 'zipCode', type: 'address', prompt: 'What\'s your address?' },
   { key: 'partyRelationship', type: 'choice', prompt: PARTY_RELATIONSHIP.prompt, options: PARTY_RELATIONSHIP.options },
   { key: 'lineage', type: 'choice', prompt: POLITICAL_LINEAGE.prompt, options: POLITICAL_LINEAGE.options, condition: (d) => !!d.partyRelationship && LINEAGE_TRIGGERS.includes(d.partyRelationship) },
@@ -431,6 +432,18 @@ export default function QuizFlow() {
         const fallback = opt?.microReaction ?? null
         setInlineReflection({ ...snapshot, status: 'ready', text: reflection ?? fallback })
       })
+    } else if (isDepends) {
+      // "It depends" with no open text — show generic static acknowledgment (SPEC §5)
+      setInlineReflection({
+        questionText: question.text,
+        selectedOptionText: 'It depends…',
+        userText: '',
+        followPrompt: '',
+        wasLast,
+        layerAtAnswer,
+        status: 'ready',
+        text: "Fair — that's a real tension, and it's noted.",
+      })
     } else {
       runTransition(wasLast, layerAtAnswer)
     }
@@ -649,10 +662,10 @@ export default function QuizFlow() {
           Most civic tools ask where you stand on the issues. We’re asking something different — and harder. We want to know how you <em>think</em>. Not which party you agree with, not which policies you support — but the underlying values that drive those positions. The stuff that’s been true about you for twenty years.
         </Body>
         <Body>
-          Fifteen questions. About ten minutes. That alone earns your Civic Mantle and your constellation — and unlocks your first tool.
+          Fourteen questions. About ten minutes. That alone earns your Civic Mantle and your constellation — and unlocks your first civic action.
         </Body>
         <Body>
-          Three optional layers after that sharpen everything: another 15–20 minutes total, whenever you want them. Each one unlocks something new.
+          Three optional layers after that sharpen everything: another 15–20 minutes total, whenever you want them. Each one unlocks another civic action.
         </Body>
         <Body>
           One thing: pick the answer that most closely aligns with your views — it doesn&apos;t have to be a perfect fit. Every question also has an &ldquo;It depends&rdquo; option for when that&apos;s genuinely how you think. If you pick it, we&apos;ll ask one quick follow-up. Your nuance is the point.
@@ -706,33 +719,18 @@ export default function QuizFlow() {
     )
   }
 
-  // ── REVEAL (after Layer 1) ────────────────────────────────────────────────
+  // ── REVEAL (after Layer 1) — single page: constellation → unlock content ────
   if (phase === 'reveal' && session?.result) {
     return (
       <>
-        <MantleReveal
-          result={session.result}
-          headerCta={
-            <button style={primaryBtn} onClick={() => setPhase('unlockScreen')}>
-              Continue →
-            </button>
-          }
+        <MantleReveal result={session.result} />
+        <InterlayerUnlockScreen
+          layer={1}
+          profile={session.result.profile}
+          pillarOneMode={pillarOneMode}
+          onKeepGoing={() => setPhase('layerIntro')}
+          onExploreUnlocked={() => router.push('/conversations')}
         />
-        <Shell>
-          <div style={{ textAlign: 'center' }}>
-            <p style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-h3, var(--text-body-lg))', color: 'var(--color-text-primary)', marginBottom: 'var(--space-3)' }}>
-              This is your values foundation — about 40% of the full picture.
-            </p>
-            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text-secondary)', maxWidth: 520, margin: '0 auto var(--space-6)', lineHeight: 'var(--leading-relaxed)' }}>
-              {LAYER_OUTRO[1].teaser}
-            </p>
-            <div style={{ textAlign: 'center' }}>
-              <button style={primaryBtn} onClick={() => setPhase('unlockScreen')}>
-                Continue →
-              </button>
-            </div>
-          </div>
-        </Shell>
       </>
     )
   }
@@ -1049,32 +1047,65 @@ export default function QuizFlow() {
           </>
         )}
 
-        {/* Text: textarea, Enter or button to finish */}
-        {stepDef.type === 'text' && (
-          <>
-            <textarea
-              value={demo.note ?? ''}
-              onChange={(e) => setDemo((d) => ({ ...d, note: e.target.value }))}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault()
-                  finishDemographics(true)
-                }
-              }}
-              rows={3}
-              placeholder="Optional…"
-              style={{ ...textarea, marginBottom: 'var(--space-3)' }}
-              autoFocus
-            />
-            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-micro)', color: 'var(--color-text-muted)', marginBottom: 'var(--space-6)' }}>
-              Press Enter to continue · Shift+Enter for a new line
-            </p>
-            <div style={{ display: 'flex', gap: 'var(--space-4)', flexWrap: 'wrap' }}>
-              <button style={primaryBtn} onClick={() => finishDemographics(true)}>Done → see my results</button>
-              <button style={ghostBtn} onClick={() => finishDemographics(true)}>Skip this note</button>
-            </div>
-          </>
-        )}
+        {/* Text: single-line for firstName, textarea for longer notes */}
+        {stepDef.type === 'text' && (() => {
+          const textKey = stepDef.key as keyof Demographics
+          const textVal = (demo as Record<string, string | undefined>)[textKey as string] ?? ''
+          const setTextVal = (v: string) => setDemo((d) => ({ ...d, [textKey]: v }))
+          const isSingleLine = textKey === 'firstName'
+          const isLast = nextDemoStep(demoStep, demo) >= DEMO_STEPS.length
+          const advance = () => advanceDemoStep(demo)
+          if (isSingleLine) {
+            return (
+              <>
+                <input
+                  type="text"
+                  value={textVal}
+                  onChange={(e) => setTextVal(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); advance() } }}
+                  placeholder="First name (optional)…"
+                  style={{ ...textarea as React.CSSProperties, rows: undefined, resize: 'none', minHeight: 'unset', height: 'auto', padding: 'var(--space-3) var(--space-4)', marginBottom: 'var(--space-6)' } as React.CSSProperties}
+                  autoFocus
+                />
+                <div style={{ display: 'flex', gap: 'var(--space-4)', flexWrap: 'wrap' }}>
+                  <button style={primaryBtn} onClick={advance}>Next →</button>
+                  <button style={ghostBtn} onClick={advance}>Skip</button>
+                </div>
+              </>
+            )
+          }
+          return (
+            <>
+              <textarea
+                value={textVal}
+                onChange={(e) => setTextVal(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); isLast ? finishDemographics(true) : advance() }
+                }}
+                rows={3}
+                placeholder="Optional…"
+                style={{ ...textarea, marginBottom: 'var(--space-3)' }}
+                autoFocus
+              />
+              <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-micro)', color: 'var(--color-text-muted)', marginBottom: 'var(--space-6)' }}>
+                Press Enter to continue · Shift+Enter for a new line
+              </p>
+              <div style={{ display: 'flex', gap: 'var(--space-4)', flexWrap: 'wrap' }}>
+                {isLast ? (
+                  <>
+                    <button style={primaryBtn} onClick={() => finishDemographics(true)}>Done → see my results</button>
+                    <button style={ghostBtn} onClick={() => finishDemographics(true)}>Skip this note</button>
+                  </>
+                ) : (
+                  <>
+                    <button style={primaryBtn} onClick={advance}>Next →</button>
+                    <button style={ghostBtn} onClick={advance}>Skip</button>
+                  </>
+                )}
+              </div>
+            </>
+          )
+        })()}
       </Shell>
     )
   }
@@ -1130,15 +1161,17 @@ export default function QuizFlow() {
         <div style={{ ...card, borderColor: 'var(--color-blue-accent)', backgroundColor: 'rgba(107,159,234,0.08)', marginBottom: 'var(--space-4)', pointerEvents: 'none' }}>
           {selectedOptionText}
         </div>
-        {/* Follow-up prompt + frozen user text */}
-        <div style={{ marginTop: 'var(--space-2)' }}>
-          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', marginBottom: 'var(--space-3)' }}>
-            {fPrompt}
-          </p>
-          <div style={{ ...textarea as React.CSSProperties, opacity: 0.7, whiteSpace: 'pre-wrap', minHeight: 72, pointerEvents: 'none' }}>
-            {userText}
+        {/* Follow-up prompt + frozen user text — hidden when no text was entered */}
+        {(userText || fPrompt) && (
+          <div style={{ marginTop: 'var(--space-2)' }}>
+            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', marginBottom: 'var(--space-3)' }}>
+              {fPrompt}
+            </p>
+            <div style={{ ...textarea as React.CSSProperties, opacity: 0.7, whiteSpace: 'pre-wrap', minHeight: 72, pointerEvents: 'none' }}>
+              {userText}
+            </div>
           </div>
-        </div>
+        )}
         {/* Inline reflection — pending or ready */}
         <div style={{ marginTop: 'var(--space-4)', paddingLeft: 'var(--space-4)', borderLeft: '2px solid var(--color-gold)' }}>
           {status === 'pending' ? (
@@ -1181,7 +1214,7 @@ export default function QuizFlow() {
   // own follow-up field. Both collect text — but only the It-depends path
   // offers the authored suggestion chips (SPEC §5 unified follow-up).
   const needsFollowText = isDepends || !!pickedOption?.followUpPrompt
-  const followReady = !needsFollowText || followText.trim().length > 0
+  const followReady = !needsFollowText || isDepends || followText.trim().length > 0
   const followPrompt = pickedOption?.followUpPrompt ?? question.dependsFollowUp.prompt
   const followChips = isDepends ? question.dependsFollowUp.chips : []
 

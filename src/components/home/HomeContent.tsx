@@ -5,7 +5,6 @@ import Link from "next/link";
 import HeroSlider from "@/components/layout/HeroSlider";
 import { getUnlockState } from "@/lib/quiz/unlockState";
 import MantleConstellation from "@/components/ui/MantleConstellation";
-import HomeTeaser from "@/components/home/HomeTeaser";
 import Constellation from "@/components/ui/Constellation";
 import { DIMENSION_PAIRS } from "@/components/ui/Constellation";
 import { useQuizStore } from "@/store/quizStore";
@@ -19,7 +18,7 @@ import { usePreviewStore } from "@/store/previewStore";
 
 function LockBadge({ layer }: { layer: number }) {
   return (
-    <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", fontSize: "11px", fontFamily: "var(--font-body)", color: "var(--color-text-muted)", marginTop: "var(--space-3)" }}>
+    <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", fontSize: "11px", fontFamily: "var(--font-body)", color: "var(--color-text-secondary)", marginTop: "var(--space-3)" }}>
       🔒 Unlocks after Layer {layer}
     </span>
   );
@@ -41,7 +40,7 @@ function PillarCards({ pillarOneMode, layersCompleted = 0 }: { pillarOneMode: Pi
       <Link href="/media-diet" style={{ textDecoration: "none", display: "block", height: "100%" }}>
         <div style={{ backgroundColor: "var(--color-bg-surface)", border: "1px solid var(--color-border)", borderRadius: "var(--radius-lg)", padding: "var(--space-8)", borderTop: "3px solid var(--color-white-warm)", transition: "var(--transition-base)", cursor: "pointer", height: "100%", boxSizing: "border-box", opacity: unlock.mediaDiet ? 1 : 0.7 }}>
           <h3 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-h3)", color: "var(--color-text-primary)", marginBottom: "var(--space-3)" }}>Your Media Diet</h3>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-body)", color: "var(--color-text-secondary)", lineHeight: "var(--leading-relaxed)" }}>Curated journalism that deepens, expands, and challenges.</p>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-body)", color: "var(--color-text-secondary)", lineHeight: "var(--leading-relaxed)" }}>Independent journalism matched to how you actually think — in three tiers.</p>
           {!unlock.mediaDiet && <LockBadge layer={2} />}
         </div>
       </Link>
@@ -72,18 +71,15 @@ function PublicHome({ pillarOneMode }: { pillarOneMode: PillarOneMode }) {
     <>
       <HeroSlider />
 
-      {/* Homepage teaser — ghost constellation (SPEC §5) */}
-      <HomeTeaser />
-
       {/* Civic Mantle teaser */}
       <section style={{ backgroundColor: "var(--color-bg-section)", padding: "var(--space-20) var(--space-6)" }}>
         <div style={{ maxWidth: "var(--max-width-wide)", margin: "0 auto" }}>
           <div style={{ textAlign: "center", maxWidth: "620px", margin: "0 auto var(--space-12)" }}>
             <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-small)", fontWeight: "var(--weight-semibold)", color: "var(--color-gold)", letterSpacing: "var(--tracking-wider)", textTransform: "uppercase", marginBottom: "var(--space-4)" }}>
-              Civic Mantle
+              One quiz. Eight dimensions.
             </p>
             <h2 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-h2)", color: "var(--color-text-primary)", lineHeight: "var(--leading-tight)", marginBottom: "var(--space-4)" }}>
-              Ten mantles.<br />One is yours.
+              Define your bedrock.<br />Find your Civic Mantle.
             </h2>
             <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-body-lg)", color: "var(--color-text-secondary)", lineHeight: "var(--leading-relaxed)" }}>
               Not a label — a mantle, something you claim. The quiz maps your values across eight dimensions and surfaces the civic identity that&apos;s already yours — each one a constellation traced across those dimensions, like the ten below.
@@ -164,6 +160,7 @@ function ReturningHome({ pillarOneMode }: { pillarOneMode: PillarOneMode }) {
   const profile = result?.profile as DimensionalProfile | undefined;
   const radarScores = profile ? profileToRadar(profile) : undefined;
   const layersCompleted = session?.completedLayers?.length ?? 0;
+  const firstName = session?.demographics?.firstName?.trim() || null;
 
   // Top traits: the user's flagged top dimensions, labeled by pole
   const topTraits = (result?.topDimensions ?? []).slice(0, 3).map((dim) => {
@@ -189,6 +186,13 @@ function ReturningHome({ pillarOneMode }: { pillarOneMode: PillarOneMode }) {
   return (
     <>
       <HeroSlider compact />
+
+      {/* Returning greeting */}
+      <div style={{ maxWidth: "var(--max-width-wide)", margin: "0 auto", padding: "var(--space-8) var(--space-6) 0" }}>
+        <p style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-h3)", color: "var(--color-text-primary)", margin: 0 }}>
+          {firstName ? `Welcome back, ${firstName}.` : "Welcome back."}
+        </p>
+      </div>
 
       {/* Your Actions */}
       <section style={{ backgroundColor: "var(--color-bg-section)", padding: "var(--space-16) var(--space-6)" }}>
