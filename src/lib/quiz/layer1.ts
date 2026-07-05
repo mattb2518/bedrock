@@ -72,14 +72,14 @@ export const LAYER1_QUESTIONS: QuizQuestion[] = [
       },
       {
         id: 'A2-b',
-        text: 'The federal government — national problems need national solutions, and local governments too often protect local interests at the expense of people who need help most.',
+        text: 'The federal government — national problems need national solutions, and local control too often fails the people who most need help.',
         microReaction:
           "The equity argument — some protections, like child labor laws and food safety, needed a national floor because they weren't going to emerge state by state. The tradeoff is real: a national floor can flatten genuine local difference.",
         scores: { local_federal: 85 },
       },
       {
         id: 'A2-c',
-        text: 'Whoever has the strongest track record on that specific problem — some things states have solved brilliantly, others have required federal action.',
+        text: 'Whoever has the best track record on that problem — states have solved some brilliantly, others needed federal action.',
         microReaction: "Federalism by track record — let the level that's working own it.",
         scores: { local_federal: 50 },
       },
@@ -103,14 +103,14 @@ export const LAYER1_QUESTIONS: QuizQuestion[] = [
     options: [
       {
         id: 'A3-a',
-        text: "Prioritize American interests — a government's first obligation is to its own citizens, and influence abroad is only sustainable when we're strong at home.",
+        text: "Prioritize American interests — government's first duty is to its own citizens, and influence abroad depends on strength at home.",
         microReaction:
           "There's a reason we have a State Department and not a World Department — every government answers first to the people who can vote it out.",
         scores: { national_global: 15 },
       },
       {
         id: 'A3-b',
-        text: "Weigh global interests seriously — in an interconnected world, what's bad for the world tends to become bad for America, and global leadership builds influence money can't buy.",
+        text: "Weigh global interests — in a connected world what hurts the world hurts America, and leadership builds influence money can't buy.",
         microReaction:
           'The post-WWII alliance system has shaped the global order for 75 years — a period that has coincided with the longest absence of great-power war in modern history.',
         scores: { national_global: 85 },
@@ -135,12 +135,12 @@ export const LAYER1_QUESTIONS: QuizQuestion[] = [
   {
     id: 'A4',
     layer: 1,
-    text: 'A mandatory minimum sentencing law that many judges and legal scholars argue produces outcomes disproportionate to the actual crimes. What should happen?',
+    text: 'A mandatory-minimum sentencing law that many judges and scholars say produces punishments disproportionate to the crimes. What should happen?',
     dimensions: ['rules_outcomes'],
     options: [
       {
         id: 'A4-a',
-        text: 'Follow the law while working to change it — rule of law only works if everyone respects it, even when it’s imperfect.',
+        text: 'Follow the law while working to change it — rule of law only works if everyone respects it, even when imperfect.',
         microReaction:
           "The moment people start picking which laws deserve respect, you've lost something hard to get back.",
         scores: { rules_outcomes: 15 },
@@ -184,7 +184,7 @@ export const LAYER1_QUESTIONS: QuizQuestion[] = [
       },
       {
         id: 'A5-b',
-        text: 'Government needs to lead, using market tools where they work — some problems are too important, too long-term, or too inequitable to leave to markets that have no incentive to solve them.',
+        text: "Government needs to lead, using market tools where they work — some problems markets simply won't solve on their own.",
         microReaction:
           'Markets are excellent at a lot of things. Problems where costs fall on people outside the transaction aren’t one of them.',
         scores: { markets_governance: 85 },
@@ -214,21 +214,21 @@ export const LAYER1_QUESTIONS: QuizQuestion[] = [
     options: [
       {
         id: 'A6-a',
-        text: 'Taking the deal in front of you — half a loaf beats no loaf, and pursuing perfect outcomes has a long history of destroying good ones.',
+        text: 'Taking the deal in front of you — half a loaf beats none, and chasing perfect often destroys good.',
         microReaction:
           "Not glamorous, but it's how Social Security, Medicare, and the Civil Rights Act got across the finish line — all compromised, all transformative.",
         scores: { pragmatism_idealism: 15 },
       },
       {
         id: 'A6-b',
-        text: 'Holding the line until the world catches up — movements that settle for less rarely get more, and the way to expand the possible is to keep demanding what’s right.',
+        text: "Holding the line until the world catches up — you expand what's possible by refusing to stop demanding what's right.",
         microReaction:
           'The hold-the-line theory of change. Movements that settle for less rarely get more.',
         scores: { pragmatism_idealism: 85 },
       },
       {
         id: 'A6-c',
-        text: 'Building the coalition first — the limiting factor is rarely the idea, it’s the political will, and you build will by bringing more people along before you ask for the vote.',
+        text: 'Building the coalition first — you win by bringing enough people along before you ever ask for the vote.',
         microReaction:
           "The coalition-building theory of change — the limiting factor is rarely the idea, it's the will, and will gets built one person at a time. Madison called it the slow work of assembling majorities.",
         scores: { pragmatism_idealism: 45 },
@@ -248,7 +248,7 @@ export const LAYER1_QUESTIONS: QuizQuestion[] = [
   {
     id: 'A7',
     layer: 1,
-    text: 'When individual freedom and community wellbeing genuinely conflict — one person’s choice imposes real costs on others — what should generally give way?',
+    text: 'When individual freedom and community wellbeing genuinely conflict — one person’s choice imposes real costs on others — what should give way?',
     dimensions: ['individual_collective'],
     options: [
       {
@@ -260,13 +260,13 @@ export const LAYER1_QUESTIONS: QuizQuestion[] = [
       },
       {
         id: 'A7-b',
-        text: "Community wellbeing — we're shaped by and responsible to our communities, and a freedom that imposes serious costs on others isn't worth protecting.",
+        text: "Community wellbeing — we owe the communities that shape us, and a freedom that badly harms others isn't worth protecting.",
         microReaction: "Rights don't exist in a vacuum. The person downwind has interests too.",
         scores: { individual_collective: 85 },
       },
       {
         id: 'A7-c',
-        text: 'Protect the individual from government, but not necessarily from community standards — your neighbors can ask more of you than your government can.',
+        text: 'Protect the individual from government, but not from community standards — neighbors can ask more of you than government can.',
         microReaction:
           "HOAs are annoying but they're not unconstitutional. There's actually a coherent philosophy in there.",
         scores: { individual_collective: 58 },
@@ -286,12 +286,12 @@ export const LAYER1_QUESTIONS: QuizQuestion[] = [
   {
     id: 'A8',
     layer: 1,
-    text: 'When a major American expert institution — a federal regulatory agency, a scientific body like the CDC or NIH, an established peer-reviewed consensus — reaches a conclusion you find surprising or uncomfortable, your first instinct is:',
+    text: 'When a major expert institution — a federal agency, the CDC, a settled scientific consensus — reaches a conclusion you find uncomfortable, your instinct is:',
     dimensions: ['trust_skepticism'],
     options: [
       {
         id: 'A8-a',
-        text: 'Give it serious weight — institutions with long track records of rigor have earned some deference, even when their conclusions are inconvenient.',
+        text: 'Give it serious weight — institutions with long track records of rigor have earned deference, even when the conclusion is inconvenient.',
         microReaction:
           'The accumulated expertise of thousands of people working on a problem for decades is not nothing.',
         scores: { trust_skepticism: 15 },
@@ -305,7 +305,7 @@ export const LAYER1_QUESTIONS: QuizQuestion[] = [
       },
       {
         id: 'A8-c',
-        text: "Calibrate based on the institution's track record on this specific type of question — the CDC gets more benefit of the doubt on epidemiology than on nutrition.",
+        text: "Calibrate by track record on this kind of question — the CDC earns more trust on epidemiology than on nutrition.",
         microReaction:
           'Trust by track record — the same institution can be rigorous in one domain and out over its skis in another. Calibrate to the domain, not the logo.',
         scores: { trust_skepticism: 50 },
@@ -327,26 +327,26 @@ export const LAYER1_QUESTIONS: QuizQuestion[] = [
   {
     id: 'C2',
     layer: 1,
-    text: 'The federal government is considering a large public investment — infrastructure, broadband, a green energy grid — paid for by higher taxes on higher earners. Your reaction:',
+    text: 'The government weighs a public investment — broadband, a green energy grid — funded by higher taxes on high earners. Your reaction:',
     dimensions: ['individual_collective', 'markets_governance'],
     options: [
       {
         id: 'C2-a',
-        text: 'Skeptical — broad public investments rarely deliver efficiently, and taking more from individuals to fund programs government manages poorly is a bad trade.',
+        text: 'Skeptical — big public investments rarely deliver efficiently, and taking more to fund programs government runs poorly is a bad trade.',
         microReaction:
           "Government programs have constituencies that outlive their usefulness. The question isn't whether government can invest well. It's whether it will.",
         scores: { individual_collective: 20, markets_governance: 20 },
       },
       {
         id: 'C2-b',
-        text: "Supportive — some things markets won't build because the return is too diffuse or too long-term, and a society that can't make collective investments in shared infrastructure is slowly eating itself.",
+        text: "Supportive — markets won't build what pays off too slowly, and a society that can't invest in shared infrastructure eats itself.",
         microReaction:
           'Broadband in rural America wasn’t going to happen through market incentives alone. Sometimes the only entity with the right time horizon is the public one.',
         scores: { individual_collective: 85, markets_governance: 85 },
       },
       {
         id: 'C2-c',
-        text: "Fund it like a private investor would — only with clear milestones, hard sunset clauses, and clawbacks if it fails. Public money should face at least the discipline private capital demands before a dollar goes out.",
+        text: "Fund it like a private investor would — clear milestones, hard sunset clauses, and clawbacks if it fails.",
         microReaction:
           "The Hoover Dam and Solyndra were both 'government investments.' The difference wasn't the label — it was whether anyone built in a way to fail fast and cut losses.",
         scores: { individual_collective: 50, markets_governance: 50 },
@@ -365,26 +365,26 @@ export const LAYER1_QUESTIONS: QuizQuestion[] = [
   {
     id: 'C4',
     layer: 1,
-    text: 'Your town has a serious housing shortage. A state law would override local zoning and require significantly more dense development. Your reaction:',
+    text: 'Your town has a housing shortage. A state law would override local zoning to require much denser development. Your reaction:',
     dimensions: ['local_federal', 'individual_collective'],
     options: [
       {
         id: 'C4-a',
-        text: 'The state is overreaching — zoning is one of the most local decisions there is, and communities should shape their own growth.',
+        text: 'The state is overreaching — zoning is about as local as decisions get, and communities should shape their own growth.',
         microReaction:
           'The people who live somewhere should have meaningful say over what it becomes. That’s not nimbyism — that’s democracy at its most direct.',
         scores: { local_federal: 15, individual_collective: 38 },
       },
       {
         id: 'C4-b',
-        text: 'The state is right to intervene — local zoning has been used for decades to exclude people by income and race, and the housing crisis is too severe to leave to the communities that created it.',
+        text: 'The state is right to intervene — the same local zoning that caused this shortage has long excluded people by income and race.',
         microReaction:
           'When local decisions impose costs on people who have no vote in that locality — the worker who can’t afford to live near their job — local democracy has a legitimacy problem.',
         scores: { local_federal: 85, individual_collective: 85 },
       },
       {
         id: 'C4-c',
-        text: 'Override the zoning but compensate the community — if the state imposes regional priorities on a local area, it should share the infrastructure costs that come with growth.',
+        text: 'Override the zoning but compensate the community — if the state mandates the growth, it should help pay for it.',
         microReaction:
           'Power without responsibility is just imposition. If you mandate the growth, fund the schools and roads.',
         scores: { local_federal: 68, individual_collective: 60 },
@@ -402,19 +402,19 @@ export const LAYER1_QUESTIONS: QuizQuestion[] = [
   {
     id: 'C5',
     layer: 1,
-    text: 'The United States has the opportunity to join a new international agreement on a problem requiring global coordination — pandemic preparedness, cyber security, nuclear proliferation. It requires real commitments and some loss of unilateral flexibility. Your instinct:',
+    text: 'The US can join a new international agreement requiring global coordination — real commitments, some loss of unilateral flexibility. Your instinct:',
     dimensions: ['national_global', 'pragmatism_idealism'],
     options: [
       {
         id: 'C5-a',
-        text: 'Be cautious — international agreements erode American sovereignty, and the history of multilateral institutions is full of good intentions and poor execution.',
+        text: 'Be cautious — these agreements erode American sovereignty, and multilateral institutions have a record of good intentions and poor execution.',
         microReaction:
           "When an international body gets it wrong, Americans don't get to vote the decision-makers out.",
         scores: { national_global: 15, pragmatism_idealism: 35 },
       },
       {
         id: 'C5-b',
-        text: 'Engage seriously — problems that cross borders require solutions that cross borders, and a United States that won’t commit to multilateral frameworks loses the credibility to shape them.',
+        text: 'Engage seriously — cross-border problems need cross-border solutions, and sitting out costs you the standing to lead.',
         microReaction: 'You either help write the rules or you live under rules written by others.',
         scores: { national_global: 85, pragmatism_idealism: 65 },
       },
@@ -441,25 +441,25 @@ export const LAYER1_QUESTIONS: QuizQuestion[] = [
   {
     id: 'C6',
     layer: 1,
-    text: 'A candidate you broadly agree with has a real chance of winning — but only if they soften a position you care deeply about. They’re asking for your support. What do you do?',
+    text: 'A candidate you agree with can win — but only if they soften a position you care deeply about. What now?',
     dimensions: ['pragmatism_idealism', 'trust_skepticism'],
     options: [
       {
         id: 'C6-a',
-        text: 'Support them — a candidate who wins on 70% of your priorities does more good than a principled candidate who loses and does nothing.',
+        text: 'Support them — a candidate who wins on 70% of your priorities does more good than a principled one who loses.',
         microReaction: 'Politics is the art of the possible, and the possible requires winning.',
         scores: { pragmatism_idealism: 15, trust_skepticism: 40 },
       },
       {
         id: 'C6-b',
-        text: 'Withhold support unless they hold the line — a candidate who softens under pressure before the election will soften further after it.',
+        text: 'Withhold support unless they hold the line — softening under pressure before the election predicts softening after it.',
         microReaction:
           'Campaign commitments are the only leverage voters have. A party that learns it can soften positions without losing support will keep softening them.',
         scores: { pragmatism_idealism: 85, trust_skepticism: 72 },
       },
       {
         id: 'C6-c',
-        text: 'Support them publicly but organize to hold them accountable after — winning matters, but so does building infrastructure that makes backsliding costly.',
+        text: 'Support them publicly but organize to hold them accountable after — winning matters, and so does making backsliding costly.',
         microReaction:
           'Show up for the win, then make sure they remember who showed up. It’s how durable political coalitions actually work.',
         scores: { pragmatism_idealism: 38, trust_skepticism: 60 },
@@ -480,12 +480,12 @@ export const LAYER1_QUESTIONS: QuizQuestion[] = [
   {
     id: 'S1',
     layer: 1,
-    text: 'After a series of domestic attacks, a president declares a national emergency and invokes executive powers never used in peacetime — suspending certain civil liberties, directing agencies without congressional approval, restricting movement. The threats are real. The legal authority is genuinely ambiguous. Your position:',
+    text: 'After domestic attacks, a president declares a national emergency and invokes peacetime-unprecedented powers — suspending civil liberties, directing agencies without Congress. The threat is real; the legal authority is ambiguous. Your position:',
     dimensions: ['stability_change', 'rules_outcomes', 'local_federal', 'trust_skepticism'],
     options: [
       {
         id: 'S1-a',
-        text: 'The executive needs these tools — in a genuine emergency, the pace of congressional deliberation is a liability, and a president who can’t act decisively has failed the most basic obligation of the office.',
+        text: 'The executive needs these tools — in a real emergency, Congress is too slow, and a paralyzed president has failed the office.',
         microReaction:
           'Lincoln suspended habeas corpus without congressional authorization. The Union survived.',
         scores: { stability_change: 60, rules_outcomes: 80, local_federal: 78, trust_skepticism: 30 },
@@ -499,7 +499,7 @@ export const LAYER1_QUESTIONS: QuizQuestion[] = [
       },
       {
         id: 'S1-c',
-        text: 'Allow the emergency action but require automatic expiration and mandatory reauthorization — give the executive the speed the moment requires, but build in a hard stop.',
+        text: 'Allow the action but require automatic expiration and reauthorization — give the executive real speed, with a hard stop built in.',
         microReaction:
           "The problem with emergency powers isn't the emergency — it's the 'temporary' measures that outlast the crisis by decades.",
         scores: { stability_change: 48, rules_outcomes: 50, local_federal: 62, trust_skepticism: 55 },
@@ -519,26 +519,26 @@ export const LAYER1_QUESTIONS: QuizQuestion[] = [
   {
     id: 'S4',
     layer: 1,
-    text: 'During a severe pandemic, the federal government mandates vaccines, masks, and business closures. The measures demonstrably reduce deaths. They also damage small businesses, disrupt children’s education, and restrict movement for an extended period. Looking back, the right balance was:',
+    text: "During a severe pandemic, the government mandates vaccines, masks, and closures — demonstrably fewer deaths, but real costs to businesses, kids' schooling, and freedom of movement. Looking back, the right balance was:",
     dimensions: ['stability_change', 'individual_collective', 'local_federal', 'trust_skepticism'],
     options: [
       {
         id: 'S4-a',
-        text: 'The restrictions were justified — collective action problems require collective solutions, and individuals who refused to participate imposed real costs on people around them.',
+        text: 'The restrictions were justified — collective problems require collective solutions, and those who refused imposed real costs on everyone around them.',
         microReaction:
           'Your freedom to move through the world unvaccinated during a pandemic is not a purely personal choice — it has a transmission probability attached to it.',
         scores: { stability_change: 55, individual_collective: 85, local_federal: 70, trust_skepticism: 30 },
       },
       {
         id: 'S4-b',
-        text: 'The restrictions went too far — costs fell heavily on specific groups while the people making decisions bore far fewer of those costs personally.',
+        text: 'The restrictions went too far — the heaviest costs fell on specific groups, not on the country as a whole.',
         microReaction:
           'When the people making decisions bear fewer costs than the people subject to them, the legitimacy of those decisions deserves scrutiny regardless of the public health merits.',
         scores: { stability_change: 45, individual_collective: 25, local_federal: 35, trust_skepticism: 70 },
       },
       {
         id: 'S4-c',
-        text: "The problem wasn't the restrictions but the lack of honest accounting — the public was told tradeoffs were simple when they weren't, and the erosion of trust came from the gap between what officials said and what was actually known.",
+        text: "The problem wasn't the restrictions but the lack of honest accounting — officials sold the tradeoffs as simple when they weren't.",
         microReaction:
           'Guidance that changed without explanation, and projections wrong in both directions, eroded the trust that effective crisis response depends on.',
         scores: { stability_change: 50, individual_collective: 50, local_federal: 50, trust_skepticism: 72 },

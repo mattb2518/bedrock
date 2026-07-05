@@ -500,10 +500,10 @@ Most problems affecting Americans day-to-day — housing, school quality, public
 **A.** Local and state governments — closer to the problem, more accountable, better at tailoring solutions.
 *"Subsidiarity — decisions made at the lowest level capable of making them well. Older than America, but America made it famous."*
 
-**B.** The federal government — national problems need national solutions, and local governments too often protect local interests at the expense of people who need help most.
+**B.** The federal government — national problems need national solutions, and local control too often fails the people who most need help.
 *"The equity argument — some protections, like child labor laws and food safety, needed a national floor because they weren't going to emerge state by state. The tradeoff is real: a national floor can flatten genuine local difference."*
 
-**C.** Whoever has the strongest track record on that specific problem — some things states have solved brilliantly, others have required federal action.
+**C.** Whoever has the best track record on that problem — states have solved some brilliantly, others needed federal action.
 *"Federalism by track record — let the level that's working own it."*
 
 **It depends** → *"What tips the balance?"*  — chips: Whether the problem crosses state lines · Whether local governments have already tried and failed · Whether equal treatment across states matters for this issue
@@ -516,10 +516,10 @@ Most problems affecting Americans day-to-day — housing, school quality, public
 
 When American and global interests conflict, the United States should generally:
 
-**A.** Prioritize American interests — a government's first obligation is to its own citizens, and influence abroad is only sustainable when we're strong at home.
+**A.** Prioritize American interests — government's first duty is to its own citizens, and influence abroad depends on strength at home.
 *"There's a reason we have a State Department and not a World Department — every government answers first to the people who can vote it out."*
 
-**B.** Weigh global interests seriously — in an interconnected world, what's bad for the world tends to become bad for America, and global leadership builds influence money can't buy.
+**B.** Weigh global interests — in a connected world what hurts the world hurts America, and leadership builds influence money can't buy.
 *"The post-WWII alliance system has shaped the global order for 75 years — a period that has coincided with the longest absence of great-power war in modern history."*
 
 **C.** Lead by example rather than intervention — America's most durable influence has always come from being worth emulating.
@@ -532,9 +532,9 @@ When American and global interests conflict, the United States should generally:
 
 **A4 — Rules↔Outcomes**
 
-A mandatory minimum sentencing law that many judges and legal scholars argue produces outcomes disproportionate to the actual crimes. What should happen?
+A mandatory-minimum sentencing law that many judges and scholars say produces punishments disproportionate to the crimes. What should happen?
 
-**A.** Follow the law while working to change it — rule of law only works if everyone respects it, even when it's imperfect.
+**A.** Follow the law while working to change it — rule of law only works if everyone respects it, even when imperfect.
 *"The moment people start picking which laws deserve respect, you've lost something hard to get back."*
 
 **B.** Use every available tool to mitigate unjust outcomes now — a law that reliably produces injustice has forfeited its moral authority.
@@ -554,7 +554,7 @@ When it comes to solving big economic and social problems — healthcare costs, 
 **A.** Let markets lead, with guardrails where necessary — competition and price signals allocate resources better than government programs.
 *"Prices carry information no central planner can replicate. Markets aggregate decentralized knowledge in ways government allocation can't match."*
 
-**B.** Government needs to lead, using market tools where they work — some problems are too important, too long-term, or too inequitable to leave to markets that have no incentive to solve them.
+**B.** Government needs to lead, using market tools where they work — some problems markets simply won't solve on their own.
 *"Markets are excellent at a lot of things. Problems where costs fall on people outside the transaction aren't one of them."*
 
 **C.** Build the market you want — design rules and incentives so doing the right thing is also the profitable thing.
@@ -568,13 +568,13 @@ When it comes to solving big economic and social problems — healthcare costs, 
 
 In politics and civic life, lasting change usually comes from:
 
-**A.** Taking the deal in front of you — half a loaf beats no loaf, and pursuing perfect outcomes has a long history of destroying good ones.
+**A.** Taking the deal in front of you — half a loaf beats none, and chasing perfect often destroys good.
 *"Not glamorous, but it's how Social Security, Medicare, and the Civil Rights Act got across the finish line — all compromised, all transformative."*
 
-**B.** Holding the line until the world catches up — movements that settle for less rarely get more, and the way to expand the possible is to keep demanding what's right.
+**B.** Holding the line until the world catches up — you expand what's possible by refusing to stop demanding what's right.
 *"The hold-the-line theory of change. Movements that settle for less rarely get more."*
 
-**C.** Building the coalition first — the limiting factor is rarely the idea, it's the political will, and you build will by bringing more people along before you ask for the vote.
+**C.** Building the coalition first — you win by bringing enough people along before you ever ask for the vote.
 *"The coalition-building theory of change — the limiting factor is rarely the idea, it's the will, and will gets built one person at a time. Madison called it the slow work of assembling majorities."*
 
 **It depends** → *"What shapes your answer?"*  — chips: Whether the moment is politically ripe · How much harm is accumulating · Whether a partial win forecloses the fuller one
@@ -586,15 +586,15 @@ In politics and civic life, lasting change usually comes from:
 
 **A7 — Individual↔Collective**
 
-When individual freedom and community wellbeing genuinely conflict — one person's choice imposes real costs on others — what should generally give way?
+When individual freedom and community wellbeing genuinely conflict — one person's choice imposes real costs on others — what should give way?
 
 **A.** Individual freedom should be the strong default — restrictions on what people can do require strong justification.
 *"The burden of proof should always be on whoever wants to restrict what someone else can do."*
 
-**B.** Community wellbeing — we're shaped by and responsible to our communities, and a freedom that imposes serious costs on others isn't worth protecting.
+**B.** Community wellbeing — we owe the communities that shape us, and a freedom that badly harms others isn't worth protecting.
 *"Rights don't exist in a vacuum. The person downwind has interests too."*
 
-**C.** Protect the individual from government, but not necessarily from community standards — your neighbors can ask more of you than your government can.
+**C.** Protect the individual from government, but not from community standards — neighbors can ask more of you than government can.
 *"HOAs are annoying but they're not unconstitutional. There's actually a coherent philosophy in there."*
 
 **It depends** → *"What shapes your answer?"*  — chips: How serious the cost to others is · Whether the community norm is itself fair · Whether government or community is doing the asking
@@ -605,15 +605,15 @@ When individual freedom and community wellbeing genuinely conflict — one perso
 
 **A8 — Trust↔Skepticism**
 
-When a major American expert institution — a federal regulatory agency, a scientific body like the CDC or NIH, an established peer-reviewed consensus — reaches a conclusion you find surprising or uncomfortable, your first instinct is:
+When a major expert institution — a federal agency, the CDC, a settled scientific consensus — reaches a conclusion you find uncomfortable, your instinct is:
 
-**A.** Give it serious weight — institutions with long track records of rigor have earned some deference, even when their conclusions are inconvenient.
+**A.** Give it serious weight — institutions with long track records of rigor have earned deference, even when the conclusion is inconvenient.
 *"The accumulated expertise of thousands of people working on a problem for decades is not nothing."*
 
 **B.** Scrutinize it hard — institutions have interests, blind spots, and failure modes, and healthy skepticism is what keeps them honest.
 *"Major institutional failures in American history — from the Tuskegee study to early COVID guidance reversals to repeated FBI surveillance overreach — were preceded by too much deference."*
 
-**C.** Calibrate based on the institution's track record on this specific type of question — the CDC gets more benefit of the doubt on epidemiology than on nutrition.
+**C.** Calibrate by track record on this kind of question — the CDC earns more trust on epidemiology than on nutrition.
 *"Trust by track record — the same institution can be rigorous in one domain and out over its skis in another. Calibrate to the domain, not the logo."*
 
 **It depends** → *"What shapes how much trust you extend?"*  — chips: The type of institution · Whether you can see their reasoning · Whether they have a stake in the outcome
@@ -629,15 +629,15 @@ When a major American expert institution — a federal regulatory agency, a scie
 
 **C2 — Individual↔Collective × Markets↔Governance**
 
-The federal government is considering a large public investment — infrastructure, broadband, a green energy grid — paid for by higher taxes on higher earners. Your reaction:
+The government weighs a public investment — broadband, a green energy grid — funded by higher taxes on high earners. Your reaction:
 
-**A.** Skeptical — broad public investments rarely deliver efficiently, and taking more from individuals to fund programs government manages poorly is a bad trade.
+**A.** Skeptical — big public investments rarely deliver efficiently, and taking more to fund programs government runs poorly is a bad trade.
 *"Government programs have constituencies that outlive their usefulness. The question isn't whether government can invest well. It's whether it will."*
 
-**B.** Supportive — some things markets won't build because the return is too diffuse or too long-term, and a society that can't make collective investments in shared infrastructure is slowly eating itself.
+**B.** Supportive — markets won't build what pays off too slowly, and a society that can't invest in shared infrastructure eats itself.
 *"Broadband in rural America wasn't going to happen through market incentives alone. Sometimes the only entity with the right time horizon is the public one."*
 
-**C.** Fund it like a private investor would — only with clear milestones, hard sunset clauses, and clawbacks if it fails. Public money should face at least the discipline private capital demands before a dollar goes out.
+**C.** Fund it like a private investor would — clear milestones, hard sunset clauses, and clawbacks if it fails.
 *"The Hoover Dam and Solyndra were both 'government investments.' The difference wasn't the label — it was whether anyone built in a way to fail fast and cut losses."*
 
 **It depends** → *"What shapes your view?"*  — chips: Whether the private sector has already tried and failed · Whether the benefits are genuinely broad · Whether there's a credible implementation plan · Whether the tax burden is fairly distributed
@@ -647,15 +647,15 @@ The federal government is considering a large public investment — infrastructu
 
 **C4 — Local↔Federal × Individual↔Collective**
 
-Your town has a serious housing shortage. A state law would override local zoning and require significantly more dense development. Your reaction:
+Your town has a housing shortage. A state law would override local zoning to require much denser development. Your reaction:
 
-**A.** The state is overreaching — zoning is one of the most local decisions there is, and communities should shape their own growth.
+**A.** The state is overreaching — zoning is about as local as decisions get, and communities should shape their own growth.
 *"The people who live somewhere should have meaningful say over what it becomes. That's not nimbyism — that's democracy at its most direct."*
 
-**B.** The state is right to intervene — local zoning has been used for decades to exclude people by income and race, and the housing crisis is too severe to leave to the communities that created it.
+**B.** The state is right to intervene — the same local zoning that caused this shortage has long excluded people by income and race.
 *"When local decisions impose costs on people who have no vote in that locality — the worker who can't afford to live near their job — local democracy has a legitimacy problem."*
 
-**C.** Override the zoning but compensate the community — if the state imposes regional priorities on a local area, it should share the infrastructure costs that come with growth.
+**C.** Override the zoning but compensate the community — if the state mandates the growth, it should help pay for it.
 *"Power without responsibility is just imposition. If you mandate the growth, fund the schools and roads."*
 
 **It depends** → *"What shapes your answer?"*  — chips: Whether the shortage affects people outside the community · Whether the community created the problem through exclusionary zoning · Whether the state is offering resources alongside the mandate
@@ -664,12 +664,12 @@ Your town has a serious housing shortage. A state law would override local zonin
 
 **C5 — National↔Global × Pragmatism↔Idealism**
 
-The United States has the opportunity to join a new international agreement on a problem requiring global coordination — pandemic preparedness, cyber security, nuclear proliferation. It requires real commitments and some loss of unilateral flexibility. Your instinct:
+The US can join a new international agreement requiring global coordination — real commitments, some loss of unilateral flexibility. Your instinct:
 
-**A.** Be cautious — international agreements erode American sovereignty, and the history of multilateral institutions is full of good intentions and poor execution.
+**A.** Be cautious — these agreements erode American sovereignty, and multilateral institutions have a record of good intentions and poor execution.
 *"When an international body gets it wrong, Americans don't get to vote the decision-makers out."*
 
-**B.** Engage seriously — problems that cross borders require solutions that cross borders, and a United States that won't commit to multilateral frameworks loses the credibility to shape them.
+**B.** Engage seriously — cross-border problems need cross-border solutions, and sitting out costs you the standing to lead.
 *"You either help write the rules or you live under rules written by others."*
 
 **C.** Join but negotiate hard for enforcement mechanisms with teeth — agreements without consequences are just press releases.
@@ -683,15 +683,15 @@ The United States has the opportunity to join a new international agreement on a
 
 **C6 — Pragmatism↔Idealism × Trust↔Skepticism**
 
-A candidate you broadly agree with has a real chance of winning — but only if they soften a position you care deeply about. They're asking for your support. What do you do?
+A candidate you agree with can win — but only if they soften a position you care deeply about. What now?
 
-**A.** Support them — a candidate who wins on 70% of your priorities does more good than a principled candidate who loses and does nothing.
+**A.** Support them — a candidate who wins on 70% of your priorities does more good than a principled one who loses.
 *"Politics is the art of the possible, and the possible requires winning."*
 
-**B.** Withhold support unless they hold the line — a candidate who softens under pressure before the election will soften further after it.
+**B.** Withhold support unless they hold the line — softening under pressure before the election predicts softening after it.
 *"Campaign commitments are the only leverage voters have. A party that learns it can soften positions without losing support will keep softening them."*
 
-**C.** Support them publicly but organize to hold them accountable after — winning matters, but so does building infrastructure that makes backsliding costly.
+**C.** Support them publicly but organize to hold them accountable after — winning matters, and so does making backsliding costly.
 *"Show up for the win, then make sure they remember who showed up. It's how durable political coalitions actually work."*
 
 **It depends** → *"What would determine whether you'd support them?"*  — chips: The specific issue · How much they're softening · Something about the candidate themselves
@@ -708,15 +708,15 @@ A candidate you broadly agree with has a real chance of winning — but only if 
 
 **S1 — Stability × Rules × Federal × Trust**
 
-After a series of domestic attacks, a president declares a national emergency and invokes executive powers never used in peacetime — suspending certain civil liberties, directing agencies without congressional approval, restricting movement. The threats are real. The legal authority is genuinely ambiguous. Your position:
+After domestic attacks, a president declares a national emergency and invokes peacetime-unprecedented powers — suspending civil liberties, directing agencies without Congress. The threat is real; the legal authority is ambiguous. Your position:
 
-**A.** The executive needs these tools — in a genuine emergency, the pace of congressional deliberation is a liability, and a president who can't act decisively has failed the most basic obligation of the office.
+**A.** The executive needs these tools — in a real emergency, Congress is too slow, and a paralyzed president has failed the office.
 *"Lincoln suspended habeas corpus without congressional authorization. The Union survived."*
 
 **B.** Congress must be involved immediately — emergency powers without legislative oversight are how democracies become something else.
 *"Every president who has tested the limits of emergency power has left the office larger than they found it."*
 
-**C.** Allow the emergency action but require automatic expiration and mandatory reauthorization — give the executive the speed the moment requires, but build in a hard stop.
+**C.** Allow the action but require automatic expiration and reauthorization — give the executive real speed, with a hard stop built in.
 *"The problem with emergency powers isn't the emergency — it's the 'temporary' measures that outlast the crisis by decades."*
 
 **It depends** → *"What would determine how much executive emergency authority you'd support?"*  — chips: The nature and severity of the threat · Which specific powers are invoked · Whether there's a hard expiration and real oversight
@@ -729,15 +729,15 @@ After a series of domestic attacks, a president declares a national emergency an
 
 **S4 — Stability × Individual × Collective × Federal × Trust**
 
-During a severe pandemic, the federal government mandates vaccines, masks, and business closures. The measures demonstrably reduce deaths. They also damage small businesses, disrupt children's education, and restrict movement for an extended period. Looking back, the right balance was:
+During a severe pandemic, the government mandates vaccines, masks, and closures — demonstrably fewer deaths, but real costs to businesses, kids' schooling, and freedom of movement. Looking back, the right balance was:
 
-**A.** The restrictions were justified — collective action problems require collective solutions, and individuals who refused to participate imposed real costs on people around them.
+**A.** The restrictions were justified — collective problems require collective solutions, and those who refused imposed real costs on everyone around them.
 *"Your freedom to move through the world unvaccinated during a pandemic is not a purely personal choice — it has a transmission probability attached to it."*
 
-**B.** The restrictions went too far — costs fell heavily on specific groups while the people making decisions bore far fewer of those costs personally.
+**B.** The restrictions went too far — the heaviest costs fell on specific groups, not on the country as a whole.
 *"When the people making decisions bear fewer costs than the people subject to them, the legitimacy of those decisions deserves scrutiny regardless of the public health merits."*
 
-**C.** The problem wasn't the restrictions but the lack of honest accounting — the public was told tradeoffs were simple when they weren't, and the erosion of trust came from the gap between what officials said and what was actually known.
+**C.** The problem wasn't the restrictions but the lack of honest accounting — officials sold the tradeoffs as simple when they weren't.
 *"Guidance that changed without explanation, and projections wrong in both directions, eroded the trust that effective crisis response depends on."*
 
 **It depends** → *"What would have made the response feel more legitimate?"*  — chips: Different policies · More honest communication · More local control · Clearer expiration dates
@@ -757,21 +757,21 @@ During a severe pandemic, the federal government mandates vaccines, masks, and b
 
 **L2-Q1 — Healthcare**
 
-The United States spends more on healthcare per person than any other wealthy country and gets middling results. Of the following, what's the right first move?
+The US spends the most per person on healthcare, for middling results. Of the following, what's the right first move?
 
 **A.** Force price transparency and real competition — publish what hospitals charge, end surprise billing, break up regional monopolies.
 *"When was the last time you comparison-shopped for a hospital? Markets need prices to work, and American healthcare has deliberately hidden them."*
 
-**B.** Expand public coverage and give government real negotiating power — extend Medicare, let it bargain on drug prices, cover the gaps private insurance won't.
+**B.** Expand public coverage and give government real negotiating power — extend Medicare, let it bargain on drug prices, cover the gaps.
 *"Forty million Americans have inadequate or no insurance. The most efficient intervention is the one that reaches them first — and private markets have had decades to do it."*
 
-**C.** Redesign how we pay — move from fee-for-service to outcomes-based payment so providers make money when patients stay healthy, not when they get sick.
+**C.** Redesign how we pay — shift from fee-for-service to outcomes-based payment, so providers earn when patients stay healthy, not sick.
 *"Fee-for-service medicine is like paying a mechanic by the part replaced rather than whether your car runs."*
 
-**D.** Move toward single-payer or Medicare-for-All — every other wealthy democracy covers everyone for less per capita, and the patchwork of private insurance is what makes American healthcare uniquely expensive.
+**D.** Move toward single-payer or Medicare-for-All — every wealthy democracy covers everyone for less, and our private patchwork makes care uniquely expensive.
 *"The simplifying answer. Administrative overhead consumes about 30 cents of every American healthcare dollar — a cost most other systems don't carry."*
 
-**E.** Put patients in control of the dollars — expand health savings accounts and direct-pay primary care, allow insurance to be bought across state lines, and let price-sensitive patients, not third-party payers, discipline costs. The reason healthcare has no real prices is that almost no one spends their own money on it.
+**E.** Put patients in control of the dollars — health savings accounts, direct-pay care, insurance across state lines, and patients disciplining costs.
 *"Cosmetic surgery and LASIK aren't covered by insurance — and their prices have fallen for decades while everything insurance touches has risen. Make people the buyers and prices start behaving."*
 
 **It depends** → *"What do you think is the most broken part?"*  — chips: Costs · Access · Quality · Insurance complexity
@@ -783,18 +783,18 @@ The United States spends more on healthcare per person than any other wealthy co
 
 **L2-Q2 — Climate and Energy**
 
-Climate and energy policy is one of the major questions of the era. Of the following, what's the right first move?
+Climate and energy is one of the era's defining questions. Of the following, what's the right first move?
 
-**A.** Get the prices right — put a price on carbon, remove fossil fuel subsidies, and let markets drive the transition without picking winners.
+**A.** Get the prices right — price carbon, end fossil fuel subsidies, and let markets drive the transition without picking winners.
 *"The acid rain cap-and-trade program cut emissions 50% at a fraction of projected cost. Make pollution expensive and people find cheaper ways to avoid it."*
 
-**B.** Set mandatory standards and fund the transition — the scale and urgency require government to move faster than markets will on their own.
+**B.** Set mandatory standards and fund the transition — the scale and urgency require government to move faster than markets will.
 *"The electric grid, the interstate highway system, and the internet all required public investment to get built at necessary scale."*
 
-**C.** Win the technology race — the country that leads on solar, battery storage, and next-generation nuclear wins both the climate and the economic competition.
+**C.** Win the technology race — whoever leads on solar, storage, and next-gen nuclear wins both the climate and the economy.
 *"Solar cost $75 per watt in 1977. It costs less than $0.20 today. That's the learning curve. The question is how fast we want to accelerate it."*
 
-**D.** Go slower and prioritize affordability and reliability — let the transition follow cost and proven technology rather than mandated deadlines, keep energy cheap and the grid stable, and don't lock in expensive bets before they pencil out. The costs of moving too fast fall hardest on working families and energy-intensive regions.
+**D.** Go slower and prioritize affordability and reliability — let proven technology and cost set the pace, not mandated deadlines.
 *"The cost-benefit caution. Energy transitions are real, but so is the price of getting them wrong — and the people paying that price aren't usually the people making the decisions."*
 
 **It depends** → *"What shapes your view?"*  — chips: How fast you think the transition needs to happen · How much you trust government to pick the right technologies · Whether international competitiveness matters as much as domestic emissions · How you weigh costs on current energy users against future generations
@@ -805,21 +805,21 @@ Climate and energy policy is one of the major questions of the era. Of the follo
 
 **L2-Q3 — Gun Policy**
 
-The Second Amendment protects an individual right to own firearms. The debate is about where that right has limits. Of the following, what's the right first move?
+The Second Amendment protects gun ownership; the real debate is where its limits fall. Of the following, what's the right first move?
 
 **A.** Enforce what's already on the books — fix the background check database, fund mental health reporting, prosecute straw purchases.
 *"Background check gaps go unfilled. Most states underfund mental health reporting. Prosecution rates for straw purchases are near zero. The existing system has room before reaching for a new one."*
 
-**B.** Close the gaps with targeted new laws — universal background checks, red flag laws, and safe storage requirements don't infringe the core right to self-defense.
+**B.** Close the gaps with targeted new laws — universal background checks, red flag laws, and safe storage don't infringe self-defense.
 *"Every constitutional right has limits where it imposes serious costs on others. The question is where those limits are, not whether they exist."*
 
 **C.** Address the root causes — gun violence is concentrated in communities with high poverty, low opportunity, and inadequate mental health resources.
 *"Gun violence tracks closely with concentrated poverty, untreated mental illness, and gang activity — the places with the least of it differ on more than their gun laws."*
 
-**D.** Pass major new restrictions — universal background checks, a federal permit-to-purchase requirement, restrictions on military-style weapons, and stricter limits on who can carry where.
+**D.** Pass major new restrictions — universal background checks, a federal permit-to-purchase, limits on military-style weapons, and stricter carry rules.
 *"The structural-change answer. Most other wealthy democracies treat firearms more like vehicles — licensed, regulated, and limited by type — and have dramatically lower gun violence rates."*
 
-**E.** Protect and expand gun rights — the problem is criminals, not lawful owners. Enforce existing laws against violent offenders, enact national concealed-carry reciprocity, and roll back restrictions that burden law-abiding owners without measurably reducing crime.
+**E.** Protect and expand gun rights — enforce existing laws on violent offenders, enact concealed-carry reciprocity, roll back restrictions on lawful owners.
 *"The rights-first answer. The premise: an armed, law-abiding citizenry is a constitutional baseline, and policy aimed at lawful owners tends to miss where violence actually concentrates."*
 
 **It depends** → *"What shapes your view?"*  — chips: Whether you think more laws would actually be enforced · Whether the focus should be on handguns or military-style rifles · Whether mental health is more central than access
@@ -830,18 +830,18 @@ The Second Amendment protects an individual right to own firearms. The debate is
 
 **L2-Q4 — Education**
 
-American public education produces wildly unequal outcomes depending almost entirely on zip code. Of the following, what's the right first move?
+American public schools produce wildly unequal outcomes, largely by zip code. Of the following, what's the right first move?
 
 **A.** Fix the funding model — schools funded by local property taxes will always produce unequal outcomes. Equalize funding first.
 *"A district where median home value is $800,000 will always outspend one where it's $150,000. That's not a teacher quality problem — it's arithmetic."*
 
-**B.** Expand choice within the public system — magnet schools, charter schools, and open enrollment give families options without defunding the schools most students attend.
+**B.** Expand choice within the public system — magnets, charters, and open enrollment give families options without defunding neighborhood schools.
 *"The strongest school systems in the world all have meaningful choice built in. Choice and public education don't have to be in conflict."*
 
 **C.** Invest in early childhood — dollar for dollar, pre-K investment produces better long-term outcomes than almost any other education spending.
 *"By the time a child enters kindergarten, the gaps that will define their educational trajectory are already forming."*
 
-**D.** Expand school choice broadly — vouchers, education savings accounts, and tax credits that let public funds follow students to the school their parents choose, public or private, secular or religious.
+**D.** Expand school choice broadly — vouchers and tax credits that let public funds follow students to any school, private or religious.
 *"The parent-power answer. The premise: parents allocate education resources better than school districts do, and competition raises quality across the board."*
 
 **It depends** → *"What shapes your view?"*  — chips: Whether your concern is primarily equity or quality · Whether you distinguish between charter schools and private vouchers · Whether you think the problem starts before kindergarten
@@ -852,20 +852,20 @@ American public education produces wildly unequal outcomes depending almost enti
 
 **L2-Q5 — Immigration (Legal Pathways)**
 
-Setting aside border enforcement, the legal immigration system determines who gets to come to America and how. Of the following, what's the right first move?
+Setting aside border enforcement, the legal immigration system decides who gets to come. Of the following, what's the right first move?
 
 *These options pull in opposite directions on purpose — pick your first move.*
 
 **A.** Shift to a skills-based points system — select immigrants primarily for education, skills, and economic potential. Canada and Australia do this.
 *"About two-thirds of American green cards go to family members of existing residents — a policy designed in 1965 that changed the composition of immigration considerably."*
 
-**B.** Clear the backlog and fix the wait times — before redesigning the system, make the existing one function. People who followed the rules deserve an answer in their lifetime.
+**B.** Clear the backlog and fix the wait times first — people who followed the rules deserve an answer in their lifetime.
 *"A skilled worker from India can wait decades for a green card that takes months for someone from a smaller country. The line isn't slow — for some nationalities it barely moves at all."*
 
-**C.** Significantly raise the overall numbers — the United States has an aging population, a below-replacement birth rate, and industries that can't find enough workers.
+**C.** Significantly raise the overall numbers — an aging population, a below-replacement birth rate, and industries that can't find enough workers.
 *"Japan chose restriction and is now managing a shrinking, aging population with severe labor shortages. The United States has a different option — but the window may be narrower than most people realize."*
 
-**D.** Reduce overall numbers — current levels exceed what the labor market, public services, and assimilation infrastructure can absorb. Lower numbers would raise wages for existing workers and ease pressure on housing.
+**D.** Reduce overall numbers — current levels strain the labor market, public services, and housing, and lower numbers would lift wages.
 *"The level-the-curve answer. Labor unions and environmentalists have historically held versions of this position alongside restrictionist conservatives — the coalition is older and stranger than it looks."*
 
 **It depends** → *"What shapes your view?"*  — chips: Whether you prioritize economic contribution or family unity · Whether current overall levels are too high, too low, or about right · Whether immigration levels affect wages for existing workers
@@ -884,7 +884,7 @@ The federal debt is approximately $34 trillion and growing. Of the following, wh
 **B.** Raise revenue — the United States collects less in taxes as a share of the economy than most comparable wealthy countries.
 *"American federal tax revenue as a share of GDP is lower than Germany, France, Canada, the UK, and Japan. The gap isn't just a spending problem."*
 
-**C.** A bipartisan grand bargain that takes both seriously — every serious deficit reduction plan in American history has required both revenue increases and spending cuts.
+**C.** A bipartisan grand bargain — every serious deficit plan in history has required both revenue increases and spending cuts.
 *"The deficit is the gap between revenue and spending. Every commission that has studied this seriously — Simpson-Bowles, Domenici-Rivlin — has reached the same conclusion: you need both."*
 
 **It depends** → *"What shapes your view?"*  — chips: Whether you think the debt is an immediate crisis or a long-term problem · Whether tax increases or spending cuts should lead · Whether you think the political system is capable of a grand bargain
@@ -894,15 +894,15 @@ The federal debt is approximately $34 trillion and growing. Of the following, wh
 
 **L2-Q7 — Foreign Policy**
 
-The United States spends more on its military than the next ten countries combined and maintains alliances and commitments on every continent. Of the following, what's the right first move?
+The US outspends the next ten militaries combined and maintains alliances worldwide. Of the following, what's the right first move?
 
-**A.** Recommit to the alliances and institutions — the post-WWII order America built has produced the longest period of great-power peace in modern history.
+**A.** Recommit to the alliances and institutions — the post-WWII order America built has produced the longest great-power peace in modern history.
 *"NATO has existed for 75 years without a single Article 5 invocation. That's not luck. That's the alliance working as designed."*
 
-**B.** Demand more from partners and less from our treasury — allies who can afford to spend more on their own defense should.
+**B.** Demand more from partners and less from our treasury — allies who can afford to spend more on their defense should.
 *"Most NATO members still don't meet the 2% of GDP spending target they committed to in 2006. American taxpayers have been subsidizing European security for decades."*
 
-**C.** Rebalance toward economic and diplomatic tools — military superiority hasn't produced the outcomes in Afghanistan, Iraq, or Libya that justified the investment.
+**C.** Rebalance toward economic and diplomatic tools — military superiority didn't produce the outcomes in Afghanistan, Iraq, or Libya that justified it.
 *"The United States has the most powerful military in human history and has fought four major wars since 1950 with mixed results. At some point the question isn't whether we can win militarily — it's whether winning militarily solves the problem."*
 
 **It depends** → *"What shapes your view?"*  — chips: Whether great-power competition with China changes the calculus · Whether military strength deters conflict or invites it · Whether domestic investment should take priority
@@ -913,18 +913,18 @@ The United States spends more on its military than the next ten countries combin
 
 **L2-Q8 — Reproductive Healthcare**
 
-Since the Supreme Court overturned Roe v. Wade in 2022, abortion policy has been set by state legislatures, producing a patchwork that varies dramatically by geography. Of the following, what's the right first move?
+Since Roe was overturned in 2022, abortion policy is set state by state — a patchwork that varies sharply. Of the following, what's the right first move?
 
-**A.** Pass a national ban with limited exceptions — a federal framework restricting abortion broadly, with carve-outs for rape, incest, and the life of the mother. The position that the government's role here is the same as on murder: uniform national protection.
+**A.** Pass a national ban with limited exceptions — broadly restricting abortion, with carve-outs for rape, incest, and the life of the mother.
 *"The view that this is the question and the answer is no — and that no level of federalism makes it acceptable for the answer to be yes somewhere."*
 
-**B.** Let the democratic process work at the state level — the Court returned this question to elected legislatures, and different states reaching different conclusions reflects genuine moral disagreement no national consensus can resolve right now.
+**B.** Let the democratic process work state by state — genuine moral disagreement, no national consensus can resolve it right now.
 *"When the Court settled this nationally for fifty years it didn't resolve the disagreement — it suppressed it."*
 
-**C.** Pass a national legislative framework — rights that vary by zip code aren't really rights, and a functioning democracy should try to reach a durable compromise rather than leaving it to the courts or the swing of state legislatures: access in early pregnancy, restrictions later.
+**C.** Pass a national legislative framework — rights shouldn't vary by zip code; reach a durable compromise of access early, restrictions later.
 *"Polling tends to find more support for access early and limits later than either party's base holds — though what counts as a fair compromise here varies enormously, and for some it isn't a question that admits one."*
 
-**D.** Codify federal protection with no gestational limits — abortion access as a constitutional right of bodily autonomy, no state restrictions, public funding for those who can't afford it.
+**D.** Codify federal protection, no gestational limits — abortion as a right of bodily autonomy, publicly funded for those who can't pay.
 *"The bodily-autonomy answer. The position that government's proper role in pregnancy decisions is, ultimately, none."*
 
 **It depends** → *"What factors matter most?"*  — chips: Stage of pregnancy · Specific circumstances · Role of religious belief · Federal vs. state authority · Focusing on contraception and IVF protections that command broader consensus
@@ -935,18 +935,18 @@ Since the Supreme Court overturned Roe v. Wade in 2022, abortion policy has been
 
 **L2-Q9 — Technology and Privacy**
 
-Technology companies now know more about most Americans than the government does — what you read, who you talk to, where you go, what you buy. Of the following, what's the right first move?
+Tech companies now know more about most Americans than the government does. Of the following, what's the right first move?
 
-**A.** Break up the platforms — the concentration of data and market power in a handful of companies is the core problem. Standard Oil didn't get regulated into submission. It got broken up.
+**A.** Break up the platforms — the concentration of data and market power in a few companies is the core problem.
 *"Google processes 8.5 billion searches a day. Meta has 3 billion monthly users. At some point 'market dominance' becomes 'infrastructure' — and infrastructure has historically been subject to different rules."*
 
-**B.** Give Americans control of their own data — you should be able to see what's collected about you, correct it, and delete it. Europe's GDPR did this in 2018. Americans still don't have a federal equivalent.
+**B.** Give Americans control of their own data — see, correct, and delete what's collected, as Europe's GDPR has allowed since 2018.
 *"Your medical records are protected by HIPAA. Your browsing history and location data can be bought and sold without your knowledge. The asymmetry is a choice, not an accident."*
 
-**C.** Regulate the algorithms, not the data — the harm isn't that companies collect information, it's that they use it to maximize engagement in ways that damage mental health, spread misinformation, and polarize the electorate.
+**C.** Regulate the algorithms, not the data — the harm isn't collection, it's maximizing engagement that harms mental health and polarizes us.
 *"Facebook's own research showed its algorithms made users angrier and more polarized — and it deployed them anyway because engagement drove revenue."*
 
-**D.** Trust competition and exit — new platforms emerge when old ones overreach, and government tools tend to entrench whoever's already large. Microsoft was supposed to be unstoppable in 1998; TikTok displaced Facebook for a generation; Bluesky and Mastodon are responses to Twitter.
+**D.** Trust competition and exit — new platforms emerge when old ones overreach, and government tools tend to entrench whoever's already big.
 *"The market-correcting answer. Big Tech criticism is bipartisan, but so is concern that letting Washington pick winners and losers in technology has a worse track record than the problem it's trying to fix."*
 
 **It depends** → *"What shapes your view?"*  — chips: Whether competition or regulation is the more effective tool · Whether you're more concerned about privacy or algorithmic harm · Whether American tech dominance is a national security asset worth protecting
@@ -966,15 +966,15 @@ Technology companies now know more about most Americans than the government does
 
 **L3-Q1 — Character vs. Policy**
 
-A candidate you mostly agree with has a serious and credible character issue — a pattern of personal dishonesty, a history of treating people badly, or conduct that would end most careers elsewhere. How much does that matter?
+A candidate you mostly agree with has a serious, credible character problem. How much does that matter to your vote?
 
-**A.** It's disqualifying — character and conduct in office are inseparable, and a person who behaves badly in private will eventually behave badly in public.
+**A.** It's disqualifying — character and conduct in office are inseparable; how someone behaves in private predicts how they'll wield power.
 *"The most reliable predictor of how someone will exercise power is how they've exercised it before — in relationships, in business, in private moments when they thought no one was watching."*
 
-**B.** Policy mostly wins — I'm electing someone to do a job, not be a role model. If the record is strong and the alternative is worse, I can hold my nose.
+**B.** Policy mostly wins — I'm electing someone to do a job, not a role model; strong record can outweigh personal flaws.
 *"FDR had a famously complicated personal life. LBJ was legendarily cruel to his staff. Nixon opened China while keeping an enemies list. Personal flaws and consequential records have coexisted in plenty of presidents."*
 
-**C.** Depends on whether the character issue is relevant to the job — financial fraud tells you something about how someone will handle public money. A messy divorce probably doesn't.
+**C.** Depends whether the flaw is relevant to the job — fraud predicts handling public money; a messy divorce doesn't.
 *"Not all character flaws are created equal."*
 
 **It depends** → *"What would push you to 'disqualifying'?"*  — chips: The type of conduct · How recent it is · The volume of incidents · Whether they've acknowledged it
@@ -987,13 +987,13 @@ A candidate you mostly agree with has a serious and credible character issue —
 
 Most voters have a general partisan lean. What would most reliably make you vote against it?
 
-**A.** A candidate who crosses a specific policy line — there are one or two issues where my position is firm enough that the wrong answer disqualifies someone regardless of party.
+**A.** A candidate who crosses a policy line — one or two issues where the wrong answer disqualifies them regardless of party.
 *"Knowing your non-negotiables in advance is more principled than deciding after the fact."*
 
-**B.** A candidate who seems genuinely unfit — not someone I disagree with, but someone who lacks the basic competence, temperament, or integrity the job requires.
+**B.** Someone genuinely unfit — not a candidate I disagree with, but one lacking the competence, temperament, or integrity the job needs.
 *"Policy disagreements are normal. A candidate who can't tell the truth, manage a team, or handle pressure is a different category of problem."*
 
-**C.** An exceptionally strong candidate on the other side — someone whose record, character, and judgment are compelling enough to vote for regardless of the party label.
+**C.** A genuinely strong candidate across the aisle — record, character, judgment compelling enough to earn your vote regardless of party.
 *"Ticket-splitting used to be common. It declined as parties sorted. The instinct — vote for the person, not the jersey — is still alive in a lot of voters."*
 
 **It depends** → *"Is there a combination of factors that would flip your vote?"*  — chips: A mix of policy and character concerns · The stakes of that particular race · How weak my own party's candidate is · The strength of the alternative
@@ -1003,15 +1003,15 @@ Most voters have a general partisan lean. What would most reliably make you vote
 
 **L3-Q3 — Electability**
 
-You're in a primary. Your preferred candidate holds positions closest to yours but faces an uphill general election battle. A more moderate candidate is more electable but less aligned. How do you vote?
+In a primary, your favorite matches you best but is a long shot; a moderate is more electable but less aligned. How do you vote?
 
-**A.** Vote for who I actually want — primaries exist to express genuine preference, and strategically voting for someone you don't really want often produces a candidate nobody's excited about.
+**A.** Vote for who I actually want — primaries are for genuine preference; strategic voting yields a nominee nobody's excited about.
 *"The expressive-preference answer — vote your actual view in the primary, save strategic voting for the general."*
 
-**B.** Vote for who can win — a candidate who loses the general helps nobody, and winning is the prerequisite for everything else.
+**B.** Vote for who can win — losing the general helps nobody, and winning is the prerequisite for everything else.
 *"The perfect candidate who loses has zero influence on policy. The imperfect candidate who wins has enormous influence."*
 
-**C.** Depends on how big the electability gap is — if my preferred candidate is slightly less electable, I vote my conscience. If they're genuinely unelectable, the math changes.
+**C.** Depends how big the electability gap is — slightly less electable, I vote my conscience; genuinely unelectable, the math changes.
 *"There's a difference between 'harder to elect' and 'unelectable.' The first is worth accepting for a candidate you believe in."*
 
 **It depends** → *"What shapes your thinking?"*  — chips: How important the office is · How different the candidates are on policy · How reliable electability polling tends to be
@@ -1020,15 +1020,15 @@ You're in a primary. Your preferred candidate holds positions closest to yours b
 
 **L3-Q4 — Downballot Salience**
 
-Most American ballots include state legislature, county commissioner, school board, judges, ballot measures — often a dozen or more decisions beyond the top of the ticket. How do you approach those?
+Most ballots carry a dozen or more decisions below the top of the ticket. How do you approach them?
 
 **A.** I research them seriously — downballot races often have more direct impact on daily life than federal ones.
 *"Your state legislature sets your tax rates, your school board sets curriculum, your county sheriff sets enforcement priorities. Local government is more present."*
 
-**B.** I vote the top of the ticket and do my best on the rest — I follow the major races closely but don't have time to research every downballot race thoroughly.
+**B.** I vote the top of the ticket and do my best below — no time to research every downballot race thoroughly.
 *"Most voters are here. The information environment for downballot races is genuinely poor — local journalism has collapsed and candidate websites are sparse."*
 
-**C.** I focus on ballot measures and skip races where I don't know enough — I'd rather leave a race blank than vote uninformed.
+**C.** I focus on ballot measures and skip what I don't know — better to leave a race blank than vote uninformed.
 *"An uninformed vote isn't necessarily better than no vote. Leaving a race blank is a defensible choice — one the instructions on most ballots explicitly permit."*
 
 **It depends** → *"What shapes how much you engage?"*  — chips: The office itself · Whether the race is contested · Whether good information is available
@@ -1044,7 +1044,7 @@ When an incumbent is running for reelection, how does that affect your thinking?
 **A.** Meaningful advantage — a track record is real information. I know what they've actually done, not just what they've promised.
 *"Campaign promises are cheap. Voting records, budget decisions, and constituent services are evidence."*
 
-**B.** Mild disadvantage — incumbents accumulate obligations and the habits of power over time. Fresh perspective is harder to maintain the longer someone has been in office.
+**B.** Mild disadvantage — incumbents accumulate obligations and the habits of power, and fresh perspective gets harder to hold.
 *"The longer someone holds office, the more relationships, obligations, and institutional habits accumulate."*
 
 **C.** Entirely depends on the record — incumbency itself is neutral. A strong record deserves reelection. A weak one deserves a challenger.
@@ -1059,15 +1059,15 @@ When an incumbent is running for reelection, how does that affect your thinking?
 
 **L3-Q6 — Party vs. Candidate**
 
-The candidate from your usual party is mediocre — not corrupt, just unremarkable. The candidate from the other party is genuinely impressive. How do you vote?
+Your party's candidate is mediocre — not corrupt, just unremarkable. The other party's is genuinely impressive. How do you vote?
 
-**A.** Vote the party — a mediocre member of your own party still votes with that caucus, helps it control the chamber, and advances its agenda. Individual quality matters less than which team holds the majority.
+**A.** Vote the party — even a mediocre member helps their caucus hold the chamber; majority control matters more than individual quality.
 *"Congress is a team sport. A brilliant independent-minded member of the minority has less influence than a mediocre member of the majority."*
 
 **B.** Vote the candidate — democracy works better when voters reward quality and punish mediocrity regardless of party.
 *"The sorting of Congress into two rigid teams where quality is irrelevant has produced exactly the Congress you'd expect."*
 
-**C.** Depends on the stakes — in a year when chamber control is on the line, the structural argument wins. In a safe year, voting for the better candidate costs nothing and signals something.
+**C.** Depends on the year — with chamber control at stake, party wins; in a safe seat, the better candidate costs nothing.
 *"Principles are easier to act on when the stakes are low."*
 
 **It depends** → *"What would push you toward the better candidate?"*  — chips: How impressive they are · How weak my usual party's candidate is · How safe the seat is
@@ -1078,9 +1078,9 @@ The candidate from your usual party is mediocre — not corrupt, just unremarkab
 
 **L3-Q7 — Time Horizon**
 
-When deciding how to vote, are you primarily thinking about the next two to four years, or the next ten to twenty?
+When you vote, are you mainly thinking about the next two to four years, or the next ten to twenty?
 
-**A.** The near term — elections have immediate consequences for real people, and voting for abstract long-term considerations while ignoring present-day impact is a luxury not everyone can afford.
+**A.** The near term — elections have immediate consequences, and putting long-term abstractions over present impact is a luxury few can afford.
 *"People losing healthcare or watching their business close aren't comforted by long-term thinking."*
 
 **B.** The long term — the most consequential decisions government makes — judicial appointments, infrastructure, constitutional norms — play out over decades, not years.
@@ -1100,11 +1100,11 @@ When deciding how to vote, are you primarily thinking about the next two to four
 *No Easter egg. No micro-reactions. Let it land.*
 *UI note: Four equal options, presented as siblings. D opens a text field immediately on selection — visually distinct from "It depends" on every other question, and not framed as a fallback for users who didn't fit A/B/C.*
 
-If you could move the needle on exactly one issue in American public life — one thing that, if fixed, would matter most to you — what would it be?
+If you could move the needle on exactly one issue in American public life — what would it be?
 
-**A.** The machinery of democracy itself — gerrymandering, money in politics, voting access, judicial independence. How decisions get made, and whether the process is one people can trust.
+**A.** The machinery of democracy — gerrymandering, money in politics, voting access, judicial independence. The system behind every other decision.
 
-**B.** Economic security and opportunity — healthcare costs, housing affordability, wages, childcare. The material conditions of most Americans' lives are harder than they should be.
+**B.** Economic security and opportunity — healthcare, housing, wages, childcare. Everyday life is harder than it should be for most Americans.
 
 **C.** National unity and civic health — the polarization and distrust that makes every other problem harder to solve.
 
