@@ -3013,7 +3013,18 @@ No new page or URL. /your-ballot gains a mode. Out of season (default): official
 
 ### 22b.4 Display — constellation overlay, not a single score
 
-No aggregate percentage. Per official: (a) overlay radar — user's constellation + official's placement as a second series (extend Constellation.tsx with optional overlaySeries prop); (b) per-dimension convergence/divergence notes — port topAlignedAxes/topDivergentAxes derivation from RankedCandidateCard in beyond-your-ballot; (c) dealbreaker flags — port crossedDealbreakers/unknownDealbreakers rendering verbatim; flags only, never exclusion; (d) confidence disclosure — if classification landed pending_review (fewer than 4 axes at confidence > 0.6): "Limited voting record available — this comparison may be less precise than for other officials."
+No aggregate percentage. Per official: (a) overlay radar — user's constellation + official's placement as a second series (extend Constellation.tsx with optional overlaySeries prop); (b) per-dimension convergence/divergence notes — port topAlignedAxes/topDivergentAxes derivation from RankedCandidateCard in beyond-your-ballot; (c) dealbreaker status — via the shared `DealbreakerStatus` component (see below); flags only, never exclusion; (d) confidence disclosure — if classification landed pending_review (fewer than 4 axes at confidence > 0.6): "Limited voting record available — this comparison may be less precise than for other officials."
+
+**Dealbreaker status presentation contract (applies to all card types — officials and ballot candidates):**
+
+Renders nothing if the user selected zero dealbreakers. Otherwise computes four explicit states from the user's selected item IDs, the candidate/official's `dealbreakers` map, and the engine-computed `unknownDealbreakers`:
+
+1. **All clear** (no crossed, no unknown): Single line, no box — "Clear on all {Y} of your dealbreakers." (Y=1: "Clear on your dealbreaker.")
+2. **Mixed** (some clear, some unknown, none crossed): Box with header — "Verified clear on {X} of your {Y} dealbreakers. Couldn't verify whether this official:" — then one item per line with the first character lowercased so each reads as a clause, then "Research these yourself before deciding." left-justified outside the list.
+3. **None verifiable** (all selected are unknown, none crossed): Box with summary only — "We couldn't verify any of your {Y} dealbreakers against this official's public record." (Y=1: "We couldn't verify your dealbreaker…") Then the research line.
+4. **Crossed** (≥1 crossed): Yellow ⚠ box listing crossed items one per line with full label text, then states 1/2/3 logic applied to the remaining (non-crossed) items beneath it. "Remaining" qualifier added to copy when crossed items exist.
+
+**Invariant:** Unverified items are never rendered as bare assertions (e.g. "Has a documented pattern of lying about verifiable facts"). They must always appear under the "couldn't verify whether this official:" header so the text reads as an unverified claim, not a statement of fact. Crossed items are always filtered to the user's *selected* dealbreakers — the component must never flag a dealbreaker the user did not choose.
 
 ### 22b.5 Framing note
 

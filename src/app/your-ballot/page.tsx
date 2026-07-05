@@ -19,7 +19,7 @@ import { fetchFederalCandidates } from '@/lib/civic/federalCandidates'
 import { fetchStateLegCandidates } from '@/lib/civic/stateLegCandidates'
 import { fetchCurrentOfficials } from '@/lib/civic/currentOfficials'
 import { createClient } from '@/lib/supabase/client'
-import type { RankedCandidate, RaceResult, ConfidenceBand, Dimension } from '@/lib/engine/match'
+import type { RankedCandidate, RaceResult, ConfidenceBand, Dimension, DealbreakEval } from '@/lib/engine/match'
 import type { FederalCandidate, FederalBallot } from '@/lib/civic/federalCandidates'
 import type { StateLegBallot } from '@/lib/civic/stateLegCandidates'
 import type { CurrentOfficial, CurrentOfficialsBallot } from '@/lib/civic/currentOfficials'
@@ -93,6 +93,102 @@ function formatDollars(n: number | null): string {
   return `$${n.toFixed(0)}`
 }
 
+// ── DealbreakerStatus ─────────────────────────────────────────────────────────
+// Single shared component for all four dealbreaker states (§22b.4).
+// Unverified items never render as bare assertions — always under a header clause.
+
+function DealbreakerStatus({
+  selectedItemIds,
+  dealbreakers,
+  unknownDealbreakers,
+  entityLabel = 'official',
+}: {
+  selectedItemIds: string[]
+  dealbreakers: Record<number, DealbreakEval>
+  unknownDealbreakers: string[]  // engine-filtered to user's selections
+  entityLabel?: string
+}) {
+  const Y = selectedItemIds.length
+  if (Y === 0) return null
+
+  const toIdx = (id: string) => parseInt(id.replace('DB-', ''), 10)
+  const itemText = (id: string) => DEALBREAKER_TEXT[id] ?? id
+  const lcFirst = (s: string) => s.length ? s[0].toLowerCase() + s.slice(1) : s
+
+  // Filter crossed to user-selected items only (fixes unfiltered bug in OfficialCard)
+  const crossed = selectedItemIds.filter(id => dealbreakers[toIdx(id)]?.status === 'crosses')
+  // unknownDealbreakers is already filtered to selected items by the engine
+  const remaining = selectedItemIds.filter(id => !crossed.includes(id))
+  const remUnknown = unknownDealbreakers  // unknown ∩ crossed = ∅, so all unknown are in remaining
+  const remY = remaining.length
+  const remX = remaining.filter(id => !remUnknown.includes(id)).length
+  const hasCrossed = crossed.length > 0
+  const q = hasCrossed ? 'remaining ' : ''  // qualifier when crossed items exist
+
+  const baseText = { margin: 0, fontFamily: 'var(--font-body)' as const, fontSize: 'var(--text-small)' as const, color: 'var(--color-text-secondary)' as const }
+  const boxStyle = { backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', padding: 'var(--space-2) var(--space-3)' }
+  const listStyle = { margin: 'var(--space-1) 0 0 var(--space-4)' as const, padding: 0, fontFamily: 'var(--font-body)' as const, fontSize: 'var(--text-small)' as const, color: 'var(--color-text-secondary)' as const }
+
+  const researchLine = <p style={{ ...baseText, marginTop: 'var(--space-1)' }}>Research these yourself before deciding.</p>
+
+  // State 4 prefix: crossed block (flag only, no exclusion for officials)
+  const crossedBlock = hasCrossed ? (
+    <div style={{ backgroundColor: '#fef9c3', border: '1px solid #fde047', borderRadius: 'var(--radius-sm)', padding: 'var(--space-2) var(--space-3)', display: 'flex', gap: 'var(--space-2)', alignItems: 'flex-start' }}>
+      <span aria-hidden>⚠</span>
+      <div>
+        <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: '#92400e' }}>
+          {crossed.length === 1 ? 'Crosses one of your dealbreakers — you decide' : `Crosses ${crossed.length} of your dealbreakers — you decide`}
+        </p>
+        <ul style={{ margin: 'var(--space-1) 0 0 var(--space-4)', padding: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: '#92400e' }}>
+          {crossed.map(id => <li key={id}>{itemText(id)}</li>)}
+        </ul>
+      </div>
+    </div>
+  ) : null
+
+  // States 1/2/3 applied to remaining (non-crossed) items
+  let statusBlock: React.ReactNode = null
+  if (remY === 0) {
+    // All selected were crossed — nothing to add
+    statusBlock = null
+  } else if (remUnknown.length === 0) {
+    // State 1: all remaining clear — single line, no box
+    const text = remY === 1 ? `Clear on your ${q}dealbreaker.` : `Clear on all ${remY} of your ${q}dealbreakers.`
+    statusBlock = <p style={baseText}>{text}</p>
+  } else if (remX === 0) {
+    // State 3: none verifiable
+    const text = remY === 1
+      ? `We couldn't verify your ${q}dealbreaker against this ${entityLabel}'s public record.`
+      : `We couldn't verify any of your ${remY} ${q}dealbreakers against this ${entityLabel}'s public record.`
+    statusBlock = (
+      <div style={boxStyle}>
+        <p style={baseText}>{text}</p>
+        {researchLine}
+      </div>
+    )
+  } else {
+    // State 2: mixed — some clear, some unknown
+    statusBlock = (
+      <div style={boxStyle}>
+        <p style={baseText}>Verified clear on {remX} of your {remY} {q}dealbreakers. Couldn&apos;t verify whether this {entityLabel}:</p>
+        <ul style={listStyle}>
+          {remUnknown.map(id => <li key={id}>{lcFirst(itemText(id))}</li>)}
+        </ul>
+        {researchLine}
+      </div>
+    )
+  }
+
+  if (!crossedBlock && !statusBlock) return null
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+      {crossedBlock}
+      {statusBlock}
+    </div>
+  )
+}
+
 // ── Candidate card ─────────────────────────────────────────────────────────────
 
 function CandidateCard({
@@ -101,12 +197,14 @@ function CandidateCard({
   mantleType,
   completionPercent,
   dataVersion,
+  selectedItemIds,
 }: {
   ranked: RankedCandidate
   userId: string | null
   mantleType: string | null
   completionPercent: number
   dataVersion: string
+  selectedItemIds: string[]
 }) {
   const { candidate, confidence, topAlignedAxes, topDivergentAxes, explanation, unknownDealbreakers } = ranked
   const c = candidate as FederalCandidate
@@ -241,34 +339,13 @@ function CandidateCard({
         </p>
       )}
 
-      {/* Unknown dealbreaker flags */}
-      {unknownDealbreakers.length > 0 && (
-        <div style={{
-          backgroundColor: 'var(--color-bg-surface)',
-          border: '1px solid var(--color-border)',
-          borderRadius: 'var(--radius-sm)',
-          padding: 'var(--space-2) var(--space-3)',
-        }}>
-          {unknownDealbreakers.length <= 2 ? (
-            <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)' }}>
-              <strong style={{ color: 'var(--color-text-primary)' }}>Couldn&apos;t verify:</strong>{' '}
-              {unknownDealbreakers.map((id) => DEALBREAKER_TEXT[id] ?? id).join(', ')} — research this yourself before deciding.
-            </p>
-          ) : (
-            <>
-              <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)' }}>
-                <strong style={{ color: 'var(--color-text-primary)' }}>Couldn&apos;t verify:</strong>
-              </p>
-              <ul style={{ margin: 'var(--space-1) 0 0 var(--space-4)', padding: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)' }}>
-                {unknownDealbreakers.map((id) => (
-                  <li key={id}>{DEALBREAKER_TEXT[id] ?? id}</li>
-                ))}
-                <li style={{ listStyle: 'none', marginTop: 2 }}>Research these yourself before deciding.</li>
-              </ul>
-            </>
-          )}
-        </div>
-      )}
+      {/* Dealbreaker status — four explicit states (§22b.4) */}
+      <DealbreakerStatus
+        selectedItemIds={selectedItemIds}
+        dealbreakers={candidate.dealbreakers}
+        unknownDealbreakers={unknownDealbreakers}
+        entityLabel="candidate"
+      />
 
       {/* Links row — FederalCandidate uses campaignSite/donateLink; StateLegCandidate uses websiteUrl */}
       <div style={{ display: 'flex', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
@@ -372,24 +449,6 @@ function CandidateCard({
               </div>
             )}
 
-            {/* Unknown dealbreakers — research prompt */}
-            {unknownDealbreakers.length > 0 && (
-              <div style={{
-                backgroundColor: '#fef9c3',
-                border: '1px solid #fde047',
-                borderRadius: 'var(--radius-sm)',
-                padding: 'var(--space-2) var(--space-3)',
-              }}>
-                <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: '#92400e' }}>
-                  Research before deciding — we couldn&apos;t verify these items:
-                </p>
-                <ul style={{ margin: 'var(--space-1) 0 0 var(--space-4)', padding: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: '#92400e' }}>
-                  {unknownDealbreakers.map((id) => (
-                    <li key={id}>{DEALBREAKER_TEXT[id] ?? id}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
           </div>
         )}
       </div>
@@ -485,11 +544,13 @@ function RaceSection({
   userId,
   mantleType,
   completionPercent,
+  selectedItemIds,
 }: {
   raceResult: RaceResult
   userId: string | null
   mantleType: string | null
   completionPercent: number
+  selectedItemIds: string[]
 }) {
   return (
     <section style={{ marginBottom: 'var(--space-8)' }}>
@@ -517,6 +578,7 @@ function RaceSection({
               mantleType={mantleType}
               completionPercent={completionPercent}
               dataVersion={ranked.candidate.lastUpdated}
+              selectedItemIds={selectedItemIds}
             />
           ))}
         </div>
@@ -557,18 +619,15 @@ function OfficialCard({
   ranked,
   userDimensionScores,
   officialName,
+  selectedItemIds,
 }: {
   official: CurrentOfficial
   ranked: RankedCandidate
   userDimensionScores: Record<Dimension, number>
   officialName: string
+  selectedItemIds: string[]
 }) {
   const { topAlignedAxes, topDivergentAxes, unknownDealbreakers } = ranked
-
-  // Dealbreaker crosses — flags only, never exclusion (§22b.4)
-  const crossedDealbreakers = Object.entries(official.dealbreakers)
-    .filter(([, v]) => v.status === 'crosses')
-    .map(([k]) => k)
 
   const userScores = userScoresForConstellation(userDimensionScores)
   const officialScores = officialScoresForConstellation(official)
@@ -619,65 +678,12 @@ function OfficialCard({
         </p>
       )}
 
-      {/* Crossed dealbreaker flag — flag only, no exclusion (§22b.4) */}
-      {crossedDealbreakers.length > 0 && (
-        <div style={{
-          backgroundColor: '#fef9c3',
-          border: '1px solid #fde047',
-          borderRadius: 'var(--radius-sm)',
-          padding: 'var(--space-2) var(--space-3)',
-          display: 'flex',
-          gap: 'var(--space-2)',
-          alignItems: 'flex-start',
-        }}>
-          <span aria-hidden>⚠</span>
-          <div>
-            <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', fontWeight: 'var(--weight-semibold)', color: '#92400e' }}>
-              Crosses one of your dealbreakers — you decide
-            </p>
-            {crossedDealbreakers.length <= 2 ? (
-              <p style={{ margin: '2px 0 0', fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: '#92400e' }}>
-                {crossedDealbreakers.map((id) => DEALBREAKER_TEXT[id] ?? id).join(', ')}
-              </p>
-            ) : (
-              <ul style={{ margin: 'var(--space-1) 0 0 var(--space-4)', padding: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: '#92400e' }}>
-                {crossedDealbreakers.map((id) => (
-                  <li key={id}>{DEALBREAKER_TEXT[id] ?? id}</li>
-                ))}
-              </ul>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Unknown dealbreaker flags */}
-      {unknownDealbreakers.length > 0 && (
-        <div style={{
-          backgroundColor: 'var(--color-bg-surface)',
-          border: '1px solid var(--color-border)',
-          borderRadius: 'var(--radius-sm)',
-          padding: 'var(--space-2) var(--space-3)',
-        }}>
-          {unknownDealbreakers.length <= 2 ? (
-            <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)' }}>
-              <strong style={{ color: 'var(--color-text-primary)' }}>Couldn&apos;t verify:</strong>{' '}
-              {unknownDealbreakers.map((id) => DEALBREAKER_TEXT[id] ?? id).join(', ')} — research this yourself before deciding.
-            </p>
-          ) : (
-            <>
-              <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)' }}>
-                <strong style={{ color: 'var(--color-text-primary)' }}>Couldn&apos;t verify:</strong>
-              </p>
-              <ul style={{ margin: 'var(--space-1) 0 0 var(--space-4)', padding: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)' }}>
-                {unknownDealbreakers.map((id) => (
-                  <li key={id}>{DEALBREAKER_TEXT[id] ?? id}</li>
-                ))}
-                <li style={{ listStyle: 'none', marginTop: 2 }}>Research these yourself before deciding.</li>
-              </ul>
-            </>
-          )}
-        </div>
-      )}
+      {/* Dealbreaker status — four explicit states, flags only (§22b.4) */}
+      <DealbreakerStatus
+        selectedItemIds={selectedItemIds}
+        dealbreakers={official.dealbreakers}
+        unknownDealbreakers={unknownDealbreakers}
+      />
 
       {/* Low-confidence disclosure for state legislators with thin records (§22b.4) */}
       {official.lowConfidence && (
@@ -818,6 +824,8 @@ function YourOfficialsMode({
     return buildMatchKey(session.result, session)
   }, [session])
 
+  const selectedItemIds = useMemo(() => matchKey?.dealbreakers?.map(d => d.itemId) ?? [], [matchKey])
+
   // Run each official through the match engine to get aligned/divergent axes
   const rankedByOfficialId = useMemo<Map<string, RankedCandidate>>(() => {
     if (!matchKey || !officials) return new Map()
@@ -955,6 +963,7 @@ function YourOfficialsMode({
                     ranked={ranked}
                     userDimensionScores={userDimensionScores}
                     officialName={label}
+                    selectedItemIds={selectedItemIds}
                   />
                 )
               })}
@@ -1353,6 +1362,8 @@ export default function YourBallotPage() {
     return buildMatchKey(session.result, session)
   }, [session])
 
+  const selectedItemIds = useMemo(() => matchKey?.dealbreakers?.map(d => d.itemId) ?? [], [matchKey])
+
   // Run engine over all races (federal + state leg) — ballot order: Senate, House, State Senate, State House
   const raceResults = useMemo<RaceResult[]>(() => {
     if (!matchKey || !ballot) return []
@@ -1621,6 +1632,7 @@ export default function YourBallotPage() {
                   userId={userId}
                   mantleType={mantleType}
                   completionPercent={completionPercent}
+                  selectedItemIds={selectedItemIds}
                 />
               ))}
 
