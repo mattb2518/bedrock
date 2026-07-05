@@ -1,4 +1,4 @@
-// Layer 1 — 14 values questions (8 anchor + 4 crossover + 2 synthesis),
+﻿// Layer 1 — 14 values questions (8 anchor + 4 crossover + 2 synthesis),
 // plus the importance closer (§ line 71).
 // Trimmed from original 20: removed C1, C3, C7, C8, S2, S3.
 //
@@ -508,9 +508,9 @@ export const LAYER1_QUESTIONS: QuizQuestion[] = [
     dependsFollowUp: {
       prompt: 'What would determine how much executive emergency authority you’d support?',
       chips: [
-        'The nature of the threat',
-        'The specific powers',
-        'The track record of the president',
+        'The nature and severity of the threat',
+        'Which specific powers are invoked',
+        'Whether there’s a hard expiration and real oversight',
       ],
     },
     easterEgg:

@@ -485,7 +485,7 @@ When something in society isn't working well, what's your instinct?
 **D.** Test whether it's really broken before changing anything — what looks broken from one angle is often working as intended from another.
 *"Chesterton's Fence — before tearing down what looks like an unnecessary obstacle, find out why it was put there in the first place."*
 
-**It depends** → OT: *"What shapes your answer — the stakes, who's affected, the track record of change in that area?"*
+**It depends** → *"What shapes your answer?"*  — chips: The stakes involved · Who's affected · The track record of change in that area
 
 *No easter egg on A1 — intentional design decision. The first question auto-advances directly to Q2 so the very first interaction demonstrates quiz pace rather than landing on a "Did you know?" intermission.*
 
@@ -506,10 +506,7 @@ Most problems affecting Americans day-to-day — housing, school quality, public
 **C.** Whoever has the strongest track record on that specific problem — some things states have solved brilliantly, others have required federal action.
 *"Federalism by track record — let the level that's working own it."*
 
-**It depends** → MC: *"What tips the balance?"*
-- Whether the problem crosses state lines
-- Whether local governments have already tried and failed
-- Whether equal treatment across states matters for this issue
+**It depends** → *"What tips the balance?"*  — chips: Whether the problem crosses state lines · Whether local governments have already tried and failed · Whether equal treatment across states matters for this issue
 
 **[EE]:** *"The 10th Amendment — 'powers not delegated to the United States are reserved to the States' — is the shortest and most fought-over sentence in the Bill of Rights. Invoked to defend slavery. Invoked to legalize marijuana. Same 28 words."*
 
@@ -528,10 +525,7 @@ When American and global interests conflict, the United States should generally:
 **C.** Lead by example rather than intervention — America's most durable influence has always come from being worth emulating.
 *"John Winthrop called it a city on a hill in 1630. Still the most distinctly American theory of foreign policy."*
 
-**It depends** → MC (select all that apply): *"What tips the balance?"*
-- The type of issue — trade, security, and humanitarian crises feel different
-- The cost to Americans
-- Whether other nations are sharing the burden
+**It depends** → *"What tips the balance?"*  — chips: The type of issue — trade, security, and humanitarian crises feel different · The cost to Americans · Whether other nations are sharing the burden
 
 
 ---
@@ -549,10 +543,7 @@ A mandatory minimum sentencing law that many judges and legal scholars argue pro
 **C.** Adjust enforcement in the meantime — sentencing guidelines and prosecution priorities can be recalibrated without waiting for legislation.
 *"The distance between a law on paper and a law in practice is where a lot of the real action happens."*
 
-**It depends** → MC (select all that apply): *"What shapes your answer?"*
-- How severe the injustice is
-- How realistic near-term legislative change is
-- Whether the harm is ongoing
+**It depends** → *"What shapes your answer?"*  — chips: How severe the injustice is · How realistic near-term legislative change is · Whether the harm is ongoing
 
 ---
 
@@ -569,10 +560,7 @@ When it comes to solving big economic and social problems — healthcare costs, 
 **C.** Build the market you want — design rules and incentives so doing the right thing is also the profitable thing.
 *"Design the rules so the right thing is also the profitable thing. Cap and trade made pollution expensive without picking winners."*
 
-**It depends** → MC (select all that apply): *"What shapes your answer?"*
-- Whether the market has actually failed or just needs better rules
-- Whether costs fall on people outside the transaction
-- Whether government has a good track record on this specific problem
+**It depends** → *"What shapes your answer?"*  — chips: Whether the market has actually failed or just needs better rules · Whether costs fall on people outside the transaction · Whether government has a good track record on this specific problem
 
 ---
 
@@ -589,7 +577,7 @@ In politics and civic life, lasting change usually comes from:
 **C.** Building the coalition first — the limiting factor is rarely the idea, it's the political will, and you build will by bringing more people along before you ask for the vote.
 *"The coalition-building theory of change — the limiting factor is rarely the idea, it's the will, and will gets built one person at a time. Madison called it the slow work of assembling majorities."*
 
-**It depends** → OT: *"What shapes your answer — whether the moment is politically ripe, how much harm is accumulating, whether a partial win forecloses the fuller one?"*
+**It depends** → *"What shapes your answer?"*  — chips: Whether the moment is politically ripe · How much harm is accumulating · Whether a partial win forecloses the fuller one
 
 **[EE]:** *"In 1849 Thoreau went to jail rather than pay a tax funding the Mexican-American War. Emerson visited and asked 'Henry, what are you doing in there?' Thoreau replied: 'Waldo, what are you doing out there?' The essay he wrote — Civil Disobedience — later influenced Gandhi and Martin Luther King Jr."*
 
@@ -609,10 +597,7 @@ When individual freedom and community wellbeing genuinely conflict — one perso
 **C.** Protect the individual from government, but not necessarily from community standards — your neighbors can ask more of you than your government can.
 *"HOAs are annoying but they're not unconstitutional. There's actually a coherent philosophy in there."*
 
-**It depends** → MC (select all that apply): *"What shapes your answer?"*
-- How serious the cost to others is
-- Whether the community norm is itself fair
-- Whether government or community is doing the asking
+**It depends** → *"What shapes your answer?"*  — chips: How serious the cost to others is · Whether the community norm is itself fair · Whether government or community is doing the asking
 
 **[EE]:** *"Eighteen states still have laws requiring citizens to help a neighbor in distress. Vermont's is the most famous — you can be fined for walking past someone drowning. One of the few places American law says being a decent neighbor is mandatory."*
 
@@ -631,7 +616,7 @@ When a major American expert institution — a federal regulatory agency, a scie
 **C.** Calibrate based on the institution's track record on this specific type of question — the CDC gets more benefit of the doubt on epidemiology than on nutrition.
 *"Trust by track record — the same institution can be rigorous in one domain and out over its skis in another. Calibrate to the domain, not the logo."*
 
-**It depends** → OT: *"What shapes how much trust you extend — the type of institution, whether you can see their reasoning, whether they have a stake in the outcome?"*
+**It depends** → *"What shapes how much trust you extend?"*  — chips: The type of institution · Whether you can see their reasoning · Whether they have a stake in the outcome
 
 **[EE]:** *"Gallup has tracked American confidence in major institutions since the 1970s. Confidence in the US military has roughly doubled over that period. Confidence in Congress has fallen by about three-quarters. Same country, same Americans — two federal institutions on opposite trajectories."*
 
@@ -655,11 +640,7 @@ The federal government is considering a large public investment — infrastructu
 **C.** Fund it like a private investor would — only with clear milestones, hard sunset clauses, and clawbacks if it fails. Public money should face at least the discipline private capital demands before a dollar goes out.
 *"The Hoover Dam and Solyndra were both 'government investments.' The difference wasn't the label — it was whether anyone built in a way to fail fast and cut losses."*
 
-**It depends** → MC (select all that apply): *"What shapes your view?"*
-- Whether the private sector has already tried and failed
-- Whether the benefits are genuinely broad
-- Whether there's a credible implementation plan
-- Whether the tax burden is fairly distributed
+**It depends** → *"What shapes your view?"*  — chips: Whether the private sector has already tried and failed · Whether the benefits are genuinely broad · Whether there's a credible implementation plan · Whether the tax burden is fairly distributed
 
 ---
 
@@ -677,10 +658,7 @@ Your town has a serious housing shortage. A state law would override local zonin
 **C.** Override the zoning but compensate the community — if the state imposes regional priorities on a local area, it should share the infrastructure costs that come with growth.
 *"Power without responsibility is just imposition. If you mandate the growth, fund the schools and roads."*
 
-**It depends** → MC (select all that apply): *"What shapes your answer?"*
-- Whether the shortage affects people outside the community
-- Whether the community created the problem through exclusionary zoning
-- Whether the state is offering resources alongside the mandate
+**It depends** → *"What shapes your answer?"*  — chips: Whether the shortage affects people outside the community · Whether the community created the problem through exclusionary zoning · Whether the state is offering resources alongside the mandate
 
 ---
 
@@ -697,11 +675,7 @@ The United States has the opportunity to join a new international agreement on a
 **C.** Join but negotiate hard for enforcement mechanisms with teeth — agreements without consequences are just press releases.
 *"The Paris Agreement had beautiful goals and no enforcement. The Chemical Weapons Convention has inspection regimes and real consequences. One of these is not like the other."*
 
-**It depends** → MC (select all that apply): *"What shapes your answer?"*
-- Whether the problem can't be solved unilaterally
-- Whether the agreement has real enforcement
-- Whether other major powers are genuinely committed
-- What America would have to give up
+**It depends** → *"What shapes your answer?"*  — chips: Whether the problem can't be solved unilaterally · Whether the agreement has real enforcement · Whether other major powers are genuinely committed · What America would have to give up
 
 **[EE]:** *"The United States proposed the League of Nations, championed it at Versailles, and refused to join it. Wilson won the Nobel Peace Prize for the idea and died having failed to ratify it at home. Twenty-seven years later, America helped write the Universal Declaration of Human Rights and has never ratified the treaty making it binding. Eleanor Roosevelt chaired the drafting committee. America's relationship with its own ideals has always been complicated — and always will be."*
 
@@ -720,7 +694,7 @@ A candidate you broadly agree with has a real chance of winning — but only if 
 **C.** Support them publicly but organize to hold them accountable after — winning matters, but so does building infrastructure that makes backsliding costly.
 *"Show up for the win, then make sure they remember who showed up. It's how durable political coalitions actually work."*
 
-**It depends** → OT: *"What would determine whether you'd support them — the specific issue, how much they're softening, something about the candidate?"*
+**It depends** → *"What would determine whether you'd support them?"*  — chips: The specific issue · How much they're softening · Something about the candidate themselves
 
 **[EE]:** *"In 1964 LBJ told aides that signing the Civil Rights Act would cost Democrats the South 'for a generation.' He signed it. Twenty-two years later Reagan struck a sweeping tax reform deal with Democratic leadership that cut rates and closed loopholes conservatives had argued about for decades. Both got their landmark bills because they could count votes. The legislation of idealists is usually written by pragmatists who got elected."*
 
@@ -745,7 +719,7 @@ After a series of domestic attacks, a president declares a national emergency an
 **C.** Allow the emergency action but require automatic expiration and mandatory reauthorization — give the executive the speed the moment requires, but build in a hard stop.
 *"The problem with emergency powers isn't the emergency — it's the 'temporary' measures that outlast the crisis by decades."*
 
-**It depends** → OT: *"What would determine how much executive emergency authority you'd support — the nature of the threat, the specific powers, the track record of the president?"*
+**It depends** → *"What would determine how much executive emergency authority you'd support?"*  — chips: The nature and severity of the threat · Which specific powers are invoked · Whether there's a hard expiration and real oversight
 
 **[EE]:** *"The federal income tax was introduced in 1861 as a temporary Civil War measure. Repealed in 1872. Back in 1894. Struck down by the Supreme Court. Back via constitutional amendment in 1913. The United States has been arguing about a tax that was supposed to last four years for over 160 years. 'Temporary' is doing a lot of work in American governance."*
 
@@ -766,7 +740,7 @@ During a severe pandemic, the federal government mandates vaccines, masks, and b
 **C.** The problem wasn't the restrictions but the lack of honest accounting — the public was told tradeoffs were simple when they weren't, and the erosion of trust came from the gap between what officials said and what was actually known.
 *"Guidance that changed without explanation, and projections wrong in both directions, eroded the trust that effective crisis response depends on."*
 
-**It depends** → OT: *"What would have made the response feel more legitimate — different policies, more honest communication, more local control, clearer expiration dates?"*
+**It depends** → *"What would have made the response feel more legitimate?"*  — chips: Different policies · More honest communication · More local control · Clearer expiration dates
 
 **[EE]:** *"The 1918 influenza pandemic killed an estimated 675,000 Americans — more than every U.S. war of the twentieth century combined. There was no national policy; every city decided for itself, and the country argued bitterly over masks, closures, and quarantines, just as it would a century later. Within a generation it had largely faded from public memory."*
 
@@ -800,7 +774,7 @@ The United States spends more on healthcare per person than any other wealthy co
 **E.** Put patients in control of the dollars — expand health savings accounts and direct-pay primary care, allow insurance to be bought across state lines, and let price-sensitive patients, not third-party payers, discipline costs. The reason healthcare has no real prices is that almost no one spends their own money on it.
 *"Cosmetic surgery and LASIK aren't covered by insurance — and their prices have fallen for decades while everything insurance touches has risen. Make people the buyers and prices start behaving."*
 
-**It depends** → OT: *"What do you think is the most broken part — costs, access, quality, insurance complexity?"*
+**It depends** → *"What do you think is the most broken part?"*  — chips: Costs · Access · Quality · Insurance complexity
 
 **[EE]:** *"American healthcare spends roughly $1 trillion a year on administrative costs alone — more than the entire GDP of Sweden or Switzerland. A 2021 federal rule required hospitals to publish their prices. Most still haven't."*
 
@@ -823,11 +797,7 @@ Climate and energy policy is one of the major questions of the era. Of the follo
 **D.** Go slower and prioritize affordability and reliability — let the transition follow cost and proven technology rather than mandated deadlines, keep energy cheap and the grid stable, and don't lock in expensive bets before they pencil out. The costs of moving too fast fall hardest on working families and energy-intensive regions.
 *"The cost-benefit caution. Energy transitions are real, but so is the price of getting them wrong — and the people paying that price aren't usually the people making the decisions."*
 
-**It depends** → MC (select all that apply): *"What shapes your view?"*
-- How fast you think the transition needs to happen
-- How much you trust government to pick the right technologies
-- Whether international competitiveness matters as much as domestic emissions
-- How you weigh costs on current energy users against future generations
+**It depends** → *"What shapes your view?"*  — chips: How fast you think the transition needs to happen · How much you trust government to pick the right technologies · Whether international competitiveness matters as much as domestic emissions · How you weigh costs on current energy users against future generations
 
 **[EE]:** *"The United States has more wind energy capacity than any country except China — enough to power about 46 million homes. Texas alone generates more wind power than most countries. The state that built its economy on oil is now one of the largest wind energy producers in the world."*
 
@@ -852,10 +822,7 @@ The Second Amendment protects an individual right to own firearms. The debate is
 **E.** Protect and expand gun rights — the problem is criminals, not lawful owners. Enforce existing laws against violent offenders, enact national concealed-carry reciprocity, and roll back restrictions that burden law-abiding owners without measurably reducing crime.
 *"The rights-first answer. The premise: an armed, law-abiding citizenry is a constitutional baseline, and policy aimed at lawful owners tends to miss where violence actually concentrates."*
 
-**It depends** → MC (select all that apply): *"What shapes your view?"*
-- Whether you think more laws would actually be enforced
-- Whether the focus should be on handguns or military-style rifles
-- Whether mental health is more central than access
+**It depends** → *"What shapes your view?"*  — chips: Whether you think more laws would actually be enforced · Whether the focus should be on handguns or military-style rifles · Whether mental health is more central than access
 
 **[EE]:** *"The Second Amendment is twenty-seven words long and has produced some of the most contested litigation in American history — yet for most of that history it was barely litigated at all. The modern body of individual-rights jurisprudence is only about fifty years old. Americans have been arguing about those twenty-seven words for far longer than the courts have."*
 
@@ -877,10 +844,7 @@ American public education produces wildly unequal outcomes depending almost enti
 **D.** Expand school choice broadly — vouchers, education savings accounts, and tax credits that let public funds follow students to the school their parents choose, public or private, secular or religious.
 *"The parent-power answer. The premise: parents allocate education resources better than school districts do, and competition raises quality across the board."*
 
-**It depends** → MC (select all that apply): *"What shapes your view?"*
-- Whether your concern is primarily equity or quality
-- Whether you distinguish between charter schools and private vouchers
-- Whether you think the problem starts before kindergarten
+**It depends** → *"What shapes your view?"*  — chips: Whether your concern is primarily equity or quality · Whether you distinguish between charter schools and private vouchers · Whether you think the problem starts before kindergarten
 
 **[EE]:** *"The Perry Preschool Project, launched in 1962 in Ypsilanti, Michigan, enrolled 58 low-income children in a high-quality preschool and tracked them for 40 years. Those who attended were more likely to graduate high school, hold steady jobs, own homes, and stay out of prison. One of the most studied interventions in American social policy."*
 
@@ -904,10 +868,7 @@ Setting aside border enforcement, the legal immigration system determines who ge
 **D.** Reduce overall numbers — current levels exceed what the labor market, public services, and assimilation infrastructure can absorb. Lower numbers would raise wages for existing workers and ease pressure on housing.
 *"The level-the-curve answer. Labor unions and environmentalists have historically held versions of this position alongside restrictionist conservatives — the coalition is older and stranger than it looks."*
 
-**It depends** → MC (select all that apply): *"What shapes your view?"*
-- Whether you prioritize economic contribution or family unity
-- Whether current overall levels are too high, too low, or about right
-- Whether immigration levels affect wages for existing workers
+**It depends** → *"What shapes your view?"*  — chips: Whether you prioritize economic contribution or family unity · Whether current overall levels are too high, too low, or about right · Whether immigration levels affect wages for existing workers
 
 **[EE]:** *"In 1977 ABC aired a Schoolhouse Rock segment called 'The Great American Melting Pot' — a three-minute animated song about immigration that ended with the Statue of Liberty serving soup. Watched by roughly every American child of that generation."*
 
@@ -926,10 +887,7 @@ The federal debt is approximately $34 trillion and growing. Of the following, wh
 **C.** A bipartisan grand bargain that takes both seriously — every serious deficit reduction plan in American history has required both revenue increases and spending cuts.
 *"The deficit is the gap between revenue and spending. Every commission that has studied this seriously — Simpson-Bowles, Domenici-Rivlin — has reached the same conclusion: you need both."*
 
-**It depends** → MC (select all that apply): *"What shapes your view?"*
-- Whether you think the debt is an immediate crisis or a long-term problem
-- Whether tax increases or spending cuts should lead
-- Whether you think the political system is capable of a grand bargain
+**It depends** → *"What shapes your view?"*  — chips: Whether you think the debt is an immediate crisis or a long-term problem · Whether tax increases or spending cuts should lead · Whether you think the political system is capable of a grand bargain
 
 
 ---
@@ -947,10 +905,7 @@ The United States spends more on its military than the next ten countries combin
 **C.** Rebalance toward economic and diplomatic tools — military superiority hasn't produced the outcomes in Afghanistan, Iraq, or Libya that justified the investment.
 *"The United States has the most powerful military in human history and has fought four major wars since 1950 with mixed results. At some point the question isn't whether we can win militarily — it's whether winning militarily solves the problem."*
 
-**It depends** → MC (select all that apply): *"What shapes your view?"*
-- Whether great-power competition with China changes the calculus
-- Whether military strength deters conflict or invites it
-- Whether domestic investment should take priority
+**It depends** → *"What shapes your view?"*  — chips: Whether great-power competition with China changes the calculus · Whether military strength deters conflict or invites it · Whether domestic investment should take priority
 
 **[EE]:** *"Iceland is a full NATO member with no standing army. Its contribution to collective defense is primarily its geography and its Coast Guard, which has fought three 'Cod Wars' against the United Kingdom over fishing rights. The alliance that has kept the peace in Europe for 75 years includes a country whose most recent military conflict was about fish."*
 
@@ -972,7 +927,7 @@ Since the Supreme Court overturned Roe v. Wade in 2022, abortion policy has been
 **D.** Codify federal protection with no gestational limits — abortion access as a constitutional right of bodily autonomy, no state restrictions, public funding for those who can't afford it.
 *"The bodily-autonomy answer. The position that government's proper role in pregnancy decisions is, ultimately, none."*
 
-**It depends** → OT: *"What factors matter most — stage of pregnancy, specific circumstances, role of religious belief, federal vs. state authority, whether to focus on the narrower contraception and IVF protections that command broader consensus?"*
+**It depends** → *"What factors matter most?"*  — chips: Stage of pregnancy · Specific circumstances · Role of religious belief · Federal vs. state authority · Focusing on contraception and IVF protections that command broader consensus
 
 **[EE]:** *"In 1972 — the year before Roe — the Republican platform supported abortion access and the Democratic platform was silent on it. George H.W. Bush was pro-choice before becoming Reagan's running mate. Al Gore was pro-life before running for president. Jesse Jackson opposed abortion until 1988. The sorting of both parties into hard positions happened gradually, then suddenly — entirely within living memory. The issue didn't change. The parties around it did."*
 
@@ -994,10 +949,7 @@ Technology companies now know more about most Americans than the government does
 **D.** Trust competition and exit — new platforms emerge when old ones overreach, and government tools tend to entrench whoever's already large. Microsoft was supposed to be unstoppable in 1998; TikTok displaced Facebook for a generation; Bluesky and Mastodon are responses to Twitter.
 *"The market-correcting answer. Big Tech criticism is bipartisan, but so is concern that letting Washington pick winners and losers in technology has a worse track record than the problem it's trying to fix."*
 
-**It depends** → MC (select all that apply): *"What shapes your view?"*
-- Whether competition or regulation is the more effective tool
-- Whether you're more concerned about privacy or algorithmic harm
-- Whether American tech dominance is a national security asset worth protecting
+**It depends** → *"What shapes your view?"*  — chips: Whether competition or regulation is the more effective tool · Whether you're more concerned about privacy or algorithmic harm · Whether American tech dominance is a national security asset worth protecting
 
 **[EE]:** *"The United States has comprehensive federal privacy laws for video rental records, children's online activity, and educational records. There is no comprehensive federal privacy law for anything else. The Video Privacy Protection Act of 1988 was passed specifically because a reporter got Robert Bork's Blockbuster rental history during his Supreme Court confirmation. Your Blockbuster history has been federally protected for 35 years. Your location data has not."*
 
@@ -1025,7 +977,7 @@ A candidate you mostly agree with has a serious and credible character issue —
 **C.** Depends on whether the character issue is relevant to the job — financial fraud tells you something about how someone will handle public money. A messy divorce probably doesn't.
 *"Not all character flaws are created equal."*
 
-**It depends** → OT: *"What would push you to 'disqualifying' — the type of conduct, how recent, the volume of incidents, whether they've acknowledged it?"*
+**It depends** → *"What would push you to 'disqualifying'?"*  — chips: The type of conduct · How recent it is · The volume of incidents · Whether they've acknowledged it
 
 **[EE]:** *"Grover Cleveland was elected president in 1884 despite his opponents publicizing that he'd fathered a child out of wedlock. They chanted 'Ma, ma, where's my pa?' His supporters responded: 'Gone to the White House, ha ha ha.' He won."*
 
@@ -1044,7 +996,7 @@ Most voters have a general partisan lean. What would most reliably make you vote
 **C.** An exceptionally strong candidate on the other side — someone whose record, character, and judgment are compelling enough to vote for regardless of the party label.
 *"Ticket-splitting used to be common. It declined as parties sorted. The instinct — vote for the person, not the jersey — is still alive in a lot of voters."*
 
-**It depends** → OT: *"Is there a specific combination of factors that would flip your vote?"*
+**It depends** → *"Is there a combination of factors that would flip your vote?"*  — chips: A mix of policy and character concerns · The stakes of that particular race · How weak my own party's candidate is · The strength of the alternative
 
 
 ---
@@ -1062,7 +1014,7 @@ You're in a primary. Your preferred candidate holds positions closest to yours b
 **C.** Depends on how big the electability gap is — if my preferred candidate is slightly less electable, I vote my conscience. If they're genuinely unelectable, the math changes.
 *"There's a difference between 'harder to elect' and 'unelectable.' The first is worth accepting for a candidate you believe in."*
 
-**It depends** → OT: *"What factors shape your thinking — how important the office is, how different the candidates are on policy, how reliable the electability polling tends to be?"*
+**It depends** → *"What shapes your thinking?"*  — chips: How important the office is · How different the candidates are on policy · How reliable electability polling tends to be
 
 ---
 
@@ -1079,7 +1031,7 @@ Most American ballots include state legislature, county commissioner, school boa
 **C.** I focus on ballot measures and skip races where I don't know enough — I'd rather leave a race blank than vote uninformed.
 *"An uninformed vote isn't necessarily better than no vote. Leaving a race blank is a defensible choice — one the instructions on most ballots explicitly permit."*
 
-**It depends** → OT: *"What shapes how much you engage — the office, whether it's contested, whether you can find good information?"*
+**It depends** → *"What shapes how much you engage?"*  — chips: The office itself · Whether the race is contested · Whether good information is available
 
 **[EE]:** *"The average American voter faces 15 to 30 separate decisions on a general election ballot. In California in 2016, voters decided 17 statewide propositions alone — covering marijuana legalization, death penalty repeal, and workplace rules for adult film actors. That was before the candidates. A fully engaged California voter in a presidential year can face 40 or more distinct choices. Most voters research about three of them thoroughly."*
 
@@ -1098,7 +1050,7 @@ When an incumbent is running for reelection, how does that affect your thinking?
 **C.** Entirely depends on the record — incumbency itself is neutral. A strong record deserves reelection. A weak one deserves a challenger.
 *"Incumbency is neither a credential nor a scarlet letter. The question is always the same: did they do the job well?"*
 
-**It depends** → OT: *"What shapes how you think about incumbents — the office, how long they've served, what they did with the time?"*
+**It depends** → *"What shapes your view of incumbents?"*  — chips: The office · How long they've served · What they did with the time
 
 **[EE]:** *"'Throw out the bums — but not my bums.' Congressional reelection rates have been above 90% in every cycle since 1996. Public approval of Congress over the same period has averaged 20%. Americans don't want to throw their bums out — just everyone else's."*
 
@@ -1118,7 +1070,7 @@ The candidate from your usual party is mediocre — not corrupt, just unremarkab
 **C.** Depends on the stakes — in a year when chamber control is on the line, the structural argument wins. In a safe year, voting for the better candidate costs nothing and signals something.
 *"Principles are easier to act on when the stakes are low."*
 
-**It depends** → OT: *"What would push you toward the better candidate — how impressive they are, how mediocre your usual party's candidate is, how safe the seat is?"*
+**It depends** → *"What would push you toward the better candidate?"*  — chips: How impressive they are · How weak my usual party's candidate is · How safe the seat is
 
 **[EE]:** *"In 2006 Joe Lieberman lost his Democratic primary in Connecticut, ran as an Independent, won the general, caucused with Democrats, and two years later delivered a keynote speech endorsing John McCain at the Republican National Convention."*
 
@@ -1137,7 +1089,7 @@ When deciding how to vote, are you primarily thinking about the next two to four
 **C.** Both, weighted by the office — presidential and judicial elections demand long-term thinking. Congressional and local elections often demand near-term accountability.
 *"A Supreme Court justice serves for life. A city council member serves two years. Your time horizon should match the time horizon of the office."*
 
-**It depends** → OT: *"What shapes your time horizon — the specific issues, who's most affected, the office being filled?"*
+**It depends** → *"What shapes your time horizon?"*  — chips: The specific issues at stake · Who's most affected · The office being filled
 
 **[EE]:** *"The Constitution was written in 1787 by delegates whose average age was 42. Benjamin Franklin was 81 and had to be carried into the convention hall. Gouverneur Morris, who wrote the final draft, was 35. The document they produced in four months of a Philadelphia summer has outlasted every other national constitution written in the same century. Whatever they were doing in that room, the time horizon was definitely not 'next election cycle.'"*
 
