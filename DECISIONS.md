@@ -234,3 +234,7 @@ Revisit in Claude Project sessions when ready to build.
 **Decision:** The single 'Sign in' text link is replaced by a two-element pair — an outlined 'Create an account' button (→ /signup) and a lower-contrast 'Sign in' text link (→ /signin). Both show simultaneously when signed out; both disappear when signed in. No single button that flips label based on some guess about returning-user status.
 
 **Why:** A signed-out visitor is anonymous — we cannot distinguish a first-time user from a returning one before they authenticate. Showing only 'Sign in' loses new visitors who don't know to click it; showing only 'Create an account' loses returning users who are confused. The pair serves both audiences without guessing. Applies to both desktop nav and mobile hamburger.
+
+## 2026-07-05 — HomeTeaser.tsx deleted
+
+**Decision:** Deleted src/components/home/HomeTeaser.tsx. The four-question homepage ghost-constellation sketch it rendered was removed from HomeContent.tsx during the launch QA pass (nothing imported it anymore). Keeping the file would mean carrying stale code and a stale 'fifteen questions' copy string with no rendering path. Deleted rather than archived.
