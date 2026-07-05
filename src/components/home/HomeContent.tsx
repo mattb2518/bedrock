@@ -13,6 +13,8 @@ import { profileToRadar, DIMENSIONS, poleLabel } from "@/lib/quiz/dimensions";
 import type { DimensionalProfile } from "@/types/quiz";
 import { PILLAR_ONE, type PillarOneMode } from "@/lib/config/pillarOne";
 import { usePreviewStore } from "@/store/previewStore";
+import { createClient } from "@/lib/supabase/client";
+import type { User } from "@supabase/supabase-js";
 
 // ── Shared pillar cards ───────────────────────────────────────────────────────
 
@@ -162,6 +164,17 @@ function ReturningHome({ pillarOneMode }: { pillarOneMode: PillarOneMode }) {
   const layersCompleted = session?.completedLayers?.length ?? 0;
   const firstName = session?.demographics?.firstName?.trim() || null;
 
+  // undefined = resolving, null = signed out, User = signed in
+  const [user, setUser] = useState<User | null | undefined>(undefined);
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data }) => setUser(data.user ?? null));
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, s) => {
+      setUser(s?.user ?? null);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+
   // Top traits: the user's flagged top dimensions, labeled by pole
   const topTraits = (result?.topDimensions ?? []).slice(0, 3).map((dim) => {
     const val = profile ? profile[dim] : 50;
@@ -187,12 +200,26 @@ function ReturningHome({ pillarOneMode }: { pillarOneMode: PillarOneMode }) {
     <>
       <HeroSlider compact />
 
-      {/* Returning greeting */}
-      <div style={{ maxWidth: "var(--max-width-wide)", margin: "0 auto", padding: "var(--space-8) var(--space-6) 0" }}>
-        <p style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-h3)", color: "var(--color-text-primary)", margin: 0 }}>
-          {firstName ? `Welcome back, ${firstName}.` : "Welcome back."}
-        </p>
-      </div>
+      {/* Returning greeting — auth-gated to avoid "Welcome back" for anonymous completers */}
+      {user !== undefined && (
+        <div style={{ maxWidth: "var(--max-width-wide)", margin: "0 auto", padding: "var(--space-8) var(--space-6) 0" }}>
+          {user ? (
+            <p style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-h3)", color: "var(--color-text-primary)", margin: 0 }}>
+              {firstName ? `Welcome back, ${firstName}.` : "Welcome back."}
+            </p>
+          ) : (
+            <>
+              <p style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-h3)", color: "var(--color-text-primary)", margin: "0 0 var(--space-2)" }}>
+                Your mantle.
+              </p>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-small)", color: "var(--color-text-muted)", margin: 0 }}>
+                <Link href="/signup" style={{ color: "var(--color-blue-accent)", textDecoration: "none", fontWeight: "var(--weight-semibold)" }}>Create an account</Link>
+                {" "}to save your results.
+              </p>
+            </>
+          )}
+        </div>
+      )}
 
       {/* Your Actions */}
       <section style={{ backgroundColor: "var(--color-bg-section)", padding: "var(--space-16) var(--space-6)" }}>

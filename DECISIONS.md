@@ -238,3 +238,9 @@ Revisit in Claude Project sessions when ready to build.
 ## 2026-07-05 — HomeTeaser.tsx deleted
 
 **Decision:** Deleted src/components/home/HomeTeaser.tsx. The four-question homepage ghost-constellation sketch it rendered was removed from HomeContent.tsx during the launch QA pass (nothing imported it anymore). Keeping the file would mean carrying stale code and a stale 'fifteen questions' copy string with no rendering path. Deleted rather than archived.
+
+## 2026-07-05 — Returning-home greeting gated on auth, not quiz completion
+
+**Decision:** HomeContent's greeting slot now reads the Supabase auth session (same pattern as Nav). Three states: undefined (resolving — slot hidden), null (anonymous — shows 'Your mantle.' + 'Create an account to save your results.' link), User (signed in — shows 'Welcome back, name.'). The returning-user layout (mantle summary, pillar cards) remains keyed on session.result and is still visible to anonymous completers.
+
+**Why:** An anonymous quiz-completer saw 'Welcome back.' alongside a nav showing 'Create an account' — direct contradiction that implied an account existed. Layout and greeting are now separate concerns: layout is store-gated (useful with zero auth), greeting is auth-gated (only warm users who actually have an account).
