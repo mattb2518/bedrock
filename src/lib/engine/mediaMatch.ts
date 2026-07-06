@@ -328,21 +328,22 @@ export function matchMedia(
   const sortedExpanding   = diversitySort(expanding,   'expanding')
   const sortedChallenging = diversitySort(challenging, 'challenging')
 
-  // Top-up thin tiers from the full pool — shared placed-set prevents cross-tier duplication
+  // Shared placed-set — seeded from geometry results; prevents cross-tier duplication in topUp
   const placed = new Set<string>([
     ...sortedConfirming.map((s) => s.source.id),
     ...sortedExpanding.map((s) => s.source.id),
     ...sortedChallenging.map((s) => s.source.id),
   ])
-  const { sources: finalConfirming,  toppedUp: tuConfirming  } = topUp(sortedConfirming,  scoredAll, 'confirming',  placed)
-  const { sources: finalExpanding,   toppedUp: tuExpanding   } = topUp(sortedExpanding,   scoredAll, 'expanding',   placed)
-  let { sources: finalChallenging, toppedUp: tuChallenging } = topUp(sortedChallenging, scoredAll, 'challenging', placed)
 
   // Graduated Challenging fallback — §24.7 (2026-07-06)
-  // Centrist users may have no source clear tensionOnHeld >= 0.40; rather than leave the tab
-  // empty, surface the closest available sources with the tension floor relaxed to 0.25,
-  // keeping all other quality floors intact. Disclosed via toppedUp flag in TierPanel.
-  if (finalChallenging.length === 0) {
+  // Must run BEFORE topUp fills Confirming/Expanding. Centrist profiles produce low
+  // tensionOnHeld scores across the board; the sources that best challenge them (e.g.
+  // The Remnant at 0.244) also score high enough on agreement to land in Confirming via
+  // topUp, consuming them before the fallback can use them. Running the fallback first
+  // reserves those sources for Challenging. Self-disables once geometry produces results.
+  let finalChallenging = sortedChallenging
+  let tuChallenging = false
+  if (sortedChallenging.length === 0) {
     const fallbackCandidates = scoredAll
       .filter((scored) =>
         !placed.has(scored.source.id) &&
@@ -357,9 +358,13 @@ export function matchMedia(
     if (fallbackCandidates.length > 0) {
       for (const s of fallbackCandidates) placed.add(s.source.id)
       tuChallenging = true
-      finalChallenging = [...finalChallenging, ...fallbackCandidates.map((s) => ({ ...s, tier: 'challenging' as MediaTier }))]
+      finalChallenging = fallbackCandidates.map((s) => ({ ...s, tier: 'challenging' as MediaTier }))
     }
   }
+
+  // Top-up thin Confirming and Expanding tiers — Challenging is handled above
+  const { sources: finalConfirming, toppedUp: tuConfirming } = topUp(sortedConfirming, scoredAll, 'confirming', placed)
+  const { sources: finalExpanding,  toppedUp: tuExpanding  } = topUp(sortedExpanding,  scoredAll, 'expanding',  placed)
 
   return {
     confirming:  finalConfirming,
