@@ -350,7 +350,7 @@ export function matchMedia(
         scored.source.reliability >= 75 &&
         scored.source.goodFaith === 'high' &&
         scored.source.independence >= 50 &&
-        scored.tensionOnHeld >= 0.25
+        scored.tensionOnHeld >= 0.22
       )
       .sort((a, b) => b.tensionOnHeld - a.tensionOnHeld)
       .slice(0, MIN_PER_TIER)
