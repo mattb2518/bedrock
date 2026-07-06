@@ -423,7 +423,7 @@ function TierPanel({
       {toppedUp && tier === 'challenging' && (
         <div style={{ padding: 'var(--space-3)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--color-bg-surface)', marginBottom: 'var(--space-4)' }}>
           <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-secondary)', lineHeight: '1.5' }}>
-            The sharpest counterpoints the catalog has for you right now — this fills out as we add sources.
+            Your profile sits close enough to center that no source clears our usual Challenging bar — these are the closest the catalog has. This tier fills out as we add sources and as your profile sharpens.
           </p>
         </div>
       )}

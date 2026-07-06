@@ -336,7 +336,30 @@ export function matchMedia(
   ])
   const { sources: finalConfirming,  toppedUp: tuConfirming  } = topUp(sortedConfirming,  scoredAll, 'confirming',  placed)
   const { sources: finalExpanding,   toppedUp: tuExpanding   } = topUp(sortedExpanding,   scoredAll, 'expanding',   placed)
-  const { sources: finalChallenging, toppedUp: tuChallenging } = topUp(sortedChallenging, scoredAll, 'challenging', placed)
+  let { sources: finalChallenging, toppedUp: tuChallenging } = topUp(sortedChallenging, scoredAll, 'challenging', placed)
+
+  // Graduated Challenging fallback — §24.7 (2026-07-06)
+  // Centrist users may have no source clear tensionOnHeld >= 0.40; rather than leave the tab
+  // empty, surface the closest available sources with the tension floor relaxed to 0.25,
+  // keeping all other quality floors intact. Disclosed via toppedUp flag in TierPanel.
+  if (finalChallenging.length === 0) {
+    const fallbackCandidates = scoredAll
+      .filter((scored) =>
+        !placed.has(scored.source.id) &&
+        scored.source.active === 'active' &&
+        scored.source.reliability >= 75 &&
+        scored.source.goodFaith === 'high' &&
+        scored.source.independence >= 50 &&
+        scored.tensionOnHeld >= 0.25
+      )
+      .sort((a, b) => b.tensionOnHeld - a.tensionOnHeld)
+      .slice(0, MIN_PER_TIER)
+    if (fallbackCandidates.length > 0) {
+      for (const s of fallbackCandidates) placed.add(s.source.id)
+      tuChallenging = true
+      finalChallenging = [...finalChallenging, ...fallbackCandidates.map((s) => ({ ...s, tier: 'challenging' as MediaTier }))]
+    }
+  }
 
   return {
     confirming:  finalConfirming,
