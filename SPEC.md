@@ -3765,7 +3765,19 @@ Applied to all routes via `headers()` in `next.config.ts`:
 | `Referrer-Policy` | `strict-origin-when-cross-origin` |
 | `Permissions-Policy` | `camera=(), microphone=(), geolocation=()` |
 
-Content-Security-Policy is intentionally excluded — requires a separate audit pass.
+Content-Security-Policy is set with the following directives:
+- default-src 'self'
+- script-src 'self' 'unsafe-inline' + Plausible + Cloudflare Turnstile
+- style-src 'self' 'unsafe-inline' (required for Next.js inline styles)
+- connect-src 'self' + Supabase + Plausible + Cloudflare Turnstile
+- img-src 'self' data: https: (broad to cover Wikipedia forebear portraits)
+- font-src 'self' (fonts are self-hosted via Next.js font optimization)
+- frame-src Cloudflare Turnstile (required for widget iframe)
+- object-src 'none'
+- base-uri 'self'
+- form-action 'self'
+
+Note: 'unsafe-inline' is required for script-src and style-src due to Next.js hydration behavior. A nonce-based CSP would remove this requirement but is a future consideration.
 
 ### Rate limiting
 
