@@ -2785,12 +2785,13 @@ Fires a Claude API call with: the full feedback dataset for that entry + current
 A human reviews the analysis and decides whether to act. A re-classify button is available from the same screen.
 
 **Weekly digest email:**
-Sent to Super Admin via Resend (`RESEND_API_KEY_ADMIN`). Sends FROM `admin@bedrock.guide` (domain verified in Resend). Contains a Claude-generated paragraph summarizing:
-- The top 5 most-disagreed-with recommendations from the prior week (both Ballot and Media Diet)
-- Feedback patterns across the full catalog
-- Recommended actions
+Sent to Super Admin via Resend (`RESEND_API_KEY_ADMIN`). FROM `admin@bedrock.guide`. Three sections:
 
-Not raw numbers — an actionable summary requiring human judgment.
+**Section 1 — New users this week:** accounts created in prior 7 days, masked email (`username@fir***.***`), sorted by signup date. Omitted if no new signups.
+
+**Section 2 — Stats snapshot:** prior 7 days vs. prior 14–7 days. New signups (count + delta), quiz completions (count + completion rate), mantle distribution (type → count descending), returning users, classification pipeline errors. Rendered as a `<ul>` in the email.
+
+**Section 3 — Claude narrative:** receives stats snapshot + disagreement feedback data. Generates 2-3 sentence actionable prose summary. If low volume, says so in one sentence — no meta-commentary about thresholds.
 
 ### 21.9 Pre-launch checklist (persistent banner in the admin dashboard)
 
