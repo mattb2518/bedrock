@@ -24,6 +24,8 @@ Exception to the auto-commit rule above: after a substantial block of edits to `
 
 # Supabase migrations
 
+Migration files must be applied to production in the same batch they are created. Two migrations have now been found unapplied at or after launch: 20260703000001 (address/district scalars, found July 5) and 20260703000000 (site_config table, found July 6). Before closing any batch that includes a migration file, confirm it has been applied to production via the Supabase SQL editor.
+
 Whenever a session adds a new file to `supabase/migrations/`, include a migration-status check before the final commit:
 
 1. Run `supabase migration list` (requires CLI linked via `supabase link`). If it reports the new migration as pending, note this in the commit message.
