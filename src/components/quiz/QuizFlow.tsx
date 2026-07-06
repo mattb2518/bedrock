@@ -26,6 +26,7 @@ import { buildResult } from '@/lib/quiz/scoring'
 import { DIMENSIONS } from '@/lib/quiz/dimensions'
 import { IT_DEPENDS, type Demographics, type Dimension, type QuizLayer, type QuizQuestion } from '@/types/quiz'
 import MantleReveal from '@/components/quiz/MantleReveal'
+import Layer3Grid from '@/components/quiz/Layer3Grid'
 import AddressAutocomplete from '@/components/ui/AddressAutocomplete'
 import { savePendingAddress } from '@/store/quizStore'
 import InterlayerUnlockScreen from '@/components/quiz/InterlayerUnlockScreen'
@@ -68,6 +69,14 @@ const QUESTIONS_BY_LAYER: Record<number, QuizQuestion[]> = {
   2: LAYER2_QUESTIONS,
   3: LAYER3_QUESTIONS,
 }
+
+// Total scoreable questions across all three quiz layers.
+// Layer 4 (dealbreakers) and the importance closer are not counted —
+// they don't contribute to the dimensional profile.
+const TOTAL_PROFILE_QUESTIONS = 36 // L1: 14, L2: 14, L3: 8
+
+// L3-Q1 through L3-Q7 (indices 0–6) render as a grid; L3-Q8 (index 7) is the capstone.
+const LAYER3_GRID_QUESTIONS = LAYER3_QUESTIONS.slice(0, 7)
 
 // Per-step config for the demographics stepper. Conditional steps are skipped
 // automatically when their condition isn't met — the next/prev helpers below
@@ -1204,6 +1213,20 @@ export default function QuizFlow() {
     )
   }
 
+  // ── LAYER 3 GRID (L3-Q1 through L3-Q7) ──────────────────────────────────
+  if (phase === 'quiz' && layer === 3 && index < 7) {
+    return (
+      <Layer3Grid
+        questions={LAYER3_GRID_QUESTIONS}
+        onComplete={() => {
+          // After all 7 grid answers are submitted, advance index is already at 7
+          // (submitAnswer was called 7 times inside Layer3Grid). Render L3-Q8.
+          setPhase('quiz')
+        }}
+      />
+    )
+  }
+
   // ── QUESTION (all layers) ─────────────────────────────────────────────────
   if (!question) return null
   const hasItDepends = question.dependsFollowUp.prompt !== ''
@@ -1218,11 +1241,22 @@ export default function QuizFlow() {
   const followPrompt = pickedOption?.followUpPrompt ?? question.dependsFollowUp.prompt
   const followChips = isDepends ? question.dependsFollowUp.chips : []
 
+  // Profile-completeness percentage — advances continuously across all layers,
+  // never resets. index is 0-based-current (not yet answered).
+  const answeredSoFar =
+    (layer === 1 ? index : LAYER1_QUESTIONS.length) +
+    (layer === 2 ? index : layer > 2 ? LAYER2_QUESTIONS.length : 0) +
+    (layer === 3 ? index : layer > 3 ? LAYER3_QUESTIONS.length : 0)
+  const profilePct = Math.min(
+    Math.round((answeredSoFar / TOTAL_PROFILE_QUESTIONS) * 100),
+    100
+  )
+
   return (
     <Shell>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-1)' }}>
         <Kicker>
-          Layer {layer} · {LAYER_LABELS[layer]} · Question {index + 1} of {questions.length}
+          Layer {layer} · {LAYER_LABELS[layer]} · {profilePct}% of your profile built
         </Kicker>
         <button
           onClick={() => {
@@ -1238,7 +1272,7 @@ export default function QuizFlow() {
       <LayerSubtitle>{LAYER_SUBTITLES[layer]}</LayerSubtitle>
 
       <div style={{ height: 4, backgroundColor: 'var(--color-bg-surface)', borderRadius: 'var(--radius-full)', marginBottom: 'var(--space-8)', marginTop: 'var(--space-4)' }}>
-        <div style={{ height: '100%', width: `${(index / questions.length) * 100}%`, backgroundColor: 'var(--color-gold)', borderRadius: 'var(--radius-full)', transition: 'width 0.3s' }} />
+        <div style={{ height: '100%', width: `${profilePct}%`, backgroundColor: 'var(--color-gold)', borderRadius: 'var(--radius-full)', transition: 'width 0.3s' }} />
       </div>
 
       <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-h3, var(--text-body-lg))', color: 'var(--color-text-primary)', lineHeight: 'var(--leading-snug, 1.4)', marginBottom: 'var(--space-2)' }}>

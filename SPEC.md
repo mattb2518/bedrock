@@ -235,7 +235,7 @@ Three edge cases the recommendation engine must detect and handle with dedicated
 - Curious, not clinical. Engaged, not bureaucratic.
 
 ### Chapter Structure
-Communicated via progress bar design, not explicit question numbering. Gives location without tunnel feeling.
+Communicated via a profile-completeness percentage (0–100% across all 36 scoreable questions), not per-layer question numbering. The bar advances continuously and never resets between layers. Gives momentum without tunnel feeling.
 
 ### Layer Labels (shown to user)
 - Layer 1: "What you believe"
@@ -244,9 +244,10 @@ Communicated via progress bar design, not explicit question numbering. Gives loc
 - Layer 4: "Where you draw the line"
 
 ### Encouragement Mechanics
-- After Layer 1: profile completeness ~40%, curiosity-driven prompt to continue
-- After Layer 2: completeness ~65%
-- After Layer 3: completeness ~85%
+- After Layer 1 (14 questions): ~39% complete
+- After Layer 2 (28 questions): ~78% complete
+- After Layer 3 (36 questions): 100% complete
+- Percentages are displayed live in the kicker and progress bar (not just used as thresholds for copy)
 - Curiosity-driven, not guilt-driven
 
 ### Interlayer Unlock Screens
@@ -958,6 +959,8 @@ Tech companies now know more about most Americans than the government does. Of t
 ---
 
 ## 9. Layer 3 Questions — Complete
+
+**UX note (shipped 2026-07-06):** L3-Q1 through L3-Q7 render as a single compact grid screen (one row per question, three tappable cells per row). "It depends" is not offered in the grid. L3-Q8 (the capstone) continues to render as a standalone screen. Full question text and `dependsFollowUp` data are preserved in `layer3.ts` for rollback and future use.
 
 *8 questions: voting behavior and priority intensity*
 *Behavioral register — noticeably different feel from Layers 1 and 2*

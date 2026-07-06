@@ -266,3 +266,24 @@ Revisit in Claude Project sessions when ready to build.
 **Decision:** The graduated Challenging fallback (tensionOnHeld >= 0.22) must run before topUp fills Confirming and Expanding. Root cause: centrist profiles produce low tensionOnHeld scores across the board, so the sources that best challenge them also score high enough on agreement to land in Confirming. Running topUp on Confirming first consumed those sources before the Challenging fallback could use them, producing an empty Challenging tab even after the fallback was added. Fix: fallback runs immediately after geometry + diversity sort, before any topUp calls. Confirmed empirically: The Remnant (agreement: 0.666, tensionOnHeld: 0.244) was landing in Confirming via topUp and being excluded from the Challenging fallback pool. If this is ever reverted, restore the original order: topUp all three tiers first, then graduated fallback. Revert is appropriate once the catalog has enough sources that centrist profiles generate natural Challenging results without the fallback.
 
 Second fix (same date): the `placed` set was seeded from all three geometry tiers before the fallback ran, so all 25 quality-passing sources were excluded before the fallback could see them. Centrist profiles produce agreement >= 0.65 against virtually the entire high-quality catalog, meaning geometry places everything in Confirming. Fix: seed `placed` from Challenging geometry only before the fallback; add Confirming/Expanding to `placed` after the fallback.
+
+## 2026-07-06 — Quiz UX: progress reframing (D) + Layer 3 grid (E)
+**Decision:** Two changes shipped together in one commit.
+
+**(D) Progress bar reframed as profile completeness.**
+The kicker and progress bar previously showed per-layer question position ("Question 3 of 14"), which reset to 0% at each layer transition and created a tunnel effect. Replaced with a continuous profile-completeness percentage (0–100% across all 36 scoreable questions across L1, L2, L3). The bar no longer resets between layers.
+
+**(E) Layer 3 (L3-Q1–Q7) rendered as a single grid screen.**
+The 7 voting-behavior questions previously rendered as 7 individual card screens (~12 minutes as experienced). They now render as a compact single-screen grid: one row per question, three tappable option cells per row, a live "N of 7 answered" counter, and a CTA that unlocks when all 7 are complete. L3-Q8 (the capstone, which has a free-text option) continues as a standalone screen.
+
+**"It depends" dropped for L3-Q1–Q7 in the grid.** These are behavioral questions rather than values questions; the "It depends" path carries less signal here. The `dependsFollowUp` data is preserved in `layer3.ts` and is available for a future format that could restore it.
+
+**Back button from the grid:** navigates to the Layer 3 intro screen; partial grid selections are not preserved. Accepted as v1 behavior.
+
+**Signal tradeoff acknowledged:** The grid format yields slightly less nuance per question than the individual card format (no "It depends," no easter eggs on L3 questions). The behavioral data captured is identical in structure — same question IDs, same option IDs, same store calls. The tradeoff is judged worth the UX improvement for first-time users.
+
+**Why both together:** Change D's progress bar depends on a stable question count; Change E changes how L3 answers are submitted (batch vs. sequential) but not the count itself. The two changes are independent and either can be reverted without affecting the other.
+
+**Rollback (D):** Restore the original kicker string and progress bar width expression in `QuizFlow.tsx`. One file, two lines. `git revert <sha>` is clean.
+
+**Rollback (E):** Delete `Layer3Grid.tsx` and remove the grid branch in `QuizFlow.tsx`. All `layer3.ts` data is untouched. `git revert <sha>` is clean.
