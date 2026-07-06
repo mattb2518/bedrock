@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { buildProfilePlaceholders } from '@/lib/conversations/profileBuilder'
 import type { QuizSession } from '@/types/quiz'
+import { createClient } from '@/lib/supabase/server'
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
@@ -61,6 +62,23 @@ When ending the session:
 
 export async function POST(request: NextRequest) {
   try {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const { data: profile } = await supabase
+      .from('quiz_profiles')
+      .select('completed_layers')
+      .eq('user_id', user.id)
+      .maybeSingle()
+
+    const completedLayers: number[] = profile?.completed_layers ?? []
+    if (!completedLayers.includes(1)) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
     const body = await request.json()
     const {
       session,

@@ -3736,4 +3736,35 @@ A 6-slide modal carousel shown automatically to first-time visitors. Designed to
 - Your Ballot is `/your-ballot` — NOT `/ballot`
 - Beyond Your Ballot is `/beyond-your-ballot` — NOT `/beyond-ballot`
 
+---
+
+## §32. Security Controls
+
+### Auth gates
+
+| Route | Auth required | Extra enforcement |
+|---|---|---|
+| `POST /api/conversations/chat` | Yes — `supabase.auth.getUser()` | Layer 1 must be in `quiz_profiles.completed_layers` |
+| `POST /api/quiz/reflect` | Yes — `supabase.auth.getUser()` | None |
+| `POST /api/address-autocomplete` | Yes — `supabase.auth.getUser()` | None |
+
+All three return `{ error: 'Unauthorized' }` with HTTP 401 on failure.
+
+### Admin RSC leak fix
+
+`/admin` calls `getCurrentUserRole()` at the very top of `AdminOverviewPage()`, before any data fetches. Redirects to `/` immediately if role is not `admin` or `super_admin`.
+
+### Security headers
+
+Applied to all routes via `headers()` in `next.config.ts`:
+
+| Header | Value |
+|---|---|
+| `X-Frame-Options` | `DENY` |
+| `X-Content-Type-Options` | `nosniff` |
+| `Referrer-Policy` | `strict-origin-when-cross-origin` |
+| `Permissions-Policy` | `camera=(), microphone=(), geolocation=()` |
+
+Content-Security-Policy is intentionally excluded — requires a separate audit pass.
+
 **Rule for Claude Code:** Before adding any path to a bypass list, nav link, or redirect, grep `src/app/` for the actual directory name. Product names and route names do not always match.

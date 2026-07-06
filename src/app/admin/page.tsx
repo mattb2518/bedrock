@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getCurrentUserRole } from '@/lib/auth/getRole'
 import ChecklistUI from './ChecklistUI'
@@ -25,8 +26,12 @@ const CHECKLIST_ITEMS: Array<{ id: string; label: string }> = [
 ]
 
 export default async function AdminOverviewPage() {
-  const admin = createAdminClient()
   const role = await getCurrentUserRole()
+  if (role !== 'admin' && role !== 'super_admin') {
+    redirect('/')
+  }
+
+  const admin = createAdminClient()
 
   const [{ count: pendingCandidates }, { count: pendingSources }, { count: auditTotal }, { count: lowConfidencePending }, { data: checklistRows }, { data: siteConfigRow }] =
     await Promise.all([

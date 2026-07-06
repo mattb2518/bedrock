@@ -3,10 +3,17 @@
 // §22d.2: US-restricted, address-type predictions, no Place Details calls.
 
 import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@/lib/supabase/server'
 
 const PLACES_URL = 'https://places.googleapis.com/v1/places:autocomplete'
 
 export async function POST(req: NextRequest) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   const apiKey = process.env.GOOGLE_PLACES_API_KEY
   if (!apiKey) {
     return NextResponse.json({ error: 'Places API not configured' }, { status: 503 })
