@@ -13,7 +13,7 @@ import { adaptCatalogRow, loadApprovedSources } from '@/lib/media/catalogAdapter
 import type { CatalogRow } from '@/lib/media/catalogAdapter'
 
 export const dynamic = 'force-dynamic'
-export const revalidate = 0
+export const revalidate = 3600
 
 function parseCsv(csv: string): CatalogRow[] {
   const lines = csv.split('\n').map((l) => l.trim()).filter(Boolean)
