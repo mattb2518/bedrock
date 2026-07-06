@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const decision = await aj.protect(request)
+    const decision = await aj.protect(request, { requested: 1 })
     if (decision.isDenied()) {
       return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
     }

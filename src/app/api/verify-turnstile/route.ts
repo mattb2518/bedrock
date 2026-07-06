@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { aj } from '@/lib/arcjet'
 
 export async function POST(req: NextRequest) {
-  const decision = await aj.protect(req)
+  const decision = await aj.protect(req, { requested: 1 })
   if (decision.isDenied()) {
     return NextResponse.json({ success: false }, { status: 429 })
   }
