@@ -5,7 +5,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { aj } from '@/lib/arcjet'
-import { request as arcjetRequest } from '@arcjet/next'
 
 const PLACES_URL = 'https://places.googleapis.com/v1/places:autocomplete'
 
@@ -16,8 +15,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const arcReq = await arcjetRequest(req)
-  const decision = await aj.protect(arcReq)
+  const decision = await aj.protect(req)
   if (decision.isDenied()) {
     return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
   }

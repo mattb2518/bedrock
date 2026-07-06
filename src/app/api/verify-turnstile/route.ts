@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { aj } from '@/lib/arcjet'
-import { request as arcjetRequest } from '@arcjet/next'
 
 export async function POST(req: NextRequest) {
-  const arcReq = await arcjetRequest(req)
-  const decision = await aj.protect(arcReq)
+  const decision = await aj.protect(req)
   if (decision.isDenied()) {
     return NextResponse.json({ success: false }, { status: 429 })
   }

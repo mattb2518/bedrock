@@ -4,7 +4,6 @@ import { buildProfilePlaceholders } from '@/lib/conversations/profileBuilder'
 import type { QuizSession } from '@/types/quiz'
 import { createClient } from '@/lib/supabase/server'
 import { aj } from '@/lib/arcjet'
-import { request as arcjetRequest } from '@arcjet/next'
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
@@ -81,8 +80,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const arcReq = await arcjetRequest(request)
-    const decision = await aj.protect(arcReq)
+    const decision = await aj.protect(request)
     if (decision.isDenied()) {
       return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
     }

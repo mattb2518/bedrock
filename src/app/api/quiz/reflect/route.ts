@@ -9,7 +9,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { createClient } from '@/lib/supabase/server'
 import { aj } from '@/lib/arcjet'
-import { request as arcjetRequest } from '@arcjet/next'
 
 export async function POST(req: NextRequest) {
   try {
@@ -19,8 +18,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const arcReq = await arcjetRequest(req)
-    const decision = await aj.protect(arcReq)
+    const decision = await aj.protect(req)
     if (decision.isDenied()) {
       return NextResponse.json({ reflection: null })
     }
