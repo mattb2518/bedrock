@@ -328,19 +328,15 @@ export function matchMedia(
   const sortedExpanding   = diversitySort(expanding,   'expanding')
   const sortedChallenging = diversitySort(challenging, 'challenging')
 
-  // Shared placed-set — seeded from geometry results; prevents cross-tier duplication in topUp
-  const placed = new Set<string>([
-    ...sortedConfirming.map((s) => s.source.id),
-    ...sortedExpanding.map((s) => s.source.id),
-    ...sortedChallenging.map((s) => s.source.id),
-  ])
+  // Seed placed only from Challenging geometry — Confirming/Expanding added after the fallback
+  // so the fallback can draw from the full catalog. Centrist profiles place nearly the entire
+  // high-quality catalog into Confirming via geometry (agreement >= 0.65 is ubiquitous), which
+  // would leave the fallback pool empty if we seeded placed from all three tiers up front.
+  const placed = new Set<string>(sortedChallenging.map((s) => s.source.id))
 
   // Graduated Challenging fallback — §24.7 (2026-07-06)
-  // Must run BEFORE topUp fills Confirming/Expanding. Centrist profiles produce low
-  // tensionOnHeld scores across the board; the sources that best challenge them (e.g.
-  // The Remnant at 0.244) also score high enough on agreement to land in Confirming via
-  // topUp, consuming them before the fallback can use them. Running the fallback first
-  // reserves those sources for Challenging. Self-disables once geometry produces results.
+  // Must run BEFORE topUp fills Confirming/Expanding, and before Confirming/Expanding geometry
+  // results are added to placed. Self-disables once geometry produces Challenging results.
   let finalChallenging = sortedChallenging
   let tuChallenging = false
   if (sortedChallenging.length === 0) {
@@ -361,6 +357,10 @@ export function matchMedia(
       finalChallenging = fallbackCandidates.map((s) => ({ ...s, tier: 'challenging' as MediaTier }))
     }
   }
+
+  // Now add Confirming/Expanding geometry results to placed before topUp
+  for (const s of sortedConfirming) placed.add(s.source.id)
+  for (const s of sortedExpanding)  placed.add(s.source.id)
 
   // Top-up thin Confirming and Expanding tiers — Challenging is handled above
   const { sources: finalConfirming, toppedUp: tuConfirming } = topUp(sortedConfirming, scoredAll, 'confirming', placed)
