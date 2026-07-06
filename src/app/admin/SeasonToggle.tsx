@@ -4,8 +4,8 @@
 // Flip pillar_one_mode between 'ballot' and 'officials'.
 // Requires admin role (enforced by /admin layout). Shows last-flipped audit info.
 
-import { useState, useTransition } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { useState } from 'react'
+import { flipPillarOneMode } from './actions'
 
 type Mode = 'ballot' | 'officials'
 
@@ -19,29 +19,25 @@ export default function SeasonToggle({
   lastFlippedBy: string | null
 }) {
   const [mode, setMode] = useState<Mode>(currentMode)
-  const [isPending, startTransition] = useTransition()
+  const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   async function flip() {
     const newMode: Mode = mode === 'officials' ? 'ballot' : 'officials'
     setError(null)
-    startTransition(async () => {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      const { error: err } = await supabase
-        .from('site_config')
-        .upsert({
-          key: 'pillar_one_mode',
-          value: newMode,
-          updated_at: new Date().toISOString(),
-          updated_by: user?.email ?? 'admin',
-        }, { onConflict: 'key' })
-      if (err) {
-        setError('Failed to update: ' + err.message)
+    setLoading(true)
+    try {
+      const result = await flipPillarOneMode(newMode)
+      if (!result.ok) {
+        setError('Failed to update: ' + result.error)
         return
       }
       setMode(newMode)
-    })
+    } catch (e) {
+      setError('Failed to update: ' + (e instanceof Error ? e.message : 'Unknown error'))
+    } finally {
+      setLoading(false)
+    }
   }
 
   const label = mode === 'officials' ? 'Your Officials (off season)' : 'Your Ballot (in season)'
@@ -74,7 +70,7 @@ export default function SeasonToggle({
         </div>
         <button
           onClick={flip}
-          disabled={isPending}
+          disabled={loading}
           style={{
             backgroundColor: mode === 'officials' ? 'var(--color-red)' : 'var(--color-blue-accent)',
             color: '#fff',
@@ -84,11 +80,11 @@ export default function SeasonToggle({
             fontFamily: 'var(--font-body)',
             fontSize: 'var(--text-small)',
             fontWeight: 'var(--weight-semibold)',
-            cursor: isPending ? 'not-allowed' : 'pointer',
-            opacity: isPending ? 0.6 : 1,
+            cursor: loading ? 'not-allowed' : 'pointer',
+            opacity: loading ? 0.6 : 1,
           }}
         >
-          {isPending ? 'Updating…' : flipLabel}
+          {loading ? 'Updating…' : flipLabel}
         </button>
       </div>
     </div>

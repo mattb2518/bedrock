@@ -604,6 +604,24 @@ export async function seedCatalogSources(): Promise<{ seeded: number; skipped: n
 
 // ── Weekly digest (Super Admin only) ─────────────────────────────────────────
 
+// ── Season toggle (Super Admin only) ─────────────────────────────────────────
+
+export async function flipPillarOneMode(newMode: 'ballot' | 'officials'): Promise<{ ok: boolean; error?: string }> {
+  const admin = createAdminClient()
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  const { error } = await admin
+    .from('site_config')
+    .upsert({
+      key: 'pillar_one_mode',
+      value: newMode,
+      updated_at: new Date().toISOString(),
+      updated_by: user?.email ?? 'admin',
+    }, { onConflict: 'key' })
+  if (error) return { ok: false, error: error.message }
+  return { ok: true }
+}
+
 export async function triggerWeeklyDigest() {
   await requireSuperAdminRole()
   const supabase = await createClient()
