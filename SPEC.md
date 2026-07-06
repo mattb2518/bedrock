@@ -3349,6 +3349,8 @@ Known catalog gap (2026-07-03): at the 0.40 floor, The Long Gamer and The Stewar
 
 Catalog additions (2026-07-02): National Review (Right / traditional conservative; independence Low; policy_depth 4) and The Ben Shapiro Show (Right / populist conservative; independence Medium; policy_depth 3), added to strengthen conservative and populist-right representation per the July 2026 bias audit. Reliability in the current engine is derived from policy_depth_score; a dedicated reliability signal fed by external ratings, with color-coded display, is a separate planned item and is not part of this change.
 
+Axis placement approximations (2026-07-06): `leanToAxisPlacement` now includes `stability_change` and `trust_skepticism` placements for all lean categories, allowing the Challenging engine to produce meaningful tensionOnHeld scores for users whose held dimensions include these axes. Values are coarse approximations pending the full classification pipeline.
+
 Below-threshold exception (v1, temporary): a host allowlist (`isBelowThresholdException` in `mediaMatch.ts`) admits independently-owned, widely-read sources into the Confirming tier for same-lean users despite missing the reliability floor. Currently The Ben Shapiro Show (dailywire.com, reliability 42). It surfaces only in Confirming — it fails the Challenging reliability/independence gates on its own — always with a disclosure footnote on the card. National Review needs no exception; the loosened Challenging gate already admits it. Remove this exception when the v2 reliability signal ships.
 
 The Confirming-tier reliability exception (dailywire.com / The Ben Shapiro Show) is unrelated to the Challenging tension floor and is NOT touched by the 2026-07-03 change.

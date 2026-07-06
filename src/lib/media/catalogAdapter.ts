@@ -30,6 +30,8 @@ function leanToAxisPlacement(lean: string): Partial<Record<Dimension, AxisPlacem
     return {
       markets_governance:    makeAxis(12, 0.65),
       individual_collective: makeAxis(20, 0.60),
+      stability_change:      makeAxis(72, 0.55),
+      trust_skepticism:      makeAxis(28, 0.50),
     }
   }
   if (/\bleft\b/.test(l) && !/center/.test(l)) {
@@ -37,18 +39,24 @@ function leanToAxisPlacement(lean: string): Partial<Record<Dimension, AxisPlacem
       markets_governance:    makeAxis(22, 0.60),
       individual_collective: makeAxis(28, 0.55),
       pragmatism_idealism:   makeAxis(68, 0.45),
+      stability_change:      makeAxis(72, 0.55),
+      trust_skepticism:      makeAxis(28, 0.50),
     }
   }
   if (/center.left/.test(l)) {
     return {
       markets_governance:    makeAxis(38, 0.50),
       individual_collective: makeAxis(40, 0.45),
+      stability_change:      makeAxis(60, 0.45),
+      trust_skepticism:      makeAxis(38, 0.40),
     }
   }
   if (/center.right/.test(l)) {
     return {
       markets_governance:    makeAxis(62, 0.50),
       individual_collective: makeAxis(60, 0.45),
+      stability_change:      makeAxis(40, 0.45),
+      trust_skepticism:      makeAxis(62, 0.40),
     }
   }
   if (/\bright\b/.test(l) && !/center/.test(l)) {
@@ -56,6 +64,8 @@ function leanToAxisPlacement(lean: string): Partial<Record<Dimension, AxisPlacem
       markets_governance:    makeAxis(78, 0.60),
       individual_collective: makeAxis(72, 0.55),
       pragmatism_idealism:   makeAxis(32, 0.45),
+      stability_change:      makeAxis(28, 0.55),
+      trust_skepticism:      makeAxis(72, 0.55),
     }
   }
   if (/heterodox/.test(l)) {
