@@ -3,6 +3,8 @@ import Anthropic from '@anthropic-ai/sdk'
 import { buildProfilePlaceholders } from '@/lib/conversations/profileBuilder'
 import type { QuizSession } from '@/types/quiz'
 import { createClient } from '@/lib/supabase/server'
+import { aj } from '@/lib/arcjet'
+import { request as arcjetRequest } from '@arcjet/next'
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
@@ -79,6 +81,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const arcReq = await arcjetRequest(request)
+    const decision = await aj.protect(arcReq)
+    if (decision.isDenied()) {
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
+    }
+
     const body = await request.json()
     const {
       session,
@@ -97,6 +105,14 @@ export async function POST(request: NextRequest) {
     }
     if (!messages?.length) {
       return NextResponse.json({ error: 'No messages provided' }, { status: 400 })
+    }
+    if (context.length > 2000) {
+      return NextResponse.json({ error: 'Context too long' }, { status: 400 })
+    }
+    for (const msg of messages) {
+      if (msg.content.length > 1000) {
+        return NextResponse.json({ error: 'Message too long' }, { status: 400 })
+      }
     }
 
     const forceEnd = turnCount >= 10

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, FormEvent, Suspense } from "react";
+import { useState, useEffect, useRef, FormEvent, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
@@ -55,8 +55,23 @@ function SignUpForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [confirmSent, setConfirmSent] = useState(false);
+  const turnstileRef = useRef<HTMLDivElement>(null);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
 
   const supabase = createClient();
+
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
+    script.async = true;
+    document.head.appendChild(script);
+    return () => { document.head.removeChild(script); };
+  }, []);
+
+  useEffect(() => {
+    (window as any).onTurnstileSuccess = (token: string) => setTurnstileToken(token);
+    return () => { delete (window as any).onTurnstileSuccess; };
+  }, []);
 
   async function handleSignUp(e: FormEvent) {
     e.preventDefault();
@@ -64,6 +79,22 @@ function SignUpForm() {
     if (password.length < 8) { setError("Password must be at least 8 characters."); return; }
     setLoading(true);
     setError("");
+    if (!turnstileToken) {
+      setError('Please complete the verification above.');
+      setLoading(false);
+      return;
+    }
+    const verifyRes = await fetch('/api/verify-turnstile', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: turnstileToken }),
+    });
+    const verifyData = await verifyRes.json();
+    if (!verifyData.success) {
+      setError('Verification failed — please try again.');
+      setLoading(false);
+      return;
+    }
     const { error } = await supabase.auth.signUp({
       email,
       password,
@@ -126,6 +157,13 @@ function SignUpForm() {
           <input type="password" required value={confirm} onChange={e => setConfirm(e.target.value)} placeholder="••••••••" style={inputStyle} />
         </div>
         {error && <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-small)", color: "var(--color-red)" }}>{error}</p>}
+        <div
+          ref={turnstileRef}
+          className="cf-turnstile"
+          data-sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY}
+          data-callback="onTurnstileSuccess"
+          data-theme="dark"
+        />
         <button type="submit" disabled={loading} style={btnPrimary}>{loading ? "Creating account…" : "Create account →"}</button>
       </form>
 

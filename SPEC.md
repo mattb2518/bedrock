@@ -3767,4 +3767,29 @@ Applied to all routes via `headers()` in `next.config.ts`:
 
 Content-Security-Policy is intentionally excluded — requires a separate audit pass.
 
+### Rate limiting
+
+Arcjet rate limiting is applied to all paid/AI API routes via a shared client at `src/lib/arcjet.ts`. Policy: token bucket, 40-request burst capacity, refilling at 20 requests/minute per IP, with Arcjet Shield enabled. Returns HTTP 429 on denial (or null silently for quiz/reflect, matching its existing error pattern).
+
+Covered routes:
+- POST /api/conversations/chat
+- POST /api/quiz/reflect
+- POST /api/address-autocomplete
+- POST /api/verify-turnstile
+
+Required environment variable: `ARCJET_KEY` (server-only)
+
+### Bot protection on signup
+
+Cloudflare Turnstile is required for email/password signup. The widget renders client-side; the token is verified server-side via POST /api/verify-turnstile before `supabase.auth.signUp` is called. Google OAuth signup is exempt.
+
+Required environment variables:
+- `NEXT_PUBLIC_TURNSTILE_SITE_KEY` (public, client-safe)
+- `TURNSTILE_SECRET_KEY` (server-only)
+
+### Input length caps
+
+- POST /api/conversations/chat: context capped at 2000 chars; each message capped at 1000 chars (returns 400)
+- POST /api/quiz/reflect: text capped at 500 chars (returns null silently)
+
 **Rule for Claude Code:** Before adding any path to a bypass list, nav link, or redirect, grep `src/app/` for the actual directory name. Product names and route names do not always match.
