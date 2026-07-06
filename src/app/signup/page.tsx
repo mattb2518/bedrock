@@ -69,8 +69,8 @@ function SignUpForm() {
   }, []);
 
   useEffect(() => {
-    (window as any).onTurnstileSuccess = (token: string) => setTurnstileToken(token);
-    return () => { delete (window as any).onTurnstileSuccess; };
+    (window as Window & { onTurnstileSuccess?: (token: string) => void }).onTurnstileSuccess = (token: string) => setTurnstileToken(token);
+    return () => { delete (window as Window & { onTurnstileSuccess?: (token: string) => void }).onTurnstileSuccess; };
   }, []);
 
   async function handleSignUp(e: FormEvent) {
