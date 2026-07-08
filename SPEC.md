@@ -3743,15 +3743,49 @@ A 6-slide modal carousel shown automatically to first-time visitors. Designed to
 
 ## §32. Security Controls
 
+### §32.1 API Security & Usage Logging — Claude-calling routes
+
+*Added 2026-07-08 after an unauthenticated-endpoint incident drained the Anthropic org's API credits (API access disabled overnight July 7→8, 2026). Root cause: two public routes called the Claude API with no auth and no rate limit, so automated traffic could run up unlimited cost.*
+
+**Protection standard — every route that calls Claude**
+
+All API routes that invoke the Anthropic/Claude API MUST enforce, in this order:
+
+1. **Auth** — `supabase.auth.getUser()` at the top of the handler. If there is no session, return 401 before any Claude call.
+2. **Rate limiting** — Arcjet `aj.protect()`. If the request exceeds the limit, return 429 before any Claude call.
+3. **Input cap** — reject oversized input before calling Claude (e.g. a 2000-char cap on free-text/PDF-derived input) to bound per-call token cost.
+
+No route may call Claude before all three checks pass. Treat a Claude-calling route with a missing check as a P1 bug.
+
+**Routes hardened in this pass**
+
+- `/api/conversations/route.ts` — was fully public with no protection. Now: `getUser()` → 401 if no session, `aj.protect()` → 429 if rate-limited, 2000-char input cap. (This was the main gap / primary suspected drain source.)
+- `/api/bias-checker/route.ts` — was fully public; two Claude calls per PDF submission. Now: same auth + Arcjet pattern.
+
+**Usage logging — `src/lib/ai/logUsage.ts`**
+
+A shared helper wired into all 9 Claude call sites. Every Claude call emits a structured `[claude-usage]` line to Vercel logs containing: route, model, input tokens, output tokens, and userId.
+
+Incident triage: on any future spike, filter Vercel logs for `[claude-usage]` to see which route, which user, and how many tokens — immediately. Any new Claude call site MUST call `logUsage()`; a call site that does not is an incomplete implementation.
+
+**Operational runbook — credit-drain / disabled-key incident**
+
+1. **Console check** — at console.anthropic.com → Usage, inspect the spike window (hourly). A sharp, concentrated spike ⇒ automated abuse rather than organic traffic.
+2. **Key** — the `ANTHROPIC_API_KEY` lives in `.env.local` and is deployed to Vercel. Because it sat behind a publicly reachable path, rotate it (don't just re-enable) at console.anthropic.com → API Keys, then update `.env.local` and the Vercel env var.
+3. **Auto-reload** — do NOT enable auto-reload until the console spike is confirmed to match the closed endpoints; otherwise it silently refills a leak.
+4. **Verify** — confirm all Claude-calling routes enforce the three-check standard above before restoring access.
+
 ### Auth gates
 
 | Route | Auth required | Extra enforcement |
 |---|---|---|
+| `POST /api/conversations` | Yes — `supabase.auth.getUser()` | 2000-char input cap |
 | `POST /api/conversations/chat` | Yes — `supabase.auth.getUser()` | Layer 1 must be in `quiz_profiles.completed_layers` |
+| `POST /api/bias-checker` | Yes — `supabase.auth.getUser()` | None |
 | `POST /api/quiz/reflect` | Yes — `supabase.auth.getUser()` | None |
 | `POST /api/address-autocomplete` | Yes — `supabase.auth.getUser()` | None |
 
-All three return `{ error: 'Unauthorized' }` with HTTP 401 on failure.
+All return `{ error: 'Unauthorized' }` with HTTP 401 on failure.
 
 ### Admin RSC leak fix
 
@@ -3787,7 +3821,9 @@ Note: 'unsafe-inline' is required for script-src and style-src due to Next.js hy
 Arcjet rate limiting is applied to all paid/AI API routes via a shared client at `src/lib/arcjet.ts`. Policy: token bucket, 40-request burst capacity, refilling at 20 requests/minute per IP, with Arcjet Shield enabled. Returns HTTP 429 on denial (or null silently for quiz/reflect, matching its existing error pattern).
 
 Covered routes:
+- POST /api/conversations
 - POST /api/conversations/chat
+- POST /api/bias-checker
 - POST /api/quiz/reflect
 - POST /api/address-autocomplete
 - POST /api/verify-turnstile
@@ -3804,6 +3840,7 @@ Required environment variables:
 
 ### Input length caps
 
+- POST /api/conversations: freeform input capped at 2000 chars (returns 400)
 - POST /api/conversations/chat: context capped at 2000 chars; each message capped at 1000 chars (returns 400)
 - POST /api/quiz/reflect: text capped at 500 chars (returns null silently)
 
