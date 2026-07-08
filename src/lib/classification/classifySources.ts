@@ -10,6 +10,7 @@
 import Anthropic from '@anthropic-ai/sdk'
 import type { Dimension, AxisPlacement } from '@/lib/engine/match'
 import { ALL_DIMENSIONS } from '@/lib/engine/match'
+import { logClaudeUsage } from '@/lib/ai/logUsage'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Input / output types
@@ -185,6 +186,7 @@ export async function classifySource(
     messages: [{ role: 'user', content: prompt }],
   })
 
+  logClaudeUsage({ route: 'classifySource', model: 'claude-sonnet-4-6', usage: response.usage })
   const rawText = response.content[0]?.type === 'text' ? response.content[0].text : ''
   const jsonText = rawText.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '').trim()
 

@@ -3,6 +3,7 @@
 // Sends FROM admin@bedrock.guide via Resend.
 
 import Anthropic from '@anthropic-ai/sdk'
+import { logClaudeUsage } from '@/lib/ai/logUsage'
 import { Resend } from 'resend'
 import { createAdminClient } from '@/lib/supabase/admin'
 
@@ -252,6 +253,7 @@ If volume is low across both stats and feedback, say so in one sentence — no m
     messages: [{ role: 'user', content: prompt }],
   })
 
+  logClaudeUsage({ route: 'weeklyDigest', model: 'claude-sonnet-4-6', usage: res.usage })
   return res.content[0]?.type === 'text' ? res.content[0].text.trim() : 'No digest generated.'
 }
 

@@ -7,6 +7,7 @@
 import Anthropic from '@anthropic-ai/sdk'
 import type { Dimension, DimensionalProfile } from '@/lib/engine/match'
 import { ALL_DIMENSIONS } from '@/lib/engine/match'
+import { logClaudeUsage } from '@/lib/ai/logUsage'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Input / output types
@@ -306,6 +307,7 @@ export async function classifyArticle(
         ] as Parameters<typeof anthropic.messages.create>[0]['messages'][0]['content'],
       }],
     })
+    logClaudeUsage({ route: 'classifyArticle/pdf-extract', model: 'claude-sonnet-4-6', usage: pdfResponse.usage })
     const extractedText = pdfResponse.content[0]?.type === 'text' ? pdfResponse.content[0].text : ''
     if (extractedText.trim() === 'IMAGE_ONLY_PDF') {
       return {
@@ -355,6 +357,7 @@ export async function classifyArticle(
     messages: [{ role: 'user', content: prompt }],
   })
 
+  logClaudeUsage({ route: 'classifyArticle/analyze', model: 'claude-sonnet-4-6', usage: response.usage })
   const rawText = response.content[0]?.type === 'text' ? response.content[0].text : ''
   const jsonText = rawText.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '').trim()
 

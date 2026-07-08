@@ -3,6 +3,7 @@
 // returning structured analysis for the admin to act on (or ignore).
 
 import Anthropic from '@anthropic-ai/sdk'
+import { logClaudeUsage } from '@/lib/ai/logUsage'
 
 export interface FeedbackDataset {
   entityId: string
@@ -76,6 +77,7 @@ Based on this feedback data, provide a structured analysis. Respond ONLY with a 
     messages: [{ role: 'user', content: prompt }],
   })
 
+  logClaudeUsage({ route: 'feedbackAnalysis', model: 'claude-sonnet-4-6', usage: response.usage })
   const text = response.content[0]?.type === 'text' ? response.content[0].text : ''
 
   try {

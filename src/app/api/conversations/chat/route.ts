@@ -4,6 +4,7 @@ import { buildProfilePlaceholders } from '@/lib/conversations/profileBuilder'
 import type { QuizSession } from '@/types/quiz'
 import { createClient } from '@/lib/supabase/server'
 import { aj } from '@/lib/arcjet'
+import { logClaudeUsage } from '@/lib/ai/logUsage'
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
@@ -126,6 +127,8 @@ export async function POST(request: NextRequest) {
       system: [{ type: 'text', text: finalSystem, cache_control: { type: 'ephemeral' } }],
       messages,
     })
+
+    logClaudeUsage({ route: '/api/conversations/chat', model: 'claude-sonnet-4-6', usage: response.usage, userId: user.id })
 
     const rawText = response.content[0]?.type === 'text' ? response.content[0].text : ''
 

@@ -11,6 +11,7 @@ import Anthropic from '@anthropic-ai/sdk'
 import type { Dimension, AxisPlacement, CandidateRecord, DealbreakEval } from '@/lib/engine/match'
 import { ALL_DIMENSIONS } from '@/lib/engine/match'
 import { LAYER4_SECTIONS } from '@/lib/quiz/layer4'
+import { logClaudeUsage } from '@/lib/ai/logUsage'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Input / output types
@@ -234,6 +235,7 @@ export async function classifyCandidate(
   const stripFences = (s: string) =>
     s.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '').trim()
 
+  logClaudeUsage({ route: 'classifyCandidate', model: 'claude-sonnet-4-6', usage: response.usage })
   const rawText = textBlocks.at(-1)?.text ?? ''
   const jsonText = stripFences(rawText)
 

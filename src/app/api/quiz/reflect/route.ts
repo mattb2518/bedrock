@@ -9,6 +9,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { createClient } from '@/lib/supabase/server'
 import { aj } from '@/lib/arcjet'
+import { logClaudeUsage } from '@/lib/ai/logUsage'
 
 export async function POST(req: NextRequest) {
   try {
@@ -42,6 +43,7 @@ export async function POST(req: NextRequest) {
     clearTimeout(timeout)
 
     const reflection = message.content[0].type === 'text' ? message.content[0].text : null
+    logClaudeUsage({ route: '/api/quiz/reflect', model: 'claude-sonnet-4-6', usage: message.usage, userId: user.id })
     return NextResponse.json({ reflection })
   } catch {
     return NextResponse.json({ reflection: null })

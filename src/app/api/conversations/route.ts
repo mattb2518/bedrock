@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { buildProfilePlaceholders } from '@/lib/conversations/profileBuilder'
 import type { QuizSession } from '@/types/quiz'
+import { createClient } from '@/lib/supabase/server'
+import { aj } from '@/lib/arcjet'
+import { logClaudeUsage } from '@/lib/ai/logUsage'
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
@@ -104,6 +107,17 @@ function buildUserMessage(
 
 export async function POST(request: NextRequest) {
   try {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const decision = await aj.protect(request, { requested: 1 })
+    if (decision.isDenied()) {
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
+    }
+
     const body = await request.json()
     const {
       session,
@@ -119,6 +133,9 @@ export async function POST(request: NextRequest) {
 
     if (!freeform?.trim()) {
       return NextResponse.json({ error: 'No input provided' }, { status: 400 })
+    }
+    if (freeform.length > 2000) {
+      return NextResponse.json({ error: 'Input too long' }, { status: 400 })
     }
 
     const systemPrompt = buildSystemPrompt(session)
@@ -136,6 +153,8 @@ export async function POST(request: NextRequest) {
       ],
       messages: [{ role: 'user', content: userMessage }],
     })
+
+    logClaudeUsage({ route: '/api/conversations', model: 'claude-sonnet-4-6', usage: response.usage, userId: user.id })
 
     const rawText =
       response.content[0]?.type === 'text' ? response.content[0].text : ''

@@ -4,11 +4,24 @@ import { NextRequest, NextResponse } from 'next/server'
 import { classifyArticle } from '@/lib/classification/classifyArticle'
 import { lookupCatalog } from '@/lib/media/catalogLookup'
 import type { DimensionalProfile } from '@/lib/engine/match'
+import { createClient } from '@/lib/supabase/server'
+import { aj } from '@/lib/arcjet'
 
 // POST /api/bias-checker
 // Article text is NEVER persisted here or in classifyArticle (§24b.5).
 // No DB writes anywhere in this flow.
 export async function POST(req: NextRequest) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const decision = await aj.protect(req, { requested: 1 })
+  if (decision.isDenied()) {
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
+  }
+
   let body: {
     url?: string
     pastedText?: string
