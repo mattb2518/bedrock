@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
 
     const completedLayers: number[] = profile?.completed_layers ?? []
     if (!completedLayers.includes(1)) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      return NextResponse.json({ error: 'quiz_required' }, { status: 403 })
     }
 
     const decision = await aj.protect(request, { requested: 1 })

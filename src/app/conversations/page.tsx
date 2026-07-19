@@ -1081,7 +1081,9 @@ export default function ConversationsPage() {
       if (res.status === 401) { window.location.href = '/signin?next=/conversations'; return }
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
-        throw new Error((data as Record<string, string>).error ?? 'Request failed')
+        const msg = (data as Record<string, string>).error
+        if (msg === 'quiz_required') throw new Error('Finish the quiz first — Back-and-forth uses your profile to make practice feel real.')
+        throw new Error(msg ?? 'Request failed')
       }
       const data = await res.json() as { brief?: string; reply: string; ended: boolean; endMessage?: string; hint?: ChatHint }
       setChatStarted(true); setCoachBrief(data.brief ?? null)
