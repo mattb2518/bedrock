@@ -62,21 +62,21 @@ OUTPUT FORMAT: Return ONLY a valid JSON object — no markdown code fences, no t
   "opening": "where their values and the other person's actually touch; surface their Mantle here if they have one",
   "responses": [
     {
-      "energy": "disarm with warmth",
+      "energy": "<whichever energy fits best for this specific situation>",
       "text": "the actual words the user could say",
       "doing": "one line on what this response is doing",
       "recommended": true,
-      "reason": "one-line reason why this is your honest pick"
+      "reason": "one-line reason why this is your honest pick given the specific situation"
     },
     {
-      "energy": "get curious",
+      "energy": "<a different energy>",
       "text": "...",
       "doing": "...",
       "recommended": false
     }
   ]
 }
-Rules: 2-4 response cards total. Exactly one "recommended": true (include "reason"). All others "recommended": false (no "reason" field needed). Energy must be one of: "disarm with warmth", "get curious", "name it lightly", "find the shared question".`
+Rules: 2-4 response cards total. Exactly one "recommended": true (include "reason"). All others "recommended": false (no "reason" field needed). Energy must be one of: "disarm with warmth", "get curious", "name it lightly", "find the shared question". Pick the recommended energy based on what actually fits this conversation — do NOT default to "disarm with warmth" every time. A high-heat situation may call for "name it lightly"; an entrenched ideological gap may call for "get curious"; only recommend warmth when warmth is genuinely the sharpest move.`
 }
 
 function buildUserMessage(
