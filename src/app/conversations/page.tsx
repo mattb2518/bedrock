@@ -1051,6 +1051,7 @@ export default function ConversationsPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ session: (session ?? null) as QuizSession | null, mode: activeMode, chips, freeform: submitStr }),
       })
+      if (res.status === 401) { window.location.href = '/signin?next=/conversations'; return }
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
         throw new Error((data as Record<string, string>).error ?? 'Request failed')
@@ -1077,6 +1078,7 @@ export default function ConversationsPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ session: (session ?? null) as QuizSession | null, context, messages: [{ role: 'user', content: '__START__' }], turnCount: 0 }),
       })
+      if (res.status === 401) { window.location.href = '/signin?next=/conversations'; return }
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
         throw new Error((data as Record<string, string>).error ?? 'Request failed')
@@ -1108,6 +1110,7 @@ export default function ConversationsPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ session: (session ?? null) as QuizSession | null, context: chatContext, messages: apiMessages, turnCount }),
       })
+      if (res.status === 401) { window.location.href = '/signin?next=/conversations'; return }
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
         throw new Error((data as Record<string, string>).error ?? 'Request failed')
