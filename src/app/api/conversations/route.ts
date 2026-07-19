@@ -159,8 +159,10 @@ export async function POST(request: NextRequest) {
     const rawText =
       response.content[0]?.type === 'text' ? response.content[0].text : ''
 
-    // Strip markdown code fences if Claude adds them despite instructions
-    const jsonText = rawText.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '').trim()
+    // Strip markdown code fences and any prose before/after the JSON object
+    const fenceStripped = rawText.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '').trim()
+    const jsonMatch = fenceStripped.match(/\{[\s\S]*\}/)
+    const jsonText = jsonMatch ? jsonMatch[0] : fenceStripped
 
     let parsed
     try {
