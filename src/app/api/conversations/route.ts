@@ -6,7 +6,10 @@ import { createClient } from '@/lib/supabase/server'
 import { aj } from '@/lib/arcjet'
 import { logClaudeUsage } from '@/lib/ai/logUsage'
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+const client = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY,
+  defaultHeaders: { 'anthropic-beta': 'prompt-caching-2024-07-31' },
+})
 
 // System prompt verbatim from SPEC §18.8 with {{...}} placeholder tokens.
 // Profile placeholders are filled server-side from the session the client sends.
