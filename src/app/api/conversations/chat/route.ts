@@ -70,17 +70,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { data: profile } = await supabase
-      .from('quiz_profiles')
-      .select('completed_layers')
-      .eq('user_id', user.id)
-      .maybeSingle()
-
-    const completedLayers: number[] = profile?.completed_layers ?? []
-    if (!completedLayers.includes(1)) {
-      return NextResponse.json({ error: 'quiz_required' }, { status: 403 })
-    }
-
     const decision = await aj.protect(request, { requested: 1 })
     if (decision.isDenied()) {
       return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
