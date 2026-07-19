@@ -6,10 +6,7 @@ import { createClient } from '@/lib/supabase/server'
 import { aj } from '@/lib/arcjet'
 import { logClaudeUsage } from '@/lib/ai/logUsage'
 
-const client = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-  defaultHeaders: { 'anthropic-beta': 'prompt-caching-2024-07-31' },
-})
+const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
 interface ChatMessage {
   role: 'user' | 'assistant'
@@ -127,7 +124,7 @@ export async function POST(request: NextRequest) {
     const response = await client.messages.create({
       model: 'claude-sonnet-4-6',
       max_tokens: 700,
-      system: [{ type: 'text', text: finalSystem, cache_control: { type: 'ephemeral' } }],
+      system: finalSystem,
       messages,
     })
 

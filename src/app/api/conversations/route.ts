@@ -6,10 +6,7 @@ import { createClient } from '@/lib/supabase/server'
 import { aj } from '@/lib/arcjet'
 import { logClaudeUsage } from '@/lib/ai/logUsage'
 
-const client = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-  defaultHeaders: { 'anthropic-beta': 'prompt-caching-2024-07-31' },
-})
+const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
 // System prompt verbatim from SPEC §18.8 with {{...}} placeholder tokens.
 // Profile placeholders are filled server-side from the session the client sends.
@@ -147,13 +144,7 @@ export async function POST(request: NextRequest) {
     const response = await client.messages.create({
       model: 'claude-sonnet-4-6',
       max_tokens: 1500,
-      system: [
-        {
-          type: 'text',
-          text: systemPrompt,
-          cache_control: { type: 'ephemeral' },
-        },
-      ],
+      system: systemPrompt,
       messages: [{ role: 'user', content: userMessage }],
     })
 
