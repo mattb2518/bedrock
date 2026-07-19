@@ -174,7 +174,10 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(parsed)
   } catch (err) {
-    console.error('Conversations API error:', err)
+    const errName = err instanceof Error ? err.constructor?.name ?? 'Error' : typeof err
+    const errMsg = err instanceof Error ? err.message : String(err)
+    const errStatus = (err as { status?: number }).status
+    console.error(`Conversations API error [${errName}${errStatus ? ` HTTP ${errStatus}` : ''}]: ${errMsg}`, err)
     return NextResponse.json({ error: 'Something went wrong — try again' }, { status: 500 })
   }
 }
